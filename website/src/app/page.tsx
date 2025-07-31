@@ -47,6 +47,33 @@ export default function TauOSLandingPage() {
   // Debug log to verify deployment
   console.log('TauOS Landing Page loaded successfully!');
   
+  // Add a visible debug indicator
+  useEffect(() => {
+    // Create a debug indicator
+    const debugDiv = document.createElement('div');
+    debugDiv.style.cssText = `
+      position: fixed;
+      top: 10px;
+      right: 10px;
+      background: #10b981;
+      color: white;
+      padding: 8px 12px;
+      border-radius: 4px;
+      font-size: 12px;
+      z-index: 9999;
+      font-family: monospace;
+    `;
+    debugDiv.textContent = '✅ TauOS Live';
+    document.body.appendChild(debugDiv);
+    
+    // Remove after 5 seconds
+    setTimeout(() => {
+      if (debugDiv.parentNode) {
+        debugDiv.parentNode.removeChild(debugDiv);
+      }
+    }, 5000);
+  }, []);
+  
   const [detectedOS, setDetectedOS] = useState<string>('');
   const [showDownloadModal, setShowDownloadModal] = useState(false);
   const [selectedDownload, setSelectedDownload] = useState<DownloadOption | null>(null);
