@@ -1,0 +1,737 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>τ Store - App Marketplace</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #0a0a0a;
+            color: #ffffff;
+            overflow: hidden;
+        }
+
+        .store-window {
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+        }
+
+        .sidebar {
+            background: rgba(26, 26, 26, 0.95);
+            backdrop-filter: blur(20px);
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+            width: 250px;
+            padding: 16px 0;
+        }
+
+        .category-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 16px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .category-item:hover {
+            background: rgba(139, 92, 246, 0.2);
+        }
+
+        .category-item.active {
+            background: rgba(139, 92, 246, 0.3);
+        }
+
+        .category-icon {
+            font-size: 16px;
+            margin-right: 12px;
+            min-width: 20px;
+        }
+
+        .category-label {
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            background: rgba(26, 26, 26, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .store-title {
+            font-size: 24px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header-buttons {
+            display: flex;
+            gap: 8px;
+        }
+
+        .header-button {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            color: white;
+            padding: 8px 16px;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+
+        .header-button:hover {
+            background: rgba(139, 92, 246, 0.2);
+            border-color: #8b5cf6;
+            transform: translateY(-1px);
+        }
+
+        .search-bar {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            color: white;
+            padding: 12px 16px;
+            font-size: 16px;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            margin: 16px;
+            flex: 1;
+        }
+
+        .search-bar:focus {
+            outline: none;
+            border-color: #8b5cf6;
+            box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.2);
+        }
+
+        .search-bar::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .featured-section {
+            padding: 16px;
+        }
+
+        .section-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #ffffff;
+            margin-bottom: 16px;
+        }
+
+        .featured-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 32px;
+        }
+
+        .featured-app-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 20px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .featured-app-card:hover {
+            background: rgba(139, 92, 246, 0.1);
+            border-color: #8b5cf6;
+            transform: translateY(-4px);
+            box-shadow: 0 8px 32px rgba(139, 92, 246, 0.2);
+        }
+
+        .app-icon-large {
+            font-size: 48px;
+            margin-bottom: 12px;
+            text-align: center;
+        }
+
+        .app-name {
+            font-size: 16px;
+            font-weight: 600;
+            color: #ffffff;
+            text-align: center;
+            margin-bottom: 4px;
+        }
+
+        .app-description {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.7);
+            text-align: center;
+            margin-bottom: 8px;
+            line-height: 1.4;
+        }
+
+        .app-rating {
+            font-size: 12px;
+            color: #fbbf24;
+            text-align: center;
+            margin-bottom: 8px;
+        }
+
+        .app-price {
+            font-size: 14px;
+            font-weight: 600;
+            color: #10b981;
+            text-align: center;
+            margin-bottom: 12px;
+        }
+
+        .install-button {
+            background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            padding: 8px 16px;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            width: 100%;
+            cursor: pointer;
+        }
+
+        .install-button:hover {
+            background: linear-gradient(135deg, #7c3aed 0%, #5855eb 100%);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 16px rgba(139, 92, 246, 0.3);
+        }
+
+        .app-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 16px;
+            padding: 16px;
+        }
+
+        .app-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 16px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .app-card:hover {
+            background: rgba(139, 92, 246, 0.1);
+            border-color: #8b5cf6;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(139, 92, 246, 0.2);
+        }
+
+        .app-icon {
+            font-size: 32px;
+            margin-bottom: 8px;
+            text-align: center;
+        }
+
+        .download-section {
+            padding: 16px;
+            background: rgba(26, 26, 26, 0.5);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .download-list {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .download-item {
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .download-item:last-child {
+            border-bottom: none;
+        }
+
+        .download-icon {
+            font-size: 24px;
+            color: rgba(255, 255, 255, 0.8);
+            min-width: 32px;
+            margin-right: 12px;
+        }
+
+        .download-info {
+            flex: 1;
+        }
+
+        .download-name {
+            font-size: 14px;
+            font-weight: 600;
+            color: #ffffff;
+        }
+
+        .download-status {
+            font-size: 12px;
+            color: #10b981;
+        }
+
+        .download-progress {
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .download-dialog {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(26, 26, 26, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 24px;
+            display: none;
+            z-index: 1000;
+            width: 500px;
+        }
+
+        .download-dialog.show {
+            display: block;
+            animation: fadeIn 0.3s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translate(-50%, -50%) scale(0.9); }
+            to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+        }
+
+        .dialog-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .dialog-header h3 {
+            margin: 0;
+            color: white;
+            font-size: 20px;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            padding: 5px;
+            border-radius: 50%;
+            transition: background-color 0.2s ease;
+        }
+
+        .close-btn:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .download-stats {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .download-stat {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.7);
+            background: rgba(255, 255, 255, 0.05);
+            padding: 4px 8px;
+            border-radius: 4px;
+        }
+
+        .download-action-buttons {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .download-action-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 6px;
+            color: white;
+            padding: 6px 12px;
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .download-action-btn:hover {
+            background: rgba(139, 92, 246, 0.2);
+            border-color: #8b5cf6;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 2px;
+            overflow: hidden;
+            margin: 8px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #8b5cf6 0%, #6366f1 100%);
+            border-radius: 2px;
+            width: 75%;
+            transition: width 0.3s ease;
+        }
+    </style>
+</head>
+<body>
+    <div class="store-window">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="category-item active" onclick="selectCategory(this)">
+                <div class="category-icon">🛒</div>
+                <div class="category-label">All</div>
+            </div>
+            <div class="category-item" onclick="selectCategory(this)">
+                <div class="category-icon">🎮</div>
+                <div class="category-label">Games</div>
+            </div>
+            <div class="category-item" onclick="selectCategory(this)">
+                <div class="category-icon">📱</div>
+                <div class="category-label">Productivity</div>
+            </div>
+            <div class="category-item" onclick="selectCategory(this)">
+                <div class="category-icon">🎵</div>
+                <div class="category-label">Music</div>
+            </div>
+            <div class="category-item" onclick="selectCategory(this)">
+                <div class="category-icon">📹</div>
+                <div class="category-label">Video</div>
+            </div>
+            <div class="category-item" onclick="selectCategory(this)">
+                <div class="category-icon">📚</div>
+                <div class="category-label">Education</div>
+            </div>
+            <div class="category-item" onclick="selectCategory(this)">
+                <div class="category-icon">🎨</div>
+                <div class="category-label">Graphics</div>
+            </div>
+            <div class="category-item" onclick="selectCategory(this)">
+                <div class="category-icon">🔧</div>
+                <div class="category-label">Developer</div>
+            </div>
+            <div class="category-item" onclick="selectCategory(this)">
+                <div class="category-icon">🛡️</div>
+                <div class="category-label">Security</div>
+            </div>
+            <div class="category-item" onclick="selectCategory(this)">
+                <div class="category-icon">🌐</div>
+                <div class="category-label">Internet</div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Header -->
+            <div class="header">
+                <div class="store-title">τ Store</div>
+                <div class="header-buttons">
+                    <button class="header-button" onclick="showAccount()">👤 Account</button>
+                    <button class="header-button" onclick="showUpdates()">🔄 Updates</button>
+                    <button class="header-button" onclick="showDownloads()">📥 Downloads</button>
+                </div>
+            </div>
+
+            <!-- Search Bar -->
+            <input type="text" class="search-bar" placeholder="Search apps..." onkeyup="searchApps(event)">
+
+            <!-- Featured Section -->
+            <div class="featured-section">
+                <div class="section-title">Featured Apps</div>
+                <div class="featured-grid">
+                    <div class="featured-app-card" onclick="showAppDetails('tau-browser')">
+                        <div class="app-icon-large">🌐</div>
+                        <div class="app-name">Tau Browser</div>
+                        <div class="app-description">Privacy-first web browser with built-in ad blocking</div>
+                        <div class="app-rating">⭐ 4.8</div>
+                        <div class="app-price">Free</div>
+                        <button class="install-button" onclick="installApp('tau-browser')">Install</button>
+                    </div>
+                    
+                    <div class="featured-app-card" onclick="showAppDetails('tau-mail')">
+                        <div class="app-icon-large">📧</div>
+                        <div class="app-name">TauMail</div>
+                        <div class="app-description">Secure email client with end-to-end encryption</div>
+                        <div class="app-rating">⭐ 4.9</div>
+                        <div class="app-price">Free</div>
+                        <button class="install-button" onclick="installApp('tau-mail')">Install</button>
+                    </div>
+                    
+                    <div class="featured-app-card" onclick="showAppDetails('tau-cloud')">
+                        <div class="app-icon-large">☁️</div>
+                        <div class="app-name">TauCloud</div>
+                        <div class="app-description">Private cloud storage with zero-knowledge encryption</div>
+                        <div class="app-rating">⭐ 4.7</div>
+                        <div class="app-price">Free</div>
+                        <button class="install-button" onclick="installApp('tau-cloud')">Install</button>
+                    </div>
+                    
+                    <div class="featured-app-card" onclick="showAppDetails('tau-explorer')">
+                        <div class="app-icon-large">📁</div>
+                        <div class="app-name">Tau Explorer</div>
+                        <div class="app-description">File manager with TauCloud integration</div>
+                        <div class="app-rating">⭐ 4.6</div>
+                        <div class="app-price">Free</div>
+                        <button class="install-button" onclick="installApp('tau-explorer')">Install</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- App Grid -->
+            <div class="app-grid">
+                <div class="app-card" onclick="showAppDetails('tau-media')">
+                    <div class="app-icon">🎵</div>
+                    <div class="app-name">Tau Media</div>
+                    <div class="app-description">Music and video player</div>
+                    <div class="app-rating">⭐ 4.5</div>
+                    <div class="app-price">Free</div>
+                    <button class="install-button" onclick="installApp('tau-media')">Install</button>
+                </div>
+                
+                <div class="app-card" onclick="showAppDetails('tau-office')">
+                    <div class="app-icon">📄</div>
+                    <div class="app-name">Tau Office</div>
+                    <div class="app-description">Document suite</div>
+                    <div class="app-rating">⭐ 4.4</div>
+                    <div class="app-price">Free</div>
+                    <button class="install-button" onclick="installApp('tau-office')">Install</button>
+                </div>
+                
+                <div class="app-card" onclick="showAppDetails('tau-games')">
+                    <div class="app-icon">🎮</div>
+                    <div class="app-name">Tau Games</div>
+                    <div class="app-description">Game collection</div>
+                    <div class="app-rating">⭐ 4.3</div>
+                    <div class="app-price">Free</div>
+                    <button class="install-button" onclick="installApp('tau-games')">Install</button>
+                </div>
+                
+                <div class="app-card" onclick="showAppDetails('tau-dev')">
+                    <div class="app-icon">🔧</div>
+                    <div class="app-name">Tau Dev</div>
+                    <div class="app-description">Development tools</div>
+                    <div class="app-rating">⭐ 4.2</div>
+                    <div class="app-price">Free</div>
+                    <button class="install-button" onclick="installApp('tau-dev')">Install</button>
+                </div>
+                
+                <div class="app-card" onclick="showAppDetails('tau-security')">
+                    <div class="app-icon">🛡️</div>
+                    <div class="app-name">Tau Security</div>
+                    <div class="app-description">Security suite</div>
+                    <div class="app-rating">⭐ 4.1</div>
+                    <div class="app-price">Free</div>
+                    <button class="install-button" onclick="installApp('tau-security')">Install</button>
+                </div>
+                
+                <div class="app-card" onclick="showAppDetails('tau-graphics')">
+                    <div class="app-icon">🎨</div>
+                    <div class="app-name">Tau Graphics</div>
+                    <div class="app-description">Graphics editor</div>
+                    <div class="app-rating">⭐ 4.0</div>
+                    <div class="app-price">Free</div>
+                    <button class="install-button" onclick="installApp('tau-graphics')">Install</button>
+                </div>
+            </div>
+
+            <!-- Download Section -->
+            <div class="download-section">
+                <div class="section-title">Downloads</div>
+                <div class="download-list">
+                    <div class="download-item">
+                        <div class="download-icon">🌐</div>
+                        <div class="download-info">
+                            <div class="download-name">Tau Browser</div>
+                            <div class="download-status">Downloading...</div>
+                            <div class="download-progress">75% - 2.1 MB/s - 30s</div>
+                        </div>
+                    </div>
+                    
+                    <div class="download-item">
+                        <div class="download-icon">📧</div>
+                        <div class="download-info">
+                            <div class="download-name">TauMail</div>
+                            <div class="download-status">Queued</div>
+                            <div class="download-progress">0% - 0 KB/s - --</div>
+                        </div>
+                    </div>
+                    
+                    <div class="download-item">
+                        <div class="download-icon">☁️</div>
+                        <div class="download-info">
+                            <div class="download-name">TauCloud</div>
+                            <div class="download-status">Installing...</div>
+                            <div class="download-progress">45% - 0 KB/s - Installing</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Download Dialog -->
+    <div class="download-dialog" id="downloadDialog">
+        <div class="dialog-header">
+            <h3>Download Manager</h3>
+            <button class="close-btn" onclick="hideDownloadDialog()">✕</button>
+        </div>
+        
+        <div class="download-stats">
+            <div class="download-stat">Queued: 2</div>
+            <div class="download-stat">Active: 1</div>
+            <div class="download-stat">Completed: 5</div>
+        </div>
+        
+        <div class="download-list">
+            <div class="download-item">
+                <div class="download-icon">🌐</div>
+                <div class="download-info">
+                    <div class="download-name">Tau Browser</div>
+                    <div class="download-status">Downloading...</div>
+                    <div class="download-progress">75% - 2.1 MB/s - 30s</div>
+                </div>
+            </div>
+            
+            <div class="download-item">
+                <div class="download-icon">📧</div>
+                <div class="download-info">
+                    <div class="download-name">TauMail</div>
+                    <div class="download-status">Queued</div>
+                    <div class="download-progress">0% - 0 KB/s - --</div>
+                </div>
+            </div>
+            
+            <div class="download-item">
+                <div class="download-icon">☁️</div>
+                <div class="download-info">
+                    <div class="download-name">TauCloud</div>
+                    <div class="download-status">Installing...</div>
+                    <div class="download-progress">45% - 0 KB/s - Installing</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="download-action-buttons">
+            <button class="download-action-btn" onclick="pauseAllDownloads()">⏸️ Pause All</button>
+            <button class="download-action-btn" onclick="resumeAllDownloads()">▶️ Resume All</button>
+            <button class="download-action-btn" onclick="clearCompletedDownloads()">🗑️ Clear Completed</button>
+        </div>
+    </div>
+
+    <script>
+        function selectCategory(element) {
+            // Remove active class from all items
+            document.querySelectorAll('.category-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            
+            // Add active class to clicked item
+            element.classList.add('active');
+            
+            // Filter apps based on category
+            const category = element.querySelector('.category-label').textContent;
+            console.log('Selected category:', category);
+        }
+
+        function searchApps(event) {
+            const query = event.target.value;
+            console.log('Searching for:', query);
+        }
+
+        function showAppDetails(appId) {
+            console.log('Showing app details for:', appId);
+        }
+
+        function installApp(appId) {
+            console.log('Installing app:', appId);
+            // Add to download queue
+            showDownloadDialog();
+        }
+
+        function showAccount() {
+            console.log('Show account clicked');
+        }
+
+        function showUpdates() {
+            console.log('Show updates clicked');
+        }
+
+        function showDownloads() {
+            showDownloadDialog();
+        }
+
+        function showDownloadDialog() {
+            document.getElementById('downloadDialog').classList.add('show');
+        }
+
+        function hideDownloadDialog() {
+            document.getElementById('downloadDialog').classList.remove('show');
+        }
+
+        function pauseAllDownloads() {
+            console.log('Pause all downloads clicked');
+        }
+
+        function resumeAllDownloads() {
+            console.log('Resume all downloads clicked');
+        }
+
+        function clearCompletedDownloads() {
+            console.log('Clear completed downloads clicked');
+        }
+
+        // Close dialog when clicking outside
+        document.addEventListener('click', function(event) {
+            const dialog = document.getElementById('downloadDialog');
+            if (event.target === dialog) {
+                hideDownloadDialog();
+            }
+        });
+
+        // Prevent event bubbling for install buttons
+        document.addEventListener('click', function(event) {
+            if (event.target.classList.contains('install-button')) {
+                event.stopPropagation();
+            }
+        });
+    </script>
+</body>
+</html> 

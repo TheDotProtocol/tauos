@@ -1,0 +1,39 @@
+id = "com.example.hello-world"
+name = "Hello World"
+version = "0.1.0"
+description = "A simple Hello World application for testing the Tau SDK"
+author = "Tau OS Team"
+license = "MIT"
+category = "utilities"
+
+main = "src/main.rs"
+
+[entry_points.default]
+exec = "target/release/hello-world"
+args = []
+env = {}
+cwd = null
+
+permissions = []
+
+dependencies = { system = [], runtime = [], dev = [] }
+
+[build]
+target = "x86_64-unknown-linux-gnu"
+flags = []
+env = {}
+pre_build = []
+post_build = []
+
+[runtime]
+sandbox_level = "normal"
+resources = { memory_mb = 512, cpu_percent = 100, disk_mb = 100, network_kbps = 1024 }
+env = {}
+cwd = null
+
+[store]
+tags = ["hello", "world", "example"]
+screenshots = []
+website = null
+repository = null
+support = null 

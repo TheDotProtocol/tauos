@@ -1,0 +1,3 @@
+# /etc/fstab
+/dev/sda1 / ext4 defaults 0 1
+/dev/sda2 swap swap defaults 0 0

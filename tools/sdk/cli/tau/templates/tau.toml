@@ -1,0 +1,23 @@
+name = "myapp"
+author = "Your Name"
+version = "0.1.0"
+lang = "rust"
+exec = "./myapp"
+icon = "icon.png"
+sandbox_mode = "default"
+
+[permissions]
+network = true
+microphone = false
+camera = false
+filesystem = "ro"
+
+[dependencies]
+# List dependencies here
+
+[hooks]
+pre_install = ""
+post_install = ""
+
+[optional_dependencies]
+# List optional dependencies here 

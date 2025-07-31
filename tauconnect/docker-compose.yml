@@ -1,0 +1,247 @@
+version: '3.8'
+
+services:
+  # Signaling Server
+  signaling:
+    build:
+      context: ./server/signaling
+      dockerfile: Dockerfile
+    container_name: tauconnect-signaling
+    hostname: signaling.connect.tauos.org
+    ports:
+      - "3000:3000"
+      - "3001:3001"  # WebSocket port
+    volumes:
+      - ./server/signaling:/app
+      - ./config:/app/config:ro
+    environment:
+      - NODE_ENV=production
+      - SIGNALING_PORT=3000
+      - WEBSOCKET_PORT=3001
+      - REDIS_URL=redis://:${REDIS_PASSWORD}@redis:6379
+      - JWT_SECRET=${JWT_SECRET}
+    networks:
+      - tauconnect_network
+    restart: unless-stopped
+    depends_on:
+      - redis
+
+  # Media Server (Mediasoup)
+  media:
+    build:
+      context: ./server/media
+      dockerfile: Dockerfile
+    container_name: tauconnect-media
+    hostname: media.connect.tauos.org
+    ports:
+      - "3002:3002"
+      - "3003:3003"  # RTP ports
+      - "3004:3004"
+    volumes:
+      - ./server/media:/app
+      - ./config:/app/config:ro
+    environment:
+      - NODE_ENV=production
+      - MEDIA_PORT=3002
+      - RTP_MIN_PORT=3003
+      - RTP_MAX_PORT=3004
+      - REDIS_URL=redis://:${REDIS_PASSWORD}@redis:6379
+      - MEDIASOUP_WORKER_BIN=/usr/local/bin/mediasoup-worker
+    networks:
+      - tauconnect_network
+    restart: unless-stopped
+    depends_on:
+      - redis
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+        reservations:
+          memory: 1G
+
+  # Authentication Service
+  auth:
+    build:
+      context: ./server/auth
+      dockerfile: Dockerfile
+    container_name: tauconnect-auth
+    hostname: auth.connect.tauos.org
+    ports:
+      - "3005:3005"
+    volumes:
+      - ./server/auth:/app
+      - ./config:/app/config:ro
+    environment:
+      - NODE_ENV=production
+      - AUTH_PORT=3005
+      - DATABASE_URL=${DATABASE_URL}
+      - JWT_SECRET=${JWT_SECRET}
+      - TAUID_URL=${TAUID_URL}
+    networks:
+      - tauconnect_network
+    restart: unless-stopped
+    depends_on:
+      - postgres
+
+  # Presence Service
+  presence:
+    build:
+      context: ./server/presence
+      dockerfile: Dockerfile
+    container_name: tauconnect-presence
+    hostname: presence.connect.tauos.org
+    ports:
+      - "3006:3006"
+    volumes:
+      - ./server/presence:/app
+      - ./config:/app/config:ro
+    environment:
+      - NODE_ENV=production
+      - PRESENCE_PORT=3006
+      - REDIS_URL=redis://:${REDIS_PASSWORD}@redis:6379
+      - DATABASE_URL=${DATABASE_URL}
+    networks:
+      - tauconnect_network
+    restart: unless-stopped
+    depends_on:
+      - redis
+      - postgres
+
+  # Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: tauconnect-postgres
+    hostname: postgres.connect.tauos.org
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - postgres_logs:/var/log/postgresql
+    environment:
+      - POSTGRES_DB=tauconnect
+      - POSTGRES_USER=tauconnect
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+    networks:
+      - tauconnect_network
+    restart: unless-stopped
+
+  # Redis Cache
+  redis:
+    image: redis:7-alpine
+    container_name: tauconnect-redis
+    hostname: redis.connect.tauos.org
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+      - redis_logs:/var/log/redis
+    command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD}
+    environment:
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
+    networks:
+      - tauconnect_network
+    restart: unless-stopped
+
+  # API Gateway
+  api:
+    build:
+      context: ./server/api
+      dockerfile: Dockerfile
+    container_name: tauconnect-api
+    hostname: api.connect.tauos.org
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./server/api:/app
+      - ./config:/app/config:ro
+    environment:
+      - NODE_ENV=production
+      - API_PORT=8000
+      - DATABASE_URL=${DATABASE_URL}
+      - REDIS_URL=redis://:${REDIS_PASSWORD}@redis:6379
+      - JWT_SECRET=${JWT_SECRET}
+    networks:
+      - tauconnect_network
+    restart: unless-stopped
+    depends_on:
+      - postgres
+      - redis
+
+  # Reverse Proxy (Nginx)
+  nginx:
+    image: nginx:alpine
+    container_name: tauconnect-nginx
+    hostname: nginx.connect.tauos.org
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./config/nginx:/etc/nginx/conf.d
+      - ./server/ssl:/etc/ssl/nginx:ro
+      - nginx_logs:/var/log/nginx
+    environment:
+      - NGINX_HOST=connect.tauos.org
+    networks:
+      - tauconnect_network
+    restart: unless-stopped
+    depends_on:
+      - signaling
+      - media
+      - auth
+      - presence
+      - api
+
+  # SSL Certificate Manager
+  certbot:
+    image: certbot/certbot:latest
+    container_name: tauconnect-certbot
+    volumes:
+      - ./server/ssl:/etc/letsencrypt
+      - ./config/certbot:/var/www/certbot
+    command: certonly --webroot --webroot-path=/var/www/certbot --email admin@tauos.org --agree-tos --no-eff-email -d connect.tauos.org -d api.connect.tauos.org
+    networks:
+      - tauconnect_network
+    depends_on:
+      - nginx
+
+  # Monitoring
+  monitoring:
+    image: prom/prometheus:latest
+    container_name: tauconnect-monitoring
+    hostname: monitoring.connect.tauos.org
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./config/monitoring:/etc/prometheus
+      - monitoring_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--storage.tsdb.retention.time=200h'
+      - '--web.enable-lifecycle'
+    networks:
+      - tauconnect_network
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+    driver: local
+  postgres_logs:
+    driver: local
+  redis_data:
+    driver: local
+  redis_logs:
+    driver: local
+  nginx_logs:
+    driver: local
+  monitoring_data:
+    driver: local
+
+networks:
+  tauconnect_network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.21.0.0/16 

@@ -1,0 +1,7 @@
+#!/bin/sh
+echo "🐢 TauStore Package Manager"
+echo "Available packages:"
+echo "✅ tau-mail - Privacy-first email client"
+echo "✅ tau-cloud - Secure cloud storage"
+echo "✅ tau-connect - Video calling app"
+echo "✅ tau-messenger - Secure messaging"

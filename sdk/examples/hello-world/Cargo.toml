@@ -1,0 +1,16 @@
+[package]
+name = "hello-world"
+version = "0.1.0"
+edition = "2021"
+authors = ["Tau OS Team"]
+description = "A simple Hello World application for testing the Tau SDK"
+
+[dependencies]
+serde = { version = "1.0", features = ["derive"] }
+anyhow = "1.0"
+log = "0.4"
+env_logger = "0.10"
+
+[[bin]]
+name = "hello-world"
+path = "src/main.rs" 

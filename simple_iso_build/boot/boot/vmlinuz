@@ -1,0 +1,6 @@
+#!/bin/bash
+echo "🐢 TauOS Kernel Loading..."
+echo "This is a minimal kernel for testing"
+echo "In production, this would be a real Linux kernel"
+sleep 2
+echo "🐢 TauOS Kernel Loaded Successfully!"

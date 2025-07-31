@@ -1,0 +1,4 @@
+#!/bin/sh
+echo "🐢 TauOS Update System"
+echo "Checking for updates..."
+echo "System is up to date!"
