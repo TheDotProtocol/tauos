@@ -44,6 +44,9 @@ interface Feature {
 }
 
 export default function TauOSLandingPage() {
+  // Debug log to verify deployment
+  console.log('TauOS Landing Page loaded successfully!');
+  
   const [detectedOS, setDetectedOS] = useState<string>('');
   const [showDownloadModal, setShowDownloadModal] = useState(false);
   const [selectedDownload, setSelectedDownload] = useState<DownloadOption | null>(null);
