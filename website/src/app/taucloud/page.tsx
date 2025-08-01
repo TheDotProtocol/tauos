@@ -26,6 +26,7 @@ import {
   List
 } from 'lucide-react';
 
+// Updated TauCloud page with improved UI design - Force deployment
 export default function TauCloudPage() {
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [selectedFile, setSelectedFile] = useState<string | null>(null);

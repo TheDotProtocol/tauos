@@ -24,6 +24,7 @@ import {
   Trash2
 } from 'lucide-react';
 
+// Updated TauMail page with improved UI design - Force deployment
 export default function TauMailPage() {
   const [selectedEmail, setSelectedEmail] = useState<number | null>(null);
   const [showCompose, setShowCompose] = useState(false);
