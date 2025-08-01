@@ -5,304 +5,405 @@ import { motion } from 'framer-motion';
 import { 
   Mail,
   Shield,
-  Search,
-  Plus,
-  Settings,
-  User,
+  Lock,
+  EyeOff,
+  Download,
+  Globe,
+  ArrowRight,
+  CheckCircle,
+  Users,
+  Zap,
+  Globe2,
+  FileText,
   Inbox,
   Send,
   Star,
-  Trash,
-  Archive,
-  Filter,
-  MoreVertical,
-  Download,
-  Lock,
-  Eye,
-  EyeOff,
-  FileText,
-  Trash2
+  Archive
 } from 'lucide-react';
 
-// Updated TauMail page with improved UI design - Force deployment
 export default function TauMailPage() {
-  const [selectedEmail, setSelectedEmail] = useState<number | null>(null);
-  const [showCompose, setShowCompose] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
+  const [email, setEmail] = useState('');
+  const [domain, setDomain] = useState('');
 
-  const emails = [
+  const features = [
     {
-      id: 1,
-      sender: 'TauOS Team',
-      subject: 'Welcome to TauMail - Your Privacy-First Email',
-      preview: 'Welcome to TauMail! Your inbox is now protected with end-to-end encryption...',
-      time: '2 hours ago',
-      isRead: false,
-      isStarred: true,
-      isEncrypted: true
+      icon: <Shield className="w-6 h-6 text-purple-400" />,
+      title: "End-to-End Encryption",
+      description: "Your emails are encrypted before they leave your device"
     },
     {
-      id: 2,
-      sender: 'Security Update',
-      subject: 'Your Privacy Matters - Zero Tracking Confirmed',
-      preview: 'Your TauMail account is running with zero telemetry and complete privacy...',
-      time: '1 day ago',
-      isRead: true,
-      isStarred: false,
-      isEncrypted: true
+      icon: <EyeOff className="w-6 h-6 text-purple-400" />,
+      title: "Zero Tracking",
+      description: "No tracking pixels, no data mining, complete privacy"
     },
     {
-      id: 3,
-      sender: 'TauCloud Integration',
-      subject: 'Seamless File Sharing with TauCloud',
-      preview: 'Share files securely with your TauCloud integration. All files are encrypted...',
-      time: '3 days ago',
-      isRead: true,
-      isStarred: false,
-      isEncrypted: true
+      icon: <Globe2 className="w-6 h-6 text-purple-400" />,
+      title: "Custom Domains",
+      description: "Use your own domain with full control"
+    },
+    {
+      icon: <Download className="w-6 h-6 text-purple-400" />,
+      title: "Self-Host Option",
+      description: "Deploy on your own servers for maximum control"
     }
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-900 text-white">
       {/* Header */}
-      <header className="bg-white shadow-sm border-b">
+      <header className="bg-gray-800 border-b border-gray-700">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center space-x-4">
               <div className="flex items-center space-x-3">
-                <div className="w-8 h-8 bg-red-600 rounded-lg flex items-center justify-center">
+                <div className="w-8 h-8 bg-purple-600 rounded-lg flex items-center justify-center">
                   <Mail className="w-5 h-5 text-white" />
                 </div>
-                <span className="text-xl font-bold text-gray-900">TauMail</span>
-              </div>
-              <div className="hidden md:flex items-center space-x-6 ml-8">
-                <a href="#" className="text-red-600 font-medium">Inbox</a>
-                <a href="#" className="text-gray-500 hover:text-gray-700">Sent</a>
-                <a href="#" className="text-gray-500 hover:text-gray-700">Drafts</a>
-                <a href="#" className="text-gray-500 hover:text-gray-700">Trash</a>
+                <span className="text-xl font-bold">TauMail</span>
               </div>
             </div>
             
             <div className="flex items-center space-x-4">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
-                <input
-                  type="text"
-                  placeholder="Search mail"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
-                />
-              </div>
-              <button className="p-2 text-gray-500 hover:text-gray-700">
-                <Settings className="w-5 h-5" />
+              <a href="/" className="text-gray-300 hover:text-white transition-colors">
+                Back to TauOS
+              </a>
+              <button className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg font-medium transition-colors">
+                Login
               </button>
-              <div className="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center">
-                <User className="w-4 h-4 text-gray-600" />
-              </div>
             </div>
           </div>
         </div>
       </header>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Main Content */}
-          <div className="lg:col-span-2">
-            {/* Compose Button */}
-            <div className="mb-6">
-              <button
-                onClick={() => setShowCompose(true)}
-                className="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg font-medium flex items-center space-x-2"
-              >
-                <Plus className="w-5 h-5" />
-                <span>Compose</span>
+      {/* Hero Section */}
+      <section className="relative overflow-hidden">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+          <div className="text-center">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+            >
+              <h1 className="text-5xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+                Welcome to TauMail
+              </h1>
+              <p className="text-xl md:text-2xl text-gray-300 mb-8 max-w-3xl mx-auto">
+                Encrypted, Sovereign Email for Everyone
+              </p>
+              <p className="text-lg text-gray-400 mb-12 max-w-2xl mx-auto">
+                Take back control of your digital communication. TauMail provides end-to-end encryption, 
+                zero tracking, and complete privacy - just like email should be.
+              </p>
+            </motion.div>
+
+            {/* CTA Buttons */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+              className="flex flex-col sm:flex-row gap-4 justify-center mb-16"
+            >
+              <button className="bg-purple-600 hover:bg-purple-700 text-white px-8 py-4 rounded-lg font-medium text-lg flex items-center justify-center space-x-2 transition-colors">
+                <span>Get Started Free</span>
+                <ArrowRight className="w-5 h-5" />
               </button>
-            </div>
-
-            {/* Email List */}
-            <div className="bg-white rounded-lg shadow-sm border">
-              {emails.map((email) => (
-                <motion.div
-                  key={email.id}
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.3 }}
-                  className={`p-4 border-b border-gray-100 hover:bg-gray-50 cursor-pointer ${
-                    selectedEmail === email.id ? 'bg-blue-50 border-blue-200' : ''
-                  } ${!email.isRead ? 'bg-blue-50' : ''}`}
-                  onClick={() => setSelectedEmail(email.id)}
-                >
-                  <div className="flex items-center space-x-4">
-                    <div className="flex items-center space-x-3 flex-1">
-                      <input type="checkbox" className="rounded" />
-                      {email.isStarred ? (
-                        <Star className="w-4 h-4 text-yellow-400 fill-current" />
-                      ) : (
-                        <Star className="w-4 h-4 text-gray-300" />
-                      )}
-                      <div className="flex-1">
-                        <div className="flex items-center space-x-2">
-                          <span className={`font-medium ${!email.isRead ? 'text-gray-900' : 'text-gray-600'}`}>
-                            {email.sender}
-                          </span>
-                          {email.isEncrypted && (
-                            <Shield className="w-4 h-4 text-green-500" />
-                          )}
-                        </div>
-                        <div className="flex items-center space-x-2">
-                          <span className={`${!email.isRead ? 'font-semibold' : 'font-medium'} text-gray-900`}>
-                            {email.subject}
-                          </span>
-                        </div>
-                        <p className="text-gray-600 text-sm truncate">{email.preview}</p>
-                      </div>
-                    </div>
-                    <div className="text-sm text-gray-500">{email.time}</div>
-                  </div>
-                </motion.div>
-              ))}
-            </div>
-          </div>
-
-          {/* Sidebar */}
-          <div className="space-y-6">
-            {/* Privacy Status */}
-            <div className="bg-white rounded-lg shadow-sm border p-6">
-              <h3 className="text-lg font-semibold mb-4 text-gray-900">Privacy Status</h3>
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-600">End-to-End Encryption</span>
-                  <div className="flex items-center space-x-2">
-                    <Shield className="w-4 h-4 text-green-500" />
-                    <span className="text-sm text-green-600 font-medium">Active</span>
-                  </div>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-600">Zero Telemetry</span>
-                  <div className="flex items-center space-x-2">
-                    <EyeOff className="w-4 h-4 text-green-500" />
-                    <span className="text-sm text-green-600 font-medium">Enabled</span>
-                  </div>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-600">No Tracking</span>
-                  <div className="flex items-center space-x-2">
-                    <Lock className="w-4 h-4 text-green-500" />
-                    <span className="text-sm text-green-600 font-medium">Protected</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Quick Stats */}
-            <div className="bg-white rounded-lg shadow-sm border p-6">
-              <h3 className="text-lg font-semibold mb-4 text-gray-900">Your Mail</h3>
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-600">Inbox</span>
-                  <span className="text-sm font-medium text-gray-900">3</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-600">Sent</span>
-                  <span className="text-sm font-medium text-gray-900">12</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-600">Drafts</span>
-                  <span className="text-sm font-medium text-gray-900">2</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-600">Storage Used</span>
-                  <span className="text-sm font-medium text-gray-900">45 MB</span>
-                </div>
-              </div>
-            </div>
-
-            {/* Features */}
-            <div className="bg-white rounded-lg shadow-sm border p-6">
-              <h3 className="text-lg font-semibold mb-4 text-gray-900">TauMail Features</h3>
-              <div className="space-y-3 text-sm text-gray-600">
-                <div className="flex items-center space-x-2">
-                  <Shield className="w-4 h-4 text-green-500" />
-                  <span>End-to-end encryption</span>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <EyeOff className="w-4 h-4 text-green-500" />
-                  <span>Zero telemetry</span>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <Lock className="w-4 h-4 text-green-500" />
-                  <span>No tracking pixels</span>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <Download className="w-4 h-4 text-green-500" />
-                  <span>Self-host option</span>
-                </div>
-              </div>
-            </div>
+              <button className="bg-gray-800 hover:bg-gray-700 text-white px-8 py-4 rounded-lg font-medium text-lg border border-gray-600 transition-colors">
+                Use with My Domain
+              </button>
+            </motion.div>
           </div>
         </div>
-      </div>
 
-      {/* Compose Modal */}
-      {showCompose && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
-        >
+        {/* Background Pattern */}
+        <div className="absolute inset-0 -z-10">
+          <div className="absolute inset-0 bg-gradient-to-br from-purple-900/20 to-pink-900/20"></div>
+          <div className="absolute top-0 left-0 w-72 h-72 bg-purple-500/10 rounded-full blur-3xl"></div>
+          <div className="absolute bottom-0 right-0 w-72 h-72 bg-pink-500/10 rounded-full blur-3xl"></div>
+        </div>
+      </section>
+
+      {/* Features Section */}
+      <section className="py-20 bg-gray-800">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
-            initial={{ scale: 0.9, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            className="bg-white rounded-lg shadow-xl w-full max-w-2xl mx-4"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            className="text-center mb-16"
           >
-            <div className="flex items-center justify-between p-4 border-b">
-              <h3 className="text-lg font-semibold">New Message</h3>
-              <button
-                onClick={() => setShowCompose(false)}
-                className="text-gray-500 hover:text-gray-700"
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">
+              Why Choose TauMail?
+            </h2>
+            <p className="text-gray-400 text-lg max-w-2xl mx-auto">
+              Built with privacy-first principles and modern security standards
+            </p>
+          </motion.div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            {features.map((feature, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: index * 0.1 }}
+                className="bg-gray-700 rounded-lg p-6 text-center"
               >
-                ×
-              </button>
-            </div>
-            <div className="p-4 space-y-4">
-              <input
-                type="email"
-                placeholder="To"
-                className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-red-500 focus:border-transparent"
-              />
-              <input
-                type="text"
-                placeholder="Subject"
-                className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-red-500 focus:border-transparent"
-              />
-              <textarea
-                placeholder="Write your message..."
-                rows={8}
-                className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-red-500 focus:border-transparent"
-              />
-            </div>
-            <div className="flex items-center justify-between p-4 border-t">
-              <div className="flex items-center space-x-2">
-                <Shield className="w-4 h-4 text-green-500" />
-                <span className="text-sm text-green-600">Message will be encrypted</span>
+                <div className="flex justify-center mb-4">
+                  {feature.icon}
+                </div>
+                <h3 className="text-lg font-semibold mb-2">{feature.title}</h3>
+                <p className="text-gray-400 text-sm">{feature.description}</p>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Screenshot Section */}
+      <section className="py-20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            className="text-center mb-16"
+          >
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">
+              See TauMail in Action
+            </h2>
+            <p className="text-gray-400 text-lg max-w-2xl mx-auto">
+              Experience the privacy-first email interface designed for the modern world
+            </p>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.8 }}
+            className="relative"
+          >
+            {/* TauMail Interface Screenshot */}
+            <div className="bg-white rounded-lg overflow-hidden shadow-2xl">
+              {/* Header */}
+              <div className="bg-gradient-to-r from-red-600 to-red-700 text-white p-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-3">
+                    <Mail className="w-5 h-5" />
+                    <span className="font-bold text-lg">TauMail</span>
+                  </div>
+                  <div className="flex items-center space-x-4">
+                    <div className="flex items-center space-x-2">
+                      <Shield className="w-4 h-4" />
+                      <span className="text-sm">Secure</span>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <span className="text-sm">Inbox (3)</span>
+                    </div>
+                  </div>
+                </div>
               </div>
-              <div className="flex space-x-2">
-                <button
-                  onClick={() => setShowCompose(false)}
-                  className="px-4 py-2 text-gray-600 hover:text-gray-800"
-                >
-                  Cancel
-                </button>
-                <button className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded">
-                  Send
-                </button>
+
+              {/* Main Interface */}
+              <div className="flex">
+                {/* Sidebar */}
+                <div className="w-64 bg-gray-50 border-r border-gray-200">
+                  <div className="p-4">
+                    <button className="w-full bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-medium mb-4">
+                      Compose
+                    </button>
+                    <nav className="space-y-2">
+                      <a href="#" className="flex items-center space-x-3 p-2 rounded-lg bg-red-50 text-red-700">
+                        <Inbox className="w-4 h-4" />
+                        <span>Inbox</span>
+                        <span className="ml-auto bg-red-600 text-white text-xs px-2 py-1 rounded-full">3</span>
+                      </a>
+                      <a href="#" className="flex items-center space-x-3 p-2 rounded-lg text-gray-600 hover:bg-gray-100">
+                        <Send className="w-4 h-4" />
+                        <span>Sent</span>
+                      </a>
+                      <a href="#" className="flex items-center space-x-3 p-2 rounded-lg text-gray-600 hover:bg-gray-100">
+                        <Star className="w-4 h-4" />
+                        <span>Starred</span>
+                      </a>
+                      <a href="#" className="flex items-center space-x-3 p-2 rounded-lg text-gray-600 hover:bg-gray-100">
+                        <Archive className="w-4 h-4" />
+                        <span>Archive</span>
+                      </a>
+                    </nav>
+                  </div>
+                </div>
+
+                {/* Email List */}
+                <div className="flex-1">
+                  <div className="border-b border-gray-200">
+                    <div className="p-4">
+                      <div className="flex items-center space-x-4">
+                        <input type="checkbox" className="rounded" />
+                        <button className="text-gray-400 hover:text-gray-600">
+                          <Star className="w-4 h-4" />
+                        </button>
+                        <span className="text-sm text-gray-500">1-3 of 3</span>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="divide-y divide-gray-200">
+                    <div className="p-4 hover:bg-gray-50 cursor-pointer">
+                      <div className="flex items-center space-x-4">
+                        <input type="checkbox" className="rounded" />
+                        <Star className="w-4 h-4 text-yellow-400 fill-current" />
+                        <div className="flex-1">
+                          <div className="flex items-center space-x-2">
+                            <span className="font-medium text-gray-900">TauOS Team</span>
+                            <Shield className="w-4 h-4 text-green-500" />
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <span className="font-semibold text-gray-900">Welcome to TauMail - Your Privacy-First Email</span>
+                          </div>
+                          <p className="text-gray-600 text-sm truncate">Welcome to TauMail! Your inbox is now protected with end-to-end encryption...</p>
+                        </div>
+                        <div className="text-sm text-gray-500">2 hours ago</div>
+                      </div>
+                    </div>
+                    
+                    <div className="p-4 hover:bg-gray-50 cursor-pointer">
+                      <div className="flex items-center space-x-4">
+                        <input type="checkbox" className="rounded" />
+                        <Star className="w-4 h-4 text-gray-300" />
+                        <div className="flex-1">
+                          <div className="flex items-center space-x-2">
+                            <span className="font-medium text-gray-600">Security Update</span>
+                            <Shield className="w-4 h-4 text-green-500" />
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <span className="font-medium text-gray-900">Your Privacy Matters - Zero Tracking Confirmed</span>
+                          </div>
+                          <p className="text-gray-600 text-sm truncate">Your TauMail account is running with zero telemetry and complete privacy...</p>
+                        </div>
+                        <div className="text-sm text-gray-500">1 day ago</div>
+                      </div>
+                    </div>
+                    
+                    <div className="p-4 hover:bg-gray-50 cursor-pointer">
+                      <div className="flex items-center space-x-4">
+                        <input type="checkbox" className="rounded" />
+                        <Star className="w-4 h-4 text-gray-300" />
+                        <div className="flex-1">
+                          <div className="flex items-center space-x-2">
+                            <span className="font-medium text-gray-600">TauCloud Integration</span>
+                            <Shield className="w-4 h-4 text-green-500" />
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <span className="font-medium text-gray-900">Seamless File Sharing with TauCloud</span>
+                          </div>
+                          <p className="text-gray-600 text-sm truncate">Share files securely with your TauCloud integration. All files are encrypted...</p>
+                        </div>
+                        <div className="text-sm text-gray-500">3 days ago</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Privacy Indicators */}
+            <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="bg-gray-800 rounded-lg p-6 text-center">
+                <Shield className="w-8 h-8 text-green-400 mx-auto mb-3" />
+                <h3 className="text-lg font-semibold mb-2">End-to-End Encryption</h3>
+                <p className="text-gray-400 text-sm">All emails encrypted before transmission</p>
+              </div>
+              <div className="bg-gray-800 rounded-lg p-6 text-center">
+                <EyeOff className="w-8 h-8 text-green-400 mx-auto mb-3" />
+                <h3 className="text-lg font-semibold mb-2">Zero Tracking</h3>
+                <p className="text-gray-400 text-sm">No tracking pixels or data mining</p>
+              </div>
+              <div className="bg-gray-800 rounded-lg p-6 text-center">
+                <Lock className="w-8 h-8 text-green-400 mx-auto mb-3" />
+                <h3 className="text-lg font-semibold mb-2">Complete Privacy</h3>
+                <p className="text-gray-400 text-sm">Your data stays yours, always</p>
               </div>
             </div>
           </motion.div>
-        </motion.div>
-      )}
+        </div>
+      </section>
+
+      {/* Sign Up Section */}
+      <section className="py-20">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            className="bg-gray-800 rounded-2xl p-8 md:p-12"
+          >
+            <div className="text-center mb-8">
+              <h2 className="text-3xl font-bold mb-4">Ready to Get Started?</h2>
+              <p className="text-gray-400">Join thousands of users who have taken control of their email privacy</p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-4">
+                <label className="block text-sm font-medium text-gray-300">Email Address</label>
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="your@email.com"
+                  className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-white placeholder-gray-400"
+                />
+                <button className="w-full bg-purple-600 hover:bg-purple-700 text-white py-3 rounded-lg font-medium transition-colors">
+                  Create Free Account
+                </button>
+              </div>
+
+              <div className="space-y-4">
+                <label className="block text-sm font-medium text-gray-300">Custom Domain</label>
+                <input
+                  type="text"
+                  value={domain}
+                  onChange={(e) => setDomain(e.target.value)}
+                  placeholder="yourdomain.com"
+                  className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-white placeholder-gray-400"
+                />
+                <button className="w-full bg-gray-700 hover:bg-gray-600 text-white py-3 rounded-lg font-medium border border-gray-600 transition-colors">
+                  Configure Domain
+                </button>
+              </div>
+            </div>
+
+            <div className="mt-8 text-center">
+              <p className="text-sm text-gray-400">
+                By signing up, you agree to our{' '}
+                <a href="#" className="text-purple-400 hover:text-purple-300">Terms of Service</a>
+                {' '}and{' '}
+                <a href="#" className="text-purple-400 hover:text-purple-300">Privacy Policy</a>
+              </p>
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="bg-gray-800 border-t border-gray-700 py-8">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-col md:flex-row justify-between items-center">
+            <div className="flex items-center space-x-3 mb-4 md:mb-0">
+              <div className="w-6 h-6 bg-purple-600 rounded flex items-center justify-center">
+                <Mail className="w-4 h-4 text-white" />
+              </div>
+              <span className="text-lg font-semibold">TauMail</span>
+            </div>
+            
+            <div className="flex space-x-6 text-sm text-gray-400">
+              <a href="#" className="hover:text-white transition-colors">Documentation</a>
+              <a href="#" className="hover:text-white transition-colors">Privacy Policy</a>
+              <a href="#" className="hover:text-white transition-colors">Terms of Service</a>
+              <a href="/" className="hover:text-white transition-colors">Back to TauOS</a>
+            </div>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 } 
