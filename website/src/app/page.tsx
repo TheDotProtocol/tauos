@@ -21,7 +21,16 @@ import {
   Zap,
   Palette,
   Users,
-  Lock
+  Lock,
+  Send,
+  FileText,
+  Trash2,
+  EyeOff,
+  Folder,
+  Image,
+  Music,
+  Video,
+  Archive
 } from 'lucide-react';
 
 interface DownloadOption {
@@ -890,45 +899,87 @@ export default function TauOSLandingPage() {
               viewport={{ once: true }}
               className="flex items-center justify-center"
             >
-              <div className="bg-gray-900 rounded-lg p-4 border border-gray-700 w-full max-w-md">
+              <div className="bg-gray-900 rounded-lg p-4 border border-gray-700 w-full max-w-lg">
                 <div className="flex items-center space-x-3 mb-4">
                   <div className="w-3 h-3 bg-red-500 rounded-full"></div>
                   <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
                   <div className="w-3 h-3 bg-green-500 rounded-full"></div>
                 </div>
-                <div className="bg-white rounded-lg min-h-[300px]">
-                  <div className="bg-red-600 text-white p-3 rounded-t-lg">
+                <div className="bg-white rounded-lg overflow-hidden shadow-lg">
+                  {/* TauMail UI Screenshot */}
+                  <div className="bg-gradient-to-r from-red-600 to-red-700 text-white p-4">
                     <div className="flex items-center justify-between">
-                      <span className="font-semibold">TauMail</span>
-                      <div className="flex items-center space-x-2">
-                        <Mail className="w-4 h-4" />
-                        <span className="text-sm">Inbox (5)</span>
+                      <div className="flex items-center space-x-3">
+                        <Mail className="w-5 h-5" />
+                        <span className="font-bold text-lg">TauMail</span>
+                      </div>
+                      <div className="flex items-center space-x-4">
+                        <div className="flex items-center space-x-2">
+                          <Shield className="w-4 h-4" />
+                          <span className="text-sm">Secure</span>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <span className="text-sm">Inbox (3)</span>
+                        </div>
                       </div>
                     </div>
                   </div>
-                  <div className="p-4">
-                    <div className="space-y-3">
-                      <div className="flex items-center space-x-3 p-2 hover:bg-gray-100 rounded">
-                        <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                        <div className="flex-1">
-                          <div className="font-semibold text-sm">Welcome to TauMail</div>
-                          <div className="text-gray-600 text-xs">TauOS Team • 2 hours ago</div>
+                  
+                  <div className="flex">
+                    {/* Sidebar */}
+                    <div className="w-48 bg-gray-50 border-r border-gray-200 p-4">
+                      <div className="space-y-2">
+                        <div className="flex items-center space-x-2 text-red-600 font-semibold">
+                          <Mail className="w-4 h-4" />
+                          <span>Inbox</span>
+                          <span className="bg-red-100 text-red-600 px-2 py-1 rounded-full text-xs">3</span>
                         </div>
-                        <Shield className="w-4 h-4 text-green-500" />
-                      </div>
-                      <div className="flex items-center space-x-3 p-2 hover:bg-gray-100 rounded">
-                        <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                        <div className="flex-1">
-                          <div className="font-semibold text-sm">Your Privacy Matters</div>
-                          <div className="text-gray-600 text-xs">Security Update • 1 day ago</div>
+                        <div className="flex items-center space-x-2 text-gray-600">
+                          <Send className="w-4 h-4" />
+                          <span>Sent</span>
                         </div>
-                        <Shield className="w-4 h-4 text-green-500" />
+                        <div className="flex items-center space-x-2 text-gray-600">
+                          <FileText className="w-4 h-4" />
+                          <span>Drafts</span>
+                        </div>
+                        <div className="flex items-center space-x-2 text-gray-600">
+                          <Trash2 className="w-4 h-4" />
+                          <span>Trash</span>
+                        </div>
                       </div>
-                      <div className="flex items-center space-x-3 p-2 hover:bg-gray-100 rounded">
-                        <div className="w-2 h-2 bg-gray-300 rounded-full"></div>
-                        <div className="flex-1">
-                          <div className="font-semibold text-sm">Zero Tracking Policy</div>
-                          <div className="text-gray-600 text-xs">System • 3 days ago</div>
+                    </div>
+                    
+                    {/* Main Content */}
+                    <div className="flex-1 p-4">
+                      <div className="space-y-3">
+                        <div className="flex items-center space-x-3 p-3 hover:bg-gray-50 rounded-lg border-l-4 border-blue-500">
+                          <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                          <div className="flex-1">
+                            <div className="font-semibold text-gray-900">Welcome to TauMail</div>
+                            <div className="text-gray-600 text-sm">TauOS Team • 2 hours ago</div>
+                            <div className="text-gray-500 text-sm">Your privacy-first email experience is ready...</div>
+                          </div>
+                          <Shield className="w-4 h-4 text-green-500" />
+                        </div>
+                        
+                        <div className="flex items-center space-x-3 p-3 hover:bg-gray-50 rounded-lg border-l-4 border-green-500">
+                          <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                          <div className="flex-1">
+                            <div className="font-semibold text-gray-900">End-to-End Encryption Active</div>
+                            <div className="text-gray-600 text-sm">Security Update • 1 day ago</div>
+                            <div className="text-gray-500 text-sm">All your emails are now encrypted...</div>
+                          </div>
+                          <Lock className="w-4 h-4 text-green-500" />
+                        </div>
+                        
+                        <div className="flex items-center space-x-3 p-3 hover:bg-gray-50 rounded-lg border-l-4 border-purple-500">
+                          <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
+                          <div className="flex-1">
+                            <div className="font-semibold text-gray-900">Zero Tracking Policy</div>
+                            <div className="text-gray-600 text-sm">System • 3 days ago</div>
+                            <div className="text-gray-500 text-sm">Your data stays private, always...</div>
+                          </div>
+                          <EyeOff className="w-4 h-4 text-purple-500" />
                         </div>
                       </div>
                     </div>
@@ -964,51 +1015,134 @@ export default function TauOSLandingPage() {
               viewport={{ once: true }}
               className="flex items-center justify-center"
             >
-              <div className="bg-gray-900 rounded-lg p-4 border border-gray-700 w-full max-w-md">
+              <div className="bg-gray-900 rounded-lg p-4 border border-gray-700 w-full max-w-lg">
                 <div className="flex items-center space-x-3 mb-4">
                   <div className="w-3 h-3 bg-red-500 rounded-full"></div>
                   <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
                   <div className="w-3 h-3 bg-green-500 rounded-full"></div>
                 </div>
-                <div className="bg-white rounded-lg min-h-[300px]">
-                  <div className="bg-blue-600 text-white p-3 rounded-t-lg">
+                <div className="bg-white rounded-lg overflow-hidden shadow-lg">
+                  {/* TauCloud UI Screenshot */}
+                  <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white p-4">
                     <div className="flex items-center justify-between">
-                      <span className="font-semibold">TauCloud</span>
-                      <div className="flex items-center space-x-2">
-                        <Cloud className="w-4 h-4" />
-                        <span className="text-sm">2.1 GB used</span>
+                      <div className="flex items-center space-x-3">
+                        <Cloud className="w-5 h-5" />
+                        <span className="font-bold text-lg">TauCloud</span>
+                      </div>
+                      <div className="flex items-center space-x-4">
+                        <div className="flex items-center space-x-2">
+                          <Lock className="w-4 h-4" />
+                          <span className="text-sm">Encrypted</span>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <span className="text-sm">2.1 GB used</span>
+                        </div>
                       </div>
                     </div>
                   </div>
-                  <div className="p-4">
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className="text-center">
-                        <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mx-auto mb-2">
-                          <span className="text-blue-600 font-bold">📁</span>
+                  
+                  <div className="flex">
+                    {/* Sidebar */}
+                    <div className="w-48 bg-gray-50 border-r border-gray-200 p-4">
+                      <div className="space-y-2">
+                        <div className="flex items-center space-x-2 text-blue-600 font-semibold">
+                          <Folder className="w-4 h-4" />
+                          <span>My Files</span>
                         </div>
-                        <div className="text-xs font-semibold">Documents</div>
-                        <div className="text-xs text-gray-500">1.2 GB</div>
+                        <div className="flex items-center space-x-2 text-gray-600">
+                          <Image className="w-4 h-4" />
+                          <span>Photos</span>
+                        </div>
+                        <div className="flex items-center space-x-2 text-gray-600">
+                          <FileText className="w-4 h-4" />
+                          <span>Documents</span>
+                        </div>
+                        <div className="flex items-center space-x-2 text-gray-600">
+                          <Music className="w-4 h-4" />
+                          <span>Music</span>
+                        </div>
+                        <div className="flex items-center space-x-2 text-gray-600">
+                          <Video className="w-4 h-4" />
+                          <span>Videos</span>
+                        </div>
+                        <div className="flex items-center space-x-2 text-gray-600">
+                          <Archive className="w-4 h-4" />
+                          <span>Backups</span>
+                        </div>
                       </div>
-                      <div className="text-center">
-                        <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mx-auto mb-2">
-                          <span className="text-green-600 font-bold">🖼️</span>
+                    </div>
+                    
+                    {/* Main Content */}
+                    <div className="flex-1 p-4">
+                      <div className="mb-4">
+                        <div className="flex items-center justify-between mb-2">
+                          <h3 className="font-semibold text-gray-900">Recent Files</h3>
+                          <button className="text-blue-600 hover:text-blue-700 text-sm">View All</button>
                         </div>
-                        <div className="text-xs font-semibold">Photos</div>
-                        <div className="text-xs text-gray-500">800 MB</div>
                       </div>
-                      <div className="text-center">
-                        <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mx-auto mb-2">
-                          <span className="text-purple-600 font-bold">🎵</span>
+                      
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="bg-blue-50 rounded-lg p-3 border border-blue-200">
+                          <div className="flex items-center space-x-3">
+                            <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                              <FileText className="w-5 h-5 text-blue-600" />
+                            </div>
+                            <div className="flex-1">
+                              <div className="font-semibold text-gray-900 text-sm">Project Report.pdf</div>
+                              <div className="text-gray-500 text-xs">2.3 MB • 2 hours ago</div>
+                            </div>
+                            <Lock className="w-3 h-3 text-green-500" />
+                          </div>
                         </div>
-                        <div className="text-xs font-semibold">Music</div>
-                        <div className="text-xs text-gray-500">100 MB</div>
+                        
+                        <div className="bg-green-50 rounded-lg p-3 border border-green-200">
+                          <div className="flex items-center space-x-3">
+                            <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
+                              <Image className="w-5 h-5 text-green-600" />
+                            </div>
+                            <div className="flex-1">
+                              <div className="font-semibold text-gray-900 text-sm">Vacation Photos</div>
+                              <div className="text-gray-500 text-xs">15.2 MB • 1 day ago</div>
+                            </div>
+                            <Lock className="w-3 h-3 text-green-500" />
+                          </div>
+                        </div>
+                        
+                        <div className="bg-purple-50 rounded-lg p-3 border border-purple-200">
+                          <div className="flex items-center space-x-3">
+                            <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
+                              <Music className="w-5 h-5 text-purple-600" />
+                            </div>
+                            <div className="flex-1">
+                              <div className="font-semibold text-gray-900 text-sm">Playlist 2025</div>
+                              <div className="text-gray-500 text-xs">45.7 MB • 3 days ago</div>
+                            </div>
+                            <Lock className="w-3 h-3 text-green-500" />
+                          </div>
+                        </div>
+                        
+                        <div className="bg-yellow-50 rounded-lg p-3 border border-yellow-200">
+                          <div className="flex items-center space-x-3">
+                            <div className="w-10 h-10 bg-yellow-100 rounded-lg flex items-center justify-center">
+                              <Archive className="w-5 h-5 text-yellow-600" />
+                            </div>
+                            <div className="flex-1">
+                              <div className="font-semibold text-gray-900 text-sm">System Backup</div>
+                              <div className="text-gray-500 text-xs">1.2 GB • 1 week ago</div>
+                            </div>
+                            <Lock className="w-3 h-3 text-green-500" />
+                          </div>
+                        </div>
                       </div>
-                      <div className="text-center">
-                        <div className="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center mx-auto mb-2">
-                          <span className="text-yellow-600 font-bold">📊</span>
+                      
+                      <div className="mt-4 p-3 bg-gray-50 rounded-lg">
+                        <div className="flex items-center justify-between text-sm">
+                          <span className="text-gray-600">Storage Used</span>
+                          <span className="font-semibold text-gray-900">2.1 GB / 10 GB</span>
                         </div>
-                        <div className="text-xs font-semibold">Backups</div>
-                        <div className="text-xs text-gray-500">50 MB</div>
+                        <div className="w-full bg-gray-200 rounded-full h-2 mt-2">
+                          <div className="bg-blue-600 h-2 rounded-full" style={{ width: '21%' }}></div>
+                        </div>
                       </div>
                     </div>
                   </div>
