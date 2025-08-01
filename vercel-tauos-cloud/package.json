@@ -1,7 +1,7 @@
 {
-  "name": "tauos-mail",
+  "name": "tauos-cloud",
   "version": "1.0.0",
-  "description": "TauMail Privacy-First Email Service",
+  "description": "TauCloud Privacy-First Cloud Storage",
   "main": "app.js",
   "scripts": {
     "start": "node app.js",
