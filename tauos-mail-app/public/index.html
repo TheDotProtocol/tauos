@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TauMail - Privacy-First Email</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #0f0f0f; color: #ffffff; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+        .header { text-align: center; margin-bottom: 40px; }
+        .logo { font-size: 3rem; color: #6366f1; margin-bottom: 10px; }
+        .subtitle { color: #a1a1aa; font-size: 1.2rem; }
+        
+        .auth-container { display: flex; justify-content: center; gap: 40px; margin: 40px 0; }
+        .auth-form { background: #1a1a1a; padding: 30px; border-radius: 12px; width: 350px; }
+        .form-title { font-size: 1.5rem; margin-bottom: 20px; color: #6366f1; }
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; margin-bottom: 8px; color: #a1a1aa; }
+        .form-group input { width: 100%; padding: 12px; border: 1px solid #333; border-radius: 6px; background: #0f0f0f; color: #fff; }
+        .btn { width: 100%; padding: 12px; background: #6366f1; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 1rem; }
+        .btn:hover { background: #5856eb; }
+        .toggle-form { text-align: center; margin-top: 20px; }
+        .toggle-form a { color: #6366f1; text-decoration: none; }
+        
+        .email-interface { display: none; background: #1a1a1a; border-radius: 12px; padding: 20px; }
+        .email-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .compose-btn { background: #6366f1; color: white; padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; }
+        .email-list { border-top: 1px solid #333; }
+        .email-item { padding: 15px; border-bottom: 1px solid #333; cursor: pointer; }
+        .email-subject { font-weight: bold; margin-bottom: 5px; }
+        .email-preview { color: #a1a1aa; font-size: 0.9rem; }
+        
+        .compose-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); }
+        .compose-content { background: #1a1a1a; margin: 50px auto; padding: 30px; border-radius: 12px; width: 600px; }
+        .close-btn { float: right; background: none; border: none; color: #a1a1aa; font-size: 1.5rem; cursor: pointer; }
+        .error { color: #ef4444; margin-top: 10px; }
+        .success { color: #10b981; margin-top: 10px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">τ</div>
+            <h1>TauMail</h1>
+            <p class="subtitle">Privacy-First Email Service</p>
+        </div>
+
+        <!-- Authentication Forms -->
+        <div class="auth-container" id="authContainer">
+            <div class="auth-form">
+                <h2 class="form-title">Login</h2>
+                <form id="loginForm">
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="email" id="loginEmail" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Password</label>
+                        <input type="password" id="loginPassword" required>
+                    </div>
+                    <button type="submit" class="btn">Login</button>
+                    <div id="loginError" class="error"></div>
+                </form>
+                <div class="toggle-form">
+                    <a href="#" onclick="toggleForm()">Need an account? Register</a>
+                </div>
+            </div>
+
+            <div class="auth-form" id="registerForm" style="display: none;">
+                <h2 class="form-title">Register</h2>
+                <form id="signupForm">
+                    <div class="form-group">
+                        <label>Name</label>
+                        <input type="text" id="registerName" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="email" id="registerEmail" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Password</label>
+                        <input type="password" id="registerPassword" required>
+                    </div>
+                    <button type="submit" class="btn">Register</button>
+                    <div id="registerError" class="error"></div>
+                </form>
+                <div class="toggle-form">
+                    <a href="#" onclick="toggleForm()">Already have an account? Login</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Email Interface -->
+        <div class="email-interface" id="emailInterface">
+            <div class="email-header">
+                <h2>Welcome, <span id="userName"></span></h2>
+                <button class="compose-btn" onclick="showCompose()">Compose</button>
+            </div>
+            <div class="email-list" id="emailList">
+                <!-- Emails will be loaded here -->
+            </div>
+        </div>
+
+        <!-- Compose Modal -->
+        <div class="compose-modal" id="composeModal">
+            <div class="compose-content">
+                <button class="close-btn" onclick="hideCompose()">&times;</button>
+                <h2>Compose Email</h2>
+                <form id="composeForm">
+                    <div class="form-group">
+                        <label>To</label>
+                        <input type="email" id="composeTo" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Subject</label>
+                        <input type="text" id="composeSubject" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Message</label>
+                        <textarea id="composeBody" rows="10" style="width: 100%; padding: 12px; border: 1px solid #333; border-radius: 6px; background: #0f0f0f; color: #fff;" required></textarea>
+                    </div>
+                    <button type="submit" class="btn">Send</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentUser = null;
+
+        function toggleForm() {
+            const loginForm = document.querySelector('.auth-form');
+            const registerForm = document.getElementById('registerForm');
+            
+            if (registerForm.style.display === 'none') {
+                loginForm.style.display = 'none';
+                registerForm.style.display = 'block';
+            } else {
+                loginForm.style.display = 'block';
+                registerForm.style.display = 'none';
+            }
+        }
+
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+
+            try {
+                const response = await fetch('/api/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+
+                const data = await response.json();
+                if (data.success) {
+                    currentUser = data.user;
+                    localStorage.setItem('tauos-token', data.token);
+                    showEmailInterface();
+                } else {
+                    document.getElementById('loginError').textContent = data.error;
+                }
+            } catch (error) {
+                document.getElementById('loginError').textContent = 'Login failed: ' + error.message;
+            }
+        });
+
+        document.getElementById('signupForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const name = document.getElementById('registerName').value;
+            const email = document.getElementById('registerEmail').value;
+            const password = document.getElementById('registerPassword').value;
+
+            try {
+                const response = await fetch('/api/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, email, password })
+                });
+
+                const data = await response.json();
+                if (data.success) {
+                    currentUser = data.user;
+                    localStorage.setItem('tauos-token', data.token);
+                    showEmailInterface();
+                } else {
+                    document.getElementById('registerError').textContent = data.error;
+                }
+            } catch (error) {
+                document.getElementById('registerError').textContent = 'Registration failed: ' + error.message;
+            }
+        });
+
+        function showEmailInterface() {
+            document.getElementById('authContainer').style.display = 'none';
+            document.getElementById('emailInterface').style.display = 'block';
+            document.getElementById('userName').textContent = currentUser.name;
+            loadEmails();
+        }
+
+        async function loadEmails() {
+            try {
+                const response = await fetch(`/api/emails/${currentUser.id}`);
+                const emails = await response.json();
+                displayEmails(emails);
+            } catch (error) {
+                console.error('Failed to load emails:', error);
+            }
+        }
+
+        function displayEmails(emails) {
+            const emailList = document.getElementById('emailList');
+            emailList.innerHTML = '';
+
+            if (emails.length === 0) {
+                emailList.innerHTML = '<div class="email-item"><p>No emails yet. Compose your first email!</p></div>';
+                return;
+            }
+
+            emails.forEach(email => {
+                const emailItem = document.createElement('div');
+                emailItem.className = 'email-item';
+                emailItem.innerHTML = `
+                    <div class="email-subject">${email.subject}</div>
+                    <div class="email-preview">To: ${email.to} • From: ${email.from} • ${new Date(email.date).toLocaleDateString()}</div>
+                `;
+                emailList.appendChild(emailItem);
+            });
+        }
+
+        function showCompose() {
+            document.getElementById('composeModal').style.display = 'block';
+        }
+
+        function hideCompose() {
+            document.getElementById('composeModal').style.display = 'none';
+        }
+
+        document.getElementById('composeForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const to = document.getElementById('composeTo').value;
+            const subject = document.getElementById('composeSubject').value;
+            const body = document.getElementById('composeBody').value;
+
+            try {
+                const response = await fetch('/api/emails', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ userId: currentUser.id, to, subject, body })
+                });
+
+                const data = await response.json();
+                if (data.success) {
+                    hideCompose();
+                    loadEmails();
+                    alert('Email sent successfully!');
+                } else {
+                    alert('Failed to send email');
+                }
+            } catch (error) {
+                alert('Failed to send email: ' + error.message);
+            }
+        });
+    </script>
+</body>
+</html>
