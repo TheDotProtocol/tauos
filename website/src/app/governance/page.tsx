@@ -1,6 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
-import { Shield, Users, FileText, Calendar, Vote, Github, Twitter, Discord } from 'lucide-react';
+import { Shield, Users, FileText, Calendar, Vote, Github, Twitter, MessageCircle } from 'lucide-react';
 
 export default function GovernancePage() {
   return (
@@ -392,7 +392,7 @@ export default function GovernancePage() {
                 href="https://discord.gg/tauos"
                 className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-6 py-3 rounded-lg font-semibold transition-all duration-200 flex items-center gap-2"
               >
-                <Discord className="h-5 w-5" />
+                <MessageCircle className="h-5 w-5" />
                 Join Discord
               </Link>
               <Link 

@@ -54,7 +54,8 @@ export default function LegalPage() {
                   <div className="bg-gray-800/50 rounded-lg p-4 border border-gray-700">
                     <h4 className="text-lg font-semibold text-purple-400 mb-2">Registration</h4>
                     <p className="text-gray-300 text-sm">
-                      AR Holdings Group is registered in Thailand under Thai corporate law.
+                      AR Holdings Group is registered in the United States in the state of California. 
+                      Tau Foundation and Tau OS Labs LLC are part of AR Holdings Group.
                     </p>
                   </div>
                   <div className="bg-gray-800/50 rounded-lg p-4 border border-gray-700">
