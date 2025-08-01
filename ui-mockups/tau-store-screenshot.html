@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tau Store Screenshot</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+            color: #F5F5F5;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .store-window {
+            width: 1200px;
+            height: 800px;
+            background: rgba(26, 26, 26, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 215, 0, 0.2);
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        .store-titlebar {
+            height: 40px;
+            background: linear-gradient(90deg, #1a1a1a 0%, #2a2a2a 100%);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 15px;
+            border-bottom: 1px solid rgba(255, 215, 0, 0.2);
+        }
+
+        .store-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #FFD700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .tau-icon {
+            font-size: 18px;
+        }
+
+        .store-controls {
+            display: flex;
+            gap: 8px;
+        }
+
+        .control-btn {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+
+        .control-btn.close {
+            background: #FF5F56;
+        }
+
+        .control-btn.minimize {
+            background: #FFBD2E;
+        }
+
+        .control-btn.maximize {
+            background: #27C93F;
+        }
+
+        .store-header {
+            height: 80px;
+            background: rgba(24, 24, 24, 0.8);
+            border-bottom: 1px solid rgba(255, 215, 0, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+        }
+
+        .search-bar {
+            flex: 1;
+            max-width: 400px;
+            height: 40px;
+            background: rgba(24, 24, 24, 0.8);
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            border-radius: 20px;
+            padding: 0 20px;
+            color: #F5F5F5;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .search-icon {
+            color: #FFD700;
+            font-size: 16px;
+        }
+
+        .user-section {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, #FFD700 0%, #FFED4E 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #000;
+            font-weight: bold;
+        }
+
+        .store-content {
+            display: flex;
+            height: calc(100% - 120px);
+        }
+
+        .store-sidebar {
+            width: 250px;
+            background: rgba(24, 24, 24, 0.8);
+            border-right: 1px solid rgba(255, 215, 0, 0.2);
+            padding: 20px;
+        }
+
+        .sidebar-section {
+            margin-bottom: 30px;
+        }
+
+        .sidebar-title {
+            font-size: 12px;
+            font-weight: 600;
+            color: #FFD700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 15px;
+        }
+
+        .sidebar-item {
+            padding: 10px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .sidebar-item:hover {
+            background: rgba(255, 215, 0, 0.1);
+        }
+
+        .sidebar-item.active {
+            background: rgba(255, 215, 0, 0.2);
+            color: #FFD700;
+        }
+
+        .sidebar-icon {
+            font-size: 16px;
+        }
+
+        .store-main {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .featured-section {
+            margin-bottom: 40px;
+        }
+
+        .section-title {
+            font-size: 24px;
+            font-weight: bold;
+            color: #FFD700;
+            margin-bottom: 20px;
+        }
+
+        .apps-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .app-card {
+            background: rgba(255, 215, 0, 0.05);
+            border: 1px solid rgba(255, 215, 0, 0.2);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .app-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(255, 215, 0, 0.2);
+            border-color: rgba(255, 215, 0, 0.4);
+        }
+
+        .app-icon {
+            width: 64px;
+            height: 64px;
+            background: linear-gradient(135deg, #FFD700 0%, #FFED4E 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            margin: 0 auto 15px;
+            box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);
+        }
+
+        .app-name {
+            font-size: 16px;
+            font-weight: 600;
+            color: #F5F5F5;
+            margin-bottom: 5px;
+        }
+
+        .app-developer {
+            font-size: 12px;
+            color: #CCCCCC;
+            margin-bottom: 10px;
+        }
+
+        .app-rating {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            margin-bottom: 15px;
+        }
+
+        .star {
+            color: #FFD700;
+            font-size: 12px;
+        }
+
+        .app-price {
+            font-size: 14px;
+            font-weight: 600;
+            color: #FFD700;
+        }
+
+        .app-price.free {
+            color: #00FF00;
+        }
+
+        .install-btn {
+            width: 100%;
+            height: 36px;
+            background: linear-gradient(135deg, #FFD700 0%, #FFED4E 100%);
+            border: none;
+            border-radius: 8px;
+            color: #000;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 10px;
+        }
+
+        .install-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(255, 215, 0, 0.4);
+        }
+
+        .featured-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: linear-gradient(135deg, #FF6B6B 0%, #FF8E8E 100%);
+            color: white;
+            font-size: 10px;
+            font-weight: bold;
+            padding: 4px 8px;
+            border-radius: 12px;
+        }
+
+        .categories-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .category-card {
+            background: rgba(255, 215, 0, 0.05);
+            border: 1px solid rgba(255, 215, 0, 0.2);
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .category-card:hover {
+            background: rgba(255, 215, 0, 0.1);
+            border-color: rgba(255, 215, 0, 0.4);
+        }
+
+        .category-icon {
+            font-size: 24px;
+            margin-bottom: 8px;
+        }
+
+        .category-name {
+            font-size: 12px;
+            font-weight: 600;
+            color: #F5F5F5;
+        }
+
+        .status-bar {
+            height: 30px;
+            background: rgba(24, 24, 24, 0.8);
+            border-top: 1px solid rgba(255, 215, 0, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 15px;
+            font-size: 12px;
+            color: #CCCCCC;
+        }
+
+        .status-left {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .status-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .status-indicator {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #00FF00;
+            box-shadow: 0 0 8px rgba(0, 255, 0, 0.5);
+        }
+    </style>
+</head>
+<body>
+    <div class="store-window">
+        <!-- Title Bar -->
+        <div class="store-titlebar">
+            <div class="store-title">
+                <span class="tau-icon">τ</span>
+                Tau Store
+            </div>
+            <div class="store-controls">
+                <div class="control-btn minimize"></div>
+                <div class="control-btn maximize"></div>
+                <div class="control-btn close"></div>
+            </div>
+        </div>
+
+        <!-- Header -->
+        <div class="store-header">
+            <div class="search-bar">
+                <span class="search-icon">🔍</span>
+                <span>Search applications...</span>
+            </div>
+            <div class="user-section">
+                <div class="user-avatar">T</div>
+                <span>tau</span>
+            </div>
+        </div>
+
+        <!-- Content -->
+        <div class="store-content">
+            <div class="store-sidebar">
+                <div class="sidebar-section">
+                    <div class="sidebar-title">Categories</div>
+                    <div class="sidebar-item active">
+                        <span class="sidebar-icon">🏠</span>
+                        <span>Featured</span>
+                    </div>
+                    <div class="sidebar-item">
+                        <span class="sidebar-icon">🎮</span>
+                        <span>Games</span>
+                    </div>
+                    <div class="sidebar-item">
+                        <span class="sidebar-icon">📱</span>
+                        <span>Productivity</span>
+                    </div>
+                    <div class="sidebar-item">
+                        <span class="sidebar-icon">🎨</span>
+                        <span>Graphics</span>
+                    </div>
+                    <div class="sidebar-item">
+                        <span class="sidebar-icon">🔧</span>
+                        <span>Development</span>
+                    </div>
+                    <div class="sidebar-item">
+                        <span class="sidebar-icon">🎵</span>
+                        <span>Multimedia</span>
+                    </div>
+                </div>
+
+                <div class="sidebar-section">
+                    <div class="sidebar-title">My Apps</div>
+                    <div class="sidebar-item">
+                        <span class="sidebar-icon">📥</span>
+                        <span>Installed</span>
+                    </div>
+                    <div class="sidebar-item">
+                        <span class="sidebar-icon">⬇️</span>
+                        <span>Updates</span>
+                    </div>
+                    <div class="sidebar-item">
+                        <span class="sidebar-icon">❤️</span>
+                        <span>Wishlist</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="store-main">
+                <div class="featured-section">
+                    <div class="section-title">Featured Applications</div>
+                    <div class="apps-grid">
+                        <div class="app-card">
+                            <div class="featured-badge">FEATURED</div>
+                            <div class="app-icon">📝</div>
+                            <div class="app-name">Tau Editor</div>
+                            <div class="app-developer">TauOS Team</div>
+                            <div class="app-rating">
+                                <span class="star">★</span>
+                                <span class="star">★</span>
+                                <span class="star">★</span>
+                                <span class="star">★</span>
+                                <span class="star">★</span>
+                                <span>(4.9)</span>
+                            </div>
+                            <div class="app-price free">Free</div>
+                            <button class="install-btn">Install</button>
+                        </div>
+
+                        <div class="app-card">
+                            <div class="app-icon">🎨</div>
+                            <div class="app-name">Tau Paint</div>
+                            <div class="app-developer">TauOS Team</div>
+                            <div class="app-rating">
+                                <span class="star">★</span>
+                                <span class="star">★</span>
+                                <span class="star">★</span>
+                                <span class="star">★</span>
+                                <span class="star">☆</span>
+                                <span>(4.2)</span>
+                            </div>
+                            <div class="app-price free">Free</div>
+                            <button class="install-btn">Install</button>
+                        </div>
+
+                        <div class="app-card">
+                            <div class="app-icon">🎮</div>
+                            <div class="app-name">Tau Games</div>
+                            <div class="app-developer">TauOS Team</div>
+                            <div class="app-rating">
+                                <span class="star">★</span>
+                                <span class="star">★</span>
+                                <span class="star">★</span>
+                                <span class="star">★</span>
+                                <span class="star">★</span>
+                                <span>(4.8)</span>
+                            </div>
+                            <div class="app-price free">Free</div>
+                            <button class="install-btn">Install</button>
+                        </div>
+
+                        <div class="app-card">
+                            <div class="app-icon">📊</div>
+                            <div class="app-name">Tau Calculator</div>
+                            <div class="app-developer">TauOS Team</div>
+                            <div class="app-rating">
+                                <span class="star">★</span>
+                                <span class="star">★</span>
+                                <span class="star">★</span>
+                                <span class="star">★</span>
+                                <span class="star">☆</span>
+                                <span>(4.1)</span>
+                            </div>
+                            <div class="app-price free">Free</div>
+                            <button class="install-btn">Install</button>
+                        </div>
+
+                        <div class="app-card">
+                            <div class="app-icon">📷</div>
+                            <div class="app-name">Tau Camera</div>
+                            <div class="app-developer">TauOS Team</div>
+                            <div class="app-rating">
+                                <span class="star">★</span>
+                                <span class="star">★</span>
+                                <span class="star">★</span>
+                                <span class="star">★</span>
+                                <span class="star">★</span>
+                                <span>(4.7)</span>
+                            </div>
+                            <div class="app-price free">Free</div>
+                            <button class="install-btn">Install</button>
+                        </div>
+
+                        <div class="app-card">
+                            <div class="app-icon">🔧</div>
+                            <div class="app-name">Tau Terminal</div>
+                            <div class="app-developer">TauOS Team</div>
+                            <div class="app-rating">
+                                <span class="star">★</span>
+                                <span class="star">★</span>
+                                <span class="star">★</span>
+                                <span class="star">★</span>
+                                <span class="star">★</span>
+                                <span>(4.9)</span>
+                            </div>
+                            <div class="app-price free">Free</div>
+                            <button class="install-btn">Install</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="featured-section">
+                    <div class="section-title">Categories</div>
+                    <div class="categories-grid">
+                        <div class="category-card">
+                            <div class="category-icon">🎮</div>
+                            <div class="category-name">Games</div>
+                        </div>
+                        <div class="category-card">
+                            <div class="category-icon">📱</div>
+                            <div class="category-name">Productivity</div>
+                        </div>
+                        <div class="category-card">
+                            <div class="category-icon">🎨</div>
+                            <div class="category-name">Graphics</div>
+                        </div>
+                        <div class="category-card">
+                            <div class="category-icon">🔧</div>
+                            <div class="category-name">Development</div>
+                        </div>
+                        <div class="category-card">
+                            <div class="category-icon">🎵</div>
+                            <div class="category-name">Multimedia</div>
+                        </div>
+                        <div class="category-card">
+                            <div class="category-icon">🌐</div>
+                            <div class="category-name">Internet</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Status Bar -->
+        <div class="status-bar">
+            <div class="status-left">
+                <div class="status-item">
+                    <div class="status-indicator"></div>
+                    <span>Connected to Tau Store</span>
+                </div>
+                <div class="status-item">
+                    <span>1,247 applications available</span>
+                </div>
+            </div>
+            <div class="status-item">
+                <span>Last updated: 2 minutes ago</span>
+            </div>
+        </div>
+    </div>
+</body>
+</html> 

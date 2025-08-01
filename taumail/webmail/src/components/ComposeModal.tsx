@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { XMarkIcon, PaperClipIcon, LockClosedIcon } from '@heroicons/react/24/outline';
 
 interface ComposeModalProps {
@@ -9,7 +9,7 @@ interface ComposeModalProps {
   onSend: (emailData: any) => void;
 }
 
-export const ComposeModal: React.FC<ComposeModalProps> = ({ isOpen, onClose, onSend }) => {
+const ComposeModal: React.FC<ComposeModalProps> = ({ isOpen, onClose, onSend }) => {
   const [formData, setFormData] = useState({
     to: '',
     cc: '',
@@ -157,4 +157,6 @@ export const ComposeModal: React.FC<ComposeModalProps> = ({ isOpen, onClose, onS
       </div>
     </div>
   );
-}; 
+};
+
+export default ComposeModal; 

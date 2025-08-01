@@ -18,7 +18,7 @@ interface SidebarProps {
   mode: 'standard' | 'parental' | 'senior';
 }
 
-export const Sidebar: React.FC<SidebarProps> = ({ 
+const Sidebar: React.FC<SidebarProps> = ({ 
   selectedFolder, 
   onFolderSelect, 
   onCompose,
@@ -113,4 +113,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
       </div>
     </div>
   );
-}; 
+};
+
+export default Sidebar; 

@@ -7,9 +7,6 @@ import {
   ShieldCheckIcon,
   LockClosedIcon
 } from '@heroicons/react/24/outline';
-import { AccessibilityModeSelector } from './AccessibilityModes';
-import { MultilingualSupport } from './MultilingualSupport';
-import { SecurityTrustSeal } from './SecurityTrustSeal';
 
 interface HeaderProps {
   mode: 'standard' | 'parental' | 'senior';
@@ -18,7 +15,7 @@ interface HeaderProps {
   onAccessibilityChange: (settings: any) => void;
 }
 
-export const Header: React.FC<HeaderProps> = ({
+const Header: React.FC<HeaderProps> = ({
   mode,
   onModeChange,
   onLanguageChange,
@@ -57,17 +54,33 @@ export const Header: React.FC<HeaderProps> = ({
 
         {/* Controls */}
         <div className="flex items-center space-x-4">
-          {/* Accessibility Mode */}
-          <AccessibilityModeSelector 
-            mode={mode} 
-            onModeChange={onModeChange} 
-          />
+          {/* Accessibility Mode Selector */}
+          <div className="flex items-center space-x-2">
+            <select
+              value={mode}
+              onChange={(e) => onModeChange(e.target.value as any)}
+              className="px-3 py-1 border border-gray-300 rounded-lg text-sm"
+            >
+              <option value="standard">Standard</option>
+              <option value="parental">Parental</option>
+              <option value="senior">Senior</option>
+            </select>
+          </div>
 
-          {/* Language & Accessibility */}
-          <MultilingualSupport 
-            onLanguageChange={onLanguageChange}
-            onAccessibilityChange={onAccessibilityChange}
-          />
+          {/* Language Selector */}
+          <div className="flex items-center space-x-2">
+            <select
+              onChange={(e) => onLanguageChange(e.target.value)}
+              className="px-3 py-1 border border-gray-300 rounded-lg text-sm"
+            >
+              <option value="en">English</option>
+              <option value="es">Español</option>
+              <option value="th">ไทย</option>
+              <option value="hi">हिंदी</option>
+              <option value="fr">Français</option>
+              <option value="km">ខ្មែរ</option>
+            </select>
+          </div>
 
           {/* Notifications */}
           <button className="p-2 text-gray-600 hover:text-gray-800 relative">
@@ -85,8 +98,17 @@ export const Header: React.FC<HeaderProps> = ({
 
       {/* Security Status Bar */}
       <div className="mt-4 pt-4 border-t border-gray-100">
-        <SecurityTrustSeal mode="dashboard" />
+        <div className="flex items-center justify-between text-sm">
+          <div className="flex items-center space-x-4">
+            <span className="text-green-600">🔒 0 trackers</span>
+            <span className="text-green-600">📊 0 ads served</span>
+            <span className="text-green-600">🔐 100% encrypted</span>
+          </div>
+          <span className="text-gray-500">99.9% uptime</span>
+        </div>
       </div>
     </header>
   );
-}; 
+};
+
+export default Header; 

@@ -1,0 +1,84 @@
+[package]
+name = "tauconnect-client"
+version = "1.0.0"
+edition = "2021"
+authors = ["TauOS Team <admin@tauos.org>"]
+description = "TauConnect native client for TauOS"
+license = "MIT"
+
+[dependencies]
+# GUI Framework
+gtk = { version = "0.7", features = ["v4_8"] }
+glib = "0.18"
+gio = "0.18"
+adw = "0.5"
+gstreamer = "0.20"
+gstreamer-video = "0.20"
+gstreamer-audio = "0.20"
+gstreamer-app = "0.20"
+
+# WebRTC and Media
+webrtc = "0.1"
+webrtc-rs = "0.1"
+mediasoup = "0.1"
+opencv = "0.84"
+
+# Networking
+tokio = { version = "1.0", features = ["full"] }
+reqwest = { version = "0.11", features = ["json", "rustls-tls"] }
+websocket = "0.26"
+tungstenite = { version = "0.20", features = ["rustls-tls"] }
+
+# Serialization
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+
+# Database
+sqlx = { version = "0.7", features = ["runtime-tokio-rustls", "sqlite", "chrono"] }
+
+# Cryptography
+ring = "0.17"
+aes = "0.8"
+sha2 = "0.10"
+base64 = "0.21"
+
+# Utilities
+anyhow = "1.0"
+thiserror = "1.0"
+chrono = { version = "0.4", features = ["serde"] }
+uuid = { version = "1.0", features = ["v4", "serde"] }
+log = "0.4"
+env_logger = "0.10"
+tracing = "0.1"
+tracing-subscriber = "0.3"
+
+# Configuration
+config = "0.13"
+toml = "0.8"
+
+# Localization
+gettext-rs = "5.0"
+gettext = "0.7"
+
+# Audio/Video Processing
+cpal = "0.15"
+dasp = "0.11"
+image = "0.24"
+
+# Async
+futures = "0.3"
+async-trait = "0.1"
+
+[dev-dependencies]
+tokio-test = "0.4"
+mockall = "0.12"
+
+[[bin]]
+name = "tauconnect"
+path = "src/main.rs"
+
+[profile.release]
+opt-level = 3
+lto = true
+codegen-units = 1
+panic = "abort" 

@@ -1,0 +1,264 @@
+# TauMail Domain Configuration
+# All AR Holdings domains and their email configurations
+
+domains:
+  # Primary TauOS domain
+  tauos.org:
+    enabled: true
+    primary: true
+    mx_records:
+      - priority: 10
+        host: mail.tauos.org
+    spf_record: "v=spf1 mx a ip4:172.20.0.0/16 ~all"
+    dkim_selector: "taumail"
+    dmarc_policy: "v=DMARC1; p=quarantine; rua=mailto:dmarc@tauos.org; ruf=mailto:dmarc@tauos.org"
+    ssl_certificate: "/etc/ssl/nginx/tauos.org.crt"
+    ssl_key: "/etc/ssl/nginx/tauos.org.key"
+    catch_all: true
+    quota: "10GB"
+    max_attachment_size: "50MB"
+    spam_threshold: 5.0
+
+  # AR Holdings Group
+  arholdings.group:
+    enabled: true
+    primary: false
+    mx_records:
+      - priority: 10
+        host: mail.tauos.org
+    spf_record: "v=spf1 mx a ip4:172.20.0.0/16 ~all"
+    dkim_selector: "taumail"
+    dmarc_policy: "v=DMARC1; p=quarantine; rua=mailto:dmarc@arholdings.group; ruf=mailto:dmarc@arholdings.group"
+    ssl_certificate: "/etc/ssl/nginx/arholdings.group.crt"
+    ssl_key: "/etc/ssl/nginx/arholdings.group.key"
+    catch_all: false
+    quota: "5GB"
+    max_attachment_size: "25MB"
+    spam_threshold: 5.0
+
+  # The Dot Protocol
+  thedotprotocol.com:
+    enabled: true
+    primary: false
+    mx_records:
+      - priority: 10
+        host: mail.tauos.org
+    spf_record: "v=spf1 mx a ip4:172.20.0.0/16 ~all"
+    dkim_selector: "taumail"
+    dmarc_policy: "v=DMARC1; p=quarantine; rua=mailto:dmarc@thedotprotocol.com; ruf=mailto:dmarc@thedotprotocol.com"
+    ssl_certificate: "/etc/ssl/nginx/thedotprotocol.com.crt"
+    ssl_key: "/etc/ssl/nginx/thedotprotocol.com.key"
+    catch_all: false
+    quota: "5GB"
+    max_attachment_size: "25MB"
+    spam_threshold: 5.0
+
+  # The Brain Defence
+  thebraindefence.org:
+    enabled: true
+    primary: false
+    mx_records:
+      - priority: 10
+        host: mail.tauos.org
+    spf_record: "v=spf1 mx a ip4:172.20.0.0/16 ~all"
+    dkim_selector: "taumail"
+    dmarc_policy: "v=DMARC1; p=quarantine; rua=mailto:dmarc@thebraindefence.org; ruf=mailto:dmarc@thebraindefence.org"
+    ssl_certificate: "/etc/ssl/nginx/thebraindefence.org.crt"
+    ssl_key: "/etc/ssl/nginx/thebraindefence.org.key"
+    catch_all: false
+    quota: "5GB"
+    max_attachment_size: "25MB"
+    spam_threshold: 5.0
+
+  # Global Dot Bank
+  globaldotbank.org:
+    enabled: true
+    primary: false
+    mx_records:
+      - priority: 10
+        host: mail.tauos.org
+    spf_record: "v=spf1 mx a ip4:172.20.0.0/16 ~all"
+    dkim_selector: "taumail"
+    dmarc_policy: "v=DMARC1; p=quarantine; rua=mailto:dmarc@globaldotbank.org; ruf=mailto:dmarc@globaldotbank.org"
+    ssl_certificate: "/etc/ssl/nginx/globaldotbank.org.crt"
+    ssl_key: "/etc/ssl/nginx/globaldotbank.org.key"
+    catch_all: false
+    quota: "5GB"
+    max_attachment_size: "25MB"
+    spam_threshold: 5.0
+
+  # Kibouor
+  kibouor.org:
+    enabled: true
+    primary: false
+    mx_records:
+      - priority: 10
+        host: mail.tauos.org
+    spf_record: "v=spf1 mx a ip4:172.20.0.0/16 ~all"
+    dkim_selector: "taumail"
+    dmarc_policy: "v=DMARC1; p=quarantine; rua=mailto:dmarc@kibouor.org; ruf=mailto:dmarc@kibouor.org"
+    ssl_certificate: "/etc/ssl/nginx/kibouor.org.crt"
+    ssl_key: "/etc/ssl/nginx/kibouor.org.key"
+    catch_all: false
+    quota: "5GB"
+    max_attachment_size: "25MB"
+    spam_threshold: 5.0
+
+  # Dot Protocol Scan
+  dotprotocolscan.com:
+    enabled: true
+    primary: false
+    mx_records:
+      - priority: 10
+        host: mail.tauos.org
+    spf_record: "v=spf1 mx a ip4:172.20.0.0/16 ~all"
+    dkim_selector: "taumail"
+    dmarc_policy: "v=DMARC1; p=quarantine; rua=mailto:dmarc@dotprotocolscan.com; ruf=mailto:dmarc@dotprotocolscan.com"
+    ssl_certificate: "/etc/ssl/nginx/dotprotocolscan.com.crt"
+    ssl_key: "/etc/ssl/nginx/dotprotocolscan.com.key"
+    catch_all: false
+    quota: "5GB"
+    max_attachment_size: "25MB"
+    spam_threshold: 5.0
+
+  # Ask Trabaajo
+  asktrabaajo.com:
+    enabled: true
+    primary: false
+    mx_records:
+      - priority: 10
+        host: mail.tauos.org
+    spf_record: "v=spf1 mx a ip4:172.20.0.0/16 ~all"
+    dkim_selector: "taumail"
+    dmarc_policy: "v=DMARC1; p=quarantine; rua=mailto:dmarc@asktrabaajo.com; ruf=mailto:dmarc@asktrabaajo.com"
+    ssl_certificate: "/etc/ssl/nginx/asktrabaajo.com.crt"
+    ssl_key: "/etc/ssl/nginx/asktrabaajo.com.key"
+    catch_all: false
+    quota: "5GB"
+    max_attachment_size: "25MB"
+    spam_threshold: 5.0
+
+# Global Settings
+global:
+  # Mail Server Configuration
+  mail_server:
+    hostname: "mail.tauos.org"
+    ip_address: "172.20.0.10"
+    smtp_port: 25
+    smtp_submission_port: 587
+    imap_port: 143
+    imaps_port: 993
+    pop3_port: 110
+    pop3s_port: 995
+
+  # SSL/TLS Configuration
+  ssl:
+    provider: "letsencrypt"
+    email: "admin@tauos.org"
+    staging: false
+    auto_renew: true
+    renewal_days: 30
+
+  # Security Settings
+  security:
+    enable_tls: true
+    require_tls: true
+    tls_protocols: ["TLSv1.2", "TLSv1.3"]
+    cipher_suite: "ECDHE-RSA-AES256-GCM-SHA384"
+    enable_dkim: true
+    enable_spf: true
+    enable_dmarc: true
+
+  # Anti-Spam Configuration
+  antispam:
+    rspamd_host: "rspamd"
+    rspamd_port: 11332
+    enable_bayes: true
+    enable_learning: true
+    spam_threshold: 5.0
+    ham_threshold: -5.0
+
+  # Storage Configuration
+  storage:
+    mail_dir: "/var/mail"
+    backup_dir: "/var/backups/taumail"
+    log_dir: "/var/log/taumail"
+    temp_dir: "/tmp/taumail"
+
+  # Database Configuration
+  database:
+    type: "postgresql"
+    host: "postgres"
+    port: 5432
+    name: "taumail"
+    user: "taumail"
+    password: "${DB_PASSWORD}"
+
+  # Redis Configuration
+  redis:
+    host: "redis"
+    port: 6379
+    password: "${REDIS_PASSWORD}"
+    database: 0
+
+  # Webmail Configuration
+  webmail:
+    hostname: "mail.tauos.org"
+    port: 3000
+    ssl: true
+    session_timeout: 3600
+    max_upload_size: "50MB"
+    enable_attachments: true
+    enable_search: true
+    enable_filters: true
+
+  # Admin Configuration
+  admin:
+    hostname: "admin.tauos.org"
+    port: 3001
+    ssl: true
+    session_timeout: 7200
+    enable_audit_log: true
+    enable_backup: true
+
+  # API Configuration
+  api:
+    hostname: "api.tauos.org"
+    port: 8000
+    ssl: true
+    rate_limit: 1000
+    rate_limit_window: 3600
+    enable_webhooks: true
+    webhook_timeout: 30
+
+# Default User Settings
+default_user:
+  quota: "1GB"
+  max_attachment_size: "10MB"
+  enable_imap: true
+  enable_pop3: false
+  enable_smtp: true
+  enable_webmail: true
+  enable_api: true
+  spam_threshold: 5.0
+  auto_delete_spam: false
+  auto_delete_after_days: 30
+
+# Backup Configuration
+backup:
+  enabled: true
+  schedule: "0 2 * * *"  # Daily at 2 AM
+  retention_days: 30
+  compression: true
+  encryption: true
+  include_attachments: true
+  include_logs: true
+
+# Monitoring Configuration
+monitoring:
+  enabled: true
+  prometheus_port: 9090
+  grafana_port: 3000
+  alertmanager_port: 9093
+  log_retention_days: 90
+  metrics_retention_days: 30 

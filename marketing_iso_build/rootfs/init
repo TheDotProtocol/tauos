@@ -1,0 +1,48 @@
+#!/bin/sh
+# TauOS Marketing Init Script
+
+echo "🐢 Starting TauOS Marketing Demo..."
+echo "=================================="
+
+# Mount essential filesystems
+mount -t proc none /proc
+mount -t sysfs none /sys
+mount -t devtmpfs none /dev
+
+# Set up networking
+ifconfig lo 127.0.0.1 up
+
+echo ""
+echo "TauOS System Information:"
+echo "========================="
+echo "Version: 1.0.0"
+echo "Architecture: x86_64"
+echo "Kernel: Linux 6.6.30"
+echo "Desktop: GTK4 with TauOS theming"
+echo "Features: Privacy-first, Zero telemetry"
+echo ""
+
+echo "Starting TauOS services..."
+echo "✅ System monitoring"
+echo "✅ Security framework"
+echo "✅ Package management"
+echo "✅ Update system"
+echo ""
+
+echo "Loading applications..."
+echo "✅ TauMail - Privacy-first email"
+echo "✅ TauCloud - Secure cloud storage"
+echo "✅ TauConnect - Video calling"
+echo "✅ TauMessenger - Secure messaging"
+echo ""
+
+echo "🐢 TauOS Marketing Demo Ready!"
+echo "=============================="
+echo ""
+echo "This is a demonstration of TauOS capabilities."
+echo "For the full experience, visit: https://tauos.org"
+echo ""
+echo "Press Enter to continue..."
+read
+
+exec /bin/sh

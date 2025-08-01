@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TauOS - Login Screen</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        
+        .tau-gradient {
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d1b69 50%, #1a1a1a 100%);
+        }
+        
+        .tau-glow {
+            box-shadow: 0 0 20px rgba(147, 51, 234, 0.3);
+        }
+        
+        .tau-border {
+            border: 1px solid rgba(147, 51, 234, 0.2);
+        }
+        
+        .tau-input {
+            background: rgba(26, 26, 26, 0.8);
+            border: 1px solid rgba(147, 51, 234, 0.3);
+            backdrop-filter: blur(10px);
+        }
+        
+        .tau-input:focus {
+            border-color: #9333ea;
+            box-shadow: 0 0 0 3px rgba(147, 51, 234, 0.1);
+        }
+        
+        .tau-button {
+            background: linear-gradient(135deg, #9333ea 0%, #7c3aed 100%);
+            transition: all 0.3s ease;
+        }
+        
+        .tau-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(147, 51, 234, 0.4);
+        }
+        
+        .tau-logo {
+            background: linear-gradient(135deg, #9333ea 0%, #7c3aed 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .shimmer {
+            background: linear-gradient(90deg, transparent, rgba(147, 51, 234, 0.1), transparent);
+            background-size: 200% 100%;
+            animation: shimmer 2s infinite;
+        }
+        
+        @keyframes shimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.8s ease-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .pulse-glow {
+            animation: pulseGlow 2s infinite;
+        }
+        
+        @keyframes pulseGlow {
+            0%, 100% { box-shadow: 0 0 20px rgba(147, 51, 234, 0.3); }
+            50% { box-shadow: 0 0 30px rgba(147, 51, 234, 0.6); }
+        }
+    </style>
+</head>
+<body class="tau-gradient min-h-screen flex items-center justify-center p-4">
+    <!-- Background Pattern -->
+    <div class="absolute inset-0 opacity-5">
+        <div class="absolute inset-0" style="background-image: radial-gradient(circle at 25% 25%, #9333ea 1px, transparent 1px), radial-gradient(circle at 75% 75%, #9333ea 1px, transparent 1px); background-size: 50px 50px;"></div>
+    </div>
+
+    <!-- Main Login Container -->
+    <div class="relative w-full max-w-md">
+        <!-- TauOS Logo and Branding -->
+        <div class="text-center mb-8 fade-in">
+            <div class="tau-logo text-6xl font-bold mb-4">τ</div>
+            <h1 class="text-3xl font-bold text-white mb-2">TauOS</h1>
+            <p class="text-gray-400 text-sm">Secure • Private • Yours</p>
+        </div>
+
+        <!-- Login Form -->
+        <div class="bg-black/20 backdrop-blur-xl rounded-2xl p-8 tau-border fade-in" style="animation-delay: 0.2s;">
+            <!-- User Avatar -->
+            <div class="text-center mb-6">
+                <div class="w-20 h-20 mx-auto rounded-full bg-gradient-to-br from-purple-500 to-blue-600 flex items-center justify-center mb-4 pulse-glow">
+                    <span class="text-2xl text-white font-semibold">U</span>
+                </div>
+                <h2 class="text-xl font-semibold text-white mb-1">Welcome back</h2>
+                <p class="text-gray-400 text-sm">user@tauos.local</p>
+            </div>
+
+            <!-- Password Input -->
+            <div class="mb-6">
+                <div class="relative">
+                    <input 
+                        type="password" 
+                        placeholder="Enter your password" 
+                        class="w-full px-4 py-3 tau-input rounded-lg text-white placeholder-gray-400 focus:outline-none transition-all duration-300"
+                        autocomplete="current-password"
+                    >
+                    <div class="absolute right-3 top-1/2 transform -translate-y-1/2">
+                        <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Login Button -->
+            <button class="w-full tau-button text-white font-semibold py-3 rounded-lg mb-4 transition-all duration-300">
+                <span class="flex items-center justify-center">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    Login to TauOS
+                </span>
+            </button>
+
+            <!-- Alternative Login Options -->
+            <div class="space-y-3">
+                <!-- TauID Login -->
+                <button class="w-full bg-gray-800/50 hover:bg-gray-700/50 text-white font-medium py-3 rounded-lg transition-all duration-300 border border-gray-700 hover:border-purple-500">
+                    <span class="flex items-center justify-center">
+                        <div class="w-5 h-5 mr-2 rounded-full bg-gradient-to-r from-purple-500 to-blue-600"></div>
+                        Login with TauID
+                    </span>
+                </button>
+
+                <!-- Biometric Login -->
+                <button class="w-full bg-gray-800/50 hover:bg-gray-700/50 text-white font-medium py-3 rounded-lg transition-all duration-300 border border-gray-700 hover:border-purple-500">
+                    <span class="flex items-center justify-center">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+                        </svg>
+                        Use Biometric
+                    </span>
+                </button>
+            </div>
+
+            <!-- Security Status -->
+            <div class="mt-6 pt-6 border-t border-gray-700">
+                <div class="flex items-center justify-between text-sm">
+                    <div class="flex items-center text-green-400">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+                        </svg>
+                        Secure Connection
+                    </div>
+                    <div class="text-gray-400">
+                        <span class="shimmer">●</span> Online
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- System Status -->
+        <div class="mt-6 text-center text-gray-400 text-sm">
+            <div class="flex items-center justify-center space-x-4">
+                <div class="flex items-center">
+                    <div class="w-2 h-2 bg-green-400 rounded-full mr-2"></div>
+                    <span>System Ready</span>
+                </div>
+                <div class="flex items-center">
+                    <div class="w-2 h-2 bg-blue-400 rounded-full mr-2"></div>
+                    <span>Network Active</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Emergency Options -->
+        <div class="mt-8 text-center">
+            <button class="text-gray-400 hover:text-white text-sm transition-colors duration-300">
+                Emergency Access
+            </button>
+            <span class="text-gray-600 mx-2">•</span>
+            <button class="text-gray-400 hover:text-white text-sm transition-colors duration-300">
+                Recovery Mode
+            </button>
+        </div>
+    </div>
+
+    <!-- Floating Security Badge -->
+    <div class="fixed top-4 right-4 bg-black/20 backdrop-blur-xl rounded-lg p-3 tau-border">
+        <div class="flex items-center text-green-400 text-sm">
+            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+            </svg>
+            <span>Encrypted</span>
+        </div>
+    </div>
+
+    <!-- Time and Date -->
+    <div class="fixed top-4 left-4 text-white text-right">
+        <div class="text-2xl font-light" id="time">12:34</div>
+        <div class="text-sm text-gray-400" id="date">Wednesday, July 30</div>
+    </div>
+
+    <script>
+        // Update time and date
+        function updateTime() {
+            const now = new Date();
+            const timeElement = document.getElementById('time');
+            const dateElement = document.getElementById('date');
+            
+            timeElement.textContent = now.toLocaleTimeString('en-US', { 
+                hour12: false, 
+                hour: '2-digit', 
+                minute: '2-digit' 
+            });
+            
+            dateElement.textContent = now.toLocaleDateString('en-US', { 
+                weekday: 'long', 
+                month: 'long', 
+                day: 'numeric' 
+            });
+        }
+        
+        updateTime();
+        setInterval(updateTime, 1000);
+
+        // Add some interactivity
+        document.querySelectorAll('button').forEach(button => {
+            button.addEventListener('click', function() {
+                this.style.transform = 'scale(0.95)';
+                setTimeout(() => {
+                    this.style.transform = '';
+                }, 150);
+            });
+        });
+
+        // Password field focus effect
+        const passwordInput = document.querySelector('input[type="password"]');
+        passwordInput.addEventListener('focus', function() {
+            this.parentElement.classList.add('tau-glow');
+        });
+        passwordInput.addEventListener('blur', function() {
+            this.parentElement.classList.remove('tau-glow');
+        });
+    </script>
+</body>
+</html> 

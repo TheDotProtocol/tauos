@@ -1,7 +1,6 @@
 'use client';
 
 import React from 'react';
-import { SecurityBadge } from './SecurityTrustSeal';
 
 interface Email {
   id: string;
@@ -24,7 +23,7 @@ interface EmailViewerProps {
   onEmailAction: (emailId: string, action: string, value?: any) => void;
 }
 
-export const EmailViewer: React.FC<EmailViewerProps> = ({ email, onEmailAction }) => {
+const EmailViewer: React.FC<EmailViewerProps> = ({ email, onEmailAction }) => {
   if (!email) {
     return (
       <div className="flex-1 flex items-center justify-center text-gray-500">
@@ -37,6 +36,17 @@ export const EmailViewer: React.FC<EmailViewerProps> = ({ email, onEmailAction }
     );
   }
 
+  const getSecurityBadge = (level: string) => {
+    switch (level) {
+      case 'encrypted':
+        return <span className="text-green-600">🔒 Encrypted</span>;
+      case 'verified':
+        return <span className="text-blue-600">✓ Verified</span>;
+      default:
+        return <span className="text-gray-600">• Standard</span>;
+    }
+  };
+
   return (
     <div className="flex-1 p-6 bg-white">
       <div className="max-w-4xl mx-auto">
@@ -48,7 +58,7 @@ export const EmailViewer: React.FC<EmailViewerProps> = ({ email, onEmailAction }
               <div className="flex items-center space-x-4 text-sm text-gray-600">
                 <span><strong>From:</strong> {email.from}</span>
                 <span><strong>Date:</strong> {new Date(email.date).toLocaleString()}</span>
-                <SecurityBadge type={email.securityLevel} />
+                {getSecurityBadge(email.securityLevel)}
               </div>
             </div>
           </div>
@@ -79,4 +89,6 @@ export const EmailViewer: React.FC<EmailViewerProps> = ({ email, onEmailAction }
       </div>
     </div>
   );
-}; 
+};
+
+export default EmailViewer; 

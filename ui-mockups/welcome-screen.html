@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TauOS - Welcome Screen</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="design-system/tauos-design-system.css">
+    <style>
+        .welcome-gradient {
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a0f3a 30%, #2d1b69 70%, #0a0a0a 100%);
+        }
+        
+        .floating-particles {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+        
+        .particle {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: rgba(147, 51, 234, 0.3);
+            border-radius: 50%;
+            animation: float 6s infinite linear;
+        }
+        
+        @keyframes float {
+            0% {
+                transform: translateY(100vh) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100px) rotate(360deg);
+                opacity: 0;
+            }
+        }
+        
+        .welcome-logo {
+            animation: welcomePulse 3s ease-in-out infinite;
+        }
+        
+        @keyframes welcomePulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        
+        .language-option {
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .language-option:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(147, 51, 234, 0.3);
+        }
+        
+        .language-option.selected {
+            background: linear-gradient(135deg, #9333ea 0%, #7c3aed 100%);
+            border-color: #9333ea;
+        }
+    </style>
+</head>
+<body class="welcome-gradient min-h-screen font-inter">
+    <!-- Floating Particles Background -->
+    <div class="floating-particles">
+        <div class="particle" style="left: 10%; animation-delay: 0s;"></div>
+        <div class="particle" style="left: 20%; animation-delay: 1s;"></div>
+        <div class="particle" style="left: 30%; animation-delay: 2s;"></div>
+        <div class="particle" style="left: 40%; animation-delay: 3s;"></div>
+        <div class="particle" style="left: 50%; animation-delay: 4s;"></div>
+        <div class="particle" style="left: 60%; animation-delay: 5s;"></div>
+        <div class="particle" style="left: 70%; animation-delay: 6s;"></div>
+        <div class="particle" style="left: 80%; animation-delay: 7s;"></div>
+        <div class="particle" style="left: 90%; animation-delay: 8s;"></div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="min-h-screen flex flex-col items-center justify-center p-8">
+        <!-- Header Section -->
+        <div class="text-center mb-16 fade-in">
+            <div class="welcome-logo text-9xl font-bold mb-8 tau-text-gradient">τ</div>
+            <h1 class="text-5xl font-bold text-white mb-4">TauOS</h1>
+            <p class="text-xl text-gray-300 mb-2">Privacy by Design</p>
+            <p class="text-sm text-gray-400">Welcome to the future of secure computing</p>
+        </div>
+
+        <!-- Language Selection -->
+        <div class="w-full max-w-4xl mb-12 fade-in" style="animation-delay: 0.3s;">
+            <h2 class="text-2xl font-semibold text-white mb-6 text-center">Choose Your Language</h2>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div class="language-option selected bg-black/30 backdrop-blur-xl rounded-xl p-6 border border-purple-500/30">
+                    <div class="text-center">
+                        <div class="text-2xl mb-2">🇺🇸</div>
+                        <div class="text-white font-medium">English</div>
+                        <div class="text-gray-400 text-sm">Default</div>
+                    </div>
+                </div>
+                <div class="language-option bg-black/30 backdrop-blur-xl rounded-xl p-6 border border-gray-700 hover:border-purple-500/30">
+                    <div class="text-center">
+                        <div class="text-2xl mb-2">🇪🇸</div>
+                        <div class="text-white font-medium">Español</div>
+                        <div class="text-gray-400 text-sm">Spanish</div>
+                    </div>
+                </div>
+                <div class="language-option bg-black/30 backdrop-blur-xl rounded-xl p-6 border border-gray-700 hover:border-purple-500/30">
+                    <div class="text-center">
+                        <div class="text-2xl mb-2">🇫🇷</div>
+                        <div class="text-white font-medium">Français</div>
+                        <div class="text-gray-400 text-sm">French</div>
+                    </div>
+                </div>
+                <div class="language-option bg-black/30 backdrop-blur-xl rounded-xl p-6 border border-gray-700 hover:border-purple-500/30">
+                    <div class="text-center">
+                        <div class="text-2xl mb-2">🇹🇭</div>
+                        <div class="text-white font-medium">ไทย</div>
+                        <div class="text-gray-400 text-sm">Thai</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Accessibility Options -->
+        <div class="w-full max-w-2xl mb-12 fade-in" style="animation-delay: 0.6s;">
+            <h2 class="text-2xl font-semibold text-white mb-6 text-center">Accessibility Options</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="bg-black/30 backdrop-blur-xl rounded-xl p-6 border border-gray-700">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center">
+                            <svg class="w-6 h-6 text-purple-400 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"></path>
+                            </svg>
+                            <span class="text-white font-medium">Screen Reader</span>
+                        </div>
+                        <div class="relative">
+                            <input type="checkbox" class="sr-only" id="screen-reader">
+                            <label for="screen-reader" class="block w-12 h-6 bg-gray-700 rounded-full cursor-pointer">
+                                <div class="w-5 h-5 bg-white rounded-full transform transition-transform duration-200 translate-x-1"></div>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-black/30 backdrop-blur-xl rounded-xl p-6 border border-gray-700">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center">
+                            <svg class="w-6 h-6 text-purple-400 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                            </svg>
+                            <span class="text-white font-medium">High Contrast</span>
+                        </div>
+                        <div class="relative">
+                            <input type="checkbox" class="sr-only" id="high-contrast">
+                            <label for="high-contrast" class="block w-12 h-6 bg-gray-700 rounded-full cursor-pointer">
+                                <div class="w-5 h-5 bg-white rounded-full transform transition-transform duration-200 translate-x-1"></div>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-black/30 backdrop-blur-xl rounded-xl p-6 border border-gray-700">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center">
+                            <svg class="w-6 h-6 text-purple-400 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                            </svg>
+                            <span class="text-white font-medium">Large Text</span>
+                        </div>
+                        <div class="relative">
+                            <input type="checkbox" class="sr-only" id="large-text">
+                            <label for="large-text" class="block w-12 h-6 bg-gray-700 rounded-full cursor-pointer">
+                                <div class="w-5 h-5 bg-white rounded-full transform transition-transform duration-200 translate-x-1"></div>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-black/30 backdrop-blur-xl rounded-xl p-6 border border-gray-700">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center">
+                            <svg class="w-6 h-6 text-purple-400 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 4V2a1 1 0 011-1h8a1 1 0 011 1v2m-9 0h10m-10 0a2 2 0 00-2 2v14a2 2 0 002 2h10a2 2 0 002-2V6a2 2 0 00-2-2"></path>
+                            </svg>
+                            <span class="text-white font-medium">Keyboard Navigation</span>
+                        </div>
+                        <div class="relative">
+                            <input type="checkbox" class="sr-only" id="keyboard-nav" checked>
+                            <label for="keyboard-nav" class="block w-12 h-6 bg-purple-600 rounded-full cursor-pointer">
+                                <div class="w-5 h-5 bg-white rounded-full transform transition-transform duration-200 translate-x-6"></div>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Get Started Button -->
+        <div class="text-center fade-in" style="animation-delay: 0.9s;">
+            <button class="tau-btn tau-btn-primary text-xl px-12 py-4 rounded-2xl">
+                <span class="flex items-center">
+                    <svg class="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path>
+                    </svg>
+                    Get Started
+                </span>
+            </button>
+            <p class="text-gray-400 text-sm mt-4">Press Enter to continue</p>
+        </div>
+
+        <!-- Footer Info -->
+        <div class="absolute bottom-8 left-8 text-gray-400 text-sm">
+            <div class="flex items-center space-x-4">
+                <span>Version 1.0.0</span>
+                <span>•</span>
+                <span>Build 2025.07.30</span>
+                <span>•</span>
+                <span>Secure Boot ✓</span>
+            </div>
+        </div>
+
+        <!-- Help Button -->
+        <div class="absolute bottom-8 right-8">
+            <button class="text-gray-400 hover:text-white transition-colors duration-300">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Language selection
+        document.querySelectorAll('.language-option').forEach(option => {
+            option.addEventListener('click', function() {
+                document.querySelectorAll('.language-option').forEach(opt => opt.classList.remove('selected'));
+                this.classList.add('selected');
+            });
+        });
+
+        // Toggle switches
+        document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                const label = this.nextElementSibling;
+                const toggle = label.querySelector('div');
+                if (this.checked) {
+                    label.classList.add('bg-purple-600');
+                    label.classList.remove('bg-gray-700');
+                    toggle.classList.add('translate-x-6');
+                    toggle.classList.remove('translate-x-1');
+                } else {
+                    label.classList.remove('bg-purple-600');
+                    label.classList.add('bg-gray-700');
+                    toggle.classList.remove('translate-x-6');
+                    toggle.classList.add('translate-x-1');
+                }
+            });
+        });
+
+        // Keyboard navigation
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                // Simulate Get Started button click
+                document.querySelector('.tau-btn').click();
+            }
+        });
+
+        // Get Started button interaction
+        document.querySelector('.tau-btn').addEventListener('click', function() {
+            this.style.transform = 'scale(0.95)';
+            setTimeout(() => {
+                this.style.transform = '';
+                // Here you would typically navigate to the next screen
+                console.log('Proceeding to next screen...');
+            }, 150);
+        });
+    </script>
+</body>
+</html> 
