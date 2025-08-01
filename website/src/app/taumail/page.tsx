@@ -19,7 +19,9 @@ import {
   Download,
   Lock,
   Eye,
-  EyeOff
+  EyeOff,
+  FileText,
+  Trash2
 } from 'lucide-react';
 
 export default function TauMailPage() {
