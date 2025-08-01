@@ -235,6 +235,12 @@ export default function TauOSLandingPage() {
               <a href="/taucloud" className="text-gray-300 hover:text-white transition-colors">
                 TauCloud
               </a>
+              <a href="/governance" className="text-gray-300 hover:text-white transition-colors">
+                Governance
+              </a>
+              <a href="/careers" className="text-gray-300 hover:text-white transition-colors">
+                Careers
+              </a>
             </div>
 
             {/* Mobile menu button */}
@@ -273,6 +279,12 @@ export default function TauOSLandingPage() {
                 </a>
                 <a href="/taucloud" className="block px-3 py-2 text-gray-300 hover:text-white transition-colors">
                   TauCloud
+                </a>
+                <a href="/governance" className="block px-3 py-2 text-gray-300 hover:text-white transition-colors">
+                  Governance
+                </a>
+                <a href="/careers" className="block px-3 py-2 text-gray-300 hover:text-white transition-colors">
+                  Careers
                 </a>
               </div>
             </motion.div>
@@ -1398,6 +1410,9 @@ export default function TauOSLandingPage() {
               <h4 className="font-semibold mb-4">Resources</h4>
               <ul className="space-y-2 text-gray-300">
                 <li><a href="#" className="hover:text-white transition-colors">Documentation</a></li>
+                <li><a href="/governance" className="hover:text-white transition-colors">Governance</a></li>
+                <li><a href="/legal" className="hover:text-white transition-colors">Legal</a></li>
+                <li><a href="/careers" className="hover:text-white transition-colors">Careers</a></li>
                 <li><a href="#" className="hover:text-white transition-colors">Blog</a></li>
                 <li><a href="#" className="hover:text-white transition-colors">Support</a></li>
               </ul>

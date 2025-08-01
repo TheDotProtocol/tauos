@@ -1,0 +1,176 @@
+version: '3.8'
+
+services:
+  # TauID Frontend (Next.js)
+  tauid-frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: tauid-frontend
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=production
+      - NEXT_PUBLIC_API_URL=http://tauid-backend:3001
+      - NEXT_PUBLIC_TAUID_DOMAIN=tauid.tauos.org
+    depends_on:
+      - tauid-backend
+      - redis
+    networks:
+      - tauid-network
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.tauid-frontend.rule=Host(`tauid.tauos.org`)"
+      - "traefik.http.routers.tauid-frontend.tls=true"
+      - "traefik.http.routers.tauid-frontend.tls.certresolver=letsencrypt"
+      - "traefik.http.services.tauid-frontend.loadbalancer.server.port=3000"
+
+  # TauID Backend (Node.js/Express)
+  tauid-backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: tauid-backend
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=production
+      - PORT=3001
+      - DATABASE_URL=postgresql://tauid:tauid@postgres:5432/tauid
+      - REDIS_URL=redis://redis:6379
+      - JWT_SECRET=tauid_jwt_secret_2025
+      - JWT_EXPIRES_IN=1h
+      - REFRESH_TOKEN_SECRET=tauid_refresh_secret_2025
+      - REFRESH_TOKEN_EXPIRES_IN=7d
+      - TAUID_DOMAIN=tauid.tauos.org
+      - CORS_ORIGIN=https://tauid.tauos.org
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - tauid-network
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.tauid-api.rule=Host(`tauid.tauos.org`) && PathPrefix(`/api`)"
+      - "traefik.http.routers.tauid-api.tls=true"
+      - "traefik.http.routers.tauid-api.tls.certresolver=letsencrypt"
+      - "traefik.http.services.tauid-api.loadbalancer.server.port=3001"
+
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: tauid-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: tauid
+      POSTGRES_USER: tauid
+      POSTGRES_PASSWORD: tauid_secure_password_2025
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./backend/scripts/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
+    networks:
+      - tauid-network
+
+  # Redis Cache
+  redis:
+    image: redis:7-alpine
+    container_name: tauid-redis
+    restart: unless-stopped
+    command: redis-server --appendonly yes --requirepass tauid_redis_password_2025
+    volumes:
+      - redis_data:/data
+    networks:
+      - tauid-network
+
+  # Traefik for SSL and Load Balancing
+  traefik:
+    image: traefik:v2.10
+    container_name: tauid-traefik
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./traefik/traefik.yml:/etc/traefik/traefik.yml:ro
+      - ./traefik/dynamic.yml:/etc/traefik/dynamic.yml:ro
+      - certbot-etc:/etc/letsencrypt:ro
+    networks:
+      - tauid-network
+
+  # Certbot for SSL Certificates
+  certbot:
+    image: certbot/certbot
+    container_name: tauid-certbot
+    volumes:
+      - certbot-etc:/etc/letsencrypt
+      - certbot-var:/var/lib/letsencrypt
+    command: certonly --webroot --webroot-path=/var/www/html --email admin@tauos.org --agree-tos --no-eff-email -d tauid.tauos.org
+    depends_on:
+      - traefik
+    networks:
+      - tauid-network
+
+  # Prometheus Monitoring
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: tauid-prometheus
+    restart: unless-stopped
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--storage.tsdb.retention.time=200h'
+      - '--web.enable-lifecycle'
+    networks:
+      - tauid-network
+
+  # Grafana Dashboard
+  grafana:
+    image: grafana/grafana:latest
+    container_name: tauid-grafana
+    restart: unless-stopped
+    ports:
+      - "3003:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=tauid_grafana_password_2025
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./monitoring/grafana/dashboards:/etc/grafana/provisioning/dashboards:ro
+      - ./monitoring/grafana/datasources:/etc/grafana/provisioning/datasources:ro
+    networks:
+      - tauid-network
+
+  # Nginx for static file serving and DID documents
+  nginx:
+    image: nginx:alpine
+    container_name: tauid-nginx
+    restart: unless-stopped
+    ports:
+      - "8080:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/conf.d:/etc/nginx/conf.d:ro
+      - ./did-documents:/var/www/html:ro
+      - certbot-etc:/etc/letsencrypt:ro
+    depends_on:
+      - tauid-frontend
+      - tauid-backend
+    networks:
+      - tauid-network
+
+volumes:
+  postgres_data:
+  redis_data:
+  prometheus_data:
+  grafana_data:
+  certbot-etc:
+  certbot-var:
+
+networks:
+  tauid-network:
+    driver: bridge 

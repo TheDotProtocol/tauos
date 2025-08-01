@@ -1,0 +1,415 @@
+/* Tau Store CSS - Modern App Store Styling */
+
+/* Main Window */
+window {
+    background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+    color: #ffffff;
+}
+
+/* Sidebar Styling */
+.sidebar {
+    background: rgba(0, 0, 0, 0.8);
+    border-right: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 20px;
+    backdrop-filter: blur(10px);
+}
+
+.sidebar-header {
+    padding: 15px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    margin-bottom: 20px;
+}
+
+.logo {
+    font-size: 24px;
+    font-weight: bold;
+    color: #a855f7;
+    margin-right: 10px;
+}
+
+.title {
+    font-size: 18px;
+    font-weight: 600;
+    color: #ffffff;
+}
+
+.search-entry {
+    margin-bottom: 20px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    color: #ffffff;
+    padding: 10px 15px;
+}
+
+.search-entry:focus {
+    border-color: #a855f7;
+    box-shadow: 0 0 0 2px rgba(168, 85, 247, 0.3);
+}
+
+.section-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: #a855f7;
+    margin: 20px 0 10px 0;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.categories-list {
+    background: transparent;
+    border: none;
+}
+
+.categories-list row {
+    background: transparent;
+    border: none;
+    padding: 8px 12px;
+    margin: 2px 0;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+}
+
+.categories-list row:hover {
+    background: rgba(168, 85, 247, 0.1);
+    color: #a855f7;
+}
+
+.categories-list row:selected {
+    background: rgba(168, 85, 247, 0.2);
+    color: #a855f7;
+}
+
+/* Content Area */
+.content-header {
+    padding: 20px;
+    background: rgba(0, 0, 0, 0.5);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+}
+
+.content-title {
+    font-size: 24px;
+    font-weight: 700;
+    color: #ffffff;
+    margin: 0;
+}
+
+/* App Cards */
+.app-card {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    padding: 20px;
+    margin: 10px;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+    min-width: 280px;
+    max-width: 320px;
+}
+
+.app-card:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(168, 85, 247, 0.3);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+}
+
+.app-name {
+    font-size: 18px;
+    font-weight: 600;
+    color: #ffffff;
+    margin: 0 0 4px 0;
+}
+
+.app-developer {
+    font-size: 12px;
+    color: #a855f7;
+    margin: 0 0 8px 0;
+    font-weight: 500;
+}
+
+.app-description {
+    font-size: 13px;
+    color: #cccccc;
+    line-height: 1.4;
+    margin: 0 0 15px 0;
+}
+
+.app-rating {
+    font-size: 14px;
+    color: #fbbf24;
+    font-weight: 600;
+}
+
+.app-size {
+    font-size: 12px;
+    color: #9ca3af;
+    font-weight: 500;
+}
+
+/* Privacy Badge */
+.privacy-badge {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    border-radius: 20px;
+    padding: 4px 8px;
+    font-size: 11px;
+    font-weight: 600;
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.privacy-badge.low {
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+}
+
+.privacy-badge.medium {
+    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+}
+
+.privacy-badge.high {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+}
+
+/* Action Buttons */
+.install-button {
+    background: linear-gradient(135deg, #a855f7 0%, #9333ea 100%);
+    border: none;
+    border-radius: 8px;
+    color: #ffffff;
+    font-weight: 600;
+    padding: 8px 16px;
+    transition: all 0.2s ease;
+}
+
+.install-button:hover {
+    background: linear-gradient(135deg, #9333ea 0%, #7c3aed 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(168, 85, 247, 0.4);
+}
+
+.remove-button {
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+    border: none;
+    border-radius: 8px;
+    color: #ffffff;
+    font-weight: 600;
+    padding: 8px 16px;
+    transition: all 0.2s ease;
+}
+
+.remove-button:hover {
+    background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
+}
+
+.details-button {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    color: #ffffff;
+    font-weight: 500;
+    padding: 8px 16px;
+    transition: all 0.2s ease;
+}
+
+.details-button:hover {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: rgba(255, 255, 255, 0.3);
+    transform: translateY(-1px);
+}
+
+/* Filters */
+switch {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 20px;
+    padding: 2px;
+}
+
+switch slider {
+    background: #ffffff;
+    border-radius: 50%;
+    margin: 2px;
+}
+
+switch:checked {
+    background: #a855f7;
+}
+
+/* Scrollbars */
+scrolledwindow {
+    background: transparent;
+}
+
+scrolledwindow scrollbar {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    margin: 2px;
+}
+
+scrolledwindow scrollbar slider {
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 10px;
+    margin: 2px;
+}
+
+scrolledwindow scrollbar slider:hover {
+    background: rgba(255, 255, 255, 0.5);
+}
+
+/* Combo Box */
+combobox {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    color: #ffffff;
+    padding: 8px 12px;
+}
+
+combobox:hover {
+    border-color: rgba(168, 85, 247, 0.5);
+}
+
+combobox:focus {
+    border-color: #a855f7;
+    box-shadow: 0 0 0 2px rgba(168, 85, 247, 0.3);
+}
+
+/* Flow Box */
+flowbox {
+    background: transparent;
+    padding: 20px;
+}
+
+flowboxchild {
+    background: transparent;
+    border: none;
+    padding: 0;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .sidebar {
+        width: 200px;
+        padding: 15px;
+    }
+    
+    .app-card {
+        min-width: 240px;
+        max-width: 280px;
+        padding: 15px;
+    }
+    
+    .content-title {
+        font-size: 20px;
+    }
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.app-card {
+    animation: fadeIn 0.3s ease-out;
+}
+
+/* Loading States */
+.loading {
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+.loading::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 20px;
+    height: 20px;
+    margin: -10px 0 0 -10px;
+    border: 2px solid rgba(168, 85, 247, 0.3);
+    border-top: 2px solid #a855f7;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Status Indicators */
+.status-indicator {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    margin-right: 8px;
+}
+
+.status-indicator.installed {
+    background: #10b981;
+}
+
+.status-indicator.updating {
+    background: #f59e0b;
+    animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+/* Tooltips */
+tooltip {
+    background: rgba(0, 0, 0, 0.9);
+    color: #ffffff;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 6px;
+    padding: 8px 12px;
+    font-size: 12px;
+}
+
+/* Accessibility */
+*:focus {
+    outline: 2px solid #a855f7;
+    outline-offset: 2px;
+}
+
+/* High Contrast Mode */
+@media (prefers-contrast: high) {
+    .app-card {
+        border-width: 2px;
+    }
+    
+    .privacy-badge {
+        border: 1px solid #ffffff;
+    }
+}
+
+/* Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+    .app-card {
+        transition: none;
+    }
+    
+    .app-card:hover {
+        transform: none;
+    }
+    
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+} 
