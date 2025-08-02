@@ -1,0 +1,47 @@
+name: Deploy to Vercel
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  deploy-taucloud:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          
+      - name: Install Vercel CLI
+        run: npm install -g vercel@latest
+        
+      - name: Deploy TauCloud to Vercel
+        run: |
+          cd vercel-tauos-cloud
+          echo ${{ secrets.VERCEL_TOKEN }} | vercel --token ${{ secrets.VERCEL_TOKEN }} --prod --yes
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          
+  deploy-taumail:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          
+      - name: Install Vercel CLI
+        run: npm install -g vercel@latest
+        
+      - name: Deploy TauMail to Vercel
+        run: |
+          cd vercel-tauos-mail
+          echo ${{ secrets.VERCEL_TOKEN }} | vercel --token ${{ secrets.VERCEL_TOKEN }} --prod --yes
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }} 
