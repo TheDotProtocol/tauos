@@ -229,10 +229,10 @@ export default function TauOSLandingPage() {
               <a href="#about" className="text-gray-300 hover:text-white transition-colors">
                 About
               </a>
-              <a href="/taumail" className="text-gray-300 hover:text-white transition-colors">
+              <a href="https://mail.tauos.org" target="_blank" rel="noopener noreferrer" className="text-gray-300 hover:text-white transition-colors">
                 TauMail
               </a>
-              <a href="/taucloud" className="text-gray-300 hover:text-white transition-colors">
+              <a href="https://cloud.tauos.org" target="_blank" rel="noopener noreferrer" className="text-gray-300 hover:text-white transition-colors">
                 TauCloud
               </a>
               <a href="/governance" className="text-gray-300 hover:text-white transition-colors">
@@ -274,10 +274,10 @@ export default function TauOSLandingPage() {
                 <a href="#about" className="block px-3 py-2 text-gray-300 hover:text-white transition-colors">
                   About
                 </a>
-                <a href="/taumail" className="block px-3 py-2 text-gray-300 hover:text-white transition-colors">
+                <a href="https://mail.tauos.org" target="_blank" rel="noopener noreferrer" className="block px-3 py-2 text-gray-300 hover:text-white transition-colors">
                   TauMail
                 </a>
-                <a href="/taucloud" className="block px-3 py-2 text-gray-300 hover:text-white transition-colors">
+                <a href="https://cloud.tauos.org" target="_blank" rel="noopener noreferrer" className="block px-3 py-2 text-gray-300 hover:text-white transition-colors">
                   TauCloud
                 </a>
                 <a href="/governance" className="block px-3 py-2 text-gray-300 hover:text-white transition-colors">
@@ -1401,8 +1401,8 @@ export default function TauOSLandingPage() {
               <h4 className="font-semibold mb-4">Products</h4>
               <ul className="space-y-2 text-gray-300">
                 <li><a href="#" className="hover:text-white transition-colors">TauOS</a></li>
-                <li><a href="/taumail" className="hover:text-white transition-colors">TauMail</a></li>
-                <li><a href="/taucloud" className="hover:text-white transition-colors">TauCloud</a></li>
+                <li><a href="https://mail.tauos.org" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">TauMail</a></li>
+                <li><a href="https://cloud.tauos.org" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">TauCloud</a></li>
               </ul>
             </div>
             

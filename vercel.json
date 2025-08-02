@@ -1,0 +1,26 @@
+{
+  "redirects": [
+    {
+      "source": "/",
+      "destination": "https://tauos-mail-f307q44qr-the-dot-protocol-co-ltds-projects.vercel.app",
+      "has": [
+        {
+          "type": "host",
+          "value": "mail.tauos.org"
+        }
+      ],
+      "permanent": false
+    },
+    {
+      "source": "/",
+      "destination": "https://vercel-tauos-cloud-5z2nci0ys-the-dot-protocol-co-ltds-projects.vercel.app",
+      "has": [
+        {
+          "type": "host",
+          "value": "cloud.tauos.org"
+        }
+      ],
+      "permanent": false
+    }
+  ]
+} 

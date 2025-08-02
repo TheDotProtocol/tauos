@@ -1,0 +1,14 @@
+{
+  "name": "taumail",
+  "version": "1.0.0",
+  "description": "TauMail Privacy-First Email Service",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "bcryptjs": "^2.4.3",
+    "jsonwebtoken": "^9.0.0"
+  }
+}

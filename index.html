@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>TauOS Services</title>
+    <script>
+        // Redirect based on hostname
+        const hostname = window.location.hostname;
+        
+        if (hostname === 'mail.tauos.org') {
+            window.location.href = 'https://tauos-mail-f307q44qr-the-dot-protocol-co-ltds-projects.vercel.app';
+        } else if (hostname === 'cloud.tauos.org') {
+            window.location.href = 'https://vercel-tauos-cloud-5z2nci0ys-the-dot-protocol-co-ltds-projects.vercel.app';
+        } else {
+            // Default to main TauOS site
+            document.body.innerHTML = `
+                <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #0f0f0f; color: #ffffff; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0;">
+                    <div style="text-align: center;">
+                        <div style="font-size: 3rem; color: #6366f1; margin-bottom: 20px;">τ</div>
+                        <h1>TauOS</h1>
+                        <p style="color: #a1a1aa; margin-top: 20px;">Privacy-First Operating System</p>
+                        <div style="margin-top: 40px;">
+                            <a href="https://tauos-mail-f307q44qr-the-dot-protocol-co-ltds-projects.vercel.app" style="color: #6366f1; text-decoration: none; margin: 0 10px;">TauMail</a>
+                            <a href="https://vercel-tauos-cloud-5z2nci0ys-the-dot-protocol-co-ltds-projects.vercel.app" style="color: #3b82f6; text-decoration: none; margin: 0 10px;">TauCloud</a>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+    </script>
+</head>
+<body>
+    <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #0f0f0f; color: #ffffff; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0;">
+        <div style="text-align: center;">
+            <div style="font-size: 3rem; color: #6366f1; margin-bottom: 20px;">τ</div>
+            <h1>TauOS</h1>
+            <p style="color: #a1a1aa; margin-top: 20px;">Loading...</p>
+        </div>
+    </div>
+</body>
+</html> 
