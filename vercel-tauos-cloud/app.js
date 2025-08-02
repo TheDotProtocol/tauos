@@ -15,17 +15,12 @@ const JWT_SECRET = process.env.JWT_SECRET || 'tauos-secret-key-change-in-product
 // For Vercel serverless, we'll use in-memory storage instead of file system
 const UPLOAD_DIR = process.env.NODE_ENV === 'production' ? '/tmp' : './uploads';
 
-// PostgreSQL connection with better error handling
+// PostgreSQL connection
 const pool = new Pool({
-  connectionString: process.env.DATABASE_URL || 'postgresql://postgres:Ak1233%40%405@db.tviqcormikopltejomkc.supabase.co:5432/postgres',
+  connectionString: process.env.DATABASE_URL || 'postgresql://postgres.tviqcormikopltejomkc:Ak1233%40%405@aws-0-ap-southeast-1.pooler.supabase.com:6543/postgres',
   ssl: {
     rejectUnauthorized: false
-  },
-  // Add connection timeout and retry settings
-  connectionTimeoutMillis: 10000,
-  idleTimeoutMillis: 30000,
-  max: 20,
-  min: 4
+  }
 });
 
 app.use(cors());

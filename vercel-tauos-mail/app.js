@@ -13,7 +13,7 @@ const JWT_SECRET = process.env.JWT_SECRET || 'tauos-secret-key-change-in-product
 
 // PostgreSQL connection
 const pool = new Pool({
-  connectionString: process.env.DATABASE_URL || 'postgresql://postgres:Ak1233%40%405@db.tviqcormikopltejomkc.supabase.co:5432/postgres',
+  connectionString: process.env.DATABASE_URL || 'postgresql://postgres.tviqcormikopltejomkc:Ak1233%40%405@aws-0-ap-southeast-1.pooler.supabase.com:6543/postgres',
   ssl: {
     rejectUnauthorized: false
   }
