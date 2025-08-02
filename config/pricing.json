@@ -1,0 +1,184 @@
+{
+  "plans": {
+    "free": {
+      "name": "Free",
+      "price": 0,
+      "billing_cycle": "monthly",
+      "storage_limit": 5368709120,
+      "storage_limit_gb": 5,
+      "features": {
+        "email": {
+          "enabled": true,
+          "storage_limit": 1073741824,
+          "max_attachments": 25,
+          "max_attachment_size": 10485760
+        },
+        "cloud": {
+          "enabled": true,
+          "max_file_size": 104857600,
+          "file_types": ["all"],
+          "versioning": false,
+          "sharing": false
+        },
+        "domains": {
+          "custom_domains": 0,
+          "subdomains": 1
+        },
+        "users": {
+          "max_users": 5
+        },
+        "support": {
+          "email": true,
+          "chat": false,
+          "phone": false
+        }
+      },
+      "stripe_price_id": null
+    },
+    "basic": {
+      "name": "Basic",
+      "price": 9.99,
+      "billing_cycle": "monthly",
+      "storage_limit": 107374182400,
+      "storage_limit_gb": 100,
+      "features": {
+        "email": {
+          "enabled": true,
+          "storage_limit": 21474836480,
+          "max_attachments": 100,
+          "max_attachment_size": 52428800
+        },
+        "cloud": {
+          "enabled": true,
+          "max_file_size": 1073741824,
+          "file_types": ["all"],
+          "versioning": true,
+          "sharing": true
+        },
+        "domains": {
+          "custom_domains": 3,
+          "subdomains": 5
+        },
+        "users": {
+          "max_users": 25
+        },
+        "support": {
+          "email": true,
+          "chat": true,
+          "phone": false
+        }
+      },
+      "stripe_price_id": "price_basic_monthly"
+    },
+    "pro": {
+      "name": "Pro",
+      "price": 19.99,
+      "billing_cycle": "monthly",
+      "storage_limit": 1073741824000,
+      "storage_limit_gb": 1000,
+      "features": {
+        "email": {
+          "enabled": true,
+          "storage_limit": 107374182400,
+          "max_attachments": 500,
+          "max_attachment_size": 104857600
+        },
+        "cloud": {
+          "enabled": true,
+          "max_file_size": 5368709120,
+          "file_types": ["all"],
+          "versioning": true,
+          "sharing": true,
+          "advanced_sharing": true
+        },
+        "domains": {
+          "custom_domains": 10,
+          "subdomains": 20
+        },
+        "users": {
+          "max_users": 100
+        },
+        "support": {
+          "email": true,
+          "chat": true,
+          "phone": true
+        }
+      },
+      "stripe_price_id": "price_pro_monthly"
+    },
+    "enterprise": {
+      "name": "Enterprise",
+      "price": 99.99,
+      "billing_cycle": "monthly",
+      "storage_limit": 10737418240000,
+      "storage_limit_gb": 10000,
+      "features": {
+        "email": {
+          "enabled": true,
+          "storage_limit": 1073741824000,
+          "max_attachments": 1000,
+          "max_attachment_size": 524288000
+        },
+        "cloud": {
+          "enabled": true,
+          "max_file_size": 10737418240,
+          "file_types": ["all"],
+          "versioning": true,
+          "sharing": true,
+          "advanced_sharing": true,
+          "api_access": true
+        },
+        "domains": {
+          "custom_domains": 50,
+          "subdomains": 100
+        },
+        "users": {
+          "max_users": 1000
+        },
+        "support": {
+          "email": true,
+          "chat": true,
+          "phone": true,
+          "dedicated_manager": true
+        }
+      },
+      "stripe_price_id": "price_enterprise_monthly"
+    }
+  },
+  "comparison": {
+    "competitors": {
+      "icloud": {
+        "free": 5,
+        "basic": 0.99,
+        "pro": 9.99
+      },
+      "google_workspace": {
+        "basic": 6,
+        "business": 12,
+        "enterprise": 25
+      }
+    }
+  },
+  "limits": {
+    "file_types": {
+      "allowed": [
+        "image/jpeg", "image/png", "image/gif", "image/webp", "image/svg+xml",
+        "video/mp4", "video/avi", "video/mov", "video/webm", "video/mkv",
+        "audio/mpeg", "audio/wav", "audio/ogg", "audio/mp4", "audio/flac",
+        "application/pdf", "application/msword", "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        "application/vnd.ms-excel", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        "application/vnd.ms-powerpoint", "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+        "text/plain", "text/html", "text/css", "text/javascript",
+        "application/json", "application/xml", "application/zip", "application/x-rar-compressed"
+      ],
+      "blocked": [
+        "application/x-executable", "application/x-msdownload", "application/x-msi"
+      ]
+    },
+    "rate_limits": {
+      "api_requests_per_minute": 1000,
+      "file_uploads_per_hour": 100,
+      "email_sends_per_day": 1000
+    }
+  }
+} 
