@@ -8,5 +8,14 @@
     "numReplicas": 1,
     "restartPolicyType": "ON_FAILURE",
     "restartPolicyMaxRetries": 10
+  },
+  "environments": {
+    "production": {
+      "variables": {
+        "NODE_ENV": "production",
+        "DATABASE_URL": "postgresql://postgres.tviqcormikopltejomkc:Ak1233%40%405@aws-0-ap-southeast-1.pooler.supabase.com:6543/postgres",
+        "JWT_SECRET": "tauos-secret-key-change-in-production"
+      }
+    }
   }
 } 

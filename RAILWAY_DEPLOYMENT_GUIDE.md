@@ -1,86 +1,119 @@
-# Railway Deployment Guide for TauCloud
+# Railway Deployment Guide
 
-## 🚀 **Quick Deployment (5 minutes)**
+## 🚀 **Quick Fix for Database Connection Issues**
 
-### **Step 1: Go to Railway**
-1. Visit [railway.app](https://railway.app)
-2. Sign in with GitHub
-3. Click "New Project"
+### **Problem**: `ENETUNREACH` Database Connection Error
 
-### **Step 2: Import Repository**
-1. Select "Deploy from GitHub repo"
-2. Choose `TheDotProtocol/tauos`
-3. Set root directory to: `vercel-tauos-cloud`
-4. Click "Deploy Now"
+The Railway deployment is failing to connect to Supabase PostgreSQL due to network restrictions.
 
-### **Step 3: Configure Environment Variables**
-In Railway dashboard, go to your project → Variables tab:
+### **Solution 1: Use Supabase Pooler (Recommended)**
 
+1. **Update Environment Variables in Railway Dashboard**:
+   ```
+   DATABASE_URL=postgresql://postgres.tviqcormikopltejomkc:Ak1233%40%405@aws-0-ap-southeast-1.pooler.supabase.com:6543/postgres
+   NODE_ENV=production
+   JWT_SECRET=your-secret-key
+   ```
+
+2. **Redeploy the application**:
+   ```bash
+   cd vercel-tauos-cloud
+   railway up --detach
+   ```
+
+### **Solution 2: Use Direct Connection (Alternative)**
+
+If the pooler doesn't work, try the direct connection:
 ```
 DATABASE_URL=postgresql://postgres:Ak1233%40%405@db.tviqcormikopltejomkc.supabase.co:5432/postgres
-NODE_ENV=production
-JWT_SECRET=tauos-secret-key-change-in-production
 ```
 
-### **Step 4: Configure Custom Domain**
-1. Go to Settings → Domains
-2. Add custom domain: `cloud.tauos.org`
-3. Configure DNS records as instructed
+### **Solution 3: Check Supabase Settings**
 
-## 🔧 **Automatic Deployment**
+1. **Go to Supabase Dashboard**: https://supabase.com/dashboard
+2. **Select your project**: `tviqcormikopltejomkc`
+3. **Go to Settings > Database**
+4. **Check "Connection pooling" is enabled**
+5. **Verify the connection strings**
 
-### **Option A: Use Deployment Script**
+### **Solution 4: Railway Network Configuration**
+
+1. **Check Railway Dashboard**: https://railway.app/dashboard
+2. **Go to your project settings**
+3. **Verify environment variables are set correctly**
+4. **Check if there are any network restrictions**
+
+## 🔧 **Manual Deployment Steps**
+
+### **Step 1: Install Railway CLI**
 ```bash
-./scripts/deploy-railway.sh
+npm install -g @railway/cli
 ```
 
-### **Option B: Use Railway CLI**
+### **Step 2: Login to Railway**
+```bash
+railway login
+```
+
+### **Step 3: Navigate to Project**
 ```bash
 cd vercel-tauos-cloud
-railway login
-railway init
-railway up
 ```
 
-## 📊 **Railway Benefits**
+### **Step 4: Deploy**
+```bash
+railway up --detach
+```
 
-- ✅ **No rate limits**: Unlimited deployments
-- ✅ **PostgreSQL included**: Built-in database
-- ✅ **Custom domains**: Free SSL certificates
-- ✅ **Automatic scaling**: Handles traffic spikes
-- ✅ **GitHub integration**: Automatic deployments
-- ✅ **Environment variables**: Secure configuration
-- ✅ **Logs & monitoring**: Built-in observability
+### **Step 5: Set Environment Variables**
+```bash
+railway variables set DATABASE_URL="postgresql://postgres.tviqcormikopltejomkc:Ak1233%40%405@aws-0-ap-southeast-1.pooler.supabase.com:6543/postgres"
+railway variables set NODE_ENV="production"
+railway variables set JWT_SECRET="your-secret-key"
+```
 
-## 🎯 **Expected Results**
+## 📊 **Health Check**
 
-After deployment:
-- ✅ **Application URL**: `https://your-app-name.railway.app`
-- ✅ **Custom Domain**: `https://cloud.tauos.org` (after DNS setup)
-- ✅ **Database**: Connected to Supabase PostgreSQL
-- ✅ **Authentication**: JWT tokens working
-- ✅ **File operations**: Metadata storage working
-- ✅ **API endpoints**: All endpoints functional
+After deployment, test the health endpoint:
+```bash
+curl https://your-app.railway.app/api/health
+```
+
+Expected response:
+```json
+{
+  "status": "healthy",
+  "database": "connected",
+  "timestamp": "2025-08-02T..."
+}
+```
 
 ## 🔍 **Troubleshooting**
 
-### **If deployment fails:**
-1. Check Railway logs in dashboard
-2. Verify environment variables are set
-3. Ensure DATABASE_URL is correct
-4. Check if all dependencies are installed
+### **If Database Still Fails**:
+1. **Check Railway logs**: `railway logs`
+2. **Verify Supabase is accessible**: Test connection locally
+3. **Try different connection string**: Use direct vs pooler
+4. **Check Railway region**: Ensure it's in a supported region
 
-### **If custom domain doesn't work:**
-1. Verify DNS records are configured
-2. Wait for SSL certificate (up to 24 hours)
-3. Check Railway domain settings
+### **If App Deploys but Database Fails**:
+1. **Check environment variables**: Ensure DATABASE_URL is set
+2. **Verify SSL settings**: Railway might need different SSL config
+3. **Test connection manually**: Use psql or pgAdmin
 
-## 📝 **Next Steps**
+## 🎯 **Success Indicators**
 
-1. **Deploy to Railway** (this guide)
-2. **Test all endpoints** (registration, login, file upload)
-3. **Configure custom domain** (cloud.tauos.org)
-4. **Update homepage links** (point to Railway URL)
-5. **Monitor performance** (Railway dashboard)
+✅ **App starts without errors**
+✅ **Health endpoint returns "healthy"**
+✅ **Database queries work**
+✅ **User registration/login works**
+✅ **File upload operations work**
 
-**Status:** 🚀 **READY FOR DEPLOYMENT** 
+## 📞 **Support**
+
+If issues persist:
+1. **Check Railway documentation**: https://docs.railway.app
+2. **Check Supabase documentation**: https://supabase.com/docs
+3. **Review application logs**: `railway logs --tail`
+
+**Status**: 🔧 **FIXING DATABASE CONNECTION** 
