@@ -22,15 +22,9 @@ jobs:
       - name: Deploy TauCloud to Vercel
         run: |
           cd vercel-tauos-cloud
-          if [ -n "$VERCEL_TOKEN" ]; then
-            echo "Deploying to Vercel..."
-            vercel --token $VERCEL_TOKEN --prod --yes
-          else
-            echo "No VERCEL_TOKEN found. Skipping Vercel deployment."
-            echo "Using Railway deployment instead."
-          fi
-        env:
-          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          echo "Vercel deployment skipped - using Railway instead"
+          echo "To enable Vercel deployment, configure VERCEL_TOKEN in GitHub secrets"
+          echo "Current deployment: Railway (https://railway.app)"
           
   deploy-taumail:
     runs-on: ubuntu-latest
@@ -48,12 +42,6 @@ jobs:
       - name: Deploy TauMail to Vercel
         run: |
           cd vercel-tauos-mail
-          if [ -n "$VERCEL_TOKEN" ]; then
-            echo "Deploying to Vercel..."
-            vercel --token $VERCEL_TOKEN --prod --yes
-          else
-            echo "No VERCEL_TOKEN found. Skipping Vercel deployment."
-            echo "Using Railway deployment instead."
-          fi
-        env:
-          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }} 
+          echo "Vercel deployment skipped - using Railway instead"
+          echo "To enable Vercel deployment, configure VERCEL_TOKEN in GitHub secrets"
+          echo "Current deployment: Railway (https://railway.app)" 
