@@ -4,6 +4,7 @@ const jwt = require('jsonwebtoken');
 const { Pool } = require('pg'); // PostgreSQL client
 const cors = require('cors');
 const bodyParser = require('body-parser');
+const nodemailer = require('nodemailer');
 const { v4: uuidv4 } = require('uuid');
 const path = require('path');
 
@@ -437,14 +438,16 @@ app.get('/email', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'email.html'));
 });
 
-// Vercel serverless function export
-module.exports = app;
+// Start server
+app.listen(PORT, () => {
+  console.log(`🚀 TauMail server running on http://localhost:${PORT}`);
+  console.log(`📧 Email domain: @tauos.org`);
+  console.log(`💾 Database: PostgreSQL (Supabase)`);
+});
 
-// For local development
-if (process.env.NODE_ENV !== 'production') {
-  app.listen(PORT, () => {
-    console.log(`🚀 TauMail server running on http://localhost:${PORT}`);
-    console.log(`📧 Email domain: @tauos.org`);
-    console.log(`💾 Database: PostgreSQL (Supabase)`);
-  });
-} 
+// Graceful shutdown
+process.on('SIGINT', () => {
+  console.log('\n🛑 Shutting down TauMail server...');
+  pool.end();
+  process.exit(0);
+}); 

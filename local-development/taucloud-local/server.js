@@ -6,26 +6,22 @@ const cors = require('cors');
 const bodyParser = require('body-parser');
 const multer = require('multer');
 const { v4: uuidv4 } = require('uuid');
+const fs = require('fs-extra');
 const path = require('path');
 
 const app = express();
 const PORT = process.env.PORT || 3002;
 const JWT_SECRET = process.env.JWT_SECRET || 'tauos-secret-key-change-in-production';
+const UPLOAD_DIR = './uploads';
 
-// For Vercel serverless, we'll use in-memory storage instead of file system
-const UPLOAD_DIR = process.env.NODE_ENV === 'production' ? '/tmp' : './uploads';
+fs.ensureDirSync(UPLOAD_DIR);
 
-// PostgreSQL connection with better error handling
+// PostgreSQL connection
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL || 'postgresql://postgres:Ak1233%40%405@db.tviqcormikopltejomkc.supabase.co:5432/postgres',
   ssl: {
     rejectUnauthorized: false
-  },
-  // Add connection timeout and retry settings
-  connectionTimeoutMillis: 10000,
-  idleTimeoutMillis: 30000,
-  max: 20,
-  min: 4
+  }
 });
 
 app.use(cors());
@@ -33,32 +29,26 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static('public'));
 
-// Test database connection with retry logic
-const testDatabaseConnection = async (retries = 3) => {
-  for (let i = 0; i < retries; i++) {
-    try {
-      const client = await pool.connect();
-      const result = await client.query('SELECT NOW()');
-      client.release();
-      console.log('✅ Database connected successfully');
-      return true;
-    } catch (err) {
-      console.error(`❌ Database connection attempt ${i + 1} failed:`, err.message);
-      if (i < retries - 1) {
-        console.log(`🔄 Retrying in 5 seconds...`);
-        await new Promise(resolve => setTimeout(resolve, 5000));
-      }
-    }
+// Test database connection
+pool.query('SELECT NOW()', (err, res) => {
+  if (err) {
+    console.error('❌ Database connection failed:', err);
+  } else {
+    console.log('✅ Database connected successfully');
   }
-  console.error('❌ All database connection attempts failed');
-  return false;
-};
+});
 
-// Initialize database connection
-testDatabaseConnection();
+// Configure multer for file uploads
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, UPLOAD_DIR);
+  },
+  filename: (req, file, cb) => {
+    const uniqueName = `${Date.now()}-${Math.round(Math.random() * 1E9)}-${file.originalname}`;
+    cb(null, uniqueName);
+  }
+});
 
-// Configure multer for file uploads (memory storage for serverless)
-const storage = multer.memoryStorage();
 const upload = multer({ 
   storage, 
   limits: { fileSize: 100 * 1024 * 1024 } // 100MB limit
@@ -229,16 +219,15 @@ app.get('/api/profile', authenticateToken, async (req, res) => {
   }
 });
 
-// Upload file (simplified for serverless)
+// Upload file
 app.post('/api/files/upload', authenticateToken, upload.single('file'), async (req, res) => {
   try {
     if (!req.file) {
       return res.status(400).json({ error: 'No file uploaded' });
     }
 
-    const { originalname, buffer, size, mimetype } = req.file;
+    const { originalname, filename, path: filePath, size, mimetype } = req.file;
     const fileType = getFileType(mimetype);
-    const filename = `${Date.now()}-${Math.round(Math.random() * 1E9)}-${originalname}`;
 
     // Get organization ID
     const orgResult = await pool.query(
@@ -255,14 +244,16 @@ app.post('/api/files/upload', authenticateToken, upload.single('file'), async (r
     );
 
     if (!storageResult.rows[0].can_upload) {
+      // Delete uploaded file
+      fs.unlinkSync(filePath);
       return res.status(413).json({ error: 'Storage limit exceeded' });
     }
 
-    // Save file record (without physical file for serverless)
+    // Save file record
     const result = await pool.query(
       `INSERT INTO files (organization_id, user_id, original_name, filename, file_path, file_size, mime_type, file_type) 
        VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id`,
-      [organizationId, req.user.userId, originalname, filename, 'memory://' + filename, size, mimetype, fileType]
+      [organizationId, req.user.userId, originalname, filename, filePath, size, mimetype, fileType]
     );
 
     // Update storage usage
@@ -302,7 +293,7 @@ app.get('/api/files', authenticateToken, async (req, res) => {
   }
 });
 
-// Download file (simplified for serverless)
+// Download file
 app.get('/api/files/:id/download', authenticateToken, async (req, res) => {
   try {
     const result = await pool.query(
@@ -315,18 +306,17 @@ app.get('/api/files/:id/download', authenticateToken, async (req, res) => {
     }
 
     const file = result.rows[0];
+    const filePath = path.join(UPLOAD_DIR, file.filename);
 
-    // For serverless, we can't serve actual files, so return file info
-    res.json({
-      message: 'File info retrieved',
-      filename: file.original_name,
-      mime_type: file.mime_type,
-      note: 'File download not available in serverless environment'
-    });
+    if (!fs.existsSync(filePath)) {
+      return res.status(404).json({ error: 'File not found on disk' });
+    }
+
+    res.download(filePath, file.original_name);
 
   } catch (error) {
     console.error('Download error:', error);
-    res.status(500).json({ error: 'Failed to get file info' });
+    res.status(500).json({ error: 'Failed to download file' });
   }
 });
 
@@ -363,6 +353,12 @@ app.delete('/api/files/:id', authenticateToken, async (req, res) => {
       'SELECT update_storage_usage($1, $2, $3)',
       [organizationId, req.user.userId, -file.file_size]
     );
+
+    // Delete physical file
+    const filePath = path.join(UPLOAD_DIR, file.filename);
+    if (fs.existsSync(filePath)) {
+      fs.unlinkSync(filePath);
+    }
 
     res.json({ message: 'File deleted successfully' });
 
@@ -463,29 +459,6 @@ app.post('/api/password/reset-request', async (req, res) => {
   }
 });
 
-// Health check endpoint
-app.get('/api/health', async (req, res) => {
-  try {
-    // Test database connection
-    const client = await pool.connect();
-    await client.query('SELECT 1');
-    client.release();
-    
-    res.json({
-      status: 'healthy',
-      database: 'connected',
-      timestamp: new Date().toISOString()
-    });
-  } catch (error) {
-    res.status(500).json({
-      status: 'unhealthy',
-      database: 'disconnected',
-      error: error.message,
-      timestamp: new Date().toISOString()
-    });
-  }
-});
-
 // Serve static files
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
@@ -499,15 +472,17 @@ app.get('/files', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'files.html'));
 });
 
-// Vercel serverless function export
-module.exports = app;
+// Start server
+app.listen(PORT, () => {
+  console.log(`☁️ TauCloud server running on http://localhost:${PORT}`);
+  console.log(`📧 Email domain: @tauos.org`);
+  console.log(`💾 Database: PostgreSQL (Supabase)`);
+  console.log(`📁 Upload directory: ${UPLOAD_DIR}`);
+});
 
-// For local development
-if (process.env.NODE_ENV !== 'production') {
-  app.listen(PORT, () => {
-    console.log(`☁️ TauCloud server running on http://localhost:${PORT}`);
-    console.log(`📧 Email domain: @tauos.org`);
-    console.log(`💾 Database: PostgreSQL (Supabase)`);
-    console.log(`📁 Upload directory: ${UPLOAD_DIR}`);
-  });
-} 
+// Graceful shutdown
+process.on('SIGINT', () => {
+  console.log('\n🛑 Shutting down TauCloud server...');
+  pool.end();
+  process.exit(0);
+}); 
