@@ -15,12 +15,17 @@ const JWT_SECRET = process.env.JWT_SECRET || 'tauos-secret-key-change-in-product
 // For Vercel serverless, we'll use in-memory storage instead of file system
 const UPLOAD_DIR = process.env.NODE_ENV === 'production' ? '/tmp' : './uploads';
 
-// PostgreSQL connection
+// PostgreSQL connection with better error handling
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL || 'postgresql://postgres:Ak1233%40%405@db.tviqcormikopltejomkc.supabase.co:5432/postgres',
   ssl: {
     rejectUnauthorized: false
-  }
+  },
+  // Add connection timeout and retry settings for Railway
+  connectionTimeoutMillis: 10000,
+  idleTimeoutMillis: 30000,
+  max: 20,
+  min: 4
 });
 
 app.use(cors());
@@ -28,14 +33,29 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static('public'));
 
-// Test database connection
-pool.query('SELECT NOW()', (err, res) => {
-  if (err) {
-    console.error('❌ Database connection failed:', err);
-  } else {
-    console.log('✅ Database connected successfully');
+// Test database connection with retry logic
+const testDatabaseConnection = async (retries = 3) => {
+  for (let i = 0; i < retries; i++) {
+    try {
+      const client = await pool.connect();
+      const result = await client.query('SELECT NOW()');
+      client.release();
+      console.log('✅ Database connected successfully');
+      return true;
+    } catch (err) {
+      console.error(`❌ Database connection attempt ${i + 1} failed:`, err.message);
+      if (i < retries - 1) {
+        console.log(`🔄 Retrying in 5 seconds...`);
+        await new Promise(resolve => setTimeout(resolve, 5000));
+      }
+    }
   }
-});
+  console.error('❌ All database connection attempts failed');
+  return false;
+};
+
+// Initialize database connection
+testDatabaseConnection();
 
 // Configure multer for file uploads (memory storage for serverless)
 const storage = multer.memoryStorage();
@@ -440,6 +460,29 @@ app.post('/api/password/reset-request', async (req, res) => {
   } catch (error) {
     console.error('Password reset error:', error);
     res.status(500).json({ error: 'Failed to send reset email' });
+  }
+});
+
+// Health check endpoint
+app.get('/api/health', async (req, res) => {
+  try {
+    // Test database connection
+    const client = await pool.connect();
+    await client.query('SELECT 1');
+    client.release();
+    
+    res.json({
+      status: 'healthy',
+      database: 'connected',
+      timestamp: new Date().toISOString()
+    });
+  } catch (error) {
+    res.status(500).json({
+      status: 'unhealthy',
+      database: 'disconnected',
+      error: error.message,
+      timestamp: new Date().toISOString()
+    });
   }
 });
 

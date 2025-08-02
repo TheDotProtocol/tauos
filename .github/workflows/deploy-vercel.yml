@@ -1,4 +1,4 @@
-name: Deploy to Vercel
+name: Deploy to Vercel (Optional)
 
 on:
   push:
@@ -22,7 +22,13 @@ jobs:
       - name: Deploy TauCloud to Vercel
         run: |
           cd vercel-tauos-cloud
-          echo ${{ secrets.VERCEL_TOKEN }} | vercel --token ${{ secrets.VERCEL_TOKEN }} --prod --yes
+          if [ -n "$VERCEL_TOKEN" ]; then
+            echo "Deploying to Vercel..."
+            vercel --token $VERCEL_TOKEN --prod --yes
+          else
+            echo "No VERCEL_TOKEN found. Skipping Vercel deployment."
+            echo "Using Railway deployment instead."
+          fi
         env:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
           
@@ -42,6 +48,12 @@ jobs:
       - name: Deploy TauMail to Vercel
         run: |
           cd vercel-tauos-mail
-          echo ${{ secrets.VERCEL_TOKEN }} | vercel --token ${{ secrets.VERCEL_TOKEN }} --prod --yes
+          if [ -n "$VERCEL_TOKEN" ]; then
+            echo "Deploying to Vercel..."
+            vercel --token $VERCEL_TOKEN --prod --yes
+          else
+            echo "No VERCEL_TOKEN found. Skipping Vercel deployment."
+            echo "Using Railway deployment instead."
+          fi
         env:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }} 
