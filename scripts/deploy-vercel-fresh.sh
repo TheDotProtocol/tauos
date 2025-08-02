@@ -47,7 +47,7 @@ echo "📝 Created fresh vercel.json configuration"
 
 # Deploy to Vercel
 echo "🚀 Deploying to Vercel..."
-vercel --prod --yes
+vercel --prod --yes --archive=tgz
 
 echo "✅ Fresh Vercel deployment complete!"
 echo ""
