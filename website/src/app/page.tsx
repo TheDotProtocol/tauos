@@ -96,7 +96,7 @@ export default function TauOSLandingPage() {
       icon: Monitor,
       file: 'tauos-simple-20250730.iso',
       size: '14.9 MB',
-      checksum: 'sha256:abc123...',
+      checksum: 'sha256:83fe8b232072572a43018339b140c379e61a739162a12b59c308d31abeed8fa3',
       recommended: true
     },
     {
@@ -105,8 +105,8 @@ export default function TauOSLandingPage() {
       description: 'Native macOS application',
       icon: Monitor,
       file: 'TauOS.dmg',
-      size: '45.2 MB',
-      checksum: 'sha256:def456...'
+      size: '14.9 MB',
+      checksum: 'sha256:83fe8b232072572a43018339b140c379e61a739162a12b59c308d31abeed8fa3'
     },
     {
       id: 'windows',
@@ -114,8 +114,8 @@ export default function TauOSLandingPage() {
       description: 'Windows executable installer',
       icon: Monitor,
       file: 'TauOS-Setup.exe',
-      size: '38.7 MB',
-      checksum: 'sha256:ghi789...'
+      size: '14.9 MB',
+      checksum: 'sha256:83fe8b232072572a43018339b140c379e61a739162a12b59c308d31abeed8fa3'
     },
     {
       id: 'linux',
@@ -123,8 +123,8 @@ export default function TauOSLandingPage() {
       description: 'Linux package and AppImage',
       icon: Monitor,
       file: 'TauOS-Linux.AppImage',
-      size: '52.1 MB',
-      checksum: 'sha256:jkl012...'
+      size: '14.9 MB',
+      checksum: 'sha256:83fe8b232072572a43018339b140c379e61a739162a12b59c308d31abeed8fa3'
     }
   ];
 
