@@ -7,7 +7,7 @@ This guide will help you create fresh, clean deployments for both TauMail and Ta
 ## 📁 **Project Structure**
 
 ### **TauMail Project**
-- **Root Directory**: `vercel-tauos-mail`
+- **Root Directory**: `vercel-tauos-mail` ✅
 - **Framework**: Other (not Node.js)
 - **Build Command**: (leave empty)
 - **Output Directory**: (leave empty)
@@ -15,7 +15,7 @@ This guide will help you create fresh, clean deployments for both TauMail and Ta
 - **Development Command**: `npm start`
 
 ### **TauCloud Project**
-- **Root Directory**: `vercel-tauos-cloud`
+- **Root Directory**: `vercel-tauos-cloud` ✅
 - **Framework**: Other (not Node.js)
 - **Build Command**: (leave empty)
 - **Output Directory**: (leave empty)
@@ -48,7 +48,7 @@ JWT_SECRET=tauos-secret-key-change-in-production
 ### **Step 2: Deploy TauMail**
 1. Click "New Project"
 2. Import from GitHub: `TheDotProtocol/tauos`
-3. **Root Directory**: `vercel-tauos-mail`
+3. **Root Directory**: `vercel-tauos-mail` ✅
 4. **Framework Preset**: Other
 5. **Install Command**: `npm install`
 6. **Development Command**: `npm start`
@@ -58,7 +58,7 @@ JWT_SECRET=tauos-secret-key-change-in-production
 ### **Step 3: Deploy TauCloud**
 1. Click "New Project"
 2. Import from GitHub: `TheDotProtocol/tauos`
-3. **Root Directory**: `vercel-tauos-cloud`
+3. **Root Directory**: `vercel-tauos-cloud` ✅
 4. **Framework Preset**: Other
 5. **Install Command**: `npm install`
 6. **Development Command**: `npm start`
@@ -75,6 +75,25 @@ JWT_SECRET=tauos-secret-key-change-in-production
    - Go to Settings → Domains
    - Add: `cloud.tauos.org`
    - Follow DNS instructions
+
+## 🔄 **Cache Refresh (If Old Version Shows)**
+
+If you see the old version after deployment:
+
+### **Option 1: Force Cache Refresh**
+```bash
+./scripts/force-cache-refresh.sh
+```
+
+### **Option 2: Manual Cache Clear**
+1. Hard refresh browser: `Ctrl+F5` (Windows) or `Cmd+Shift+R` (Mac)
+2. Clear browser cache
+3. Wait 2-3 minutes for Vercel rebuild
+
+### **Option 3: Vercel Dashboard**
+1. Go to your project in Vercel dashboard
+2. Click "Redeploy" on latest deployment
+3. Wait for build to complete
 
 ## 🔍 **Verification Steps**
 
@@ -143,6 +162,7 @@ After both deployments complete:
 3. **Environment Variables**: Copy exactly as shown above
 4. **DNS Propagation**: Allow 5-30 minutes for domain changes
 5. **SSL Certificates**: May take up to 24 hours for custom domains
+6. **Cache Issues**: Use force cache refresh if old version shows
 
 ## 📝 **Troubleshooting**
 
@@ -156,5 +176,11 @@ After both deployments complete:
 1. Verify DATABASE_URL is correct
 2. Check Supabase is accessible
 3. Ensure SSL settings are correct
+
+### **If Old Version Shows:**
+1. Run cache refresh script
+2. Hard refresh browser
+3. Wait 2-3 minutes for rebuild
+4. Check Vercel deployment logs
 
 **Status**: 🚀 **READY FOR CLEAN DEPLOYMENTS** 
