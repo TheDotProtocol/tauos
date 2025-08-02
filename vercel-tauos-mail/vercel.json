@@ -1,5 +1,4 @@
 {
-  "name": "tauos-mail",
   "version": 2,
   "builds": [
     {
@@ -12,8 +11,5 @@
       "src": "/(.*)",
       "dest": "/app.js"
     }
-  ],
-  "env": {
-    "NODE_ENV": "production"
-  }
+  ]
 } 
