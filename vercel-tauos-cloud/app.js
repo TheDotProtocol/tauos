@@ -6,15 +6,14 @@ const cors = require('cors');
 const bodyParser = require('body-parser');
 const multer = require('multer');
 const { v4: uuidv4 } = require('uuid');
-const fs = require('fs-extra');
 const path = require('path');
 
 const app = express();
 const PORT = process.env.PORT || 3002;
 const JWT_SECRET = process.env.JWT_SECRET || 'tauos-secret-key-change-in-production';
-const UPLOAD_DIR = './uploads';
 
-fs.ensureDirSync(UPLOAD_DIR);
+// For Vercel serverless, we'll use in-memory storage instead of file system
+const UPLOAD_DIR = process.env.NODE_ENV === 'production' ? '/tmp' : './uploads';
 
 // PostgreSQL connection
 const pool = new Pool({
@@ -38,17 +37,8 @@ pool.query('SELECT NOW()', (err, res) => {
   }
 });
 
-// Configure multer for file uploads
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, UPLOAD_DIR);
-  },
-  filename: (req, file, cb) => {
-    const uniqueName = `${Date.now()}-${Math.round(Math.random() * 1E9)}-${file.originalname}`;
-    cb(null, uniqueName);
-  }
-});
-
+// Configure multer for file uploads (memory storage for serverless)
+const storage = multer.memoryStorage();
 const upload = multer({ 
   storage, 
   limits: { fileSize: 100 * 1024 * 1024 } // 100MB limit
@@ -219,15 +209,16 @@ app.get('/api/profile', authenticateToken, async (req, res) => {
   }
 });
 
-// Upload file
+// Upload file (simplified for serverless)
 app.post('/api/files/upload', authenticateToken, upload.single('file'), async (req, res) => {
   try {
     if (!req.file) {
       return res.status(400).json({ error: 'No file uploaded' });
     }
 
-    const { originalname, filename, path: filePath, size, mimetype } = req.file;
+    const { originalname, buffer, size, mimetype } = req.file;
     const fileType = getFileType(mimetype);
+    const filename = `${Date.now()}-${Math.round(Math.random() * 1E9)}-${originalname}`;
 
     // Get organization ID
     const orgResult = await pool.query(
@@ -244,16 +235,14 @@ app.post('/api/files/upload', authenticateToken, upload.single('file'), async (r
     );
 
     if (!storageResult.rows[0].can_upload) {
-      // Delete uploaded file
-      fs.unlinkSync(filePath);
       return res.status(413).json({ error: 'Storage limit exceeded' });
     }
 
-    // Save file record
+    // Save file record (without physical file for serverless)
     const result = await pool.query(
       `INSERT INTO files (organization_id, user_id, original_name, filename, file_path, file_size, mime_type, file_type) 
        VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id`,
-      [organizationId, req.user.userId, originalname, filename, filePath, size, mimetype, fileType]
+      [organizationId, req.user.userId, originalname, filename, 'memory://' + filename, size, mimetype, fileType]
     );
 
     // Update storage usage
@@ -293,7 +282,7 @@ app.get('/api/files', authenticateToken, async (req, res) => {
   }
 });
 
-// Download file
+// Download file (simplified for serverless)
 app.get('/api/files/:id/download', authenticateToken, async (req, res) => {
   try {
     const result = await pool.query(
@@ -306,17 +295,18 @@ app.get('/api/files/:id/download', authenticateToken, async (req, res) => {
     }
 
     const file = result.rows[0];
-    const filePath = path.join(UPLOAD_DIR, file.filename);
 
-    if (!fs.existsSync(filePath)) {
-      return res.status(404).json({ error: 'File not found on disk' });
-    }
-
-    res.download(filePath, file.original_name);
+    // For serverless, we can't serve actual files, so return file info
+    res.json({
+      message: 'File info retrieved',
+      filename: file.original_name,
+      mime_type: file.mime_type,
+      note: 'File download not available in serverless environment'
+    });
 
   } catch (error) {
     console.error('Download error:', error);
-    res.status(500).json({ error: 'Failed to download file' });
+    res.status(500).json({ error: 'Failed to get file info' });
   }
 });
 
@@ -353,12 +343,6 @@ app.delete('/api/files/:id', authenticateToken, async (req, res) => {
       'SELECT update_storage_usage($1, $2, $3)',
       [organizationId, req.user.userId, -file.file_size]
     );
-
-    // Delete physical file
-    const filePath = path.join(UPLOAD_DIR, file.filename);
-    if (fs.existsSync(filePath)) {
-      fs.unlinkSync(filePath);
-    }
 
     res.json({ message: 'File deleted successfully' });
 
