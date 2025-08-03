@@ -1,10 +1,8 @@
 const express = require('express');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const { Pool } = require('pg'); // PostgreSQL client
 const cors = require('cors');
 const bodyParser = require('body-parser');
-const nodemailer = require('nodemailer');
 const { v4: uuidv4 } = require('uuid');
 const path = require('path');
 
@@ -12,27 +10,20 @@ const app = express();
 const PORT = process.env.PORT || 3001;
 const JWT_SECRET = process.env.JWT_SECRET || 'tauos-secret-key-change-in-production';
 
-// PostgreSQL connection
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL || 'postgresql://postgres:Ak1233%40%405@db.tviqcormikopltejomkc.supabase.co:5432/postgres',
-  ssl: {
-    rejectUnauthorized: false
-  }
-});
+// In-memory storage for local development
+const users = [];
+const emails = [];
+let userIdCounter = 1;
+let emailIdCounter = 1;
 
 app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static('public'));
 
-// Test database connection
-pool.query('SELECT NOW()', (err, res) => {
-  if (err) {
-    console.error('❌ Database connection failed:', err);
-  } else {
-    console.log('✅ Database connected successfully');
-  }
-});
+console.log('🚀 TauMail server running on http://localhost:3001');
+console.log('📧 Email domain: @tauos.org');
+console.log('💾 Database: In-Memory (Local Development)');
 
 const generateToken = (userId, username) => {
   return jwt.sign(
@@ -59,6 +50,15 @@ const authenticateToken = (req, res, next) => {
   });
 };
 
+// Health check endpoint
+app.get('/api/health', (req, res) => {
+  res.json({
+    status: 'healthy',
+    database: 'in-memory',
+    timestamp: new Date().toISOString()
+  });
+});
+
 // User registration
 app.post('/api/register', async (req, res) => {
   try {
@@ -72,44 +72,35 @@ app.post('/api/register', async (req, res) => {
     const passwordHash = await bcrypt.hash(password, 12);
 
     // Check if user already exists
-    const existingUser = await pool.query(
-      'SELECT id FROM users WHERE email = $1',
-      [email]
-    );
-
-    if (existingUser.rows.length > 0) {
+    const existingUser = users.find(u => u.email === email);
+    if (existingUser) {
       return res.status(409).json({ error: 'User already exists' });
     }
 
-    // Get TauOS organization
-    const orgResult = await pool.query(
-      'SELECT id FROM organizations WHERE domain = $1',
-      ['tauos.org']
-    );
-
-    if (orgResult.rows.length === 0) {
-      return res.status(500).json({ error: 'Organization not found' });
-    }
-
-    const organizationId = orgResult.rows[0].id;
-
     // Create user
-    const result = await pool.query(
-      `INSERT INTO users (organization_id, username, email, password_hash, recovery_email) 
-       VALUES ($1, $2, $3, $4, $5) RETURNING id, username, email`,
-      [organizationId, username, email, passwordHash, recovery_email]
-    );
+    const newUser = {
+      id: userIdCounter++,
+      username,
+      email,
+      password_hash: passwordHash,
+      recovery_email,
+      organization_id: 1,
+      created_at: new Date().toISOString()
+    };
 
-    const token = generateToken(result.rows[0].id, result.rows[0].username);
+    users.push(newUser);
 
-    res.status(201).json({
+    // Generate token
+    const token = generateToken(newUser.id, newUser.username);
+
+    res.json({
       message: 'User registered successfully',
+      token,
       user: {
-        id: result.rows[0].id,
-        username: result.rows[0].username,
-        email: result.rows[0].email
-      },
-      token
+        id: newUser.id,
+        username: newUser.username,
+        email: newUser.email
+      }
     });
 
   } catch (error) {
@@ -128,65 +119,33 @@ app.post('/api/login', async (req, res) => {
     }
 
     const email = `${username}@tauos.org`;
+    const user = users.find(u => u.email === email);
 
-    // Find user
-    const result = await pool.query(
-      'SELECT id, username, email, password_hash FROM users WHERE email = $1',
-      [email]
-    );
-
-    if (result.rows.length === 0) {
+    if (!user) {
       return res.status(401).json({ error: 'Invalid credentials' });
     }
 
-    const user = result.rows[0];
-    const validPassword = await bcrypt.compare(password, user.password_hash);
-
-    if (!validPassword) {
+    const isValidPassword = await bcrypt.compare(password, user.password_hash);
+    if (!isValidPassword) {
       return res.status(401).json({ error: 'Invalid credentials' });
     }
 
-    // Update last login
-    await pool.query(
-      'UPDATE users SET last_login = CURRENT_TIMESTAMP WHERE id = $1',
-      [user.id]
-    );
-
+    // Generate token
     const token = generateToken(user.id, user.username);
 
     res.json({
       message: 'Login successful',
+      token,
       user: {
         id: user.id,
         username: user.username,
         email: user.email
-      },
-      token
+      }
     });
 
   } catch (error) {
     console.error('Login error:', error);
     res.status(500).json({ error: 'Login failed' });
-  }
-});
-
-// Get user profile
-app.get('/api/profile', authenticateToken, async (req, res) => {
-  try {
-    const result = await pool.query(
-      'SELECT id, username, email, recovery_email, created_at, last_login FROM users WHERE id = $1',
-      [req.user.userId]
-    );
-
-    if (result.rows.length === 0) {
-      return res.status(404).json({ error: 'User not found' });
-    }
-
-    res.json(result.rows[0]);
-
-  } catch (error) {
-    console.error('Profile error:', error);
-    res.status(500).json({ error: 'Failed to get profile' });
   }
 });
 
@@ -200,35 +159,30 @@ app.post('/api/emails/send', authenticateToken, async (req, res) => {
     }
 
     // Find recipient
-    const recipientResult = await pool.query(
-      'SELECT id FROM users WHERE email = $1',
-      [to]
-    );
-
-    if (recipientResult.rows.length === 0) {
+    const recipient = users.find(u => u.email === to);
+    if (!recipient) {
       return res.status(404).json({ error: 'Recipient not found' });
     }
 
-    const recipientId = recipientResult.rows[0].id;
-
-    // Get organization ID
-    const orgResult = await pool.query(
-      'SELECT organization_id FROM users WHERE id = $1',
-      [req.user.userId]
-    );
-
-    const organizationId = orgResult.rows[0].organization_id;
-
     // Create email
-    const result = await pool.query(
-      `INSERT INTO emails (organization_id, sender_id, recipient_id, subject, body) 
-       VALUES ($1, $2, $3, $4, $5) RETURNING id`,
-      [organizationId, req.user.userId, recipientId, subject, body]
-    );
+    const newEmail = {
+      id: emailIdCounter++,
+      organization_id: 1,
+      sender_id: req.user.userId,
+      recipient_id: recipient.id,
+      subject,
+      body,
+      is_read: false,
+      is_starred: false,
+      is_deleted: false,
+      created_at: new Date().toISOString()
+    };
+
+    emails.push(newEmail);
 
     res.json({
       message: 'Email sent successfully',
-      email_id: result.rows[0].id
+      email_id: newEmail.id
     });
 
   } catch (error) {
@@ -240,17 +194,25 @@ app.post('/api/emails/send', authenticateToken, async (req, res) => {
 // Get inbox emails
 app.get('/api/emails/inbox', authenticateToken, async (req, res) => {
   try {
-    const result = await pool.query(
-      `SELECT e.id, e.subject, e.body, e.is_read, e.is_starred, e.created_at,
-              u.username as sender_username, u.email as sender_email
-       FROM emails e
-       JOIN users u ON e.sender_id = u.id
-       WHERE e.recipient_id = $1 AND e.is_deleted = false
-       ORDER BY e.created_at DESC`,
-      [req.user.userId]
+    const userEmails = emails.filter(e => 
+      e.recipient_id === req.user.userId && !e.is_deleted
     );
 
-    res.json(result.rows);
+    const emailsWithSender = userEmails.map(email => {
+      const sender = users.find(u => u.id === email.sender_id);
+      return {
+        id: email.id,
+        subject: email.subject,
+        body: email.body,
+        is_read: email.is_read,
+        is_starred: email.is_starred,
+        created_at: email.created_at,
+        sender_username: sender ? sender.username : 'Unknown',
+        sender_email: sender ? sender.email : 'unknown@tauos.org'
+      };
+    });
+
+    res.json(emailsWithSender);
 
   } catch (error) {
     console.error('Get inbox error:', error);
@@ -261,17 +223,23 @@ app.get('/api/emails/inbox', authenticateToken, async (req, res) => {
 // Get sent emails
 app.get('/api/emails/sent', authenticateToken, async (req, res) => {
   try {
-    const result = await pool.query(
-      `SELECT e.id, e.subject, e.body, e.created_at,
-              u.username as recipient_username, u.email as recipient_email
-       FROM emails e
-       JOIN users u ON e.recipient_id = u.id
-       WHERE e.sender_id = $1 AND e.is_deleted = false
-       ORDER BY e.created_at DESC`,
-      [req.user.userId]
+    const userEmails = emails.filter(e => 
+      e.sender_id === req.user.userId && !e.is_deleted
     );
 
-    res.json(result.rows);
+    const emailsWithRecipient = userEmails.map(email => {
+      const recipient = users.find(u => u.id === email.recipient_id);
+      return {
+        id: email.id,
+        subject: email.subject,
+        body: email.body,
+        created_at: email.created_at,
+        recipient_username: recipient ? recipient.username : 'Unknown',
+        recipient_email: recipient ? recipient.email : 'unknown@tauos.org'
+      };
+    });
+
+    res.json(emailsWithRecipient);
 
   } catch (error) {
     console.error('Get sent error:', error);
@@ -282,22 +250,27 @@ app.get('/api/emails/sent', authenticateToken, async (req, res) => {
 // Get single email
 app.get('/api/emails/:id', authenticateToken, async (req, res) => {
   try {
-    const result = await pool.query(
-      `SELECT e.*, 
-              sender.username as sender_username, sender.email as sender_email,
-              recipient.username as recipient_username, recipient.email as recipient_email
-       FROM emails e
-       JOIN users sender ON e.sender_id = sender.id
-       JOIN users recipient ON e.recipient_id = recipient.id
-       WHERE e.id = $1 AND (e.sender_id = $2 OR e.recipient_id = $2)`,
-      [req.params.id, req.user.userId]
+    const email = emails.find(e => 
+      e.id === parseInt(req.params.id) && 
+      (e.sender_id === req.user.userId || e.recipient_id === req.user.userId)
     );
 
-    if (result.rows.length === 0) {
+    if (!email) {
       return res.status(404).json({ error: 'Email not found' });
     }
 
-    res.json(result.rows[0]);
+    const sender = users.find(u => u.id === email.sender_id);
+    const recipient = users.find(u => u.id === email.recipient_id);
+
+    const emailWithDetails = {
+      ...email,
+      sender_username: sender ? sender.username : 'Unknown',
+      sender_email: sender ? sender.email : 'unknown@tauos.org',
+      recipient_username: recipient ? recipient.username : 'Unknown',
+      recipient_email: recipient ? recipient.email : 'unknown@tauos.org'
+    };
+
+    res.json(emailWithDetails);
 
   } catch (error) {
     console.error('Get email error:', error);
@@ -306,17 +279,18 @@ app.get('/api/emails/:id', authenticateToken, async (req, res) => {
 });
 
 // Mark email as read
-app.patch('/api/emails/:id/read', authenticateToken, async (req, res) => {
+app.put('/api/emails/:id/read', authenticateToken, async (req, res) => {
   try {
-    const result = await pool.query(
-      'UPDATE emails SET is_read = true WHERE id = $1 AND recipient_id = $2',
-      [req.params.id, req.user.userId]
+    const email = emails.find(e => 
+      e.id === parseInt(req.params.id) && 
+      e.recipient_id === req.user.userId
     );
 
-    if (result.rowCount === 0) {
+    if (!email) {
       return res.status(404).json({ error: 'Email not found' });
     }
 
+    email.is_read = true;
     res.json({ message: 'Email marked as read' });
 
   } catch (error) {
@@ -330,15 +304,16 @@ app.patch('/api/emails/:id/star', authenticateToken, async (req, res) => {
   try {
     const { starred } = req.body;
     
-    const result = await pool.query(
-      'UPDATE emails SET is_starred = $1 WHERE id = $2 AND (sender_id = $3 OR recipient_id = $3)',
-      [starred, req.params.id, req.user.userId]
+    const email = emails.find(e => 
+      e.id === parseInt(req.params.id) && 
+      (e.sender_id === req.user.userId || e.recipient_id === req.user.userId)
     );
 
-    if (result.rowCount === 0) {
+    if (!email) {
       return res.status(404).json({ error: 'Email not found' });
     }
 
+    email.is_starred = starred;
     res.json({ message: starred ? 'Email starred' : 'Email unstarred' });
 
   } catch (error) {
@@ -350,15 +325,16 @@ app.patch('/api/emails/:id/star', authenticateToken, async (req, res) => {
 // Delete email
 app.delete('/api/emails/:id', authenticateToken, async (req, res) => {
   try {
-    const result = await pool.query(
-      'UPDATE emails SET is_deleted = true WHERE id = $1 AND (sender_id = $2 OR recipient_id = $2)',
-      [req.params.id, req.user.userId]
+    const email = emails.find(e => 
+      e.id === parseInt(req.params.id) && 
+      (e.sender_id === req.user.userId || e.recipient_id === req.user.userId)
     );
 
-    if (result.rowCount === 0) {
+    if (!email) {
       return res.status(404).json({ error: 'Email not found' });
     }
 
+    email.is_deleted = true;
     res.json({ message: 'Email deleted' });
 
   } catch (error) {
@@ -370,25 +346,23 @@ app.delete('/api/emails/:id', authenticateToken, async (req, res) => {
 // Get email stats
 app.get('/api/emails/stats', authenticateToken, async (req, res) => {
   try {
-    const inboxCount = await pool.query(
-      'SELECT COUNT(*) as count FROM emails WHERE recipient_id = $1 AND is_deleted = false AND is_read = false',
-      [req.user.userId]
-    );
+    const inboxCount = emails.filter(e => 
+      e.recipient_id === req.user.userId && !e.is_deleted && !e.is_read
+    ).length;
 
-    const sentCount = await pool.query(
-      'SELECT COUNT(*) as count FROM emails WHERE sender_id = $1 AND is_deleted = false',
-      [req.user.userId]
-    );
+    const sentCount = emails.filter(e => 
+      e.sender_id === req.user.userId && !e.is_deleted
+    ).length;
 
-    const starredCount = await pool.query(
-      'SELECT COUNT(*) as count FROM emails WHERE (sender_id = $1 OR recipient_id = $1) AND is_starred = true AND is_deleted = false',
-      [req.user.userId]
-    );
+    const starredCount = emails.filter(e => 
+      (e.sender_id === req.user.userId || e.recipient_id === req.user.userId) && 
+      e.is_starred && !e.is_deleted
+    ).length;
 
     res.json({
-      inbox: parseInt(inboxCount.rows[0].count),
-      sent: parseInt(sentCount.rows[0].count),
-      starred: parseInt(starredCount.rows[0].count)
+      inbox: inboxCount,
+      sent: sentCount,
+      starred: starredCount
     });
 
   } catch (error) {
@@ -407,12 +381,8 @@ app.post('/api/password/reset-request', async (req, res) => {
     }
 
     // Check if user exists
-    const result = await pool.query(
-      'SELECT id FROM users WHERE email = $1',
-      [email]
-    );
-
-    if (result.rows.length === 0) {
+    const user = users.find(u => u.email === email);
+    if (!user) {
       return res.status(404).json({ error: 'User not found' });
     }
 
@@ -425,52 +395,11 @@ app.post('/api/password/reset-request', async (req, res) => {
   }
 });
 
-// Health check endpoint
-app.get('/api/health', async (req, res) => {
-  try {
-    // Test database connection
-    const client = await pool.connect();
-    await client.query('SELECT 1');
-    client.release();
-    
-    res.json({
-      status: 'healthy',
-      database: 'connected',
-      timestamp: new Date().toISOString()
-    });
-  } catch (error) {
-    res.status(500).json({
-      status: 'unhealthy',
-      database: 'disconnected',
-      error: error.message,
-      timestamp: new Date().toISOString()
-    });
-  }
-});
-
 // Serve static files
-app.get('/', (req, res) => {
+app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-app.get('/dashboard', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'dashboard.html'));
-});
-
-app.get('/email', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'email.html'));
-});
-
-// Start server
 app.listen(PORT, () => {
-  console.log(`🚀 TauMail server running on http://localhost:${PORT}`);
-  console.log(`📧 Email domain: @tauos.org`);
-  console.log(`💾 Database: PostgreSQL (Supabase)`);
-});
-
-// Graceful shutdown
-process.on('SIGINT', () => {
-  console.log('\n🛑 Shutting down TauMail server...');
-  pool.end();
-  process.exit(0);
+  console.log(`Server running on port ${PORT}`);
 }); 

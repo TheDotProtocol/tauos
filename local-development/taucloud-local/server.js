@@ -1,54 +1,34 @@
 const express = require('express');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const { Pool } = require('pg'); // PostgreSQL client
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const multer = require('multer');
 const { v4: uuidv4 } = require('uuid');
-const fs = require('fs-extra');
 const path = require('path');
 
 const app = express();
 const PORT = process.env.PORT || 3002;
 const JWT_SECRET = process.env.JWT_SECRET || 'tauos-secret-key-change-in-production';
-const UPLOAD_DIR = './uploads';
 
-fs.ensureDirSync(UPLOAD_DIR);
-
-// PostgreSQL connection
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL || 'postgresql://postgres:Ak1233%40%405@db.tviqcormikopltejomkc.supabase.co:5432/postgres',
-  ssl: {
-    rejectUnauthorized: false
-  }
-});
+// In-memory storage for local development
+const users = [];
+const files = [];
+let userIdCounter = 1;
+let fileIdCounter = 1;
 
 app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static('public'));
 
-// Test database connection
-pool.query('SELECT NOW()', (err, res) => {
-  if (err) {
-    console.error('❌ Database connection failed:', err);
-  } else {
-    console.log('✅ Database connected successfully');
-  }
-});
+console.log('☁️ TauCloud server running on http://localhost:3002');
+console.log('📧 Email domain: @tauos.org');
+console.log('💾 Database: In-Memory (Local Development)');
+console.log('📁 Upload directory: ./uploads');
 
-// Configure multer for file uploads
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, UPLOAD_DIR);
-  },
-  filename: (req, file, cb) => {
-    const uniqueName = `${Date.now()}-${Math.round(Math.random() * 1E9)}-${file.originalname}`;
-    cb(null, uniqueName);
-  }
-});
-
+// Configure multer for file uploads (memory storage for local development)
+const storage = multer.memoryStorage();
 const upload = multer({ 
   storage, 
   limits: { fileSize: 100 * 1024 * 1024 } // 100MB limit
@@ -88,6 +68,15 @@ const getFileType = (mimeType) => {
   return 'other';
 };
 
+// Health check endpoint
+app.get('/api/health', (req, res) => {
+  res.json({
+    status: 'healthy',
+    database: 'in-memory',
+    timestamp: new Date().toISOString()
+  });
+});
+
 // User registration
 app.post('/api/register', async (req, res) => {
   try {
@@ -101,44 +90,35 @@ app.post('/api/register', async (req, res) => {
     const passwordHash = await bcrypt.hash(password, 12);
 
     // Check if user already exists
-    const existingUser = await pool.query(
-      'SELECT id FROM users WHERE email = $1',
-      [email]
-    );
-
-    if (existingUser.rows.length > 0) {
+    const existingUser = users.find(u => u.email === email);
+    if (existingUser) {
       return res.status(409).json({ error: 'User already exists' });
     }
 
-    // Get TauOS organization
-    const orgResult = await pool.query(
-      'SELECT id FROM organizations WHERE domain = $1',
-      ['tauos.org']
-    );
-
-    if (orgResult.rows.length === 0) {
-      return res.status(500).json({ error: 'Organization not found' });
-    }
-
-    const organizationId = orgResult.rows[0].id;
-
     // Create user
-    const result = await pool.query(
-      `INSERT INTO users (organization_id, username, email, password_hash, recovery_email) 
-       VALUES ($1, $2, $3, $4, $5) RETURNING id, username, email`,
-      [organizationId, username, email, passwordHash, recovery_email]
-    );
+    const newUser = {
+      id: userIdCounter++,
+      username,
+      email,
+      password_hash: passwordHash,
+      recovery_email,
+      organization_id: 1,
+      created_at: new Date().toISOString()
+    };
 
-    const token = generateToken(result.rows[0].id, result.rows[0].username);
+    users.push(newUser);
 
-    res.status(201).json({
+    // Generate token
+    const token = generateToken(newUser.id, newUser.username);
+
+    res.json({
       message: 'User registered successfully',
+      token,
       user: {
-        id: result.rows[0].id,
-        username: result.rows[0].username,
-        email: result.rows[0].email
-      },
-      token
+        id: newUser.id,
+        username: newUser.username,
+        email: newUser.email
+      }
     });
 
   } catch (error) {
@@ -157,65 +137,33 @@ app.post('/api/login', async (req, res) => {
     }
 
     const email = `${username}@tauos.org`;
+    const user = users.find(u => u.email === email);
 
-    // Find user
-    const result = await pool.query(
-      'SELECT id, username, email, password_hash FROM users WHERE email = $1',
-      [email]
-    );
-
-    if (result.rows.length === 0) {
+    if (!user) {
       return res.status(401).json({ error: 'Invalid credentials' });
     }
 
-    const user = result.rows[0];
-    const validPassword = await bcrypt.compare(password, user.password_hash);
-
-    if (!validPassword) {
+    const isValidPassword = await bcrypt.compare(password, user.password_hash);
+    if (!isValidPassword) {
       return res.status(401).json({ error: 'Invalid credentials' });
     }
 
-    // Update last login
-    await pool.query(
-      'UPDATE users SET last_login = CURRENT_TIMESTAMP WHERE id = $1',
-      [user.id]
-    );
-
+    // Generate token
     const token = generateToken(user.id, user.username);
 
     res.json({
       message: 'Login successful',
+      token,
       user: {
         id: user.id,
         username: user.username,
         email: user.email
-      },
-      token
+      }
     });
 
   } catch (error) {
     console.error('Login error:', error);
     res.status(500).json({ error: 'Login failed' });
-  }
-});
-
-// Get user profile
-app.get('/api/profile', authenticateToken, async (req, res) => {
-  try {
-    const result = await pool.query(
-      'SELECT id, username, email, recovery_email, created_at, last_login FROM users WHERE id = $1',
-      [req.user.userId]
-    );
-
-    if (result.rows.length === 0) {
-      return res.status(404).json({ error: 'User not found' });
-    }
-
-    res.json(result.rows[0]);
-
-  } catch (error) {
-    console.error('Profile error:', error);
-    res.status(500).json({ error: 'Failed to get profile' });
   }
 });
 
@@ -226,46 +174,33 @@ app.post('/api/files/upload', authenticateToken, upload.single('file'), async (r
       return res.status(400).json({ error: 'No file uploaded' });
     }
 
-    const { originalname, filename, path: filePath, size, mimetype } = req.file;
+    const { originalname, mimetype, size, buffer } = req.file;
     const fileType = getFileType(mimetype);
 
-    // Get organization ID
-    const orgResult = await pool.query(
-      'SELECT organization_id FROM users WHERE id = $1',
-      [req.user.userId]
-    );
+    // Create file record
+    const newFile = {
+      id: fileIdCounter++,
+      organization_id: 1,
+      user_id: req.user.userId,
+      name: originalname,
+      type: fileType,
+      size: size,
+      mime_type: mimetype,
+      data: buffer,
+      created_at: new Date().toISOString()
+    };
 
-    const organizationId = orgResult.rows[0].organization_id;
-
-    // Check storage limits
-    const storageResult = await pool.query(
-      'SELECT check_storage_limit($1, $2, $3) as can_upload',
-      [organizationId, req.user.userId, size]
-    );
-
-    if (!storageResult.rows[0].can_upload) {
-      // Delete uploaded file
-      fs.unlinkSync(filePath);
-      return res.status(413).json({ error: 'Storage limit exceeded' });
-    }
-
-    // Save file record
-    const result = await pool.query(
-      `INSERT INTO files (organization_id, user_id, original_name, filename, file_path, file_size, mime_type, file_type) 
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id`,
-      [organizationId, req.user.userId, originalname, filename, filePath, size, mimetype, fileType]
-    );
-
-    // Update storage usage
-    await pool.query(
-      'SELECT update_storage_usage($1, $2, $3)',
-      [organizationId, req.user.userId, size]
-    );
+    files.push(newFile);
 
     res.json({
       message: 'File uploaded successfully',
-      file_id: result.rows[0].id,
-      file_type: fileType
+      file: {
+        id: newFile.id,
+        name: newFile.name,
+        type: newFile.type,
+        size: newFile.size,
+        created_at: newFile.created_at
+      }
     });
 
   } catch (error) {
@@ -274,18 +209,21 @@ app.post('/api/files/upload', authenticateToken, upload.single('file'), async (r
   }
 });
 
-// Get user files
+// Get files
 app.get('/api/files', authenticateToken, async (req, res) => {
   try {
-    const result = await pool.query(
-      `SELECT id, original_name, filename, file_size, mime_type, file_type, created_at 
-       FROM files 
-       WHERE user_id = $1 AND is_deleted = false 
-       ORDER BY created_at DESC`,
-      [req.user.userId]
-    );
+    const userFiles = files.filter(f => f.user_id === req.user.userId);
 
-    res.json(result.rows);
+    const filesWithDetails = userFiles.map(file => ({
+      id: file.id,
+      name: file.name,
+      type: file.type,
+      size: file.size,
+      mime_type: file.mime_type,
+      created_at: file.created_at
+    }));
+
+    res.json(filesWithDetails);
 
   } catch (error) {
     console.error('Get files error:', error);
@@ -296,23 +234,17 @@ app.get('/api/files', authenticateToken, async (req, res) => {
 // Download file
 app.get('/api/files/:id/download', authenticateToken, async (req, res) => {
   try {
-    const result = await pool.query(
-      'SELECT filename, original_name, mime_type FROM files WHERE id = $1 AND user_id = $2 AND is_deleted = false',
-      [req.params.id, req.user.userId]
+    const file = files.find(f => 
+      f.id === parseInt(req.params.id) && f.user_id === req.user.userId
     );
 
-    if (result.rows.length === 0) {
+    if (!file) {
       return res.status(404).json({ error: 'File not found' });
     }
 
-    const file = result.rows[0];
-    const filePath = path.join(UPLOAD_DIR, file.filename);
-
-    if (!fs.existsSync(filePath)) {
-      return res.status(404).json({ error: 'File not found on disk' });
-    }
-
-    res.download(filePath, file.original_name);
+    res.setHeader('Content-Type', file.mime_type);
+    res.setHeader('Content-Disposition', `attachment; filename="${file.name}"`);
+    res.send(file.data);
 
   } catch (error) {
     console.error('Download error:', error);
@@ -323,42 +255,15 @@ app.get('/api/files/:id/download', authenticateToken, async (req, res) => {
 // Delete file
 app.delete('/api/files/:id', authenticateToken, async (req, res) => {
   try {
-    // Get file info
-    const result = await pool.query(
-      'SELECT filename, file_size FROM files WHERE id = $1 AND user_id = $2 AND is_deleted = false',
-      [req.params.id, req.user.userId]
+    const fileIndex = files.findIndex(f => 
+      f.id === parseInt(req.params.id) && f.user_id === req.user.userId
     );
 
-    if (result.rows.length === 0) {
+    if (fileIndex === -1) {
       return res.status(404).json({ error: 'File not found' });
     }
 
-    const file = result.rows[0];
-
-    // Mark as deleted
-    await pool.query(
-      'UPDATE files SET is_deleted = true WHERE id = $1',
-      [req.params.id]
-    );
-
-    // Update storage usage (subtract file size)
-    const orgResult = await pool.query(
-      'SELECT organization_id FROM users WHERE id = $1',
-      [req.user.userId]
-    );
-
-    const organizationId = orgResult.rows[0].organization_id;
-
-    await pool.query(
-      'SELECT update_storage_usage($1, $2, $3)',
-      [organizationId, req.user.userId, -file.file_size]
-    );
-
-    // Delete physical file
-    const filePath = path.join(UPLOAD_DIR, file.filename);
-    if (fs.existsSync(filePath)) {
-      fs.unlinkSync(filePath);
-    }
+    files.splice(fileIndex, 1);
 
     res.json({ message: 'File deleted successfully' });
 
@@ -368,144 +273,31 @@ app.delete('/api/files/:id', authenticateToken, async (req, res) => {
   }
 });
 
-// Create folder
-app.post('/api/folders', authenticateToken, async (req, res) => {
-  try {
-    const { name } = req.body;
-    
-    if (!name) {
-      return res.status(400).json({ error: 'Folder name is required' });
-    }
-
-    // Get organization ID
-    const orgResult = await pool.query(
-      'SELECT organization_id FROM users WHERE id = $1',
-      [req.user.userId]
-    );
-
-    const organizationId = orgResult.rows[0].organization_id;
-
-    const result = await pool.query(
-      `INSERT INTO folders (organization_id, user_id, name) 
-       VALUES ($1, $2, $3) RETURNING id, name`,
-      [organizationId, req.user.userId, name]
-    );
-
-    res.status(201).json({
-      message: 'Folder created successfully',
-      folder: result.rows[0]
-    });
-
-  } catch (error) {
-    console.error('Create folder error:', error);
-    res.status(500).json({ error: 'Failed to create folder' });
-  }
-});
-
 // Get storage stats
 app.get('/api/storage/stats', authenticateToken, async (req, res) => {
   try {
-    const result = await pool.query(
-      'SELECT get_user_storage_stats($1) as stats',
-      [req.user.userId]
-    );
-
-    if (result.rows.length === 0) {
-      return res.status(404).json({ error: 'User not found' });
-    }
-
-    const stats = result.rows[0].stats;
+    const userFiles = files.filter(f => f.user_id === req.user.userId);
+    const totalSize = userFiles.reduce((sum, file) => sum + file.size, 0);
+    const fileCount = userFiles.length;
 
     res.json({
-      user_storage_used: parseInt(stats.user_storage_used),
-      user_storage_limit: parseInt(stats.user_storage_limit),
-      user_storage_percentage: parseFloat(stats.user_storage_percentage),
-      org_storage_used: parseInt(stats.org_storage_used),
-      org_storage_limit: parseInt(stats.org_storage_limit),
-      org_storage_percentage: parseFloat(stats.org_storage_percentage)
+      total_size: totalSize,
+      file_count: fileCount,
+      used_gb: (totalSize / (1024 * 1024 * 1024)).toFixed(2),
+      total_gb: 10
     });
 
   } catch (error) {
-    console.error('Get stats error:', error);
+    console.error('Stats error:', error);
     res.status(500).json({ error: 'Failed to get storage stats' });
   }
 });
 
-// Password reset request
-app.post('/api/password/reset-request', async (req, res) => {
-  try {
-    const { email } = req.body;
-    
-    if (!email) {
-      return res.status(400).json({ error: 'Email is required' });
-    }
-
-    // Check if user exists
-    const result = await pool.query(
-      'SELECT id FROM users WHERE email = $1',
-      [email]
-    );
-
-    if (result.rows.length === 0) {
-      return res.status(404).json({ error: 'User not found' });
-    }
-
-    // In production, send reset email
-    res.json({ message: 'Password reset email sent (simulated)' });
-
-  } catch (error) {
-    console.error('Password reset error:', error);
-    res.status(500).json({ error: 'Failed to send reset email' });
-  }
-});
-
-// Health check endpoint
-app.get('/api/health', async (req, res) => {
-  try {
-    // Test database connection
-    const client = await pool.connect();
-    await client.query('SELECT 1');
-    client.release();
-    
-    res.json({
-      status: 'healthy',
-      database: 'connected',
-      timestamp: new Date().toISOString()
-    });
-  } catch (error) {
-    res.status(500).json({
-      status: 'unhealthy',
-      database: 'disconnected',
-      error: error.message,
-      timestamp: new Date().toISOString()
-    });
-  }
-});
-
 // Serve static files
-app.get('/', (req, res) => {
+app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-app.get('/dashboard', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'dashboard.html'));
-});
-
-app.get('/files', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'files.html'));
-});
-
-// Start server
 app.listen(PORT, () => {
-  console.log(`☁️ TauCloud server running on http://localhost:${PORT}`);
-  console.log(`📧 Email domain: @tauos.org`);
-  console.log(`💾 Database: PostgreSQL (Supabase)`);
-  console.log(`📁 Upload directory: ${UPLOAD_DIR}`);
-});
-
-// Graceful shutdown
-process.on('SIGINT', () => {
-  console.log('\n🛑 Shutting down TauCloud server...');
-  pool.end();
-  process.exit(0);
+  console.log(`Server running on port ${PORT}`);
 }); 
