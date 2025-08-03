@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TauMail Dashboard - Privacy-First Email</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f8f9fa;
+            color: #333;
+        }
+
+        .dashboard-container {
+            display: flex;
+            height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 250px;
+            background: #2c3e50;
+            color: white;
+            padding: 20px 0;
+            overflow-y: auto;
+        }
+
+        .sidebar-header {
+            padding: 0 20px 20px;
+            border-bottom: 1px solid #34495e;
+        }
+
+        .sidebar-logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #3498db;
+        }
+
+        .sidebar-nav {
+            padding: 20px 0;
+        }
+
+        .nav-item {
+            padding: 12px 20px;
+            cursor: pointer;
+            transition: background 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .nav-item:hover {
+            background: #34495e;
+        }
+
+        .nav-item.active {
+            background: #3498db;
+        }
+
+        .nav-icon {
+            width: 20px;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header */
+        .header {
+            background: white;
+            padding: 15px 30px;
+            border-bottom: 1px solid #e1e5e9;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .search-bar {
+            display: flex;
+            align-items: center;
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 8px 16px;
+            width: 400px;
+        }
+
+        .search-input {
+            border: none;
+            background: none;
+            outline: none;
+            flex: 1;
+            margin-left: 8px;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            padding: 8px 12px;
+            border-radius: 6px;
+            transition: background 0.3s;
+        }
+
+        .user-menu:hover {
+            background: #f8f9fa;
+        }
+
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #3498db;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+
+        /* Email Content */
+        .email-content {
+            flex: 1;
+            display: flex;
+        }
+
+        .email-list {
+            width: 350px;
+            background: white;
+            border-right: 1px solid #e1e5e9;
+            overflow-y: auto;
+        }
+
+        .email-item {
+            padding: 15px 20px;
+            border-bottom: 1px solid #f1f3f4;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .email-item:hover {
+            background: #f8f9fa;
+        }
+
+        .email-item.unread {
+            background: #e3f2fd;
+            font-weight: 600;
+        }
+
+        .email-sender {
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .email-subject {
+            color: #666;
+            margin-bottom: 4px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .email-preview {
+            color: #999;
+            font-size: 14px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .email-time {
+            color: #999;
+            font-size: 12px;
+            margin-top: 4px;
+        }
+
+        /* Email Detail */
+        .email-detail {
+            flex: 1;
+            background: white;
+            padding: 30px;
+            overflow-y: auto;
+        }
+
+        .email-header {
+            border-bottom: 1px solid #e1e5e9;
+            padding-bottom: 20px;
+            margin-bottom: 20px;
+        }
+
+        .email-subject-large {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .email-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: #666;
+        }
+
+        .email-sender-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .email-body {
+            line-height: 1.6;
+            color: #333;
+        }
+
+        /* Compose Button */
+        .compose-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: #3498db;
+            color: white;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
+            transition: all 0.3s;
+        }
+
+        .compose-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 16px rgba(52, 152, 219, 0.4);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 200px;
+            }
+            
+            .email-list {
+                width: 300px;
+            }
+            
+            .search-bar {
+                width: 250px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo">τ Mail</div>
+            </div>
+            <div class="sidebar-nav">
+                <div class="nav-item active">
+                    <i class="fas fa-inbox nav-icon"></i>
+                    Inbox
+                </div>
+                <div class="nav-item">
+                    <i class="fas fa-paper-plane nav-icon"></i>
+                    Sent
+                </div>
+                <div class="nav-item">
+                    <i class="fas fa-star nav-icon"></i>
+                    Starred
+                </div>
+                <div class="nav-item">
+                    <i class="fas fa-trash nav-icon"></i>
+                    Trash
+                </div>
+                <div class="nav-item">
+                    <i class="fas fa-folder nav-icon"></i>
+                    Drafts
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Header -->
+            <div class="header">
+                <div class="header-left">
+                    <div class="search-bar">
+                        <i class="fas fa-search"></i>
+                        <input type="text" class="search-input" placeholder="Search emails...">
+                    </div>
+                </div>
+                <div class="header-right">
+                    <div class="user-menu">
+                        <div class="user-avatar">U</div>
+                        <span id="user-email">user@tauos.org</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Email Content -->
+            <div class="email-content">
+                <!-- Email List -->
+                <div class="email-list">
+                    <div class="email-item unread">
+                        <div class="email-sender">TauOS Team</div>
+                        <div class="email-subject">Welcome to TauMail!</div>
+                        <div class="email-preview">Thank you for choosing TauMail, the privacy-first email service...</div>
+                        <div class="email-time">2 hours ago</div>
+                    </div>
+                    <div class="email-item">
+                        <div class="email-sender">Security Alert</div>
+                        <div class="email-subject">Your account is secure</div>
+                        <div class="email-preview">We've detected a new login to your account...</div>
+                        <div class="email-time">1 day ago</div>
+                    </div>
+                    <div class="email-item">
+                        <div class="email-sender">TauCloud</div>
+                        <div class="email-subject">Storage update</div>
+                        <div class="email-preview">Your cloud storage has been updated...</div>
+                        <div class="email-time">3 days ago</div>
+                    </div>
+                </div>
+
+                <!-- Email Detail -->
+                <div class="email-detail">
+                    <div class="email-header">
+                        <div class="email-subject-large">Welcome to TauMail!</div>
+                        <div class="email-meta">
+                            <div class="email-sender-info">
+                                <div class="user-avatar">T</div>
+                                <div>
+                                    <div>TauOS Team</div>
+                                    <div>team@tauos.org</div>
+                                </div>
+                            </div>
+                            <div>2 hours ago</div>
+                        </div>
+                    </div>
+                    <div class="email-body">
+                        <p>Welcome to TauMail, the privacy-first email service built for the future of computing!</p>
+                        <br>
+                        <p>With TauMail, you get:</p>
+                        <ul>
+                            <li>End-to-end encryption for all your emails</li>
+                            <li>Zero tracking and surveillance</li>
+                            <li>Complete control over your data</li>
+                            <li>Beautiful, intuitive interface</li>
+                        </ul>
+                        <br>
+                        <p>Your emails are stored securely and privately. We never read your messages or sell your data.</p>
+                        <br>
+                        <p>Best regards,<br>The TauOS Team</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Compose Button -->
+    <button class="compose-btn">
+        <i class="fas fa-plus"></i>
+    </button>
+
+    <script>
+        // Check if user is logged in
+        const token = localStorage.getItem('token');
+        if (!token) {
+            window.location.href = '/';
+        }
+
+        // Load user email
+        const userEmail = localStorage.getItem('userEmail');
+        if (userEmail) {
+            document.getElementById('user-email').textContent = userEmail;
+        }
+
+        // Handle logout
+        document.querySelector('.user-menu').addEventListener('click', function() {
+            if (confirm('Do you want to logout?')) {
+                localStorage.removeItem('token');
+                localStorage.removeItem('userEmail');
+                window.location.href = '/';
+            }
+        });
+
+        // Handle email item clicks
+        document.querySelectorAll('.email-item').forEach(item => {
+            item.addEventListener('click', function() {
+                document.querySelectorAll('.email-item').forEach(i => i.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+
+        // Handle compose button
+        document.querySelector('.compose-btn').addEventListener('click', function() {
+            alert('Compose feature coming soon!');
+        });
+    </script>
+</body>
+</html> 

@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TauCloud Dashboard - Privacy-First Cloud Storage</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f8f9fa;
+            color: #333;
+        }
+
+        .dashboard-container {
+            display: flex;
+            height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 250px;
+            background: #2c3e50;
+            color: white;
+            padding: 20px 0;
+            overflow-y: auto;
+        }
+
+        .sidebar-header {
+            padding: 0 20px 20px;
+            border-bottom: 1px solid #34495e;
+        }
+
+        .sidebar-logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #3498db;
+        }
+
+        .sidebar-nav {
+            padding: 20px 0;
+        }
+
+        .nav-item {
+            padding: 12px 20px;
+            cursor: pointer;
+            transition: background 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .nav-item:hover {
+            background: #34495e;
+        }
+
+        .nav-item.active {
+            background: #3498db;
+        }
+
+        .nav-icon {
+            width: 20px;
+        }
+
+        .storage-info {
+            padding: 20px;
+            border-top: 1px solid #34495e;
+            margin-top: 20px;
+        }
+
+        .storage-text {
+            font-size: 14px;
+            color: #bdc3c7;
+            margin-bottom: 8px;
+        }
+
+        .storage-bar {
+            width: 100%;
+            height: 6px;
+            background: #34495e;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .storage-fill {
+            height: 100%;
+            background: #3498db;
+            width: 35%;
+            transition: width 0.3s;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header */
+        .header {
+            background: white;
+            padding: 15px 30px;
+            border-bottom: 1px solid #e1e5e9;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .search-bar {
+            display: flex;
+            align-items: center;
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 8px 16px;
+            width: 400px;
+        }
+
+        .search-input {
+            border: none;
+            background: none;
+            outline: none;
+            flex: 1;
+            margin-left: 8px;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .upload-btn {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background 0.3s;
+        }
+
+        .upload-btn:hover {
+            background: #2980b9;
+        }
+
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            padding: 8px 12px;
+            border-radius: 6px;
+            transition: background 0.3s;
+        }
+
+        .user-menu:hover {
+            background: #f8f9fa;
+        }
+
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #3498db;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+
+        /* File Content */
+        .file-content {
+            flex: 1;
+            padding: 30px;
+            overflow-y: auto;
+        }
+
+        .file-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .file-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .view-toggle {
+            display: flex;
+            gap: 10px;
+        }
+
+        .view-btn {
+            padding: 8px 12px;
+            border: 1px solid #e1e5e9;
+            background: white;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .view-btn.active {
+            background: #3498db;
+            color: white;
+            border-color: #3498db;
+        }
+
+        /* File Grid */
+        .file-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .file-item {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 1px solid #e1e5e9;
+        }
+
+        .file-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .file-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            color: #3498db;
+        }
+
+        .file-name {
+            font-weight: 600;
+            margin-bottom: 5px;
+            word-break: break-word;
+        }
+
+        .file-size {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .file-date {
+            color: #999;
+            font-size: 12px;
+            margin-top: 5px;
+        }
+
+        /* File List */
+        .file-list {
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .file-list-item {
+            display: flex;
+            align-items: center;
+            padding: 15px 20px;
+            border-bottom: 1px solid #f1f3f4;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .file-list-item:hover {
+            background: #f8f9fa;
+        }
+
+        .file-list-icon {
+            font-size: 1.5rem;
+            margin-right: 15px;
+            color: #3498db;
+            width: 30px;
+        }
+
+        .file-list-info {
+            flex: 1;
+        }
+
+        .file-list-name {
+            font-weight: 600;
+            margin-bottom: 2px;
+        }
+
+        .file-list-meta {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .file-list-size {
+            color: #999;
+            font-size: 12px;
+            margin-left: 20px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 200px;
+            }
+            
+            .search-bar {
+                width: 250px;
+            }
+            
+            .file-grid {
+                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo">τ Cloud</div>
+            </div>
+            <div class="sidebar-nav">
+                <div class="nav-item active">
+                    <i class="fas fa-home nav-icon"></i>
+                    Home
+                </div>
+                <div class="nav-item">
+                    <i class="fas fa-folder nav-icon"></i>
+                    My Files
+                </div>
+                <div class="nav-item">
+                    <i class="fas fa-share-alt nav-icon"></i>
+                    Shared
+                </div>
+                <div class="nav-item">
+                    <i class="fas fa-star nav-icon"></i>
+                    Starred
+                </div>
+                <div class="nav-item">
+                    <i class="fas fa-trash nav-icon"></i>
+                    Trash
+                </div>
+            </div>
+            <div class="storage-info">
+                <div class="storage-text">Storage Used</div>
+                <div class="storage-bar">
+                    <div class="storage-fill"></div>
+                </div>
+                <div class="storage-text">3.5 GB of 10 GB used</div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Header -->
+            <div class="header">
+                <div class="header-left">
+                    <div class="search-bar">
+                        <i class="fas fa-search"></i>
+                        <input type="text" class="search-input" placeholder="Search files...">
+                    </div>
+                </div>
+                <div class="header-right">
+                    <button class="upload-btn">
+                        <i class="fas fa-upload"></i>
+                        Upload
+                    </button>
+                    <div class="user-menu">
+                        <div class="user-avatar">U</div>
+                        <span id="user-email">user@tauos.org</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- File Content -->
+            <div class="file-content">
+                <div class="file-header">
+                    <div class="file-title">My Files</div>
+                    <div class="view-toggle">
+                        <button class="view-btn active" data-view="grid">
+                            <i class="fas fa-th"></i>
+                        </button>
+                        <button class="view-btn" data-view="list">
+                            <i class="fas fa-list"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- File Grid View -->
+                <div class="file-grid" id="file-grid">
+                    <div class="file-item">
+                        <div class="file-icon">
+                            <i class="fas fa-file-pdf"></i>
+                        </div>
+                        <div class="file-name">TauOS Documentation.pdf</div>
+                        <div class="file-size">2.3 MB</div>
+                        <div class="file-date">2 hours ago</div>
+                    </div>
+                    <div class="file-item">
+                        <div class="file-icon">
+                            <i class="fas fa-file-image"></i>
+                        </div>
+                        <div class="file-name">Screenshot.png</div>
+                        <div class="file-size">1.1 MB</div>
+                        <div class="file-date">1 day ago</div>
+                    </div>
+                    <div class="file-item">
+                        <div class="file-icon">
+                            <i class="fas fa-file-word"></i>
+                        </div>
+                        <div class="file-name">Project Report.docx</div>
+                        <div class="file-size">456 KB</div>
+                        <div class="file-date">3 days ago</div>
+                    </div>
+                    <div class="file-item">
+                        <div class="file-icon">
+                            <i class="fas fa-folder"></i>
+                        </div>
+                        <div class="file-name">Work Documents</div>
+                        <div class="file-size">15 items</div>
+                        <div class="file-date">1 week ago</div>
+                    </div>
+                    <div class="file-item">
+                        <div class="file-icon">
+                            <i class="fas fa-file-video"></i>
+                        </div>
+                        <div class="file-name">Presentation.mp4</div>
+                        <div class="file-size">45.2 MB</div>
+                        <div class="file-date">2 weeks ago</div>
+                    </div>
+                    <div class="file-item">
+                        <div class="file-icon">
+                            <i class="fas fa-file-music"></i>
+                        </div>
+                        <div class="file-name">Audio Recording.mp3</div>
+                        <div class="file-size">8.7 MB</div>
+                        <div class="file-date">1 month ago</div>
+                    </div>
+                </div>
+
+                <!-- File List View (Hidden by default) -->
+                <div class="file-list" id="file-list" style="display: none;">
+                    <div class="file-list-item">
+                        <div class="file-list-icon">
+                            <i class="fas fa-file-pdf"></i>
+                        </div>
+                        <div class="file-list-info">
+                            <div class="file-list-name">TauOS Documentation.pdf</div>
+                            <div class="file-list-meta">Modified 2 hours ago</div>
+                        </div>
+                        <div class="file-list-size">2.3 MB</div>
+                    </div>
+                    <div class="file-list-item">
+                        <div class="file-list-icon">
+                            <i class="fas fa-file-image"></i>
+                        </div>
+                        <div class="file-list-info">
+                            <div class="file-list-name">Screenshot.png</div>
+                            <div class="file-list-meta">Modified 1 day ago</div>
+                        </div>
+                        <div class="file-list-size">1.1 MB</div>
+                    </div>
+                    <div class="file-list-item">
+                        <div class="file-list-icon">
+                            <i class="fas fa-file-word"></i>
+                        </div>
+                        <div class="file-list-info">
+                            <div class="file-list-name">Project Report.docx</div>
+                            <div class="file-list-meta">Modified 3 days ago</div>
+                        </div>
+                        <div class="file-list-size">456 KB</div>
+                    </div>
+                    <div class="file-list-item">
+                        <div class="file-list-icon">
+                            <i class="fas fa-folder"></i>
+                        </div>
+                        <div class="file-list-info">
+                            <div class="file-list-name">Work Documents</div>
+                            <div class="file-list-meta">15 items</div>
+                        </div>
+                        <div class="file-list-size">-</div>
+                    </div>
+                    <div class="file-list-item">
+                        <div class="file-list-icon">
+                            <i class="fas fa-file-video"></i>
+                        </div>
+                        <div class="file-list-info">
+                            <div class="file-list-name">Presentation.mp4</div>
+                            <div class="file-list-meta">Modified 2 weeks ago</div>
+                        </div>
+                        <div class="file-list-size">45.2 MB</div>
+                    </div>
+                    <div class="file-list-item">
+                        <div class="file-list-icon">
+                            <i class="fas fa-file-music"></i>
+                        </div>
+                        <div class="file-list-info">
+                            <div class="file-list-name">Audio Recording.mp3</div>
+                            <div class="file-list-meta">Modified 1 month ago</div>
+                        </div>
+                        <div class="file-list-size">8.7 MB</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Check if user is logged in
+        const token = localStorage.getItem('token');
+        if (!token) {
+            window.location.href = '/';
+        }
+
+        // Load user email
+        const userEmail = localStorage.getItem('userEmail');
+        if (userEmail) {
+            document.getElementById('user-email').textContent = userEmail;
+        }
+
+        // Handle logout
+        document.querySelector('.user-menu').addEventListener('click', function() {
+            if (confirm('Do you want to logout?')) {
+                localStorage.removeItem('token');
+                localStorage.removeItem('userEmail');
+                window.location.href = '/';
+            }
+        });
+
+        // Handle view toggle
+        document.querySelectorAll('.view-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const view = this.dataset.view;
+                
+                // Update active button
+                document.querySelectorAll('.view-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                
+                // Show/hide views
+                if (view === 'grid') {
+                    document.getElementById('file-grid').style.display = 'grid';
+                    document.getElementById('file-list').style.display = 'none';
+                } else {
+                    document.getElementById('file-grid').style.display = 'none';
+                    document.getElementById('file-list').style.display = 'block';
+                }
+            });
+        });
+
+        // Handle file item clicks
+        document.querySelectorAll('.file-item, .file-list-item').forEach(item => {
+            item.addEventListener('click', function() {
+                const fileName = this.querySelector('.file-name, .file-list-name').textContent;
+                alert(`Opening: ${fileName}`);
+            });
+        });
+
+        // Handle upload button
+        document.querySelector('.upload-btn').addEventListener('click', function() {
+            alert('Upload feature coming soon!');
+        });
+    </script>
+</body>
+</html> 
