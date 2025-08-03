@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TauMail Dashboard - Privacy-First Email</title>
+    <title>TauMail - Privacy-First Email</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
         * {
@@ -13,59 +13,84 @@
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #f8f9fa;
-            color: #333;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 100%);
+            color: #ffffff;
+            height: 100vh;
+            overflow: hidden;
         }
 
         .dashboard-container {
             display: flex;
             height: 100vh;
+            background: rgba(15, 15, 35, 0.95);
+            backdrop-filter: blur(20px);
         }
 
         /* Sidebar */
         .sidebar {
-            width: 250px;
-            background: #2c3e50;
-            color: white;
+            width: 280px;
+            background: rgba(26, 26, 46, 0.8);
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
             padding: 20px 0;
             overflow-y: auto;
         }
 
         .sidebar-header {
-            padding: 0 20px 20px;
-            border-bottom: 1px solid #34495e;
+            padding: 0 24px 24px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .sidebar-logo {
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: #3498db;
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #FFD700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
         .sidebar-nav {
-            padding: 20px 0;
+            padding: 24px 0;
         }
 
         .nav-item {
-            padding: 12px 20px;
+            padding: 16px 24px;
             cursor: pointer;
-            transition: background 0.3s;
+            transition: all 0.3s ease;
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 16px;
+            margin: 4px 12px;
+            border-radius: 12px;
+            font-weight: 500;
         }
 
         .nav-item:hover {
-            background: #34495e;
+            background: rgba(255, 215, 0, 0.1);
+            color: #FFD700;
         }
 
         .nav-item.active {
-            background: #3498db;
+            background: rgba(255, 215, 0, 0.2);
+            color: #FFD700;
+            border-left: 3px solid #FFD700;
         }
 
         .nav-icon {
             width: 20px;
+            text-align: center;
+        }
+
+        .nav-count {
+            margin-left: auto;
+            background: rgba(255, 215, 0, 0.2);
+            color: #FFD700;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
         }
 
         /* Main Content */
@@ -77,9 +102,10 @@
 
         /* Header */
         .header {
-            background: white;
-            padding: 15px 30px;
-            border-bottom: 1px solid #e1e5e9;
+            background: rgba(26, 26, 46, 0.9);
+            backdrop-filter: blur(10px);
+            padding: 16px 32px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -88,16 +114,18 @@
         .header-left {
             display: flex;
             align-items: center;
-            gap: 20px;
+            gap: 24px;
         }
 
         .search-bar {
             display: flex;
             align-items: center;
-            background: #f8f9fa;
-            border-radius: 8px;
-            padding: 8px 16px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 12px 20px;
             width: 400px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .search-input {
@@ -105,161 +133,371 @@
             background: none;
             outline: none;
             flex: 1;
-            margin-left: 8px;
+            margin-left: 12px;
+            color: #ffffff;
+            font-size: 14px;
+        }
+
+        .search-input::placeholder {
+            color: rgba(255, 255, 255, 0.6);
         }
 
         .header-right {
             display: flex;
             align-items: center;
-            gap: 15px;
+            gap: 16px;
+        }
+
+        .compose-btn {
+            background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+            color: #000;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .compose-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(255, 215, 0, 0.3);
         }
 
         .user-menu {
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 12px;
             cursor: pointer;
-            padding: 8px 12px;
-            border-radius: 6px;
+            padding: 8px 16px;
+            border-radius: 12px;
             transition: background 0.3s;
+            background: rgba(255, 255, 255, 0.1);
         }
 
         .user-menu:hover {
-            background: #f8f9fa;
+            background: rgba(255, 255, 255, 0.2);
         }
 
         .user-avatar {
-            width: 32px;
-            height: 32px;
+            width: 36px;
+            height: 36px;
             border-radius: 50%;
-            background: #3498db;
+            background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
             display: flex;
             align-items: center;
             justify-content: center;
-            color: white;
-            font-weight: bold;
+            color: #000;
+            font-weight: 700;
+            font-size: 16px;
         }
 
         /* Email Content */
         .email-content {
             flex: 1;
             display: flex;
+            background: rgba(15, 15, 35, 0.5);
         }
 
         .email-list {
-            width: 350px;
-            background: white;
-            border-right: 1px solid #e1e5e9;
+            width: 400px;
+            background: rgba(26, 26, 46, 0.8);
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
             overflow-y: auto;
         }
 
         .email-item {
-            padding: 15px 20px;
-            border-bottom: 1px solid #f1f3f4;
+            padding: 20px 24px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
             cursor: pointer;
-            transition: background 0.3s;
+            transition: all 0.3s ease;
+            position: relative;
         }
 
         .email-item:hover {
-            background: #f8f9fa;
+            background: rgba(255, 215, 0, 0.05);
         }
 
         .email-item.unread {
-            background: #e3f2fd;
-            font-weight: 600;
+            background: rgba(255, 215, 0, 0.1);
+            border-left: 3px solid #FFD700;
+        }
+
+        .email-item.unread::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+            background: #FFD700;
         }
 
         .email-sender {
             font-weight: 600;
-            margin-bottom: 4px;
+            margin-bottom: 8px;
+            color: #ffffff;
         }
 
         .email-subject {
-            color: #666;
-            margin-bottom: 4px;
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 8px;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
+            font-weight: 500;
         }
 
         .email-preview {
-            color: #999;
+            color: rgba(255, 255, 255, 0.6);
             font-size: 14px;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
+            margin-bottom: 8px;
         }
 
         .email-time {
-            color: #999;
+            color: rgba(255, 255, 255, 0.4);
             font-size: 12px;
-            margin-top: 4px;
+            font-weight: 500;
+        }
+
+        .email-actions {
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            display: none;
+            gap: 8px;
+        }
+
+        .email-item:hover .email-actions {
+            display: flex;
+        }
+
+        .email-action-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: rgba(255, 255, 255, 0.7);
+            padding: 6px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .email-action-btn:hover {
+            background: rgba(255, 215, 0, 0.2);
+            color: #FFD700;
         }
 
         /* Email Detail */
         .email-detail {
             flex: 1;
-            background: white;
-            padding: 30px;
+            background: rgba(15, 15, 35, 0.8);
+            padding: 32px;
             overflow-y: auto;
         }
 
         .email-header {
-            border-bottom: 1px solid #e1e5e9;
-            padding-bottom: 20px;
-            margin-bottom: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 24px;
+            margin-bottom: 24px;
         }
 
         .email-subject-large {
-            font-size: 1.5rem;
-            font-weight: 600;
-            margin-bottom: 10px;
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 16px;
+            color: #ffffff;
         }
 
         .email-meta {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            color: #666;
+            color: rgba(255, 255, 255, 0.7);
         }
 
         .email-sender-info {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 16px;
         }
 
         .email-body {
-            line-height: 1.6;
-            color: #333;
+            line-height: 1.8;
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 16px;
         }
 
-        /* Compose Button */
-        .compose-btn {
+        /* Compose Modal */
+        .compose-modal {
             position: fixed;
-            bottom: 30px;
-            right: 30px;
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            background: #3498db;
-            color: white;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .compose-modal.active {
+            display: flex;
+        }
+
+        .compose-window {
+            background: rgba(26, 26, 46, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 16px;
+            padding: 32px;
+            width: 90%;
+            max-width: 600px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .compose-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .compose-title {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #FFD700;
+        }
+
+        .close-btn {
+            background: none;
             border: none;
+            color: rgba(255, 255, 255, 0.6);
             font-size: 24px;
             cursor: pointer;
-            box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
-            transition: all 0.3s;
+            padding: 8px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
         }
 
-        .compose-btn:hover {
-            transform: scale(1.1);
-            box-shadow: 0 6px 16px rgba(52, 152, 219, 0.4);
+        .close-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: #ffffff;
+        }
+
+        .compose-form {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .form-label {
+            color: rgba(255, 255, 255, 0.8);
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .form-input {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            padding: 12px 16px;
+            color: #ffffff;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #FFD700;
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .form-textarea {
+            min-height: 200px;
+            resize: vertical;
+        }
+
+        .compose-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+            margin-top: 24px;
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+            color: #000;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(255, 215, 0, 0.3);
+        }
+
+        /* Loading States */
+        .loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 200px;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .spinner {
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-top: 2px solid #FFD700;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            animation: spin 1s linear infinite;
+            margin-right: 12px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
 
         /* Responsive */
         @media (max-width: 768px) {
             .sidebar {
-                width: 200px;
+                width: 240px;
             }
             
             .email-list {
@@ -277,28 +515,36 @@
         <!-- Sidebar -->
         <div class="sidebar">
             <div class="sidebar-header">
-                <div class="sidebar-logo">τ Mail</div>
+                <div class="sidebar-logo">
+                    <i class="fas fa-envelope"></i>
+                    τ Mail
+                </div>
             </div>
             <div class="sidebar-nav">
-                <div class="nav-item active">
+                <div class="nav-item active" data-folder="inbox">
                     <i class="fas fa-inbox nav-icon"></i>
                     Inbox
+                    <span class="nav-count" id="inbox-count">0</span>
                 </div>
-                <div class="nav-item">
+                <div class="nav-item" data-folder="sent">
                     <i class="fas fa-paper-plane nav-icon"></i>
                     Sent
+                    <span class="nav-count" id="sent-count">0</span>
                 </div>
-                <div class="nav-item">
+                <div class="nav-item" data-folder="starred">
                     <i class="fas fa-star nav-icon"></i>
                     Starred
+                    <span class="nav-count" id="starred-count">0</span>
                 </div>
-                <div class="nav-item">
+                <div class="nav-item" data-folder="drafts">
+                    <i class="fas fa-file-alt nav-icon"></i>
+                    Drafts
+                    <span class="nav-count" id="drafts-count">0</span>
+                </div>
+                <div class="nav-item" data-folder="trash">
                     <i class="fas fa-trash nav-icon"></i>
                     Trash
-                </div>
-                <div class="nav-item">
-                    <i class="fas fa-folder nav-icon"></i>
-                    Drafts
+                    <span class="nav-count" id="trash-count">0</span>
                 </div>
             </div>
         </div>
@@ -310,12 +556,16 @@
                 <div class="header-left">
                     <div class="search-bar">
                         <i class="fas fa-search"></i>
-                        <input type="text" class="search-input" placeholder="Search emails...">
+                        <input type="text" class="search-input" placeholder="Search emails..." id="search-input">
                     </div>
                 </div>
                 <div class="header-right">
-                    <div class="user-menu">
-                        <div class="user-avatar">U</div>
+                    <button class="compose-btn" id="compose-btn">
+                        <i class="fas fa-plus"></i>
+                        Compose
+                    </button>
+                    <div class="user-menu" id="user-menu">
+                        <div class="user-avatar" id="user-avatar">U</div>
                         <span id="user-email">user@tauos.org</span>
                         <i class="fas fa-chevron-down"></i>
                     </div>
@@ -325,82 +575,314 @@
             <!-- Email Content -->
             <div class="email-content">
                 <!-- Email List -->
-                <div class="email-list">
-                    <div class="email-item unread">
-                        <div class="email-sender">TauOS Team</div>
-                        <div class="email-subject">Welcome to TauMail!</div>
-                        <div class="email-preview">Thank you for choosing TauMail, the privacy-first email service...</div>
-                        <div class="email-time">2 hours ago</div>
-                    </div>
-                    <div class="email-item">
-                        <div class="email-sender">Security Alert</div>
-                        <div class="email-subject">Your account is secure</div>
-                        <div class="email-preview">We've detected a new login to your account...</div>
-                        <div class="email-time">1 day ago</div>
-                    </div>
-                    <div class="email-item">
-                        <div class="email-sender">TauCloud</div>
-                        <div class="email-subject">Storage update</div>
-                        <div class="email-preview">Your cloud storage has been updated...</div>
-                        <div class="email-time">3 days ago</div>
+                <div class="email-list" id="email-list">
+                    <div class="loading">
+                        <div class="spinner"></div>
+                        Loading emails...
                     </div>
                 </div>
 
                 <!-- Email Detail -->
-                <div class="email-detail">
-                    <div class="email-header">
-                        <div class="email-subject-large">Welcome to TauMail!</div>
-                        <div class="email-meta">
-                            <div class="email-sender-info">
-                                <div class="user-avatar">T</div>
-                                <div>
-                                    <div>TauOS Team</div>
-                                    <div>team@tauos.org</div>
-                                </div>
-                            </div>
-                            <div>2 hours ago</div>
-                        </div>
-                    </div>
-                    <div class="email-body">
-                        <p>Welcome to TauMail, the privacy-first email service built for the future of computing!</p>
-                        <br>
-                        <p>With TauMail, you get:</p>
-                        <ul>
-                            <li>End-to-end encryption for all your emails</li>
-                            <li>Zero tracking and surveillance</li>
-                            <li>Complete control over your data</li>
-                            <li>Beautiful, intuitive interface</li>
-                        </ul>
-                        <br>
-                        <p>Your emails are stored securely and privately. We never read your messages or sell your data.</p>
-                        <br>
-                        <p>Best regards,<br>The TauOS Team</p>
+                <div class="email-detail" id="email-detail">
+                    <div class="loading">
+                        <div class="spinner"></div>
+                        Select an email to view
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Compose Button -->
-    <button class="compose-btn">
-        <i class="fas fa-plus"></i>
-    </button>
+    <!-- Compose Modal -->
+    <div class="compose-modal" id="compose-modal">
+        <div class="compose-window">
+            <div class="compose-header">
+                <div class="compose-title">New Message</div>
+                <button class="close-btn" id="close-compose">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form class="compose-form" id="compose-form">
+                <div class="form-group">
+                    <label class="form-label">To:</label>
+                    <input type="email" class="form-input" id="compose-to" placeholder="recipient@tauos.org" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Subject:</label>
+                    <input type="text" class="form-input" id="compose-subject" placeholder="Subject" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Message:</label>
+                    <textarea class="form-input form-textarea" id="compose-body" placeholder="Write your message here..." required></textarea>
+                </div>
+                <div class="compose-actions">
+                    <button type="button" class="btn-secondary" id="save-draft">Save Draft</button>
+                    <button type="submit" class="btn-primary">Send Message</button>
+                </div>
+            </form>
+        </div>
+    </div>
 
     <script>
-        // Check if user is logged in
+        // Global variables
+        let currentUser = null;
+        let currentFolder = 'inbox';
+        let emails = [];
+        let selectedEmail = null;
+
+        // Check authentication
         const token = localStorage.getItem('token');
         if (!token) {
             window.location.href = '/';
         }
 
-        // Load user email
+        // Load user data
         const userEmail = localStorage.getItem('userEmail');
         if (userEmail) {
             document.getElementById('user-email').textContent = userEmail;
+            document.getElementById('user-avatar').textContent = userEmail.charAt(0).toUpperCase();
         }
 
-        // Handle logout
-        document.querySelector('.user-menu').addEventListener('click', function() {
+        // API functions
+        async function apiCall(endpoint, options = {}) {
+            const response = await fetch(`/api${endpoint}`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+                },
+                ...options
+            });
+            
+            if (!response.ok) {
+                throw new Error(`API error: ${response.status}`);
+            }
+            
+            return response.json();
+        }
+
+        // Load emails
+        async function loadEmails(folder = 'inbox') {
+            try {
+                const endpoint = folder === 'sent' ? '/emails/sent' : '/emails/inbox';
+                const data = await apiCall(endpoint);
+                emails = data;
+                renderEmailList();
+                updateCounts();
+            } catch (error) {
+                console.error('Failed to load emails:', error);
+                showError('Failed to load emails');
+            }
+        }
+
+        // Render email list
+        function renderEmailList() {
+            const emailList = document.getElementById('email-list');
+            emailList.innerHTML = '';
+
+            if (emails.length === 0) {
+                emailList.innerHTML = `
+                    <div class="loading">
+                        <i class="fas fa-inbox" style="font-size: 48px; color: rgba(255,255,255,0.3); margin-bottom: 16px;"></i>
+                        <div>No emails in ${currentFolder}</div>
+                    </div>
+                `;
+                return;
+            }
+
+            emails.forEach(email => {
+                const emailItem = document.createElement('div');
+                emailItem.className = `email-item ${email.is_read ? '' : 'unread'}`;
+                emailItem.dataset.emailId = email.id;
+                
+                const timeAgo = getTimeAgo(email.created_at);
+                
+                emailItem.innerHTML = `
+                    <div class="email-sender">${email.sender_username || email.recipient_username}</div>
+                    <div class="email-subject">${email.subject}</div>
+                    <div class="email-preview">${email.body.substring(0, 100)}${email.body.length > 100 ? '...' : ''}</div>
+                    <div class="email-time">${timeAgo}</div>
+                    <div class="email-actions">
+                        <button class="email-action-btn" onclick="starEmail(${email.id})">
+                            <i class="fas fa-star ${email.is_starred ? 'fas' : 'far'}"></i>
+                        </button>
+                        <button class="email-action-btn" onclick="deleteEmail(${email.id})">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                `;
+                
+                emailItem.addEventListener('click', () => selectEmail(email.id));
+                emailList.appendChild(emailItem);
+            });
+        }
+
+        // Select email
+        async function selectEmail(emailId) {
+            try {
+                const email = await apiCall(`/emails/${emailId}`);
+                selectedEmail = email;
+                renderEmailDetail(email);
+                
+                // Mark as read if not already
+                if (!email.is_read) {
+                    await apiCall(`/emails/${emailId}/read`, { method: 'PUT' });
+                    loadEmails(currentFolder);
+                }
+            } catch (error) {
+                console.error('Failed to load email:', error);
+                showError('Failed to load email');
+            }
+        }
+
+        // Render email detail
+        function renderEmailDetail(email) {
+            const emailDetail = document.getElementById('email-detail');
+            const timeAgo = getTimeAgo(email.created_at);
+            
+            emailDetail.innerHTML = `
+                <div class="email-header">
+                    <div class="email-subject-large">${email.subject}</div>
+                    <div class="email-meta">
+                        <div class="email-sender-info">
+                            <div class="user-avatar">${(email.sender_username || email.recipient_username).charAt(0).toUpperCase()}</div>
+                            <div>
+                                <div>${email.sender_username || email.recipient_username}</div>
+                                <div>${email.sender_email || email.recipient_email}</div>
+                            </div>
+                        </div>
+                        <div>${timeAgo}</div>
+                    </div>
+                </div>
+                <div class="email-body">
+                    ${email.body.replace(/\n/g, '<br>')}
+                </div>
+            `;
+        }
+
+        // Send email
+        async function sendEmail(formData) {
+            try {
+                await apiCall('/emails/send', {
+                    method: 'POST',
+                    body: JSON.stringify(formData)
+                });
+                
+                closeComposeModal();
+                loadEmails(currentFolder);
+                showSuccess('Email sent successfully!');
+            } catch (error) {
+                console.error('Failed to send email:', error);
+                showError('Failed to send email');
+            }
+        }
+
+        // Compose modal functions
+        function openComposeModal() {
+            document.getElementById('compose-modal').classList.add('active');
+            document.getElementById('compose-to').focus();
+        }
+
+        function closeComposeModal() {
+            document.getElementById('compose-modal').classList.remove('active');
+            document.getElementById('compose-form').reset();
+        }
+
+        // Utility functions
+        function getTimeAgo(dateString) {
+            const date = new Date(dateString);
+            const now = new Date();
+            const diffMs = now - date;
+            const diffMins = Math.floor(diffMs / 60000);
+            const diffHours = Math.floor(diffMs / 3600000);
+            const diffDays = Math.floor(diffMs / 86400000);
+
+            if (diffMins < 1) return 'Just now';
+            if (diffMins < 60) return `${diffMins}m ago`;
+            if (diffHours < 24) return `${diffHours}h ago`;
+            if (diffDays < 7) return `${diffDays}d ago`;
+            return date.toLocaleDateString();
+        }
+
+        function updateCounts() {
+            const counts = {
+                inbox: emails.filter(e => !e.is_read).length,
+                sent: emails.length,
+                starred: emails.filter(e => e.is_starred).length,
+                drafts: 0,
+                trash: 0
+            };
+
+            Object.keys(counts).forEach(folder => {
+                const element = document.getElementById(`${folder}-count`);
+                if (element) {
+                    element.textContent = counts[folder];
+                }
+            });
+        }
+
+        function showSuccess(message) {
+            // Simple success notification
+            alert(message);
+        }
+
+        function showError(message) {
+            // Simple error notification
+            alert(message);
+        }
+
+        // Event listeners
+        document.getElementById('compose-btn').addEventListener('click', openComposeModal);
+        document.getElementById('close-compose').addEventListener('click', closeComposeModal);
+
+        document.getElementById('compose-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const formData = {
+                to: document.getElementById('compose-to').value,
+                subject: document.getElementById('compose-subject').value,
+                body: document.getElementById('compose-body').value
+            };
+            
+            await sendEmail(formData);
+        });
+
+        // Folder navigation
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', function() {
+                const folder = this.dataset.folder;
+                if (folder) {
+                    currentFolder = folder;
+                    
+                    // Update active state
+                    document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    // Load emails for folder
+                    loadEmails(folder);
+                }
+            });
+        });
+
+        // Search functionality
+        document.getElementById('search-input').addEventListener('input', function() {
+            const query = this.value.toLowerCase();
+            const emailItems = document.querySelectorAll('.email-item');
+            
+            emailItems.forEach(item => {
+                const sender = item.querySelector('.email-sender').textContent.toLowerCase();
+                const subject = item.querySelector('.email-subject').textContent.toLowerCase();
+                const preview = item.querySelector('.email-preview').textContent.toLowerCase();
+                
+                if (sender.includes(query) || subject.includes(query) || preview.includes(query)) {
+                    item.style.display = 'block';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        });
+
+        // Logout functionality
+        document.getElementById('user-menu').addEventListener('click', function() {
             if (confirm('Do you want to logout?')) {
                 localStorage.removeItem('token');
                 localStorage.removeItem('userEmail');
@@ -408,18 +890,8 @@
             }
         });
 
-        // Handle email item clicks
-        document.querySelectorAll('.email-item').forEach(item => {
-            item.addEventListener('click', function() {
-                document.querySelectorAll('.email-item').forEach(i => i.classList.remove('active'));
-                this.classList.add('active');
-            });
-        });
-
-        // Handle compose button
-        document.querySelector('.compose-btn').addEventListener('click', function() {
-            alert('Compose feature coming soon!');
-        });
+        // Initialize
+        loadEmails();
     </script>
 </body>
 </html> 
