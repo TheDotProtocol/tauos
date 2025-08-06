@@ -19,7 +19,92 @@ import {
   Image,
   Music,
   Video,
-  Archive
+  Archive,
+  Search,
+  Filter,
+  Settings,
+  Bell,
+  User,
+  ChevronRight,
+  Play,
+  Sparkles,
+  Key,
+  Smartphone,
+  Monitor,
+  Tablet,
+  Server,
+  Database,
+  Cpu,
+  HardDrive,
+  Wifi,
+  Battery,
+  Smartphone as Phone,
+  Heart,
+  Code,
+  GitBranch,
+  Github,
+  Twitter,
+  Linkedin,
+  Clock,
+  Calendar,
+  MessageSquare,
+  FileImage,
+  FileVideo,
+  FileAudio,
+  FileText as FileTextIcon,
+  FolderOpen,
+  Share2,
+  Copy,
+  Trash2,
+  Edit3,
+  MoreHorizontal,
+  Plus,
+  Minus,
+  X,
+  Check,
+  AlertCircle,
+  Info,
+  ExternalLink,
+  Download as DownloadIcon,
+  Upload,
+  RefreshCw,
+  RotateCcw,
+  Save,
+  Eye,
+  EyeOff as EyeOffIcon,
+  Unlock,
+  Key as KeyIcon,
+  Fingerprint,
+  Shield as ShieldIcon,
+  Zap as ZapIcon,
+  Globe as GlobeIcon,
+  Database as DatabaseIcon,
+  Server as ServerIcon,
+  Cpu as CpuIcon,
+  HardDrive as HardDriveIcon,
+  Wifi as WifiIcon,
+  Battery as BatteryIcon,
+  Smartphone as SmartphoneIcon,
+  Monitor as MonitorIcon,
+  Tablet as TabletIcon,
+  Server as ServerIcon2,
+  Database as DatabaseIcon2,
+  Cpu as CpuIcon2,
+  HardDrive as HardDriveIcon2,
+  Wifi as WifiIcon2,
+  Battery as BatteryIcon2,
+  Smartphone as SmartphoneIcon2,
+  Monitor as MonitorIcon2,
+  Tablet as TabletIcon2,
+  Server as ServerIcon3,
+  Database as DatabaseIcon3,
+  Cpu as CpuIcon3,
+  HardDrive as HardDriveIcon3,
+  Wifi as WifiIcon3,
+  Battery as BatteryIcon3,
+  Smartphone as SmartphoneIcon3,
+  Monitor as MonitorIcon3,
+  Tablet as TabletIcon3
 } from 'lucide-react';
 
 export default function TauCloudPage() {
@@ -28,24 +113,28 @@ export default function TauCloudPage() {
 
   const features = [
     {
-      icon: <Shield className="w-6 h-6 text-purple-400" />,
+      icon: <Shield className="w-8 h-8 text-blue-500" />,
       title: "Client-Side Encryption",
-      description: "Files are encrypted before they reach our servers"
+      description: "Files are encrypted before they reach our servers with AES-256 encryption",
+      color: "from-blue-500/20 to-cyan-500/20"
     },
     {
-      icon: <EyeOff className="w-6 h-6 text-purple-400" />,
+      icon: <EyeOff className="w-8 h-8 text-green-500" />,
       title: "Zero-Knowledge Privacy",
-      description: "We can't see your files, even if we wanted to"
+      description: "We can't see your files, even if we wanted to. Complete privacy by design",
+      color: "from-green-500/20 to-emerald-500/20"
     },
     {
-      icon: <Download className="w-6 h-6 text-purple-400" />,
+      icon: <Server className="w-8 h-8 text-purple-500" />,
       title: "Self-Host Option",
-      description: "Deploy on your own infrastructure for maximum control"
+      description: "Deploy on your own infrastructure for maximum control and complete sovereignty",
+      color: "from-purple-500/20 to-pink-500/20"
     },
     {
-      icon: <Globe2 className="w-6 h-6 text-purple-400" />,
+      icon: <Globe2 className="w-8 h-8 text-orange-500" />,
       title: "Cross-Platform Sync",
-      description: "Access your files from any device, anywhere"
+      description: "Access your files from any device, anywhere, with seamless synchronization",
+      color: "from-orange-500/20 to-red-500/20"
     }
   ];
 
@@ -70,93 +159,158 @@ export default function TauCloudPage() {
     }
   ];
 
+  const fileTypes = [
+    { icon: <Folder className="w-12 h-12 text-blue-400" />, name: "Documents", desc: "PDFs, Word docs, spreadsheets" },
+    { icon: <Image className="w-12 h-12 text-green-400" />, name: "Photos", desc: "High-resolution images and albums" },
+    { icon: <Music className="w-12 h-12 text-purple-400" />, name: "Music", desc: "Your music library, anywhere" },
+    { icon: <Video className="w-12 h-12 text-red-400" />, name: "Videos", desc: "HD videos and movies" }
+  ];
+
   return (
-    <div className="min-h-screen bg-gray-900 text-white">
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black text-white overflow-hidden">
+      {/* Animated Background */}
+      <div className="fixed inset-0 -z-10">
+        <div className="absolute inset-0 bg-gradient-to-br from-gray-900 via-gray-800 to-black" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(59,130,246,0.15),transparent_50%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom,rgba(16,185,129,0.1),transparent_50%)]" />
+        <motion.div 
+          className="absolute inset-0 opacity-30"
+          animate={{ 
+            background: [
+              "radial-gradient(circle at 20% 80%, rgba(59,130,246,0.1) 0%, transparent 50%)",
+              "radial-gradient(circle at 80% 20%, rgba(16,185,129,0.1) 0%, transparent 50%)",
+              "radial-gradient(circle at 40% 40%, rgba(139,92,246,0.1) 0%, transparent 50%)",
+              "radial-gradient(circle at 20% 80%, rgba(59,130,246,0.1) 0%, transparent 50%)"
+            ]
+          }}
+          transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
+        />
+      </div>
+
       {/* Header */}
-      <header className="bg-gray-800 border-b border-gray-700">
+      <header className="relative z-50 bg-black/20 backdrop-blur-xl border-b border-white/10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            <div className="flex items-center space-x-4">
+          <div className="flex items-center justify-between h-20">
+            <motion.div 
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              className="flex items-center space-x-4"
+            >
               <div className="flex items-center space-x-3">
-                <div className="w-8 h-8 bg-purple-600 rounded-lg flex items-center justify-center">
-                  <Cloud className="w-5 h-5 text-white" />
+                <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center shadow-lg">
+                  <Cloud className="w-6 h-6 text-white" />
                 </div>
-                <span className="text-xl font-bold">TauCloud</span>
+                <span className="text-2xl font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
+                  TauCloud
+                </span>
               </div>
-            </div>
+            </motion.div>
             
-            <div className="flex items-center space-x-4">
-              <a href="/" className="text-gray-300 hover:text-white transition-colors">
+            <motion.div 
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              className="flex items-center space-x-6"
+            >
+              <a href="/" className="text-gray-300 hover:text-white transition-all duration-300 hover:scale-105">
                 Back to TauOS
               </a>
-              <button className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg font-medium transition-colors">
-                Login
+              <button className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white px-6 py-3 rounded-xl font-medium transition-all duration-300 hover:scale-105 shadow-lg">
+                Sign In
               </button>
-            </div>
+            </motion.div>
           </div>
         </div>
       </header>
 
       {/* Hero Section */}
-      <section className="relative overflow-hidden">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+      <section className="relative py-32 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto">
           <div className="text-center">
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6 }}
+              transition={{ duration: 0.8 }}
+              className="space-y-8"
             >
-              <h1 className="text-5xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
-                Welcome to TauCloud
-              </h1>
-              <p className="text-xl md:text-2xl text-gray-300 mb-8 max-w-3xl mx-auto">
-                Private, Secure Cloud Storage for Everyone
-              </p>
-              <p className="text-lg text-gray-400 mb-12 max-w-2xl mx-auto">
-                Store your files with complete privacy. TauCloud uses client-side encryption 
-                and zero-knowledge architecture to ensure your data stays yours.
-              </p>
-            </motion.div>
+              {/* Main Heading */}
+              <div className="space-y-6">
+                <motion.h1 
+                  className="text-6xl md:text-7xl font-black leading-tight"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.8, delay: 0.2 }}
+                >
+                  <span className="text-white">Private, secure cloud</span>
+                  <br />
+                  <span className="bg-gradient-to-r from-blue-400 via-cyan-400 to-green-400 bg-clip-text text-transparent">
+                    storage for everyone
+                  </span>
+                </motion.h1>
+                
+                <motion.p 
+                  className="text-xl md:text-2xl text-gray-300 max-w-4xl mx-auto leading-relaxed"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.8, delay: 0.4 }}
+                >
+                  Store your files with complete privacy. TauCloud uses client-side encryption 
+                  and zero-knowledge architecture to ensure your data stays yours.
+                </motion.p>
+              </div>
 
-            {/* CTA Buttons */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.2 }}
-              className="flex flex-col sm:flex-row gap-4 justify-center mb-16"
-            >
-              <button className="bg-purple-600 hover:bg-purple-700 text-white px-8 py-4 rounded-lg font-medium text-lg flex items-center justify-center space-x-2 transition-colors">
-                <span>Get Started Free</span>
-                <ArrowRight className="w-5 h-5" />
-              </button>
-              <button className="bg-gray-800 hover:bg-gray-700 text-white px-8 py-4 rounded-lg font-medium text-lg border border-gray-600 transition-colors">
-                View Plans
-              </button>
+              {/* CTA Buttons */}
+              <motion.div 
+                className="flex flex-col sm:flex-row items-center justify-center space-y-4 sm:space-y-0 sm:space-x-6"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, delay: 0.6 }}
+              >
+                <button className="group relative px-8 py-4 bg-gradient-to-r from-blue-500 to-blue-600 rounded-xl text-lg font-semibold flex items-center space-x-3 transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:shadow-blue-500/25">
+                  <span>Get Started Free</span>
+                  <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-x-1" />
+                </button>
+                
+                <button className="px-8 py-4 border border-white/20 rounded-xl text-lg font-semibold flex items-center space-x-3 transition-all duration-300 hover:bg-white/10 hover:scale-105 backdrop-blur-sm">
+                  <Play className="w-5 h-5" />
+                  <span>Watch Demo</span>
+                </button>
+              </motion.div>
+
+              {/* Floating Elements */}
+              <motion.div 
+                className="absolute top-1/4 left-1/4 opacity-20"
+                animate={{ y: [-10, 10, -10] }}
+                transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+              >
+                <Sparkles className="w-8 h-8 text-blue-400" />
+              </motion.div>
+              
+              <motion.div 
+                className="absolute top-1/3 right-1/4 opacity-20"
+                animate={{ y: [10, -10, 10] }}
+                transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
+              >
+                <Sparkles className="w-6 h-6 text-green-400" />
+              </motion.div>
             </motion.div>
           </div>
-        </div>
-
-        {/* Background Pattern */}
-        <div className="absolute inset-0 -z-10">
-          <div className="absolute inset-0 bg-gradient-to-br from-purple-900/20 to-pink-900/20"></div>
-          <div className="absolute top-0 left-0 w-72 h-72 bg-purple-500/10 rounded-full blur-3xl"></div>
-          <div className="absolute bottom-0 right-0 w-72 h-72 bg-pink-500/10 rounded-full blur-3xl"></div>
         </div>
       </section>
 
       {/* Features Section */}
-      <section className="py-20 bg-gray-800">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section className="py-24 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto">
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            className="text-center mb-16"
+            transition={{ duration: 0.8 }}
+            viewport={{ once: true }}
+            className="text-center mb-20"
           >
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">
-              Why Choose TauCloud?
+            <h2 className="text-5xl md:text-6xl font-bold mb-6">
+              Why Choose <span className="bg-gradient-to-r from-blue-400 to-green-400 bg-clip-text text-transparent">TauCloud</span>?
             </h2>
-            <p className="text-gray-400 text-lg max-w-2xl mx-auto">
+            <p className="text-xl text-gray-300 max-w-3xl mx-auto">
               Built with privacy-first principles and modern security standards
             </p>
           </motion.div>
@@ -165,323 +319,51 @@ export default function TauCloudPage() {
             {features.map((feature, index) => (
               <motion.div
                 key={index}
-                initial={{ opacity: 0, y: 20 }}
+                initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: index * 0.1 }}
-                className="bg-gray-700 rounded-lg p-6 text-center"
+                transition={{ duration: 0.8, delay: index * 0.1 }}
+                viewport={{ once: true }}
+                className="group relative"
               >
-                <div className="flex justify-center mb-4">
-                  {feature.icon}
+                <div className={`relative p-8 rounded-2xl bg-gradient-to-br ${feature.color} border border-white/10 backdrop-blur-sm transition-all duration-300 hover:scale-105 hover:shadow-2xl`}>
+                  <div className="flex justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+                    {feature.icon}
+                  </div>
+                  <h3 className="text-xl font-bold mb-4 text-white">{feature.title}</h3>
+                  <p className="text-gray-300 leading-relaxed">{feature.description}</p>
                 </div>
-                <h3 className="text-lg font-semibold mb-2">{feature.title}</h3>
-                <p className="text-gray-400 text-sm">{feature.description}</p>
               </motion.div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Screenshot Section */}
-      <section className="py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      {/* File Types Section */}
+      <section className="py-24 px-4 sm:px-6 lg:px-8 bg-black/20">
+        <div className="max-w-7xl mx-auto">
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            className="text-center mb-16"
-          >
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">
-              See TauCloud in Action
-            </h2>
-            <p className="text-gray-400 text-lg max-w-2xl mx-auto">
-              Experience the privacy-first cloud storage interface designed for complete control
-            </p>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            whileInView={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.8 }}
-            className="relative"
+            viewport={{ once: true }}
+            className="text-center mb-20"
           >
-            {/* TauCloud Interface Screenshot */}
-            <div className="bg-white rounded-lg overflow-hidden shadow-2xl">
-              {/* Header */}
-              <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white p-4">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-3">
-                    <Cloud className="w-5 h-5" />
-                    <span className="font-bold text-lg">TauCloud</span>
-                  </div>
-                  <div className="flex items-center space-x-4">
-                    <div className="flex items-center space-x-2">
-                      <Shield className="w-4 h-4" />
-                      <span className="text-sm">Encrypted</span>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <span className="text-sm">2.1 GB / 5 GB</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Main Interface */}
-              <div className="flex">
-                {/* Sidebar */}
-                <div className="w-64 bg-gray-50 border-r border-gray-200">
-                  <div className="p-4">
-                    <button className="w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium mb-4">
-                      Upload Files
-                    </button>
-                    <nav className="space-y-2">
-                      <a href="#" className="flex items-center space-x-3 p-2 rounded-lg bg-blue-50 text-blue-700">
-                        <Folder className="w-4 h-4" />
-                        <span>Files</span>
-                      </a>
-                      <a href="#" className="flex items-center space-x-3 p-2 rounded-lg text-gray-600 hover:bg-gray-100">
-                        <Image className="w-4 h-4" />
-                        <span>Photos</span>
-                      </a>
-                      <a href="#" className="flex items-center space-x-3 p-2 rounded-lg text-gray-600 hover:bg-gray-100">
-                        <Music className="w-4 h-4" />
-                        <span>Music</span>
-                      </a>
-                      <a href="#" className="flex items-center space-x-3 p-2 rounded-lg text-gray-600 hover:bg-gray-100">
-                        <Video className="w-4 h-4" />
-                        <span>Videos</span>
-                      </a>
-                    </nav>
-                  </div>
-                </div>
-
-                {/* File Grid */}
-                <div className="flex-1">
-                  <div className="border-b border-gray-200">
-                    <div className="p-4">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center space-x-4">
-                          <button className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-sm">
-                            Upload
-                          </button>
-                          <button className="text-gray-600 hover:text-gray-800 px-3 py-1 rounded text-sm">
-                            New Folder
-                          </button>
-                        </div>
-                        <div className="text-sm text-gray-500">
-                          2.1 GB of 5 GB used
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <div className="p-6">
-                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                      <div className="p-4 rounded-lg border-2 border-gray-200 hover:bg-gray-50 cursor-pointer">
-                        <div className="text-center">
-                          <div className="flex justify-center mb-3">
-                            <FileText className="w-8 h-8 text-blue-500" />
-                          </div>
-                          <div className="flex items-center justify-center mb-2">
-                            <span className="text-sm font-medium text-gray-900 truncate max-w-full">
-                              TauOS Documentation.pdf
-                            </span>
-                            <Shield className="w-4 h-4 text-green-500 ml-1" />
-                          </div>
-                          <p className="text-xs text-gray-500">2.3 MB</p>
-                          <p className="text-xs text-gray-400">2 hours ago</p>
-                        </div>
-                      </div>
-                      
-                      <div className="p-4 rounded-lg border-2 border-gray-200 hover:bg-gray-50 cursor-pointer">
-                        <div className="text-center">
-                          <div className="flex justify-center mb-3">
-                            <Folder className="w-8 h-8 text-blue-500" />
-                          </div>
-                          <div className="flex items-center justify-center mb-2">
-                            <span className="text-sm font-medium text-gray-900 truncate max-w-full">
-                              Project Screenshots
-                            </span>
-                            <Shield className="w-4 h-4 text-green-500 ml-1" />
-                          </div>
-                          <p className="text-xs text-gray-500">15 items</p>
-                          <p className="text-xs text-gray-400">1 day ago</p>
-                        </div>
-                      </div>
-                      
-                      <div className="p-4 rounded-lg border-2 border-gray-200 hover:bg-gray-50 cursor-pointer">
-                        <div className="text-center">
-                          <div className="flex justify-center mb-3">
-                            <Image className="w-8 h-8 text-green-500" />
-                          </div>
-                          <div className="flex items-center justify-center mb-2">
-                            <span className="text-sm font-medium text-gray-900 truncate max-w-full">
-                              vacation-photos.jpg
-                            </span>
-                            <Shield className="w-4 h-4 text-green-500 ml-1" />
-                          </div>
-                          <p className="text-xs text-gray-500">4.1 MB</p>
-                          <p className="text-xs text-gray-400">3 days ago</p>
-                        </div>
-                      </div>
-                      
-                      <div className="p-4 rounded-lg border-2 border-gray-200 hover:bg-gray-50 cursor-pointer">
-                        <div className="text-center">
-                          <div className="flex justify-center mb-3">
-                            <FileText className="w-8 h-8 text-blue-500" />
-                          </div>
-                          <div className="flex items-center justify-center mb-2">
-                            <span className="text-sm font-medium text-gray-900 truncate max-w-full">
-                              presentation.pptx
-                            </span>
-                            <Shield className="w-4 h-4 text-green-500 ml-1" />
-                          </div>
-                          <p className="text-xs text-gray-500">8.7 MB</p>
-                          <p className="text-xs text-gray-400">1 week ago</p>
-                        </div>
-                      </div>
-                      
-                      <div className="p-4 rounded-lg border-2 border-gray-200 hover:bg-gray-50 cursor-pointer">
-                        <div className="text-center">
-                          <div className="flex justify-center mb-3">
-                            <Music className="w-8 h-8 text-purple-500" />
-                          </div>
-                          <div className="flex items-center justify-center mb-2">
-                            <span className="text-sm font-medium text-gray-900 truncate max-w-full">
-                              Music Collection
-                            </span>
-                            <Shield className="w-4 h-4 text-green-500 ml-1" />
-                          </div>
-                          <p className="text-xs text-gray-500">127 items</p>
-                          <p className="text-xs text-gray-400">2 weeks ago</p>
-                        </div>
-                      </div>
-                      
-                      <div className="p-4 rounded-lg border-2 border-gray-200 hover:bg-gray-50 cursor-pointer">
-                        <div className="text-center">
-                          <div className="flex justify-center mb-3">
-                            <Archive className="w-8 h-8 text-orange-500" />
-                          </div>
-                          <div className="flex items-center justify-center mb-2">
-                            <span className="text-sm font-medium text-gray-900 truncate max-w-full">
-                              backup-2025.zip
-                            </span>
-                            <Shield className="w-4 h-4 text-green-500 ml-1" />
-                          </div>
-                          <p className="text-xs text-gray-500">156 MB</p>
-                          <p className="text-xs text-gray-400">1 month ago</p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Privacy Indicators */}
-            <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div className="bg-gray-800 rounded-lg p-6 text-center">
-                <Shield className="w-8 h-8 text-green-400 mx-auto mb-3" />
-                <h3 className="text-lg font-semibold mb-2">Client-Side Encryption</h3>
-                <p className="text-gray-400 text-sm">Files encrypted before upload</p>
-              </div>
-              <div className="bg-gray-800 rounded-lg p-6 text-center">
-                <EyeOff className="w-8 h-8 text-green-400 mx-auto mb-3" />
-                <h3 className="text-lg font-semibold mb-2">Zero-Knowledge</h3>
-                <p className="text-gray-400 text-sm">We can't see your files</p>
-              </div>
-              <div className="bg-gray-800 rounded-lg p-6 text-center">
-                <Lock className="w-8 h-8 text-green-400 mx-auto mb-3" />
-                <h3 className="text-lg font-semibold mb-2">Complete Control</h3>
-                <p className="text-gray-400 text-sm">Your data, your rules</p>
-              </div>
-            </div>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* Storage Plans Section */}
-      <section className="py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            className="text-center mb-16"
-          >
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">
-              Choose Your Plan
+            <h2 className="text-5xl md:text-6xl font-bold mb-6">
+              Store <span className="bg-gradient-to-r from-blue-400 to-green-400 bg-clip-text text-transparent">Everything</span> Securely
             </h2>
-            <p className="text-gray-400 text-lg max-w-2xl mx-auto">
-              Start free and upgrade as you grow
-            </p>
-          </motion.div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {storagePlans.map((plan, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: index * 0.1 }}
-                className={`bg-gray-800 rounded-lg p-8 ${
-                  plan.name === "Pro" ? "ring-2 ring-purple-500" : ""
-                }`}
-              >
-                <div className="text-center mb-6">
-                  <h3 className="text-2xl font-bold mb-2">{plan.name}</h3>
-                  <div className="text-4xl font-bold text-purple-400 mb-2">{plan.price}</div>
-                  <div className="text-gray-400">{plan.storage} storage</div>
-                </div>
-                <ul className="space-y-3 mb-8">
-                  {plan.features.map((feature, featureIndex) => (
-                    <li key={featureIndex} className="flex items-center space-x-3">
-                      <CheckCircle className="w-5 h-5 text-green-400 flex-shrink-0" />
-                      <span className="text-gray-300">{feature}</span>
-                    </li>
-                  ))}
-                </ul>
-                <button className={`w-full py-3 rounded-lg font-medium transition-colors ${
-                  plan.name === "Pro" 
-                    ? "bg-purple-600 hover:bg-purple-700 text-white" 
-                    : "bg-gray-700 hover:bg-gray-600 text-white border border-gray-600"
-                }`}>
-                  {plan.name === "Free" ? "Get Started" : "Choose Plan"}
-                </button>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* File Types Preview */}
-      <section className="py-20 bg-gray-800">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            className="text-center mb-16"
-          >
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">
-              Store Everything Securely
-            </h2>
-            <p className="text-gray-400 text-lg max-w-2xl mx-auto">
+            <p className="text-xl text-gray-300 max-w-3xl mx-auto">
               All your files, encrypted and synced across devices
             </p>
           </motion.div>
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-            {[
-              { icon: <Folder className="w-12 h-12 text-blue-400" />, name: "Documents", desc: "PDFs, Word docs, spreadsheets" },
-              { icon: <Image className="w-12 h-12 text-green-400" />, name: "Photos", desc: "High-resolution images and albums" },
-              { icon: <Music className="w-12 h-12 text-purple-400" />, name: "Music", desc: "Your music library, anywhere" },
-              { icon: <Video className="w-12 h-12 text-red-400" />, name: "Videos", desc: "HD videos and movies" }
-            ].map((type, index) => (
+            {fileTypes.map((type, index) => (
               <motion.div
                 key={index}
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: index * 0.1 }}
+                viewport={{ once: true }}
                 className="text-center"
               >
                 <div className="flex justify-center mb-4">
@@ -495,56 +377,113 @@ export default function TauCloudPage() {
         </div>
       </section>
 
+      {/* Storage Plans Section */}
+      <section className="py-24 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            viewport={{ once: true }}
+            className="text-center mb-20"
+          >
+            <h2 className="text-5xl md:text-6xl font-bold mb-6">
+              Choose Your <span className="bg-gradient-to-r from-blue-400 to-green-400 bg-clip-text text-transparent">Plan</span>
+            </h2>
+            <p className="text-xl text-gray-300 max-w-3xl mx-auto">
+              Start free and upgrade as you grow
+            </p>
+          </motion.div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {storagePlans.map((plan, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, delay: index * 0.1 }}
+                viewport={{ once: true }}
+                className={`relative p-8 rounded-2xl bg-gradient-to-br from-gray-800/50 to-gray-900/50 border border-white/10 backdrop-blur-sm ${
+                  plan.name === "Pro" ? "ring-2 ring-blue-500" : ""
+                }`}
+              >
+                <div className="text-center mb-8">
+                  <h3 className="text-2xl font-bold mb-2">{plan.name}</h3>
+                  <div className="text-4xl font-bold text-blue-400 mb-2">{plan.price}</div>
+                  <div className="text-gray-400">{plan.storage} storage</div>
+                </div>
+                <ul className="space-y-4 mb-8">
+                  {plan.features.map((feature, featureIndex) => (
+                    <li key={featureIndex} className="flex items-center space-x-3">
+                      <CheckCircle className="w-5 h-5 text-green-400 flex-shrink-0" />
+                      <span className="text-gray-300">{feature}</span>
+                    </li>
+                  ))}
+                </ul>
+                <button className={`w-full py-4 rounded-xl font-medium transition-all duration-300 hover:scale-105 ${
+                  plan.name === "Pro" 
+                    ? "bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white" 
+                    : "bg-gray-700/50 hover:bg-gray-600/50 text-white border border-gray-600"
+                }`}>
+                  {plan.name === "Free" ? "Get Started" : "Choose Plan"}
+                </button>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* Sign Up Section */}
-      <section className="py-20">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section className="py-24 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-4xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            className="bg-gray-800 rounded-2xl p-8 md:p-12"
+            transition={{ duration: 0.8 }}
+            viewport={{ once: true }}
+            className="bg-gradient-to-br from-gray-800/50 to-gray-900/50 rounded-3xl p-12 border border-white/10 backdrop-blur-sm"
           >
-            <div className="text-center mb-8">
-              <h2 className="text-3xl font-bold mb-4">Ready to Get Started?</h2>
-              <p className="text-gray-400">Join thousands of users who have taken control of their data privacy</p>
+            <div className="text-center mb-12">
+              <h2 className="text-4xl font-bold mb-4">Ready to Get Started?</h2>
+              <p className="text-xl text-gray-300">Join thousands of users who have taken control of their data privacy</p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="space-y-4">
-                <label className="block text-sm font-medium text-gray-300">Email Address</label>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div className="space-y-6">
+                <label className="block text-lg font-semibold text-gray-200">Email Address</label>
                 <input
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="your@email.com"
-                  className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-white placeholder-gray-400"
+                  className="w-full px-6 py-4 bg-gray-700/50 border border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent text-white placeholder-gray-400 text-lg"
                 />
-                <button className="w-full bg-purple-600 hover:bg-purple-700 text-white py-3 rounded-lg font-medium transition-colors">
+                <button className="w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white py-4 rounded-xl font-semibold text-lg transition-all duration-300 hover:scale-105">
                   Create Free Account
                 </button>
               </div>
 
-              <div className="space-y-4">
-                <label className="block text-sm font-medium text-gray-300">Custom Domain</label>
+              <div className="space-y-6">
+                <label className="block text-lg font-semibold text-gray-200">Custom Domain</label>
                 <input
                   type="text"
                   value={domain}
                   onChange={(e) => setDomain(e.target.value)}
                   placeholder="yourdomain.com"
-                  className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-white placeholder-gray-400"
+                  className="w-full px-6 py-4 bg-gray-700/50 border border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent text-white placeholder-gray-400 text-lg"
                 />
-                <button className="w-full bg-gray-700 hover:bg-gray-600 text-white py-3 rounded-lg font-medium border border-gray-600 transition-colors">
+                <button className="w-full bg-gray-700/50 hover:bg-gray-600/50 text-white py-4 rounded-xl font-semibold text-lg border border-gray-600 transition-all duration-300 hover:scale-105">
                   Configure Domain
                 </button>
               </div>
             </div>
 
             <div className="mt-8 text-center">
-              <p className="text-sm text-gray-400">
+              <p className="text-gray-400">
                 By signing up, you agree to our{' '}
-                <a href="#" className="text-purple-400 hover:text-purple-300">Terms of Service</a>
+                <a href="#" className="text-blue-400 hover:text-blue-300 transition-colors">Terms of Service</a>
                 {' '}and{' '}
-                <a href="#" className="text-purple-400 hover:text-purple-300">Privacy Policy</a>
+                <a href="#" className="text-blue-400 hover:text-blue-300 transition-colors">Privacy Policy</a>
               </p>
             </div>
           </motion.div>
@@ -552,17 +491,17 @@ export default function TauCloudPage() {
       </section>
 
       {/* Footer */}
-      <footer className="bg-gray-800 border-t border-gray-700 py-8">
+      <footer className="bg-black/20 border-t border-white/10 py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row justify-between items-center">
-            <div className="flex items-center space-x-3 mb-4 md:mb-0">
-              <div className="w-6 h-6 bg-purple-600 rounded flex items-center justify-center">
-                <Cloud className="w-4 h-4 text-white" />
+            <div className="flex items-center space-x-4 mb-6 md:mb-0">
+              <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center">
+                <Cloud className="w-5 h-5 text-white" />
               </div>
-              <span className="text-lg font-semibold">TauCloud</span>
+              <span className="text-xl font-bold">TauCloud</span>
             </div>
             
-            <div className="flex space-x-6 text-sm text-gray-400">
+            <div className="flex space-x-8 text-sm text-gray-400">
               <a href="#" className="hover:text-white transition-colors">Documentation</a>
               <a href="#" className="hover:text-white transition-colors">Privacy Policy</a>
               <a href="#" className="hover:text-white transition-colors">Terms of Service</a>
