@@ -6,10 +6,37 @@ const cors = require('cors');
 const bodyParser = require('body-parser');
 const { v4: uuidv4 } = require('uuid');
 const path = require('path');
+const nodemailer = require('nodemailer');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
 const JWT_SECRET = process.env.JWT_SECRET || 'tauos-secret-key-change-in-production';
+
+// SMTP Configuration
+const smtpConfig = {
+  host: 'mailserver.tauos.org',
+  port: 25,
+  secure: false, // true for 465, false for other ports
+  auth: {
+    user: process.env.SMTP_USER || 'noreply@tauos.org',
+    pass: process.env.SMTP_PASS || ''
+  },
+  tls: {
+    rejectUnauthorized: false
+  }
+};
+
+// Create SMTP transporter
+const transporter = nodemailer.createTransporter(smtpConfig);
+
+// Test SMTP connection
+transporter.verify(function(error, success) {
+  if (error) {
+    console.error('❌ SMTP connection failed:', error);
+  } else {
+    console.log('✅ SMTP server is ready to send emails');
+  }
+});
 
 // PostgreSQL connection
 const pool = new Pool({
@@ -101,16 +128,15 @@ app.post('/api/register', async (req, res) => {
 
     const token = generateToken(result.rows[0].id, result.rows[0].username);
 
-    res.status(201).json({
+    res.json({
       message: 'User registered successfully',
+      token,
       user: {
         id: result.rows[0].id,
         username: result.rows[0].username,
         email: result.rows[0].email
-      },
-      token
+      }
     });
-
   } catch (error) {
     console.error('Registration error:', error);
     res.status(500).json({ error: 'Registration failed' });
@@ -139,15 +165,16 @@ app.post('/api/login', async (req, res) => {
     }
 
     const user = result.rows[0];
-    const validPassword = await bcrypt.compare(password, user.password_hash);
 
-    if (!validPassword) {
+    // Verify password
+    const isValidPassword = await bcrypt.compare(password, user.password_hash);
+    if (!isValidPassword) {
       return res.status(401).json({ error: 'Invalid credentials' });
     }
 
     // Update last login
     await pool.query(
-      'UPDATE users SET last_login = CURRENT_TIMESTAMP WHERE id = $1',
+      'UPDATE users SET last_login = NOW() WHERE id = $1',
       [user.id]
     );
 
@@ -155,14 +182,13 @@ app.post('/api/login', async (req, res) => {
 
     res.json({
       message: 'Login successful',
+      token,
       user: {
         id: user.id,
         username: user.username,
         email: user.email
-      },
-      token
+      }
     });
-
   } catch (error) {
     console.error('Login error:', error);
     res.status(500).json({ error: 'Login failed' });
@@ -181,15 +207,14 @@ app.get('/api/profile', authenticateToken, async (req, res) => {
       return res.status(404).json({ error: 'User not found' });
     }
 
-    res.json(result.rows[0]);
-
+    res.json({ user: result.rows[0] });
   } catch (error) {
-    console.error('Profile error:', error);
+    console.error('Get profile error:', error);
     res.status(500).json({ error: 'Failed to get profile' });
   }
 });
 
-// Send email
+// Send email with SMTP
 app.post('/api/emails/send', authenticateToken, async (req, res) => {
   try {
     const { to, subject, body } = req.body;
@@ -198,7 +223,19 @@ app.post('/api/emails/send', authenticateToken, async (req, res) => {
       return res.status(400).json({ error: 'To, subject, and body are required' });
     }
 
-    // Find recipient
+    // Get sender info
+    const senderResult = await pool.query(
+      'SELECT id, username, email FROM users WHERE id = $1',
+      [req.user.userId]
+    );
+
+    if (senderResult.rows.length === 0) {
+      return res.status(404).json({ error: 'Sender not found' });
+    }
+
+    const sender = senderResult.rows[0];
+
+    // Get recipient info
     const recipientResult = await pool.query(
       'SELECT id FROM users WHERE email = $1',
       [to]
@@ -210,26 +247,29 @@ app.post('/api/emails/send', authenticateToken, async (req, res) => {
 
     const recipientId = recipientResult.rows[0].id;
 
-    // Get organization ID
-    const orgResult = await pool.query(
-      'SELECT organization_id FROM users WHERE id = $1',
-      [req.user.userId]
-    );
+    // Send email via SMTP
+    const mailOptions = {
+      from: sender.email,
+      to: to,
+      subject: subject,
+      text: body,
+      html: `<div>${body}</div>`
+    };
 
-    const organizationId = orgResult.rows[0].organization_id;
+    const info = await transporter.sendMail(mailOptions);
 
-    // Create email
+    // Store email in database
     const result = await pool.query(
-      `INSERT INTO emails (organization_id, sender_id, recipient_id, subject, body) 
-       VALUES ($1, $2, $3, $4, $5) RETURNING id`,
-      [organizationId, req.user.userId, recipientId, subject, body]
+      `INSERT INTO emails (organization_id, sender_id, recipient_id, subject, body, message_id)
+       VALUES ($1, $2, $3, $4, $5, $6) RETURNING id`,
+      [sender.organization_id, sender.id, recipientId, subject, body, info.messageId]
     );
 
     res.json({
       message: 'Email sent successfully',
-      email_id: result.rows[0].id
+      email_id: result.rows[0].id,
+      message_id: info.messageId
     });
-
   } catch (error) {
     console.error('Send email error:', error);
     res.status(500).json({ error: 'Failed to send email' });

@@ -259,14 +259,14 @@ export default function TauOSLandingPage() {
               className="hidden md:flex items-center space-x-8"
             >
               {[
-                { href: '#features', label: 'Features' },
-                { href: '#interface', label: 'TauOS Interface' },
-                { href: '#download', label: 'Download' },
-                { href: '#about', label: 'About' },
-                { href: 'https://mail.tauos.org', label: 'TauMail', external: true },
-                { href: 'https://cloud.tauos.org', label: 'TauCloud', external: true },
-                { href: '/governance', label: 'Governance' },
-                { href: '/careers', label: 'Careers' }
+                { href: '#features', label: 'Features', external: false },
+                { href: '#interface', label: 'TauOS Interface', external: false },
+                { href: '#download', label: 'Download', external: false },
+                { href: '#about', label: 'About', external: false },
+                { href: '/taumail', label: 'TauMail', external: true },
+                { href: '/taucloud', label: 'TauCloud', external: true },
+                { href: '/governance', label: 'Governance', external: false },
+                { href: '/careers', label: 'Careers', external: false }
               ].map((item) => (
                 <a
                   key={item.label}
@@ -303,14 +303,14 @@ export default function TauOSLandingPage() {
           >
             <div className="px-2 pt-2 pb-3 space-y-1 border-t border-white/10">
               {[
-                { href: '#features', label: 'Features' },
-                { href: '#interface', label: 'TauOS Interface' },
-                { href: '#download', label: 'Download' },
-                { href: '#about', label: 'About' },
-                { href: 'https://mail.tauos.org', label: 'TauMail', external: true },
-                { href: 'https://cloud.tauos.org', label: 'TauCloud', external: true },
-                { href: '/governance', label: 'Governance' },
-                { href: '/careers', label: 'Careers' }
+                { href: '#features', label: 'Features', external: false },
+                { href: '#interface', label: 'TauOS Interface', external: false },
+                { href: '#download', label: 'Download', external: false },
+                { href: '#about', label: 'About', external: false },
+                { href: '/taumail', label: 'TauMail', external: true },
+                { href: '/taucloud', label: 'TauCloud', external: true },
+                { href: '/governance', label: 'Governance', external: false },
+                { href: '/careers', label: 'Careers', external: false }
               ].map((item) => (
                 <a
                   key={item.label}
@@ -824,8 +824,8 @@ export default function TauOSLandingPage() {
               <h4 className="font-semibold mb-4">Products</h4>
               <ul className="space-y-2 text-gray-300">
                 <li><a href="#" className="hover:text-white transition-colors">TauOS</a></li>
-                <li><a href="https://mail.tauos.org" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">TauMail</a></li>
-                <li><a href="https://cloud.tauos.org" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">TauCloud</a></li>
+                <li><a href="/taumail" className="hover:text-white transition-colors">TauMail</a></li>
+                <li><a href="/taucloud" className="hover:text-white transition-colors">TauCloud</a></li>
               </ul>
             </div>
             

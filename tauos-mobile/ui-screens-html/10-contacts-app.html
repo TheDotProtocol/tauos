@@ -1,0 +1,784 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TauContacts - Contact Management</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #16213e 100%);
+            color: #ffffff;
+            overflow-x: hidden;
+        }
+
+        .phone-container {
+            width: 375px;
+            height: 812px;
+            margin: 20px auto;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 100%);
+            border-radius: 40px;
+            border: 2px solid #333;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+        }
+
+        .status-bar {
+            height: 44px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(20px);
+        }
+
+        .status-left {
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .status-right {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .battery {
+            width: 25px;
+            height: 12px;
+            border: 1px solid #fff;
+            border-radius: 2px;
+            position: relative;
+        }
+
+        .battery::after {
+            content: '';
+            position: absolute;
+            right: -3px;
+            top: 3px;
+            width: 2px;
+            height: 6px;
+            background: #fff;
+            border-radius: 0 1px 1px 0;
+        }
+
+        .battery-level {
+            height: 100%;
+            width: 80%;
+            background: linear-gradient(90deg, #4CAF50, #8BC34A);
+            border-radius: 1px;
+        }
+
+        .app-header {
+            padding: 20px;
+            text-align: center;
+            background: rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(20px);
+        }
+
+        .app-title {
+            font-size: 28px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+
+        .app-subtitle {
+            font-size: 14px;
+            color: #888;
+            opacity: 0.8;
+        }
+
+        .search-bar {
+            padding: 15px 20px;
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .search-input {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 25px;
+            padding: 12px 20px;
+            color: #fff;
+            font-size: 14px;
+            outline: none;
+        }
+
+        .search-input::placeholder {
+            color: #888;
+        }
+
+        .tab-bar {
+            display: flex;
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .tab {
+            flex: 1;
+            padding: 15px;
+            text-align: center;
+            color: #888;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-bottom: 2px solid transparent;
+        }
+
+        .tab.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+        }
+
+        .tab-content {
+            height: 550px;
+            overflow-y: auto;
+        }
+
+        .contacts-section {
+            padding: 20px;
+        }
+
+        .section-header {
+            font-size: 18px;
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .favorites-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .favorite-item {
+            text-align: center;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .favorite-item:hover {
+            background: rgba(102, 126, 234, 0.1);
+            transform: scale(1.05);
+        }
+
+        .favorite-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: 600;
+            margin: 0 auto 10px;
+        }
+
+        .favorite-name {
+            font-size: 14px;
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 5px;
+        }
+
+        .favorite-phone {
+            font-size: 12px;
+            color: #888;
+        }
+
+        .contact-item {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border-radius: 15px;
+            margin-bottom: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .contact-item:hover {
+            background: rgba(102, 126, 234, 0.1);
+            transform: translateX(5px);
+        }
+
+        .contact-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            font-weight: 600;
+            margin-right: 15px;
+            position: relative;
+        }
+
+        .online-indicator {
+            position: absolute;
+            bottom: 2px;
+            right: 2px;
+            width: 12px;
+            height: 12px;
+            background: #4CAF50;
+            border-radius: 50%;
+            border: 2px solid #0a0a0a;
+        }
+
+        .contact-info {
+            flex: 1;
+        }
+
+        .contact-name {
+            font-size: 16px;
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 5px;
+        }
+
+        .contact-details {
+            font-size: 14px;
+            color: #888;
+            margin-bottom: 5px;
+        }
+
+        .contact-notes {
+            font-size: 12px;
+            color: #666;
+            font-style: italic;
+        }
+
+        .contact-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .contact-action {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            background: rgba(102, 126, 234, 0.2);
+            border: none;
+            color: #667eea;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .contact-action:hover {
+            background: rgba(102, 126, 234, 0.4);
+            transform: scale(1.1);
+        }
+
+        .groups-section {
+            display: none;
+            padding: 20px;
+        }
+
+        .group-item {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border-radius: 15px;
+            margin-bottom: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .group-item:hover {
+            background: rgba(102, 126, 234, 0.1);
+            transform: translateX(5px);
+        }
+
+        .group-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            margin-right: 15px;
+        }
+
+        .group-info {
+            flex: 1;
+        }
+
+        .group-name {
+            font-size: 16px;
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 5px;
+        }
+
+        .group-count {
+            font-size: 14px;
+            color: #888;
+        }
+
+        .add-contact-section {
+            display: none;
+            padding: 20px;
+        }
+
+        .add-contact-form {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            font-size: 14px;
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .form-input {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            padding: 12px 15px;
+            color: #fff;
+            font-size: 14px;
+            outline: none;
+        }
+
+        .form-input::placeholder {
+            color: #888;
+        }
+
+        .form-textarea {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            padding: 12px 15px;
+            color: #fff;
+            font-size: 14px;
+            outline: none;
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .form-textarea::placeholder {
+            color: #888;
+        }
+
+        .add-button {
+            width: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 15px;
+            padding: 15px;
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .add-button:hover {
+            transform: scale(1.02);
+        }
+
+        .privacy-indicator {
+            position: absolute;
+            top: 60px;
+            right: 20px;
+            background: rgba(76, 175, 80, 0.2);
+            color: #4CAF50;
+            padding: 8px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(76, 175, 80, 0.3);
+        }
+
+        .sync-status {
+            position: absolute;
+            top: 100px;
+            right: 20px;
+            background: rgba(102, 126, 234, 0.2);
+            color: #667eea;
+            padding: 6px 10px;
+            border-radius: 15px;
+            font-size: 10px;
+            font-weight: 600;
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(102, 126, 234, 0.3);
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); }
+            to { transform: translateX(0); }
+        }
+
+        .slide-in {
+            animation: slideIn 0.3s ease-out;
+        }
+    </style>
+</head>
+<body>
+    <div class="phone-container">
+        <!-- Status Bar -->
+        <div class="status-bar">
+            <div class="status-left">9:41</div>
+            <div class="status-right">
+                <span>📶</span>
+                <span>📶</span>
+                <div class="battery">
+                    <div class="battery-level"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- App Header -->
+        <div class="app-header">
+            <div class="app-title">👥 TauContacts</div>
+            <div class="app-subtitle">Contact Management</div>
+        </div>
+
+        <!-- Privacy Indicators -->
+        <div class="privacy-indicator">🔒 Private</div>
+        <div class="sync-status">🔄 Synced</div>
+
+        <!-- Search Bar -->
+        <div class="search-bar">
+            <input type="text" class="search-input" placeholder="Search contacts..." id="searchInput">
+        </div>
+
+        <!-- Tab Bar -->
+        <div class="tab-bar">
+            <div class="tab active" onclick="switchTab('contacts')">👥 All</div>
+            <div class="tab" onclick="switchTab('favorites')">⭐ Favorites</div>
+            <div class="tab" onclick="switchTab('groups')">📁 Groups</div>
+            <div class="tab" onclick="switchTab('add')">➕ Add</div>
+        </div>
+
+        <!-- Tab Content -->
+        <div class="tab-content">
+            <!-- Contacts Section -->
+            <div id="contacts-section" class="contacts-section fade-in">
+                <div class="section-header">
+                    <span>⭐</span>
+                    <span>Favorites</span>
+                </div>
+                
+                <div class="favorites-grid">
+                    <div class="favorite-item" onclick="openContact('John Doe')">
+                        <div class="favorite-avatar">J</div>
+                        <div class="favorite-name">John</div>
+                        <div class="favorite-phone">📞</div>
+                    </div>
+                    
+                    <div class="favorite-item" onclick="openContact('Sarah Smith')">
+                        <div class="favorite-avatar">S</div>
+                        <div class="favorite-name">Sarah</div>
+                        <div class="favorite-phone">📞</div>
+                    </div>
+                    
+                    <div class="favorite-item" onclick="openContact('Mike Johnson')">
+                        <div class="favorite-avatar">M</div>
+                        <div class="favorite-name">Mike</div>
+                        <div class="favorite-phone">📞</div>
+                    </div>
+                </div>
+
+                <div class="section-header">
+                    <span>👥</span>
+                    <span>All Contacts</span>
+                </div>
+                
+                <div class="contact-item" onclick="openContact('John Doe')">
+                    <div class="contact-avatar">
+                        J
+                        <div class="online-indicator"></div>
+                    </div>
+                    <div class="contact-info">
+                        <div class="contact-name">John Doe</div>
+                        <div class="contact-details">+1 (555) 123-4567 • john@example.com</div>
+                        <div class="contact-notes">Work colleague, project manager</div>
+                    </div>
+                    <div class="contact-actions">
+                        <button class="contact-action" onclick="callContact('John Doe')">📞</button>
+                        <button class="contact-action" onclick="messageContact('John Doe')">💬</button>
+                        <button class="contact-action" onclick="videoCallContact('John Doe')">📹</button>
+                    </div>
+                </div>
+                
+                <div class="contact-item" onclick="openContact('Sarah Smith')">
+                    <div class="contact-avatar">
+                        S
+                    </div>
+                    <div class="contact-info">
+                        <div class="contact-name">Sarah Smith</div>
+                        <div class="contact-details">+1 (555) 234-5678 • sarah@example.com</div>
+                        <div class="contact-notes">Design team lead</div>
+                    </div>
+                    <div class="contact-actions">
+                        <button class="contact-action" onclick="callContact('Sarah Smith')">📞</button>
+                        <button class="contact-action" onclick="messageContact('Sarah Smith')">💬</button>
+                        <button class="contact-action" onclick="videoCallContact('Sarah Smith')">📹</button>
+                    </div>
+                </div>
+                
+                <div class="contact-item" onclick="openContact('Mike Johnson')">
+                    <div class="contact-avatar">
+                        M
+                        <div class="online-indicator"></div>
+                    </div>
+                    <div class="contact-info">
+                        <div class="contact-name">Mike Johnson</div>
+                        <div class="contact-details">+1 (555) 345-6789 • mike@example.com</div>
+                        <div class="contact-notes">Developer, works on mobile apps</div>
+                    </div>
+                    <div class="contact-actions">
+                        <button class="contact-action" onclick="callContact('Mike Johnson')">📞</button>
+                        <button class="contact-action" onclick="messageContact('Mike Johnson')">💬</button>
+                        <button class="contact-action" onclick="videoCallContact('Mike Johnson')">📹</button>
+                    </div>
+                </div>
+                
+                <div class="contact-item" onclick="openContact('Emily Davis')">
+                    <div class="contact-avatar">
+                        E
+                    </div>
+                    <div class="contact-info">
+                        <div class="contact-name">Emily Davis</div>
+                        <div class="contact-details">+1 (555) 456-7890 • emily@example.com</div>
+                        <div class="contact-notes">UX researcher</div>
+                    </div>
+                    <div class="contact-actions">
+                        <button class="contact-action" onclick="callContact('Emily Davis')">📞</button>
+                        <button class="contact-action" onclick="messageContact('Emily Davis')">💬</button>
+                        <button class="contact-action" onclick="videoCallContact('Emily Davis')">📹</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Favorites Section -->
+            <div id="favorites-section" class="contacts-section">
+                <div class="section-header">
+                    <span>⭐</span>
+                    <span>Favorite Contacts</span>
+                </div>
+                
+                <div class="favorites-grid">
+                    <div class="favorite-item" onclick="openContact('John Doe')">
+                        <div class="favorite-avatar">J</div>
+                        <div class="favorite-name">John</div>
+                        <div class="favorite-phone">📞</div>
+                    </div>
+                    
+                    <div class="favorite-item" onclick="openContact('Sarah Smith')">
+                        <div class="favorite-avatar">S</div>
+                        <div class="favorite-name">Sarah</div>
+                        <div class="favorite-phone">📞</div>
+                    </div>
+                    
+                    <div class="favorite-item" onclick="openContact('Mike Johnson')">
+                        <div class="favorite-avatar">M</div>
+                        <div class="favorite-name">Mike</div>
+                        <div class="favorite-phone">📞</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Groups Section -->
+            <div id="groups-section" class="groups-section">
+                <div class="section-header">
+                    <span>📁</span>
+                    <span>Contact Groups</span>
+                </div>
+                
+                <div class="group-item" onclick="openGroup('Work')">
+                    <div class="group-icon">💼</div>
+                    <div class="group-info">
+                        <div class="group-name">Work</div>
+                        <div class="group-count">12 contacts</div>
+                    </div>
+                </div>
+                
+                <div class="group-item" onclick="openGroup('Family')">
+                    <div class="group-icon">👨‍👩‍👧‍👦</div>
+                    <div class="group-info">
+                        <div class="group-name">Family</div>
+                        <div class="group-count">8 contacts</div>
+                    </div>
+                </div>
+                
+                <div class="group-item" onclick="openGroup('Friends')">
+                    <div class="group-icon">👥</div>
+                    <div class="group-info">
+                        <div class="group-name">Friends</div>
+                        <div class="group-count">15 contacts</div>
+                    </div>
+                </div>
+                
+                <div class="group-item" onclick="openGroup('Emergency')">
+                    <div class="group-icon">🚨</div>
+                    <div class="group-info">
+                        <div class="group-name">Emergency</div>
+                        <div class="group-count">3 contacts</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Add Contact Section -->
+            <div id="add-contact-section" class="add-contact-section">
+                <div class="add-contact-form">
+                    <div class="form-group">
+                        <label class="form-label">First Name</label>
+                        <input type="text" class="form-input" placeholder="Enter first name">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Last Name</label>
+                        <input type="text" class="form-input" placeholder="Enter last name">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Phone Number</label>
+                        <input type="tel" class="form-input" placeholder="Enter phone number">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Email</label>
+                        <input type="email" class="form-input" placeholder="Enter email address">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Notes</label>
+                        <textarea class="form-textarea" placeholder="Add notes about this contact"></textarea>
+                    </div>
+                    
+                    <button class="add-button" onclick="addContact()">Add Contact</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function switchTab(tabName) {
+            // Hide all sections
+            document.querySelectorAll('.tab-content > div').forEach(section => {
+                section.style.display = 'none';
+            });
+            
+            // Remove active class from all tabs
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Show selected section
+            document.getElementById(tabName + '-section').style.display = 'block';
+            
+            // Add active class to clicked tab
+            event.target.classList.add('active');
+        }
+
+        function openContact(contactName) {
+            alert(`Opening contact: ${contactName}`);
+        }
+
+        function callContact(contactName) {
+            alert(`Calling ${contactName}...`);
+        }
+
+        function messageContact(contactName) {
+            alert(`Opening message to ${contactName}...`);
+        }
+
+        function videoCallContact(contactName) {
+            alert(`Starting video call with ${contactName}...`);
+        }
+
+        function openGroup(groupName) {
+            alert(`Opening group: ${groupName}`);
+        }
+
+        function addContact() {
+            alert('Contact added successfully!');
+            // Reset form
+            document.querySelectorAll('.form-input, .form-textarea').forEach(input => {
+                input.value = '';
+            });
+        }
+
+        // Search functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchInput = document.getElementById('searchInput');
+            searchInput.addEventListener('input', function() {
+                const searchTerm = this.value.toLowerCase();
+                const contactItems = document.querySelectorAll('.contact-item');
+                
+                contactItems.forEach(item => {
+                    const contactName = item.querySelector('.contact-name').textContent.toLowerCase();
+                    const contactDetails = item.querySelector('.contact-details').textContent.toLowerCase();
+                    
+                    if (contactName.includes(searchTerm) || contactDetails.includes(searchTerm)) {
+                        item.style.display = 'flex';
+                    } else {
+                        item.style.display = 'none';
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html> 

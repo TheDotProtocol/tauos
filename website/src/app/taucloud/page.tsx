@@ -458,9 +458,26 @@ export default function TauCloudPage() {
                   placeholder="your@email.com"
                   className="w-full px-6 py-4 bg-gray-700/50 border border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent text-white placeholder-gray-400 text-lg"
                 />
-                <button className="w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white py-4 rounded-xl font-semibold text-lg transition-all duration-300 hover:scale-105">
+                <button 
+                  onClick={() => {
+                    if (email) {
+                      // Redirect to actual TauCloud application for registration
+                      window.open('https://cloud.tauos.org', '_blank');
+                    }
+                  }}
+                  className="w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white py-4 rounded-xl font-semibold text-lg transition-all duration-300 hover:scale-105"
+                >
                   Create Free Account
                 </button>
+                <div className="text-center">
+                  <p className="text-gray-400 text-sm">Already have an account?</p>
+                  <button 
+                    onClick={() => window.open('https://cloud.tauos.org', '_blank')}
+                    className="text-blue-400 hover:text-blue-300 transition-colors text-sm underline"
+                  >
+                    Sign in to TauCloud
+                  </button>
+                </div>
               </div>
 
               <div className="space-y-6">
@@ -472,9 +489,23 @@ export default function TauCloudPage() {
                   placeholder="yourdomain.com"
                   className="w-full px-6 py-4 bg-gray-700/50 border border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent text-white placeholder-gray-400 text-lg"
                 />
-                <button className="w-full bg-gray-700/50 hover:bg-gray-600/50 text-white py-4 rounded-xl font-semibold text-lg border border-gray-600 transition-all duration-300 hover:scale-105">
+                <button 
+                  onClick={() => {
+                    if (domain) {
+                      // Redirect to actual TauCloud application for domain configuration
+                      window.open('https://cloud.tauos.org', '_blank');
+                    }
+                  }}
+                  className="w-full bg-gray-700/50 hover:bg-gray-600/50 text-white py-4 rounded-xl font-semibold text-lg border border-gray-600 transition-all duration-300 hover:scale-105"
+                >
                   Configure Domain
                 </button>
+                <div className="text-center">
+                  <p className="text-gray-400 text-sm">Need help with setup?</p>
+                  <a href="#" className="text-blue-400 hover:text-blue-300 transition-colors text-sm underline">
+                    View Documentation
+                  </a>
+                </div>
               </div>
             </div>
 

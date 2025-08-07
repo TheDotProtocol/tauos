@@ -1,0 +1,43 @@
+#!/bin/bash
+
+echo "🚀 TauOS Custom Domain Configuration"
+echo "====================================="
+echo ""
+
+echo "📧 Mail Project Configuration:"
+echo "Project: vercel-tauos-mail"
+echo "Current URL: https://vercel-tauos-mail-m1zuzff4d-the-dot-protocol-co-ltds-projects.vercel.app"
+echo "Target Domain: mail.tauos.org"
+echo "Redirects to: https://www.tauos.org/taumail"
+echo ""
+
+echo "☁️ Cloud Project Configuration:"
+echo "Project: vercel-tauos-cloud"
+echo "Current URL: https://vercel-tauos-cloud-ezt9oqxm6-the-dot-protocol-co-ltds-projects.vercel.app"
+echo "Target Domain: cloud.tauos.org"
+echo "Redirects to: https://www.tauos.org/taucloud"
+echo ""
+
+echo "🔧 Next Steps:"
+echo "1. Go to https://vercel.com/dashboard"
+echo "2. Navigate to vercel-tauos-mail project"
+echo "3. Go to Settings → Domains"
+echo "4. Add custom domain: mail.tauos.org"
+echo "5. Follow DNS configuration instructions"
+echo ""
+echo "6. Navigate to vercel-tauos-cloud project"
+echo "7. Go to Settings → Domains"
+echo "8. Add custom domain: cloud.tauos.org"
+echo "9. Follow DNS configuration instructions"
+echo ""
+
+echo "✅ Current Status:"
+echo "- Landing pages are live and working"
+echo "- Redirect projects are deployed"
+echo "- Custom domains need DNS configuration"
+echo ""
+
+echo "🎯 Expected Result:"
+echo "- mail.tauos.org → redirects to TauMail landing page"
+echo "- cloud.tauos.org → redirects to TauCloud landing page"
+echo "- Registration buttons → redirect to actual applications" 

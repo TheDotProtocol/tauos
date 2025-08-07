@@ -11,9 +11,19 @@ import Imap from 'imap';
 import { simpleParser } from 'mailparser';
 import { z } from 'zod';
 import dotenv from 'dotenv';
+import AWS from 'aws-sdk';
 
 // Load environment variables
 dotenv.config();
+
+// Configure AWS SES
+AWS.config.update({
+  region: process.env.AWS_SES_REGION || 'us-east-1',
+  accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+  secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+});
+
+const ses = new AWS.SES();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -139,22 +149,25 @@ class EmailService {
   private imap: Imap;
 
   constructor() {
-    // SMTP configuration
+    // SMTP configuration for AWS email server
     this.transporter = nodemailer.createTransporter({
-      host: process.env.SMTP_HOST || 'localhost',
+      host: process.env.SMTP_HOST || 'smtptauos.tauos.org',
       port: parseInt(process.env.SMTP_PORT || '587'),
-      secure: false,
+      secure: false, // STARTTLS
       auth: {
-        user: process.env.SMTP_USER || 'admin@tauos.org',
+        user: process.env.SMTP_USER || 'no-reply@tauos.org',
         pass: process.env.SMTP_PASSWORD || 'password',
       },
+      tls: {
+        rejectUnauthorized: false
+      }
     });
 
-    // IMAP configuration
+    // IMAP configuration for AWS email server
     this.imap = new Imap({
-      user: process.env.IMAP_USER || 'admin@tauos.org',
+      user: process.env.IMAP_USER || 'no-reply@tauos.org',
       password: process.env.IMAP_PASSWORD || 'password',
-      host: process.env.IMAP_HOST || 'localhost',
+      host: process.env.IMAP_HOST || 'imaptauos.tauos.org',
       port: parseInt(process.env.IMAP_PORT || '993'),
       tls: true,
       tlsOptions: { rejectUnauthorized: false },
@@ -163,21 +176,34 @@ class EmailService {
 
   async sendEmail(emailData: any, userId: number) {
     try {
-      const mailOptions = {
-        from: process.env.SMTP_USER || 'admin@tauos.org',
-        to: emailData.to,
-        subject: emailData.subject,
-        text: emailData.body,
-        html: emailData.html || emailData.body,
+      // Use AWS SES for external email delivery
+      const params = {
+        Source: process.env.SMTP_USER || 'no-reply@tauos.org',
+        Destination: {
+          ToAddresses: [emailData.to],
+        },
+        Message: {
+          Subject: {
+            Data: emailData.subject,
+          },
+          Body: {
+            Text: {
+              Data: emailData.body,
+            },
+            Html: {
+              Data: emailData.html || emailData.body,
+            },
+          },
+        },
       };
 
-      const result = await this.transporter.sendMail(mailOptions);
+      const result = await ses.sendEmail(params).promise();
       
       // Save to sent folder
       await this.saveEmail({
         user_id: userId,
-        message_id: result.messageId,
-        from_email: mailOptions.from,
+        message_id: result.MessageId,
+        from_email: params.Source,
         to_email: emailData.to,
         subject: emailData.subject,
         body: emailData.body,
@@ -502,7 +528,7 @@ app.post('/api/emails', authenticateToken, async (req, res) => {
 
     res.json({
       message: 'Email sent successfully',
-      messageId: result.messageId,
+      messageId: result.MessageId,
     });
   } catch (error) {
     console.error('Error sending email:', error);

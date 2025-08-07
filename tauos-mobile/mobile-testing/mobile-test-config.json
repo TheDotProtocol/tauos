@@ -1,0 +1,27 @@
+{
+  "platforms": {
+    "android": {
+      "emulator": "Pixel_4_API_30",
+      "architecture": "arm64-v8a"
+    },
+    "ios": {
+      "simulator": "iPhone 12",
+      "architecture": "arm64"
+    }
+  },
+  "apps": {
+    "taumail": {
+      "path": "../TauMailMobile",
+      "type": "react-native"
+    },
+    "taucloud": {
+      "path": "../TauCloudMobile",
+      "type": "react-native"
+    }
+  },
+  "qemu": {
+    "memory": "2G",
+    "cpu": "cortex-a57",
+    "cores": 4
+  }
+}

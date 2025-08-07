@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TauOS - Privacy-First Computing</title>
+    <meta name="description" content="The world's most secure, intuitive operating system. Built for privacy, designed for freedom.">
+    
+    <!-- Inter Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <!-- CSS -->
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="nav glass-dark">
+        <div class="container nav-container">
+            <div class="nav-logo">
+                <span class="logo-text">τ</span>
+                <span class="logo-brand">TauOS</span>
+            </div>
+            
+            <div class="nav-menu">
+                <a href="#features" class="nav-link">Features</a>
+                <a href="#apps" class="nav-link">Apps</a>
+                <a href="#download" class="nav-link">Download</a>
+                <a href="https://mail.tauos.org" class="nav-link" target="_blank">TauMail</a>
+                <a href="https://cloud.tauos.org" class="nav-link" target="_blank">TauCloud</a>
+            </div>
+            
+            <div class="nav-actions">
+                <button class="btn-secondary">Sign In</button>
+                <button class="btn-primary">Get Started</button>
+            </div>
+            
+            <button class="mobile-menu-toggle" id="mobileMenuToggle">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-background">
+            <div class="particle-system" id="particleSystem"></div>
+            <div class="gradient-overlay"></div>
+        </div>
+        
+        <div class="container hero-container">
+            <div class="hero-content">
+                <h1 class="hero-title">
+                    <span class="gradient-text">TauOS</span>
+                    <br>
+                    <span class="hero-subtitle">Privacy-First Computing</span>
+                </h1>
+                
+                <p class="hero-description">
+                    The world's most secure, intuitive operating system. 
+                    Built for privacy, designed for freedom.
+                </p>
+                
+                <div class="hero-actions">
+                    <button class="btn-primary btn-large">
+                        <span class="btn-icon">⬇️</span>
+                        Download TauOS
+                    </button>
+                    <button class="btn-secondary btn-large">
+                        <span class="btn-icon">▶️</span>
+                        Watch Demo
+                    </button>
+                </div>
+                
+                <div class="hero-stats">
+                    <div class="stat-item">
+                        <span class="stat-number">100%</span>
+                        <span class="stat-label">Privacy</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number">0</span>
+                        <span class="stat-label">Telemetry</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number">∞</span>
+                        <span class="stat-label">Freedom</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="hero-visual">
+                <div class="device-showcase">
+                    <div class="device desktop-device">
+                        <div class="device-screen">
+                            <div class="app-preview taumail-preview">
+                                <div class="app-header">
+                                    <div class="app-icon">📧</div>
+                                    <div class="app-title">TauMail</div>
+                                </div>
+                                <div class="app-content">
+                                    <div class="email-item">
+                                        <div class="email-avatar">J</div>
+                                        <div class="email-info">
+                                            <div class="email-sender">John Doe</div>
+                                            <div class="email-subject">Project Update</div>
+                                        </div>
+                                        <div class="email-time">2:30 PM</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="device mobile-device">
+                        <div class="device-screen">
+                            <div class="app-preview tauphone-preview">
+                                <div class="app-header">
+                                    <div class="app-icon">📞</div>
+                                    <div class="app-title">TauPhone</div>
+                                </div>
+                                <div class="app-content">
+                                    <div class="phone-number">+1 (555) 123-4567</div>
+                                    <div class="dialpad">
+                                        <div class="dialpad-row">
+                                            <div class="dialpad-button">1</div>
+                                            <div class="dialpad-button">2</div>
+                                            <div class="dialpad-button">3</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features" id="features">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Why Choose TauOS?</h2>
+                <p class="section-description">
+                    Built from the ground up with privacy, security, and performance in mind.
+                </p>
+            </div>
+            
+            <div class="features-grid">
+                <div class="feature-card glass-card">
+                    <div class="feature-icon">🔒</div>
+                    <h3 class="feature-title">End-to-End Encryption</h3>
+                    <p class="feature-description">
+                        All communications encrypted by default. Your data stays yours.
+                    </p>
+                </div>
+                
+                <div class="feature-card glass-card">
+                    <div class="feature-icon">🚀</div>
+                    <h3 class="feature-title">Lightning Fast</h3>
+                    <p class="feature-description">
+                        Optimized for performance and speed. Every interaction feels instant.
+                    </p>
+                </div>
+                
+                <div class="feature-card glass-card">
+                    <div class="feature-icon">🌐</div>
+                    <h3 class="feature-title">Cross-Platform</h3>
+                    <p class="feature-description">
+                        Desktop, mobile, and web applications. Seamless experience everywhere.
+                    </p>
+                </div>
+                
+                <div class="feature-card glass-card">
+                    <div class="feature-icon">🛡️</div>
+                    <h3 class="feature-title">Zero Telemetry</h3>
+                    <p class="feature-description">
+                        No data collection, no tracking, no surveillance. Complete privacy.
+                    </p>
+                </div>
+                
+                <div class="feature-card glass-card">
+                    <div class="feature-icon">🔧</div>
+                    <h3 class="feature-title">Open Source</h3>
+                    <p class="feature-description">
+                        Complete transparency. Review, modify, and contribute to the codebase.
+                    </p>
+                </div>
+                
+                <div class="feature-card glass-card">
+                    <div class="feature-icon">🎨</div>
+                    <h3 class="feature-title">Beautiful Design</h3>
+                    <p class="feature-description">
+                        Modern, intuitive interface. Glassmorphism and smooth animations.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Apps Section -->
+    <section class="apps" id="apps">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Complete Ecosystem</h2>
+                <p class="section-description">
+                    Everything you need for a privacy-first digital life.
+                </p>
+            </div>
+            
+            <div class="apps-grid">
+                <div class="app-card glass-card">
+                    <div class="app-preview">
+                        <div class="app-screenshot taumail-screenshot">
+                            <div class="app-header">
+                                <div class="app-icon">📧</div>
+                                <div class="app-title">TauMail</div>
+                            </div>
+                            <div class="app-content">
+                                <div class="email-list">
+                                    <div class="email-item">
+                                        <div class="email-avatar">S</div>
+                                        <div class="email-info">
+                                            <div class="email-sender">Sarah Smith</div>
+                                            <div class="email-subject">Meeting Tomorrow</div>
+                                        </div>
+                                        <div class="email-time">1:45 PM</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <h3 class="app-title">TauMail</h3>
+                    <p class="app-description">Privacy-first email service with end-to-end encryption.</p>
+                    <a href="https://mail.tauos.org" class="app-link" target="_blank">Try TauMail</a>
+                </div>
+                
+                <div class="app-card glass-card">
+                    <div class="app-preview">
+                        <div class="app-screenshot taucloud-screenshot">
+                            <div class="app-header">
+                                <div class="app-icon">☁️</div>
+                                <div class="app-title">TauCloud</div>
+                            </div>
+                            <div class="app-content">
+                                <div class="file-grid">
+                                    <div class="file-item">📄</div>
+                                    <div class="file-item">📷</div>
+                                    <div class="file-item">🎵</div>
+                                    <div class="file-item">📹</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <h3 class="app-title">TauCloud</h3>
+                    <p class="app-description">Secure cloud storage with client-side encryption.</p>
+                    <a href="https://cloud.tauos.org" class="app-link" target="_blank">Try TauCloud</a>
+                </div>
+                
+                <div class="app-card glass-card">
+                    <div class="app-preview">
+                        <div class="app-screenshot tauphone-screenshot">
+                            <div class="app-header">
+                                <div class="app-icon">📞</div>
+                                <div class="app-title">TauPhone</div>
+                            </div>
+                            <div class="app-content">
+                                <div class="phone-number">+1 (555) 123-4567</div>
+                                <div class="dialpad">
+                                    <div class="dialpad-row">
+                                        <div class="dialpad-button">1</div>
+                                        <div class="dialpad-button">2</div>
+                                        <div class="dialpad-button">3</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <h3 class="app-title">TauPhone</h3>
+                    <p class="app-description">Secure phone app with encrypted calls and messages.</p>
+                    <a href="#" class="app-link">Coming Soon</a>
+                </div>
+                
+                <div class="app-card glass-card">
+                    <div class="app-preview">
+                        <div class="app-screenshot taumessages-screenshot">
+                            <div class="app-header">
+                                <div class="app-icon">💬</div>
+                                <div class="app-title">TauMessages</div>
+                            </div>
+                            <div class="app-content">
+                                <div class="message-bubble">
+                                    <div class="message-text">Hey, how are you?</div>
+                                    <div class="message-time">2:30 PM</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <h3 class="app-title">TauMessages</h3>
+                    <p class="app-description">Encrypted messaging with ephemeral messages.</p>
+                    <a href="#" class="app-link">Coming Soon</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Download Section -->
+    <section class="download" id="download">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Get Started Today</h2>
+                <p class="section-description">
+                    Join thousands of users who have chosen privacy-first computing.
+                </p>
+            </div>
+            
+            <div class="download-options">
+                <div class="download-card glass-card">
+                    <div class="download-icon">🖥️</div>
+                    <h3 class="download-title">Desktop</h3>
+                    <p class="download-description">Download for macOS, Windows, or Linux</p>
+                    <button class="btn-primary btn-large">Download for Desktop</button>
+                </div>
+                
+                <div class="download-card glass-card">
+                    <div class="download-icon">📱</div>
+                    <h3 class="download-title">Mobile</h3>
+                    <p class="download-description">Available on iOS and Android</p>
+                    <button class="btn-secondary btn-large">Download for Mobile</button>
+                </div>
+                
+                <div class="download-card glass-card">
+                    <div class="download-icon">🌐</div>
+                    <h3 class="download-title">Web Apps</h3>
+                    <p class="download-description">Use TauMail and TauCloud in your browser</p>
+                    <div class="web-apps">
+                        <a href="https://mail.tauos.org" class="btn-secondary" target="_blank">TauMail</a>
+                        <a href="https://cloud.tauos.org" class="btn-secondary" target="_blank">TauCloud</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer glass-dark">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <div class="footer-logo">
+                        <span class="logo-text">τ</span>
+                        <span class="logo-brand">TauOS</span>
+                    </div>
+                    <p class="footer-description">
+                        Privacy-first computing for everyone.
+                    </p>
+                </div>
+                
+                <div class="footer-section">
+                    <h4 class="footer-title">Products</h4>
+                    <a href="#" class="footer-link">TauOS Desktop</a>
+                    <a href="#" class="footer-link">TauOS Mobile</a>
+                    <a href="https://mail.tauos.org" class="footer-link">TauMail</a>
+                    <a href="https://cloud.tauos.org" class="footer-link">TauCloud</a>
+                </div>
+                
+                <div class="footer-section">
+                    <h4 class="footer-title">Company</h4>
+                    <a href="#" class="footer-link">About</a>
+                    <a href="#" class="footer-link">Blog</a>
+                    <a href="#" class="footer-link">Careers</a>
+                    <a href="#" class="footer-link">Contact</a>
+                </div>
+                
+                <div class="footer-section">
+                    <h4 class="footer-title">Support</h4>
+                    <a href="#" class="footer-link">Help Center</a>
+                    <a href="#" class="footer-link">Documentation</a>
+                    <a href="#" class="footer-link">Community</a>
+                    <a href="#" class="footer-link">Status</a>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <p class="footer-copyright">
+                    © 2024 TauOS. All rights reserved.
+                </p>
+                <div class="footer-links">
+                    <a href="#" class="footer-link">Privacy Policy</a>
+                    <a href="#" class="footer-link">Terms of Service</a>
+                    <a href="#" class="footer-link">Cookie Policy</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript -->
+    <script src="script.js"></script>
+</body>
+</html> 

@@ -1,15 +1,26 @@
 {
   "version": 2,
-  "builds": [
+  "redirects": [
     {
-      "src": "app.js",
-      "use": "@vercel/node"
+      "source": "/",
+      "destination": "https://www.tauos.org/taumail",
+      "permanent": false
+    },
+    {
+      "source": "/(.*)",
+      "destination": "https://www.tauos.org/taumail",
+      "permanent": false
     }
   ],
-  "routes": [
+  "headers": [
     {
-      "src": "/(.*)",
-      "dest": "/app.js"
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex, nofollow"
+        }
+      ]
     }
   ]
 } 

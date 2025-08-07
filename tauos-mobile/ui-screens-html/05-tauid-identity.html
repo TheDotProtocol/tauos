@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TauID - Identity</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);
+            color: #ffffff;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .container {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            background: rgba(42, 42, 42, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .menu-button {
+            font-size: 20px;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 8px;
+            transition: background 0.2s;
+        }
+
+        .menu-button:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .app-title {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .scan-button, .more-button {
+            font-size: 18px;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 8px;
+            transition: background 0.2s;
+        }
+
+        .scan-button:hover, .more-button:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .identity-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 16px;
+            margin: 20px;
+            padding: 24px;
+            text-align: center;
+        }
+
+        .identity-photo {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #8b5cf6 100%);
+            margin: 0 auto 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            font-weight: bold;
+        }
+
+        .identity-name {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .identity-title {
+            font-size: 14px;
+            color: #a1a1aa;
+            margin-bottom: 16px;
+        }
+
+        .verification-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(74, 222, 128, 0.2);
+            border: 1px solid rgba(74, 222, 128, 0.3);
+            border-radius: 20px;
+            padding: 8px 16px;
+            font-size: 12px;
+            font-weight: 600;
+            color: #4ade80;
+            margin-bottom: 20px;
+        }
+
+        .did-display {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 20px;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 10px;
+            color: #a1a1aa;
+            word-break: break-all;
+        }
+
+        .identity-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+        }
+
+        .action-button {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            padding: 8px 16px;
+            color: #ffffff;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .action-button:hover {
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .credentials-section {
+            flex: 1;
+            overflow-y: auto;
+            padding: 0 20px;
+        }
+
+        .section-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: #a1a1aa;
+        }
+
+        .credential-item {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .credential-item:hover {
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .credential-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 8px;
+        }
+
+        .credential-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            background: linear-gradient(135deg, #667eea 0%, #8b5cf6 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+
+        .credential-info {
+            flex: 1;
+        }
+
+        .credential-name {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 2px;
+        }
+
+        .credential-issuer {
+            font-size: 12px;
+            color: #a1a1aa;
+        }
+
+        .credential-status {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 10px;
+            font-weight: 600;
+        }
+
+        .status-valid {
+            color: #4ade80;
+        }
+
+        .status-expired {
+            color: #f87171;
+        }
+
+        .status-pending {
+            color: #fbbf24;
+        }
+
+        .privacy-score {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            margin: 0 20px 20px 20px;
+            padding: 16px;
+        }
+
+        .score-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .score-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #a1a1aa;
+        }
+
+        .score-value {
+            font-size: 18px;
+            font-weight: 700;
+            color: #4ade80;
+        }
+
+        .score-bar {
+            width: 100%;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .score-fill {
+            height: 100%;
+            background: linear-gradient(135deg, #4ade80 0%, #22c55e 100%);
+            width: 95%;
+            border-radius: 3px;
+        }
+
+        .bottom-nav {
+            background: rgba(42, 42, 42, 0.95);
+            backdrop-filter: blur(20px);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 12px 0 8px 0;
+        }
+
+        .nav-tabs {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+        }
+
+        .nav-tab {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+
+        .nav-tab.active {
+            color: #667eea;
+        }
+
+        .nav-icon {
+            font-size: 20px;
+        }
+
+        .nav-label {
+            font-size: 10px;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="header-left">
+                <div class="menu-button">☰</div>
+                <div class="app-title">TauID</div>
+            </div>
+            <div class="header-right">
+                <div class="scan-button">📷</div>
+                <div class="more-button">⋯</div>
+            </div>
+        </div>
+
+        <!-- Identity Card -->
+        <div class="identity-card">
+            <div class="identity-photo">JD</div>
+            <div class="identity-name">John Doe</div>
+            <div class="identity-title">Software Engineer</div>
+            <div class="verification-status">
+                <span>✅</span>
+                <span>Verified Identity</span>
+            </div>
+            <div class="did-display">
+                did:web:tauos.org:user:john.doe@tauos.org
+            </div>
+            <div class="identity-actions">
+                <button class="action-button">Share</button>
+                <button class="action-button">Backup</button>
+                <button class="action-button">Export</button>
+            </div>
+        </div>
+
+        <!-- Privacy Score -->
+        <div class="privacy-score">
+            <div class="score-header">
+                <div class="score-title">Privacy Score</div>
+                <div class="score-value">95/100</div>
+            </div>
+            <div class="score-bar">
+                <div class="score-fill"></div>
+            </div>
+        </div>
+
+        <!-- Credentials Section -->
+        <div class="credentials-section">
+            <div class="section-title">Verifiable Credentials</div>
+
+            <!-- Credential Item 1 -->
+            <div class="credential-item">
+                <div class="credential-header">
+                    <div class="credential-icon">🎓</div>
+                    <div class="credential-info">
+                        <div class="credential-name">Bachelor's Degree</div>
+                        <div class="credential-issuer">Stanford University</div>
+                    </div>
+                    <div class="credential-status status-valid">
+                        <span>✅</span>
+                        <span>Valid</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Credential Item 2 -->
+            <div class="credential-item">
+                <div class="credential-header">
+                    <div class="credential-icon">💼</div>
+                    <div class="credential-info">
+                        <div class="credential-name">Professional License</div>
+                        <div class="credential-issuer">State Board</div>
+                    </div>
+                    <div class="credential-status status-valid">
+                        <span>✅</span>
+                        <span>Valid</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Credential Item 3 -->
+            <div class="credential-item">
+                <div class="credential-header">
+                    <div class="credential-icon">🏥</div>
+                    <div class="credential-info">
+                        <div class="credential-name">Health Certificate</div>
+                        <div class="credential-issuer">Medical Center</div>
+                    </div>
+                    <div class="credential-status status-pending">
+                        <span>⏳</span>
+                        <span>Pending</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Credential Item 4 -->
+            <div class="credential-item">
+                <div class="credential-header">
+                    <div class="credential-icon">🚗</div>
+                    <div class="credential-info">
+                        <div class="credential-name">Driver's License</div>
+                        <div class="credential-issuer">DMV</div>
+                    </div>
+                    <div class="credential-status status-expired">
+                        <span>❌</span>
+                        <span>Expired</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Credential Item 5 -->
+            <div class="credential-item">
+                <div class="credential-header">
+                    <div class="credential-icon">🏦</div>
+                    <div class="credential-info">
+                        <div class="credential-name">Bank Verification</div>
+                        <div class="credential-issuer">Chase Bank</div>
+                    </div>
+                    <div class="credential-status status-valid">
+                        <span>✅</span>
+                        <span>Valid</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom Navigation -->
+        <div class="bottom-nav">
+            <div class="nav-tabs">
+                <div class="nav-tab">
+                    <div class="nav-icon">📧</div>
+                    <div class="nav-label">TauMail</div>
+                </div>
+                <div class="nav-tab">
+                    <div class="nav-icon">☁️</div>
+                    <div class="nav-label">TauCloud</div>
+                </div>
+                <div class="nav-tab active">
+                    <div class="nav-icon">🆔</div>
+                    <div class="nav-label">TauID</div>
+                </div>
+                <div class="nav-tab">
+                    <div class="nav-icon">⚙️</div>
+                    <div class="nav-label">Settings</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html> 

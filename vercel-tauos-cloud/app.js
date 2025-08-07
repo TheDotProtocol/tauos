@@ -7,6 +7,16 @@ const bodyParser = require('body-parser');
 const multer = require('multer');
 const { v4: uuidv4 } = require('uuid');
 const path = require('path');
+const AWS = require('aws-sdk');
+
+// Configure AWS SES
+AWS.config.update({
+  region: process.env.AWS_SES_REGION || 'us-east-1',
+  accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+  secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+});
+
+const ses = new AWS.SES();
 
 const app = express();
 const PORT = process.env.PORT || 3002;
@@ -82,6 +92,38 @@ const authenticateToken = (req, res, next) => {
     req.user = user;
     next();
   });
+};
+
+// Helper function to send email notifications
+const sendEmailNotification = async (to, subject, body) => {
+  try {
+    const params = {
+      Source: 'no-reply@tauos.org',
+      Destination: {
+        ToAddresses: [to],
+      },
+      Message: {
+        Subject: {
+          Data: subject,
+        },
+        Body: {
+          Text: {
+            Data: body,
+          },
+          Html: {
+            Data: body.replace(/\n/g, '<br>'),
+          },
+        },
+      },
+    };
+
+    const result = await ses.sendEmail(params).promise();
+    console.log('Email notification sent:', result.MessageId);
+    return result;
+  } catch (error) {
+    console.error('Error sending email notification:', error);
+    throw error;
+  }
 };
 
 // Helper function to determine file type from MIME type
@@ -265,6 +307,28 @@ app.post('/api/files/upload', authenticateToken, upload.single('file'), async (r
       'SELECT update_storage_usage($1, $2, $3)',
       [organizationId, req.user.userId, size]
     );
+
+    // Send email notification
+    try {
+      const userResult = await pool.query(
+        'SELECT email, recovery_email FROM users WHERE id = $1',
+        [req.user.userId]
+      );
+      
+      const user = userResult.rows[0];
+      const notificationEmail = user.recovery_email || user.email;
+      
+      if (notificationEmail) {
+        await sendEmailNotification(
+          notificationEmail,
+          'File Uploaded - TauCloud',
+          `Your file "${originalname}" has been successfully uploaded to TauCloud.\n\nFile Details:\n- Size: ${(size / 1024 / 1024).toFixed(2)} MB\n- Type: ${fileType}\n- Uploaded: ${new Date().toLocaleString()}\n\nThank you for using TauCloud!`
+        );
+      }
+    } catch (emailError) {
+      console.error('Email notification failed:', emailError);
+      // Don't fail the upload if email fails
+    }
 
     res.json({
       message: 'File uploaded successfully',

@@ -1,0 +1,28 @@
+☁️ TauCloud - Private Cloud Storage
+
+Your personal cloud with zero-knowledge encryption. Store, sync, and share files with complete privacy and security.
+
+🔒 PRIVACY FEATURES:
+• Client-side encryption
+• Zero-knowledge architecture
+• No data access by providers
+• End-to-end encrypted sharing
+• Privacy-first design
+
+📱 KEY FEATURES:
+• iCloud-style interface
+• Automatic file encryption
+• Cross-platform sync
+• Secure file sharing
+• Version history
+
+🛡️ SECURITY:
+• AES-256 encryption
+• Local encryption keys
+• No backdoor access
+• GDPR compliant
+• Open source
+
+Perfect for storing sensitive documents, photos, and personal data with complete privacy.
+
+Take control of your data with TauCloud.

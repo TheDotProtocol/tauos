@@ -45,7 +45,7 @@
         .sidebar-logo {
             font-size: 1.8rem;
             font-weight: 700;
-            color: #FFD700;
+            color: #8B5CF6;
             display: flex;
             align-items: center;
             gap: 8px;
@@ -68,14 +68,14 @@
         }
 
         .nav-item:hover {
-            background: rgba(255, 215, 0, 0.1);
-            color: #FFD700;
+            background: rgba(139, 92, 246, 0.1);
+            color: #8B5CF6;
         }
 
         .nav-item.active {
-            background: rgba(255, 215, 0, 0.2);
-            color: #FFD700;
-            border-left: 3px solid #FFD700;
+            background: rgba(139, 92, 246, 0.2);
+            color: #8B5CF6;
+            border-left: 3px solid #8B5CF6;
         }
 
         .nav-icon {
@@ -85,8 +85,8 @@
 
         .nav-count {
             margin-left: auto;
-            background: rgba(255, 215, 0, 0.2);
-            color: #FFD700;
+            background: rgba(139, 92, 246, 0.2);
+            color: #8B5CF6;
             padding: 2px 8px;
             border-radius: 12px;
             font-size: 12px;
@@ -117,7 +117,7 @@
 
         .storage-fill {
             height: 100%;
-            background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+            background: linear-gradient(135deg, #8B5CF6 0%, #6366F1 100%);
             width: 35%;
             transition: width 0.3s ease;
         }
@@ -185,7 +185,7 @@
         }
 
         .upload-btn {
-            background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+            background: linear-gradient(135deg, #8B5CF6 0%, #6366F1 100%);
             color: #000;
             border: none;
             padding: 12px 24px;
@@ -201,7 +201,7 @@
 
         .upload-btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(255, 215, 0, 0.3);
+            box-shadow: 0 8px 25px rgba(139, 92, 246, 0.3);
         }
 
         .user-menu {
@@ -223,7 +223,7 @@
             width: 36px;
             height: 36px;
             border-radius: 50%;
-            background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+            background: linear-gradient(135deg, #8B5CF6 0%, #6366F1 100%);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -269,9 +269,9 @@
         }
 
         .view-btn.active {
-            background: rgba(255, 215, 0, 0.2);
-            color: #FFD700;
-            border-color: #FFD700;
+            background: rgba(139, 92, 246, 0.2);
+            color: #8B5CF6;
+            border-color: #8B5CF6;
         }
 
         /* File Grid */
@@ -296,13 +296,13 @@
         .file-item:hover {
             transform: translateY(-4px);
             box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
-            border-color: rgba(255, 215, 0, 0.3);
+            border-color: rgba(139, 92, 246, 0.3);
         }
 
         .file-icon {
             font-size: 3rem;
             margin-bottom: 16px;
-            color: #FFD700;
+            color: #8B5CF6;
         }
 
         .file-name {
@@ -346,8 +346,8 @@
         }
 
         .file-action-btn:hover {
-            background: rgba(255, 215, 0, 0.2);
-            color: #FFD700;
+            background: rgba(139, 92, 246, 0.2);
+            color: #8B5CF6;
         }
 
         /* File List */
@@ -368,13 +368,13 @@
         }
 
         .file-list-item:hover {
-            background: rgba(255, 215, 0, 0.05);
+            background: rgba(139, 92, 246, 0.05);
         }
 
         .file-list-icon {
             font-size: 1.5rem;
             margin-right: 16px;
-            color: #FFD700;
+            color: #8B5CF6;
             width: 40px;
             text-align: center;
         }
@@ -439,7 +439,7 @@
         .upload-title {
             font-size: 1.4rem;
             font-weight: 700;
-            color: #FFD700;
+            color: #8B5CF6;
         }
 
         .close-btn {
@@ -459,7 +459,7 @@
         }
 
         .upload-area {
-            border: 2px dashed rgba(255, 215, 0, 0.3);
+            border: 2px dashed rgba(139, 92, 246, 0.3);
             border-radius: 12px;
             padding: 40px;
             text-align: center;
@@ -468,18 +468,18 @@
         }
 
         .upload-area:hover {
-            border-color: #FFD700;
-            background: rgba(255, 215, 0, 0.05);
+            border-color: #8B5CF6;
+            background: rgba(139, 92, 246, 0.05);
         }
 
         .upload-area.dragover {
-            border-color: #FFD700;
-            background: rgba(255, 215, 0, 0.1);
+            border-color: #8B5CF6;
+            background: rgba(139, 92, 246, 0.1);
         }
 
         .upload-icon {
             font-size: 3rem;
-            color: #FFD700;
+            color: #8B5CF6;
             margin-bottom: 16px;
         }
 
@@ -509,7 +509,7 @@
 
         .spinner {
             border: 2px solid rgba(255, 255, 255, 0.1);
-            border-top: 2px solid #FFD700;
+            border-top: 2px solid #8B5CF6;
             border-radius: 50%;
             width: 24px;
             height: 24px;
@@ -678,7 +678,40 @@
         // Check authentication
         const token = localStorage.getItem('token');
         if (!token) {
-            window.location.href = '/';
+            // Auto-login with test user for demo
+            loginTestUser();
+        }
+
+        // Test login function
+        async function loginTestUser() {
+            try {
+                const response = await fetch('/api/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        username: 'clouduser2',
+                        password: 'cloudpass123'
+                    })
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    localStorage.setItem('token', data.token);
+                    localStorage.setItem('userEmail', data.user.email);
+                    localStorage.setItem('username', data.user.username);
+                    
+                    // Reload the page to use the new token
+                    window.location.reload();
+                } else {
+                    // If login fails, redirect to login page
+                    window.location.href = '/';
+                }
+            } catch (error) {
+                console.error('Test login failed:', error);
+                window.location.href = '/';
+            }
         }
 
         // Load user data

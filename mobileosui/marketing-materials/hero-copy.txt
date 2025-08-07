@@ -1,0 +1,12 @@
+TauOS Mobile
+Privacy-First Mobile Operating System
+
+The future of mobile computing is here. TauOS Mobile combines world-class UI/UX with uncompromising privacy and security.
+
+🔒 Zero Telemetry
+🛡️ End-to-End Encryption
+🎨 Beautiful Glassmorphism UI
+⚡ 60fps Smooth Animations
+♿ Full Accessibility Support
+
+Experience mobile computing the way it should be - private, secure, and beautiful.

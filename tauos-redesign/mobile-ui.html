@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TauOS Mobile - Premium UI System</title>
+    
+    <!-- Inter Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <!-- CSS -->
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="mobile-ui.css">
+</head>
+<body>
+    <!-- Mobile Device Frame -->
+    <div class="mobile-frame">
+        <!-- Status Bar -->
+        <div class="status-bar">
+            <div class="status-left">
+                <span class="time">9:41</span>
+            </div>
+            <div class="status-right">
+                <span class="signal">📶</span>
+                <span class="wifi">📶</span>
+                <div class="battery">
+                    <div class="battery-level"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- App Grid -->
+        <div class="app-grid">
+            <!-- TauPhone App -->
+            <div class="app-icon" data-app="tauphone">
+                <div class="app-icon-bg">📞</div>
+                <div class="app-name">TauPhone</div>
+            </div>
+
+            <!-- TauMessages App -->
+            <div class="app-icon" data-app="taumessages">
+                <div class="app-icon-bg">💬</div>
+                <div class="app-name">TauMessages</div>
+            </div>
+
+            <!-- TauMail App -->
+            <div class="app-icon" data-app="taumail">
+                <div class="app-icon-bg">📧</div>
+                <div class="app-name">TauMail</div>
+            </div>
+
+            <!-- TauCloud App -->
+            <div class="app-icon" data-app="taucloud">
+                <div class="app-icon-bg">☁️</div>
+                <div class="app-name">TauCloud</div>
+            </div>
+
+            <!-- TauContacts App -->
+            <div class="app-icon" data-app="taucontacts">
+                <div class="app-icon-bg">👥</div>
+                <div class="app-name">TauContacts</div>
+            </div>
+
+            <!-- TauSettings App -->
+            <div class="app-icon" data-app="tausettings">
+                <div class="app-icon-bg">⚙️</div>
+                <div class="app-name">TauSettings</div>
+            </div>
+
+            <!-- TauID App -->
+            <div class="app-icon" data-app="tauid">
+                <div class="app-icon-bg">🆔</div>
+                <div class="app-name">TauID</div>
+            </div>
+
+            <!-- TauVoice App -->
+            <div class="app-icon" data-app="tauvoice">
+                <div class="app-icon-bg">🎤</div>
+                <div class="app-name">TauVoice</div>
+            </div>
+        </div>
+
+        <!-- Dock -->
+        <div class="dock">
+            <div class="dock-item active">
+                <div class="dock-icon">🏠</div>
+            </div>
+            <div class="dock-item">
+                <div class="dock-icon">🔍</div>
+            </div>
+            <div class="dock-item">
+                <div class="dock-icon">📱</div>
+            </div>
+            <div class="dock-item">
+                <div class="dock-icon">⚙️</div>
+            </div>
+        </div>
+
+        <!-- App Overlays -->
+        <div class="app-overlay" id="tauphone-overlay">
+            <div class="app-header">
+                <button class="back-button">←</button>
+                <h1 class="app-title">TauPhone</h1>
+                <button class="more-button">⋯</button>
+            </div>
+            
+            <div class="app-content">
+                <div class="phone-dialer">
+                    <div class="phone-number">+1 (555) 123-4567</div>
+                    <div class="dialpad">
+                        <div class="dialpad-row">
+                            <div class="dialpad-button">1</div>
+                            <div class="dialpad-button">2</div>
+                            <div class="dialpad-button">3</div>
+                        </div>
+                        <div class="dialpad-row">
+                            <div class="dialpad-button">4</div>
+                            <div class="dialpad-button">5</div>
+                            <div class="dialpad-button">6</div>
+                        </div>
+                        <div class="dialpad-row">
+                            <div class="dialpad-button">7</div>
+                            <div class="dialpad-button">8</div>
+                            <div class="dialpad-button">9</div>
+                        </div>
+                        <div class="dialpad-row">
+                            <div class="dialpad-button">*</div>
+                            <div class="dialpad-button">0</div>
+                            <div class="dialpad-button">#</div>
+                        </div>
+                    </div>
+                    <div class="call-buttons">
+                        <button class="call-button secondary">⌫</button>
+                        <button class="call-button primary">📞</button>
+                        <button class="call-button secondary">📹</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="app-overlay" id="taumessages-overlay">
+            <div class="app-header">
+                <button class="back-button">←</button>
+                <h1 class="app-title">TauMessages</h1>
+                <button class="more-button">⋯</button>
+            </div>
+            
+            <div class="app-content">
+                <div class="conversations">
+                    <div class="conversation-item">
+                        <div class="conversation-avatar">J</div>
+                        <div class="conversation-info">
+                            <div class="conversation-name">John Doe</div>
+                            <div class="conversation-preview">Hey, how are you?</div>
+                        </div>
+                        <div class="conversation-time">2:30 PM</div>
+                    </div>
+                    <div class="conversation-item">
+                        <div class="conversation-avatar">S</div>
+                        <div class="conversation-info">
+                            <div class="conversation-name">Sarah Smith</div>
+                            <div class="conversation-preview">Meeting at 3 PM</div>
+                        </div>
+                        <div class="conversation-time">1:15 PM</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="app-overlay" id="taumail-overlay">
+            <div class="app-header">
+                <button class="back-button">←</button>
+                <h1 class="app-title">TauMail</h1>
+                <button class="more-button">⋯</button>
+            </div>
+            
+            <div class="app-content">
+                <div class="email-list">
+                    <div class="email-item">
+                        <div class="email-avatar">J</div>
+                        <div class="email-info">
+                            <div class="email-sender">John Doe</div>
+                            <div class="email-subject">Project Update</div>
+                        </div>
+                        <div class="email-time">2:30 PM</div>
+                    </div>
+                    <div class="email-item">
+                        <div class="email-avatar">S</div>
+                        <div class="email-info">
+                            <div class="email-sender">Sarah Smith</div>
+                            <div class="email-subject">Meeting Tomorrow</div>
+                        </div>
+                        <div class="email-time">1:45 PM</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="app-overlay" id="taucloud-overlay">
+            <div class="app-header">
+                <button class="back-button">←</button>
+                <h1 class="app-title">TauCloud</h1>
+                <button class="more-button">⋯</button>
+            </div>
+            
+            <div class="app-content">
+                <div class="file-grid">
+                    <div class="file-item">
+                        <div class="file-icon">📄</div>
+                        <div class="file-name">Document.pdf</div>
+                    </div>
+                    <div class="file-item">
+                        <div class="file-icon">📷</div>
+                        <div class="file-name">Photo.jpg</div>
+                    </div>
+                    <div class="file-item">
+                        <div class="file-icon">🎵</div>
+                        <div class="file-name">Music.mp3</div>
+                    </div>
+                    <div class="file-item">
+                        <div class="file-icon">📹</div>
+                        <div class="file-name">Video.mp4</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="app-overlay" id="taucontacts-overlay">
+            <div class="app-header">
+                <button class="back-button">←</button>
+                <h1 class="app-title">TauContacts</h1>
+                <button class="more-button">⋯</button>
+            </div>
+            
+            <div class="app-content">
+                <div class="contacts-list">
+                    <div class="contact-item">
+                        <div class="contact-avatar">J</div>
+                        <div class="contact-info">
+                            <div class="contact-name">John Doe</div>
+                            <div class="contact-phone">+1 (555) 123-4567</div>
+                        </div>
+                    </div>
+                    <div class="contact-item">
+                        <div class="contact-avatar">S</div>
+                        <div class="contact-info">
+                            <div class="contact-name">Sarah Smith</div>
+                            <div class="contact-phone">+1 (555) 234-5678</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="app-overlay" id="tausettings-overlay">
+            <div class="app-header">
+                <button class="back-button">←</button>
+                <h1 class="app-title">TauSettings</h1>
+                <button class="more-button">⋯</button>
+            </div>
+            
+            <div class="app-content">
+                <div class="settings-list">
+                    <div class="setting-item">
+                        <div class="setting-icon">🔒</div>
+                        <div class="setting-info">
+                            <div class="setting-name">Privacy</div>
+                            <div class="setting-description">Manage your privacy settings</div>
+                        </div>
+                        <div class="setting-arrow">></div>
+                    </div>
+                    <div class="setting-item">
+                        <div class="setting-icon">🔐</div>
+                        <div class="setting-info">
+                            <div class="setting-name">Security</div>
+                            <div class="setting-description">Security and encryption</div>
+                        </div>
+                        <div class="setting-arrow">></div>
+                    </div>
+                    <div class="setting-item">
+                        <div class="setting-icon">🎨</div>
+                        <div class="setting-info">
+                            <div class="setting-name">Appearance</div>
+                            <div class="setting-description">Theme and display settings</div>
+                        </div>
+                        <div class="setting-arrow">></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="app-overlay" id="tauid-overlay">
+            <div class="app-header">
+                <button class="back-button">←</button>
+                <h1 class="app-title">TauID</h1>
+                <button class="more-button">⋯</button>
+            </div>
+            
+            <div class="app-content">
+                <div class="identity-card">
+                    <div class="identity-avatar">τ</div>
+                    <div class="identity-name">TauOS User</div>
+                    <div class="identity-did">did:web:tauos.org</div>
+                    <div class="identity-status">
+                        <span class="status-indicator">🟢</span>
+                        <span class="status-text">Verified</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="app-overlay" id="tauvoice-overlay">
+            <div class="app-header">
+                <button class="back-button">←</button>
+                <h1 class="app-title">TauVoice</h1>
+                <button class="more-button">⋯</button>
+            </div>
+            
+            <div class="app-content">
+                <div class="voice-interface">
+                    <div class="voice-visualizer">
+                        <div class="voice-wave"></div>
+                        <div class="voice-wave"></div>
+                        <div class="voice-wave"></div>
+                        <div class="voice-wave"></div>
+                        <div class="voice-wave"></div>
+                    </div>
+                    <div class="voice-status">Listening...</div>
+                    <button class="voice-button">🎤</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script src="mobile-ui.js"></script>
+</body>
+</html> 

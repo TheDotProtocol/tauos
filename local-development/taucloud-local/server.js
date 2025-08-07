@@ -294,6 +294,19 @@ app.get('/api/storage/stats', authenticateToken, async (req, res) => {
 });
 
 // Serve static files
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
+
+app.get('/dashboard', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'dashboard.html'));
+});
+
+app.get('/files', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'files.html'));
+});
+
+// Catch-all route for other static files
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
