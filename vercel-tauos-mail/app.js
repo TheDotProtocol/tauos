@@ -27,7 +27,7 @@ const smtpConfig = {
 };
 
 // Create SMTP transporter
-const transporter = nodemailer.createTransporter(smtpConfig);
+const transporter = nodemailer.createTransport(smtpConfig);
 
 // Test SMTP connection
 transporter.verify(function(error, success) {
