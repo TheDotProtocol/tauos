@@ -111,7 +111,7 @@ export default function LegalPage() {
           >
             <h2 className="text-4xl font-bold mb-6">Company Information</h2>
             <p className="text-xl text-gray-300 max-w-3xl mx-auto">
-              TauOS is developed and maintained by AR Holdings Group, a privacy-first technology company.
+              TauOS is developed and maintained by The Tau Foundation, a privacy-first technology company.
             </p>
           </motion.div>
 
@@ -124,20 +124,27 @@ export default function LegalPage() {
               className="space-y-8"
             >
               <div className="glass-strong p-8 rounded-2xl">
-                <h3 className="text-2xl font-bold mb-6 text-purple-400">AR Holdings Group</h3>
+                <h3 className="text-2xl font-bold mb-6 text-purple-400">The Tau Foundation</h3>
                 <div className="space-y-4">
                   <div className="flex items-start space-x-3">
                     <Building className="w-5 h-5 text-purple-400 mt-1" />
                     <div>
                       <h4 className="font-semibold text-white">Company Name</h4>
-                      <p className="text-gray-300 text-sm">AR Holdings Group</p>
+                      <p className="text-gray-300 text-sm">The Tau Foundation</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start space-x-3">
+                    <Building className="w-5 h-5 text-purple-400 mt-1" />
+                    <div>
+                      <h4 className="font-semibold text-white">Legal Entity</h4>
+                      <p className="text-gray-300 text-sm">Tau LLC</p>
                     </div>
                   </div>
                   <div className="flex items-start space-x-3">
                     <Globe className="w-5 h-5 text-purple-400 mt-1" />
                     <div>
                       <h4 className="font-semibold text-white">Website</h4>
-                      <p className="text-gray-300 text-sm">https://www.arholdings.group</p>
+                      <p className="text-gray-300 text-sm">https://www.tauos.org</p>
                     </div>
                   </div>
                   <div className="flex items-start space-x-3">
@@ -161,7 +168,7 @@ export default function LegalPage() {
               <div className="glass-strong p-8 rounded-2xl">
                 <h3 className="text-2xl font-bold mb-6 text-blue-400">Our Mission</h3>
                 <p className="text-gray-300 leading-relaxed mb-6">
-                  AR Holdings Group is committed to building privacy-first technology that puts users back in control of their digital lives. 
+                  The Tau Foundation is committed to building privacy-first technology that puts users back in control of their digital lives. 
                   We believe privacy is a fundamental human right that should be protected by default.
                 </p>
                 <div className="space-y-3">
