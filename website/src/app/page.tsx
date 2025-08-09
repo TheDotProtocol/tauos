@@ -263,8 +263,8 @@ export default function TauOSLandingPage() {
                 { href: '#interface', label: 'TauOS Interface', external: false },
                 { href: '#download', label: 'Download', external: false },
                 { href: '#about', label: 'About', external: false },
-                { href: '/taumail', label: 'TauMail', external: true },
-                { href: '/taucloud', label: 'TauCloud', external: true },
+                { href: 'https://mail.tauos.org', label: 'TauMail', external: true },
+                { href: 'https://cloud.tauos.org', label: 'TauCloud', external: true },
                 { href: '/governance', label: 'Governance', external: false },
                 { href: '/careers', label: 'Careers', external: false }
               ].map((item) => (
@@ -307,8 +307,8 @@ export default function TauOSLandingPage() {
                 { href: '#interface', label: 'TauOS Interface', external: false },
                 { href: '#download', label: 'Download', external: false },
                 { href: '#about', label: 'About', external: false },
-                { href: '/taumail', label: 'TauMail', external: true },
-                { href: '/taucloud', label: 'TauCloud', external: true },
+                { href: 'https://mail.tauos.org', label: 'TauMail', external: true },
+                { href: 'https://cloud.tauos.org', label: 'TauCloud', external: true },
                 { href: '/governance', label: 'Governance', external: false },
                 { href: '/careers', label: 'Careers', external: false }
               ].map((item) => (
@@ -824,8 +824,8 @@ export default function TauOSLandingPage() {
               <h4 className="font-semibold mb-4">Products</h4>
               <ul className="space-y-2 text-gray-300">
                 <li><a href="#" className="hover:text-white transition-colors">TauOS</a></li>
-                <li><a href="/taumail" className="hover:text-white transition-colors">TauMail</a></li>
-                <li><a href="/taucloud" className="hover:text-white transition-colors">TauCloud</a></li>
+                <li><a href="https://mail.tauos.org" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">TauMail</a></li>
+                <li><a href="https://cloud.tauos.org" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">TauCloud</a></li>
               </ul>
             </div>
             
