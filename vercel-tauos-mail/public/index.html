@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TauMail - Privacy-First Email</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="icon" type="image/x-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📧</text></svg>">
     <style>
         * {
             margin: 0;
@@ -13,355 +13,534 @@
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #f5f5f5;
-            color: #333;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #0a0a0a;
+            color: #ffffff;
+            overflow-x: hidden;
         }
 
+        /* Animated Background */
+        .bg-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: linear-gradient(135deg, #000000 0%, #1a1a2e 50%, #16213e 100%);
+        }
+
+        .bg-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(ellipse at top, rgba(139, 92, 246, 0.15) 0%, transparent 50%),
+                        radial-gradient(ellipse at bottom, rgba(59, 130, 246, 0.1) 0%, transparent 50%);
+        }
+
+        /* Glassmorphism Card */
         .auth-container {
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
         }
 
         .auth-card {
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
             padding: 40px;
             width: 100%;
-            max-width: 400px;
+            max-width: 440px;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .auth-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 35px 70px rgba(0, 0, 0, 0.4);
+        }
+
+        /* Logo and Header */
+        .auth-header {
             text-align: center;
+            margin-bottom: 40px;
         }
 
         .auth-logo {
-            font-size: 2.5rem;
-            color: #667eea;
-            margin-bottom: 20px;
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #8b5cf6, #3b82f6);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            font-size: 2rem;
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes glow {
+            0% { box-shadow: 0 0 20px rgba(139, 92, 246, 0.3); }
+            100% { box-shadow: 0 0 30px rgba(139, 92, 246, 0.6); }
         }
 
         .auth-title {
-            font-size: 1.8rem;
-            color: #333;
-            margin-bottom: 10px;
+            font-size: 2rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #ffffff, #a0a0a0);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 8px;
         }
 
         .auth-subtitle {
-            color: #666;
-            margin-bottom: 30px;
+            color: #a0a0a0;
+            font-size: 1rem;
+            margin-bottom: 8px;
+        }
+
+        .privacy-badge {
+            display: inline-flex;
+            align-items: center;
+            background: rgba(34, 197, 94, 0.1);
+            border: 1px solid rgba(34, 197, 94, 0.3);
+            border-radius: 20px;
+            padding: 4px 12px;
+            font-size: 0.8rem;
+            color: #22c55e;
+            margin-top: 8px;
+        }
+
+        .privacy-badge::before {
+            content: '🔒';
+            margin-right: 6px;
+        }
+
+        /* Form Styles */
+        .auth-form {
+            space-y: 20px;
         }
 
         .form-group {
-            margin-bottom: 20px;
-            text-align: left;
+            margin-bottom: 24px;
         }
 
         .form-label {
             display: block;
-            margin-bottom: 8px;
-            color: #333;
+            color: #e0e0e0;
+            font-size: 0.9rem;
             font-weight: 500;
+            margin-bottom: 8px;
         }
 
         .form-input {
             width: 100%;
-            padding: 12px 16px;
-            border: 2px solid #e1e5e9;
-            border-radius: 8px;
-            font-size: 16px;
-            transition: border-color 0.3s;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 16px;
+            font-size: 1rem;
+            color: #ffffff;
+            transition: all 0.3s ease;
         }
 
         .form-input:focus {
             outline: none;
-            border-color: #667eea;
+            border-color: #8b5cf6;
+            box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+            background: rgba(255, 255, 255, 0.08);
         }
 
-        .email-preview {
-            background: #f8f9fa;
-            padding: 8px 12px;
-            border-radius: 6px;
-            font-size: 14px;
+        .form-input::placeholder {
             color: #666;
-            margin-top: 5px;
         }
 
+        /* Button Styles */
         .btn {
             width: 100%;
-            padding: 12px;
+            padding: 16px;
             border: none;
-            border-radius: 8px;
-            font-size: 16px;
+            border-radius: 12px;
+            font-size: 1rem;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.3s;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
         }
 
         .btn-primary {
-            background: #667eea;
+            background: linear-gradient(135deg, #8b5cf6, #3b82f6);
             color: white;
+            margin-bottom: 16px;
         }
 
         .btn-primary:hover {
-            background: #5a6fd8;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(139, 92, 246, 0.3);
         }
 
         .btn-secondary {
-            background: #f8f9fa;
-            color: #333;
-            border: 2px solid #e1e5e9;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #e0e0e0;
         }
 
         .btn-secondary:hover {
-            background: #e9ecef;
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 255, 255, 0.2);
         }
 
-        .auth-switch {
-            margin-top: 20px;
-            color: #666;
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none !important;
         }
 
-        .auth-switch a {
-            color: #667eea;
-            text-decoration: none;
-            font-weight: 500;
-            cursor: pointer;
+        /* Tab Styles */
+        .auth-tabs {
+            display: flex;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 12px;
+            padding: 4px;
+            margin-bottom: 32px;
         }
 
-        .error-message {
-            color: #dc3545;
-            font-size: 14px;
-            margin-top: 10px;
-        }
-
-        .success-message {
-            color: #28a745;
-            font-size: 14px;
-            margin-top: 10px;
-        }
-
-        .loading {
-            display: none;
+        .auth-tab {
+            flex: 1;
+            padding: 12px;
             text-align: center;
-            padding: 20px;
-            color: #666;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
         }
 
-        .spinner {
-            border: 3px solid #f3f3f3;
-            border-top: 3px solid #667eea;
+        .auth-tab.active {
+            background: linear-gradient(135deg, #8b5cf6, #3b82f6);
+            color: white;
+        }
+
+        .auth-tab:not(.active) {
+            color: #a0a0a0;
+        }
+
+        .auth-tab:not(.active):hover {
+            background: rgba(255, 255, 255, 0.05);
+            color: #e0e0e0;
+        }
+
+        /* Messages */
+        .message {
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 0.9rem;
+        }
+
+        .message.error {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: #fca5a5;
+        }
+
+        .message.success {
+            background: rgba(34, 197, 94, 0.1);
+            border: 1px solid rgba(34, 197, 94, 0.3);
+            color: #86efac;
+        }
+
+        /* Loading Animation */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
             border-radius: 50%;
-            width: 30px;
-            height: 30px;
+            border-top: 2px solid #ffffff;
             animation: spin 1s linear infinite;
-            margin: 0 auto 10px;
+            margin-right: 8px;
         }
 
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
+
+        /* Footer */
+        .auth-footer {
+            text-align: center;
+            margin-top: 32px;
+            padding-top: 24px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .footer-links {
+            color: #a0a0a0;
+            font-size: 0.9rem;
+        }
+
+        .footer-links a {
+            color: #8b5cf6;
+            text-decoration: none;
+            margin: 0 8px;
+        }
+
+        .footer-links a:hover {
+            color: #a78bfa;
+        }
+
+        /* Responsive */
+        @media (max-width: 480px) {
+            .auth-card {
+                padding: 24px;
+                margin: 10px;
+            }
+            
+            .auth-title {
+                font-size: 1.6rem;
+            }
+        }
+
+        /* Hide forms initially */
+        .auth-form {
+            display: none;
+        }
+
+        .auth-form.active {
+            display: block;
+        }
     </style>
 </head>
 <body>
-    <div id="authContainer" class="auth-container">
+    <div class="bg-container"></div>
+    
+    <div class="auth-container">
         <div class="auth-card">
-            <div class="auth-logo">📧</div>
-            <h1 class="auth-title">TauMail</h1>
-            <p class="auth-subtitle">Privacy-first email for everyone</p>
-            
+            <div class="auth-header">
+                <div class="auth-logo">τ</div>
+                <h1 class="auth-title">TauMail</h1>
+                <p class="auth-subtitle">Privacy-first email for everyone</p>
+                <div class="privacy-badge">Zero tracking • End-to-end encrypted</div>
+            </div>
+
+            <div class="auth-tabs">
+                <div class="auth-tab active" onclick="switchTab('login')">Sign In</div>
+                <div class="auth-tab" onclick="switchTab('register')">Sign Up</div>
+            </div>
+
+            <div id="message-container"></div>
+
             <!-- Login Form -->
-            <form id="loginForm">
+            <form id="login-form" class="auth-form active">
                 <div class="form-group">
-                    <label for="loginUsername" class="form-label">Username</label>
-                    <input type="text" id="loginUsername" name="username" class="form-input" placeholder="Enter username" autocomplete="username" required>
+                    <label class="form-label" for="login-username">Username</label>
+                    <input type="text" id="login-username" class="form-input" placeholder="Enter your username" required>
                 </div>
+                
                 <div class="form-group">
-                    <label for="loginPassword" class="form-label">Password</label>
-                    <input type="password" id="loginPassword" name="password" class="form-input" placeholder="Enter password" autocomplete="current-password" required>
+                    <label class="form-label" for="login-password">Password</label>
+                    <input type="password" id="login-password" class="form-input" placeholder="Enter your password" required>
                 </div>
-                <button type="submit" class="btn btn-primary">Sign In</button>
-                <div class="auth-switch">
-                    Don't have an account? <a onclick="showRegister()">Create one</a>
-                </div>
+
+                <button type="submit" class="btn btn-primary" id="login-btn">
+                    Sign In to TauMail
+                </button>
+                
+                <button type="button" class="btn btn-secondary" onclick="showForgotPassword()">
+                    Forgot Password?
+                </button>
             </form>
 
             <!-- Register Form -->
-            <form id="registerForm" style="display: none;">
+            <form id="register-form" class="auth-form">
                 <div class="form-group">
-                    <label for="registerUsername" class="form-label">Username</label>
-                    <input type="text" id="registerUsername" name="username" class="form-input" placeholder="Enter username" autocomplete="username" required>
-                    <div class="email-preview" id="emailPreview">username@tauos.org</div>
+                    <label class="form-label" for="register-username">Username</label>
+                    <input type="text" id="register-username" class="form-input" placeholder="Choose a username" required>
+                    <small style="color: #a0a0a0; font-size: 0.8rem;">Your email will be: username@tauos.org</small>
                 </div>
+                
                 <div class="form-group">
-                    <label for="registerPassword" class="form-label">Password</label>
-                    <input type="password" id="registerPassword" name="password" class="form-input" placeholder="Enter password" autocomplete="new-password" required>
+                    <label class="form-label" for="register-password">Password</label>
+                    <input type="password" id="register-password" class="form-input" placeholder="Create a secure password" required>
                 </div>
+
                 <div class="form-group">
-                    <label for="recoveryEmail" class="form-label">Recovery Email (Optional)</label>
-                    <input type="email" id="recoveryEmail" name="recovery_email" class="form-input" placeholder="Enter recovery email" autocomplete="email">
+                    <label class="form-label" for="register-recovery">Recovery Email (Optional)</label>
+                    <input type="email" id="register-recovery" class="form-input" placeholder="recovery@example.com">
                 </div>
-                <button type="submit" class="btn btn-primary">Create Account</button>
-                <div class="auth-switch">
-                    Already have an account? <a onclick="showLogin()">Sign in</a>
-                </div>
+
+                <button type="submit" class="btn btn-primary" id="register-btn">
+                    Create TauMail Account
+                </button>
             </form>
 
-            <div id="authMessage"></div>
-            <div id="loading" class="loading">
-                <div class="spinner"></div>
-                Processing...
+            <div class="auth-footer">
+                <div class="footer-links">
+                    <a href="https://www.tauos.org">TauOS</a> •
+                    <a href="https://www.tauos.org/legal">Privacy Policy</a> •
+                    <a href="https://cloud.tauos.org">TauCloud</a>
+                </div>
             </div>
         </div>
     </div>
 
     <script>
-        let currentUser = null;
+        let currentTab = 'login';
 
-        // Form switching functions
-        function showRegister() {
-            document.getElementById('loginForm').style.display = 'none';
-            document.getElementById('registerForm').style.display = 'block';
-            document.getElementById('authMessage').textContent = '';
+        function switchTab(tab) {
+            // Update tab buttons
+            document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+            document.querySelector(`.auth-tab[onclick="switchTab('${tab}')"]`).classList.add('active');
+            
+            // Update forms
+            document.querySelectorAll('.auth-form').forEach(f => f.classList.remove('active'));
+            document.getElementById(`${tab}-form`).classList.add('active');
+            
+            currentTab = tab;
+            clearMessages();
         }
 
-        function showLogin() {
-            document.getElementById('registerForm').style.display = 'none';
-            document.getElementById('loginForm').style.display = 'block';
-            document.getElementById('authMessage').textContent = '';
+        function showMessage(message, type = 'error') {
+            const container = document.getElementById('message-container');
+            container.innerHTML = `<div class="message ${type}">${message}</div>`;
         }
 
-        // Update email preview
-        function updateEmailPreview() {
-            const username = document.getElementById('registerUsername').value;
-            document.getElementById('emailPreview').textContent = username ? `${username}@tauos.org` : 'username@tauos.org';
+        function clearMessages() {
+            document.getElementById('message-container').innerHTML = '';
         }
 
-        document.getElementById('registerUsername').addEventListener('input', updateEmailPreview);
-
-        // Show/hide loading
-        function showLoading() {
-            document.getElementById('loading').style.display = 'block';
+        function showLoading(buttonId, text = 'Loading...') {
+            const button = document.getElementById(buttonId);
+            button.disabled = true;
+            button.innerHTML = `<span class="loading"></span>${text}`;
         }
 
-        function hideLoading() {
-            document.getElementById('loading').style.display = 'none';
+        function hideLoading(buttonId, originalText) {
+            const button = document.getElementById(buttonId);
+            button.disabled = false;
+            button.innerHTML = originalText;
         }
 
-        // Show messages
-        function showMessage(message, type) {
-            const messageDiv = document.getElementById('authMessage');
-            messageDiv.textContent = message;
-            messageDiv.className = type === 'error' ? 'error-message' : 'success-message';
+        function showForgotPassword() {
+            showMessage('Please contact support at support@tauos.org for password recovery assistance.', 'success');
         }
 
-        // API Functions
-        async function register() {
-            const username = document.getElementById('registerUsername').value;
-            const password = document.getElementById('registerPassword').value;
-            const recoveryEmail = document.getElementById('recoveryEmail').value;
-
+        // Login form handler
+        document.getElementById('login-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            clearMessages();
+            
+            const username = document.getElementById('login-username').value;
+            const password = document.getElementById('login-password').value;
+            
             if (!username || !password) {
-                showMessage('Username and password are required', 'error');
+                showMessage('Please enter both username and password.');
                 return;
             }
 
-            showLoading();
-
-            try {
-                const response = await fetch('/api/register', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ username, password, recovery_email: recoveryEmail })
-                });
-
-                const data = await response.json();
-                
-                if (response.ok) {
-                    localStorage.setItem('token', data.token);
-                    currentUser = data.user;
-                    showMessage('Account created successfully! Redirecting...', 'success');
-                    setTimeout(() => {
-                        window.location.href = '/dashboard';
-                    }, 1500);
-                } else {
-                    showMessage(data.error || 'Registration failed', 'error');
-                }
-            } catch (error) {
-                showMessage('Registration failed. Please try again.', 'error');
-            } finally {
-                hideLoading();
-            }
-        }
-
-        async function login() {
-            const username = document.getElementById('loginUsername').value;
-            const password = document.getElementById('loginPassword').value;
-
-            if (!username || !password) {
-                showMessage('Username and password are required', 'error');
-                return;
-            }
-
-            showLoading();
+            showLoading('login-btn', 'Signing in...');
 
             try {
                 const response = await fetch('/api/login', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
                     body: JSON.stringify({ username, password })
                 });
 
                 const data = await response.json();
-                
+
                 if (response.ok) {
-                    localStorage.setItem('token', data.token);
-                    currentUser = data.user;
+                    localStorage.setItem('taumail_token', data.token);
+                    localStorage.setItem('taumail_user', JSON.stringify(data.user));
                     showMessage('Login successful! Redirecting...', 'success');
                     setTimeout(() => {
                         window.location.href = '/dashboard';
-                    }, 1500);
+                    }, 1000);
                 } else {
-                    showMessage(data.error || 'Login failed', 'error');
+                    showMessage(data.error || 'Login failed. Please try again.');
                 }
             } catch (error) {
-                showMessage('Login failed. Please try again.', 'error');
+                console.error('Login error:', error);
+                showMessage('Network error. Please check your connection and try again.');
             } finally {
-                hideLoading();
+                hideLoading('login-btn', 'Sign In to TauMail');
             }
-        }
-
-        // Event listeners
-        document.getElementById('loginForm').addEventListener('submit', (e) => {
-            e.preventDefault();
-            login();
         });
 
-        document.getElementById('registerForm').addEventListener('submit', (e) => {
+        // Register form handler
+        document.getElementById('register-form').addEventListener('submit', async (e) => {
             e.preventDefault();
-            register();
+            clearMessages();
+            
+            const username = document.getElementById('register-username').value;
+            const password = document.getElementById('register-password').value;
+            const recovery_email = document.getElementById('register-recovery').value;
+            
+            if (!username || !password) {
+                showMessage('Please enter both username and password.');
+                return;
+            }
+
+            if (username.length < 3) {
+                showMessage('Username must be at least 3 characters long.');
+                return;
+            }
+
+            if (password.length < 6) {
+                showMessage('Password must be at least 6 characters long.');
+                return;
+            }
+
+            showLoading('register-btn', 'Creating account...');
+
+            try {
+                const response = await fetch('/api/register', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ 
+                        username, 
+                        password, 
+                        recovery_email: recovery_email || undefined 
+                    })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    localStorage.setItem('taumail_token', data.token);
+                    localStorage.setItem('taumail_user', JSON.stringify(data.user));
+                    showMessage('Account created successfully! Redirecting...', 'success');
+                    setTimeout(() => {
+                        window.location.href = '/dashboard';
+                    }, 1000);
+                } else {
+                    showMessage(data.error || 'Registration failed. Please try again.');
+                }
+            } catch (error) {
+                console.error('Registration error:', error);
+                showMessage('Network error. Please check your connection and try again.');
+            } finally {
+                hideLoading('register-btn', 'Create TauMail Account');
+            }
         });
 
         // Check if user is already logged in
-        window.addEventListener('load', () => {
-            const token = localStorage.getItem('token');
-            if (token) {
-                // Verify token and redirect to dashboard
-                fetch('/api/profile', {
-                    headers: { 'Authorization': `Bearer ${token}` }
-                }).then(response => {
-                    if (response.ok) {
-                        window.location.href = '/dashboard';
-                    } else {
-                        localStorage.removeItem('token');
-                    }
-                }).catch(() => {
-                    localStorage.removeItem('token');
-                });
-            }
-        });
+        if (localStorage.getItem('taumail_token')) {
+            window.location.href = '/dashboard';
+        }
     </script>
 </body>
 </html> 
