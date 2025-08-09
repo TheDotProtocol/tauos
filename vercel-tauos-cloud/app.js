@@ -7,16 +7,33 @@ const bodyParser = require('body-parser');
 const multer = require('multer');
 const { v4: uuidv4 } = require('uuid');
 const path = require('path');
-const AWS = require('aws-sdk');
+const nodemailer = require('nodemailer');
 
-// Configure AWS SES
-AWS.config.update({
-  region: process.env.AWS_SES_REGION || 'us-east-1',
-  accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-  secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+// SMTP Configuration
+const smtpConfig = {
+  host: 'mailserver.tauos.org',
+  port: 25,
+  secure: false, // true for 465, false for other ports
+  auth: {
+    user: process.env.SMTP_USER || 'noreply@tauos.org',
+    pass: process.env.SMTP_PASS || ''
+  },
+  tls: {
+    rejectUnauthorized: false
+  }
+};
+
+// Create SMTP transporter
+const transporter = nodemailer.createTransport(smtpConfig);
+
+// Test SMTP connection
+transporter.verify(function(error, success) {
+  if (error) {
+    console.error('❌ SMTP connection failed:', error);
+  } else {
+    console.log('✅ SMTP server is ready to send emails');
+  }
 });
-
-const ses = new AWS.SES();
 
 const app = express();
 const PORT = process.env.PORT || 3002;
@@ -97,29 +114,17 @@ const authenticateToken = (req, res, next) => {
 // Helper function to send email notifications
 const sendEmailNotification = async (to, subject, body) => {
   try {
-    const params = {
-      Source: 'no-reply@tauos.org',
-      Destination: {
-        ToAddresses: [to],
-      },
-      Message: {
-        Subject: {
-          Data: subject,
-        },
-        Body: {
-          Text: {
-            Data: body,
-          },
-          Html: {
-            Data: body.replace(/\n/g, '<br>'),
-          },
-        },
-      },
+    const mailOptions = {
+      from: 'no-reply@tauos.org', // sender address
+      to: to, // list of receivers
+      subject: subject, // Subject line
+      text: body, // plain text body
+      html: body.replace(/\n/g, '<br>') // html body
     };
 
-    const result = await ses.sendEmail(params).promise();
-    console.log('Email notification sent:', result.MessageId);
-    return result;
+    const info = await transporter.sendMail(mailOptions);
+    console.log('Email notification sent:', info.messageId);
+    return info;
   } catch (error) {
     console.error('Error sending email notification:', error);
     throw error;
