@@ -1,26 +1,20 @@
 {
   "version": 2,
-  "redirects": [
+  "builds": [
     {
-      "source": "/",
-      "destination": "https://www.tauos.org/taucloud",
-      "permanent": false
-    },
-    {
-      "source": "/(.*)",
-      "destination": "https://www.tauos.org/taucloud",
-      "permanent": false
+      "src": "app.js",
+      "use": "@vercel/node"
     }
   ],
-  "headers": [
+  "routes": [
     {
-      "source": "/(.*)",
-      "headers": [
-        {
-          "key": "X-Robots-Tag",
-          "value": "noindex, nofollow"
-        }
-      ]
+      "src": "/(.*)",
+      "dest": "/app.js"
     }
-  ]
+  ],
+  "env": {
+    "DATABASE_URL": "postgresql://postgres:Ak1233%40%405@db.tviqcormikopltejomkc.supabase.co:6543/postgres",
+    "NODE_ENV": "production",
+    "JWT_SECRET": "tauos-secret-key-change-in-production"
+  }
 }

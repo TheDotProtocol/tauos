@@ -235,17 +235,16 @@ app.post('/api/emails/send', authenticateToken, async (req, res) => {
 
     const sender = senderResult.rows[0];
 
-    // Get recipient info
+    // Check if recipient is a registered user
     const recipientResult = await pool.query(
       'SELECT id FROM users WHERE email = $1',
       [to]
     );
 
-    if (recipientResult.rows.length === 0) {
-      return res.status(404).json({ error: 'Recipient not found' });
+    let recipientId = null;
+    if (recipientResult.rows.length > 0) {
+      recipientId = recipientResult.rows[0].id;
     }
-
-    const recipientId = recipientResult.rows[0].id;
 
     // Send email via SMTP
     const mailOptions = {
@@ -258,16 +257,18 @@ app.post('/api/emails/send', authenticateToken, async (req, res) => {
 
     const info = await transporter.sendMail(mailOptions);
 
-    // Store email in database
-    const result = await pool.query(
-      `INSERT INTO emails (organization_id, sender_id, recipient_id, subject, body, message_id)
-       VALUES ($1, $2, $3, $4, $5, $6) RETURNING id`,
-      [sender.organization_id, sender.id, recipientId, subject, body, info.messageId]
-    );
+    // Store email in database (if recipient is registered)
+    if (recipientId) {
+      const result = await pool.query(
+        `INSERT INTO emails (organization_id, sender_id, recipient_id, subject, body, message_id)
+         VALUES ($1, $2, $3, $4, $5, $6) RETURNING id`,
+        [sender.organization_id, sender.id, recipientId, subject, body, info.messageId]
+      );
+    }
 
     res.json({
       message: 'Email sent successfully',
-      email_id: result.rows[0].id,
+      email_id: recipientId ? 'stored_in_db' : 'external_email',
       message_id: info.messageId
     });
   } catch (error) {
