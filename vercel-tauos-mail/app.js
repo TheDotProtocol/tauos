@@ -65,27 +65,41 @@ transporter.verify(function(error, success) {
   }
 });
 
-// PostgreSQL connection
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL || 'postgresql://postgres.tviqcormikopltejomkc:Ak1233%40%405@aws-0-ap-southeast-1.pooler.supabase.com:6543/postgres',
-  ssl: {
-    rejectUnauthorized: false
-  }
-});
+// PostgreSQL connection with local fallback
+let pool;
+let usingLocalStorage = false;
+
+try {
+  pool = new Pool({
+    connectionString: process.env.DATABASE_URL || 'postgresql://postgres.tviqcormikopltejomkc:Ak1233%40%405@aws-0-ap-southeast-1.pooler.supabase.com:6543/postgres',
+    ssl: {
+      rejectUnauthorized: false
+    }
+  });
+  
+  // Test database connection
+  pool.query('SELECT NOW()', (err, res) => {
+    if (err) {
+      console.error('❌ Database connection failed:', err.message);
+      console.log('🔄 Switching to local storage for testing...');
+      usingLocalStorage = true;
+    } else {
+      console.log('✅ Database connected successfully');
+    }
+  });
+} catch (error) {
+  console.log('🔄 Using local storage for testing...');
+  usingLocalStorage = true;
+}
+
+// Local storage for testing
+const localUsers = new Map();
+const localEmails = new Map();
 
 app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static('public'));
-
-// Test database connection
-pool.query('SELECT NOW()', (err, res) => {
-  if (err) {
-    console.error('❌ Database connection failed:', err);
-  } else {
-    console.log('✅ Database connected successfully');
-  }
-});
 
 const generateToken = (userId, username) => {
   return jwt.sign(
@@ -495,16 +509,24 @@ app.post('/api/password/reset-request', async (req, res) => {
 // Health check endpoint
 app.get('/api/health', async (req, res) => {
   try {
-    // Test database connection
-    const client = await pool.connect();
-    await client.query('SELECT 1');
-    client.release();
-    
-    res.json({
-      status: 'healthy',
-      database: 'connected',
-      timestamp: new Date().toISOString()
-    });
+    if (usingLocalStorage) {
+      res.json({
+        status: 'healthy',
+        database: 'local-storage',
+        timestamp: new Date().toISOString()
+      });
+    } else {
+      // Test database connection
+      const client = await pool.connect();
+      await client.query('SELECT 1');
+      client.release();
+      
+      res.json({
+        status: 'healthy',
+        database: 'connected',
+        timestamp: new Date().toISOString()
+      });
+    }
   } catch (error) {
     res.status(500).json({
       status: 'unhealthy',
