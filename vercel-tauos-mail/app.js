@@ -12,10 +12,10 @@ const app = express();
 const PORT = process.env.PORT || 3001;
 const JWT_SECRET = process.env.JWT_SECRET || 'tauos-secret-key-change-in-production';
 
-// SMTP Configuration with Mailtrap fallback
+// SMTP Configuration - TauOS Sovereign Email Infrastructure
 const smtpConfig = {
-  host: 'mailserver.tauos.org',
-  port: 587,
+  host: process.env.SMTP_HOST || 'mailserver.tauos.org',
+  port: parseInt(process.env.SMTP_PORT) || 587,
   secure: false,
   auth: {
     user: process.env.SMTP_USER || 'noreply@tauos.org',
@@ -27,13 +27,13 @@ const smtpConfig = {
   requireTLS: true
 };
 
-// Mailtrap fallback configuration (FREE - replace with your credentials)
+// Mailtrap fallback configuration (for development/testing only)
 const mailtrapConfig = {
   host: 'sandbox.smtp.mailtrap.io',
   port: 2525,
   auth: {
-    user: process.env.MAILTRAP_USER || 'e5b253ac8d7940', // Your actual Mailtrap username
-    pass: process.env.MAILTRAP_PASS || 'dd6f3ec509aec7'  // Your actual Mailtrap password
+    user: process.env.MAILTRAP_USER || 'e5b253ac8d7940',
+    pass: process.env.MAILTRAP_PASS || 'dd6f3ec509aec7'
   }
 };
 
@@ -44,18 +44,20 @@ let smtpAvailable = false;
 
 // Test SMTP connection with automatic fallback
 async function initializeSMTP() {
-  console.log('🔍 Initializing SMTP...');
+  console.log('🔍 Initializing TauOS Sovereign SMTP...');
   console.log('Environment variables check:');
+  console.log('- SMTP_HOST:', process.env.SMTP_HOST || 'mailserver.tauos.org');
+  console.log('- SMTP_PORT:', process.env.SMTP_PORT || '587');
   console.log('- SMTP_USER:', process.env.SMTP_USER ? 'set' : 'not_set');
   console.log('- SMTP_PASS:', process.env.SMTP_PASS ? 'set' : 'not_set');
   console.log('- MAILTRAP_USER:', process.env.MAILTRAP_USER ? 'set' : 'not_set');
   console.log('- MAILTRAP_PASS:', process.env.MAILTRAP_PASS ? 'set' : 'not_set');
 
-  // Try primary SMTP first
+  // Try our own SMTP server first (TauOS infrastructure)
   if (process.env.SMTP_USER && process.env.SMTP_PASS) {
     try {
-      console.log('🔍 Testing primary SMTP connection...');
-      console.log('Primary SMTP config:', {
+      console.log('🔍 Testing TauOS SMTP server connection...');
+      console.log('TauOS SMTP config:', {
         host: smtpConfig.host,
         port: smtpConfig.port,
         user: smtpConfig.auth.user,
@@ -64,19 +66,20 @@ async function initializeSMTP() {
       
       transporter = nodemailer.createTransport(smtpConfig);
       await transporter.verify();
-      console.log('✅ Primary SMTP server is ready to send emails');
+      console.log('✅ TauOS SMTP server is ready for sovereign email delivery!');
       smtpAvailable = true;
       return;
     } catch (error) {
-      console.error('❌ Primary SMTP connection failed:', error.message);
+      console.error('❌ TauOS SMTP connection failed:', error.message);
+      console.log('🔄 Falling back to Mailtrap for development...');
     }
   } else {
-    console.log('⚠️  Primary SMTP credentials not configured, trying Mailtrap...');
+    console.log('⚠️  TauOS SMTP credentials not configured, using Mailtrap for development...');
   }
   
-  // Try Mailtrap as fallback
+  // Try Mailtrap as development fallback
   if (process.env.MAILTRAP_USER && process.env.MAILTRAP_PASS) {
-    console.log('🔄 Switching to Mailtrap for email testing...');
+    console.log('🔄 Using Mailtrap for development/testing...');
     
     // Switch to Mailtrap
     transporter = nodemailer.createTransport(mailtrapConfig);
@@ -91,7 +94,7 @@ async function initializeSMTP() {
     
     try {
       await transporter.verify();
-      console.log('✅ Mailtrap SMTP ready - emails will be captured for testing');
+      console.log('✅ Mailtrap ready for development testing');
       console.log('📧 View emails at: https://mailtrap.io/inboxes');
       smtpAvailable = true;
       return;
