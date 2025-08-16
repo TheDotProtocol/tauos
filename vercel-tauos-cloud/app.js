@@ -30,7 +30,7 @@ const mailtrapConfig = {
   port: 2525,
   auth: {
     user: process.env.MAILTRAP_USER || 'e5b253ac8d7940', // Your actual Mailtrap username
-    pass: process.env.MAILTRAP_PASS || '****aec7'        // Your actual Mailtrap password
+    pass: process.env.MAILTRAP_PASS || 'aec7'            // Your actual Mailtrap password
   }
 };
 

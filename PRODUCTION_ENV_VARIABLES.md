@@ -21,7 +21,7 @@ SMTP_PASS=your_smtp_password_here
 ### **Mailtrap Configuration (Fallback for testing)**
 ```
 MAILTRAP_USER=e5b253ac8d7940
-MAILTRAP_PASS=****aec7
+MAILTRAP_PASS=aec7
 ```
 
 ### **Application Configuration**
