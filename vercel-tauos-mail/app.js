@@ -38,26 +38,44 @@ const mailtrapConfig = {
 };
 
 // Try primary SMTP, fallback to Mailtrap
-let transporter = nodemailer.createTransport(smtpConfig);
+let transporter = null;
 let usingMailtrap = false;
 let smtpAvailable = false;
 
 // Test SMTP connection with automatic fallback
 async function initializeSMTP() {
-  try {
-    console.log('🔍 Testing primary SMTP connection...');
-    console.log('Primary SMTP config:', {
-      host: smtpConfig.host,
-      port: smtpConfig.port,
-      user: smtpConfig.auth.user,
-      pass: smtpConfig.auth.pass ? '***' : 'not_set'
-    });
-    
-    await transporter.verify();
-    console.log('✅ Primary SMTP server is ready to send emails');
-    smtpAvailable = true;
-  } catch (error) {
-    console.error('❌ Primary SMTP connection failed:', error.message);
+  console.log('🔍 Initializing SMTP...');
+  console.log('Environment variables check:');
+  console.log('- SMTP_USER:', process.env.SMTP_USER ? 'set' : 'not_set');
+  console.log('- SMTP_PASS:', process.env.SMTP_PASS ? 'set' : 'not_set');
+  console.log('- MAILTRAP_USER:', process.env.MAILTRAP_USER ? 'set' : 'not_set');
+  console.log('- MAILTRAP_PASS:', process.env.MAILTRAP_PASS ? 'set' : 'not_set');
+
+  // Try primary SMTP first
+  if (process.env.SMTP_USER && process.env.SMTP_PASS) {
+    try {
+      console.log('🔍 Testing primary SMTP connection...');
+      console.log('Primary SMTP config:', {
+        host: smtpConfig.host,
+        port: smtpConfig.port,
+        user: smtpConfig.auth.user,
+        pass: '***'
+      });
+      
+      transporter = nodemailer.createTransport(smtpConfig);
+      await transporter.verify();
+      console.log('✅ Primary SMTP server is ready to send emails');
+      smtpAvailable = true;
+      return;
+    } catch (error) {
+      console.error('❌ Primary SMTP connection failed:', error.message);
+    }
+  } else {
+    console.log('⚠️  Primary SMTP credentials not configured, trying Mailtrap...');
+  }
+  
+  // Try Mailtrap as fallback
+  if (process.env.MAILTRAP_USER && process.env.MAILTRAP_PASS) {
     console.log('🔄 Switching to Mailtrap for email testing...');
     
     // Switch to Mailtrap
@@ -68,7 +86,7 @@ async function initializeSMTP() {
       host: mailtrapConfig.host,
       port: mailtrapConfig.port,
       user: mailtrapConfig.auth.user,
-      pass: mailtrapConfig.auth.pass ? '***' : 'not_set'
+      pass: '***'
     });
     
     try {
@@ -76,14 +94,17 @@ async function initializeSMTP() {
       console.log('✅ Mailtrap SMTP ready - emails will be captured for testing');
       console.log('📧 View emails at: https://mailtrap.io/inboxes');
       smtpAvailable = true;
+      return;
     } catch (mailtrapError) {
       console.error('❌ Mailtrap connection also failed:', mailtrapError.message);
-      console.log('⚠️  Email sending will not work until SMTP is configured');
-      console.log('📧 Emails will be stored in database only');
-      transporter = null;
-      smtpAvailable = false;
     }
   }
+  
+  // If we get here, no SMTP is working
+  console.log('⚠️  No SMTP configuration is working');
+  console.log('📧 Emails will be stored in database only');
+  transporter = null;
+  smtpAvailable = false;
 }
 
 // Initialize SMTP on startup
@@ -355,20 +376,31 @@ app.post('/api/emails/send', authenticateToken, async (req, res) => {
     };
 
     console.log('Sending email via SMTP...');
+    console.log('SMTP Status:', {
+      transporter_exists: !!transporter,
+      smtp_available: smtpAvailable,
+      using_mailtrap: usingMailtrap
+    });
     
     let info = null;
+    let smtpStatus = 'database_only';
+    
     if (transporter && smtpAvailable) {
       try {
+        console.log('Attempting to send via SMTP...');
         info = await transporter.sendMail(mailOptions);
-        console.log('Email sent successfully:', info.messageId);
+        console.log('✅ Email sent successfully via SMTP:', info.messageId);
+        smtpStatus = 'sent';
       } catch (smtpError) {
-        console.error('SMTP sending failed:', smtpError.message);
+        console.error('❌ SMTP sending failed:', smtpError.message);
         console.log('Continuing with database storage only...');
         info = { messageId: `local-${Date.now()}` };
+        smtpStatus = 'database_only';
       }
     } else {
       console.log('SMTP not available, storing in database only...');
       info = { messageId: `local-${Date.now()}` };
+      smtpStatus = 'database_only';
     }
 
     // Store email in database
@@ -378,7 +410,7 @@ app.post('/api/emails/send', authenticateToken, async (req, res) => {
     const sentEmailResult = await pool.query(
       `INSERT INTO sent_emails (organization_id, sender_id, recipient_email, subject, body, message_id, smtp_status)
        VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id`,
-      [sender.organization_id, sender.id, to, subject, body, info.messageId, smtpAvailable ? 'sent' : 'database_only']
+      [sender.organization_id, sender.id, to, subject, body, info.messageId, smtpStatus]
     );
     console.log('Sent email stored with ID:', sentEmailResult.rows[0].id);
     
@@ -393,10 +425,10 @@ app.post('/api/emails/send', authenticateToken, async (req, res) => {
     }
 
     res.json({
-      message: smtpAvailable ? 'Email sent successfully' : 'Email stored in database (SMTP not available)',
+      message: smtpStatus === 'sent' ? 'Email sent successfully' : 'Email stored in database (SMTP not available)',
       email_id: recipientId ? 'stored_in_db' : 'external_email',
       message_id: info.messageId,
-      smtp_status: smtpAvailable ? 'sent' : 'database_only'
+      smtp_status: smtpStatus
     });
   } catch (error) {
     console.error('Send email error details:', {
