@@ -46,6 +46,13 @@ let smtpAvailable = false;
 async function initializeSMTP() {
   try {
     console.log('🔍 Testing primary SMTP connection...');
+    console.log('Primary SMTP config:', {
+      host: smtpConfig.host,
+      port: smtpConfig.port,
+      user: smtpConfig.auth.user,
+      pass: smtpConfig.auth.pass ? '***' : 'not_set'
+    });
+    
     await transporter.verify();
     console.log('✅ Primary SMTP server is ready to send emails');
     smtpAvailable = true;
@@ -56,6 +63,13 @@ async function initializeSMTP() {
     // Switch to Mailtrap
     transporter = nodemailer.createTransport(mailtrapConfig);
     usingMailtrap = true;
+    
+    console.log('Mailtrap config:', {
+      host: mailtrapConfig.host,
+      port: mailtrapConfig.port,
+      user: mailtrapConfig.auth.user,
+      pass: mailtrapConfig.auth.pass ? '***' : 'not_set'
+    });
     
     try {
       await transporter.verify();
