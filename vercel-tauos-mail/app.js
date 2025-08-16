@@ -414,6 +414,8 @@ app.post('/api/emails/send', authenticateToken, async (req, res) => {
 // Get inbox emails
 app.get('/api/emails/inbox', authenticateToken, async (req, res) => {
   try {
+    console.log('Getting inbox for user ID:', req.user.userId);
+    
     const result = await pool.query(
       `SELECT e.id, e.subject, e.body, e.is_read, e.is_starred, e.created_at,
               u.username as sender_username, u.email as sender_email
@@ -423,6 +425,13 @@ app.get('/api/emails/inbox', authenticateToken, async (req, res) => {
        ORDER BY e.created_at DESC`,
       [req.user.userId]
     );
+
+    console.log('Inbox query result:', result.rows.length, 'emails found');
+    console.log('User ID being searched:', req.user.userId);
+    
+    // Debug: Check what emails exist in the database
+    const allEmails = await pool.query('SELECT id, sender_id, recipient_id, subject FROM emails LIMIT 5');
+    console.log('All emails in database:', allEmails.rows);
 
     res.json(result.rows);
 
@@ -435,6 +444,8 @@ app.get('/api/emails/inbox', authenticateToken, async (req, res) => {
 // Get sent emails
 app.get('/api/emails/sent', authenticateToken, async (req, res) => {
   try {
+    console.log('Getting sent emails for user ID:', req.user.userId);
+    
     const result = await pool.query(
       `SELECT id, subject, body, recipient_email, recipient_name, smtp_status, created_at
        FROM sent_emails 
@@ -442,6 +453,9 @@ app.get('/api/emails/sent', authenticateToken, async (req, res) => {
        ORDER BY created_at DESC`,
       [req.user.userId]
     );
+
+    console.log('Sent emails query result:', result.rows.length, 'emails found');
+    console.log('Sent emails data:', result.rows);
 
     res.json(result.rows);
 
