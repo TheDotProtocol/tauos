@@ -470,9 +470,37 @@ app.get('/api/emails/:id', authenticateToken, async (req, res) => {
       console.log('Emails table query result:', result.rows.length, 'rows');
     }
 
+    // If still not found, try a broader search in sent_emails (maybe ID type mismatch)
     if (result.rows.length === 0) {
-      console.log('Email not found in either table');
-      return res.status(404).json({ error: 'Email not found' });
+      console.log('Trying broader search in sent_emails...');
+      result = await pool.query(
+        `SELECT id, subject, body, recipient_email, recipient_name, smtp_status, created_at,
+                'sent' as email_type
+         FROM sent_emails 
+         WHERE id::text = $1 AND sender_id = $2`,
+        [req.params.id, req.user.userId]
+      );
+      console.log('Broader sent emails query result:', result.rows.length, 'rows');
+    }
+
+    if (result.rows.length === 0) {
+      console.log('Email not found in either table. Checking what emails exist for this user...');
+      
+      // Debug: Check what emails exist for this user
+      const userSentEmails = await pool.query(
+        'SELECT id, subject, created_at FROM sent_emails WHERE sender_id = $1 LIMIT 5',
+        [req.user.userId]
+      );
+      console.log('User sent emails:', userSentEmails.rows);
+      
+      return res.status(404).json({ 
+        error: 'Email not found',
+        debug_info: {
+          searched_id: req.params.id,
+          user_id: req.user.userId,
+          available_sent_emails: userSentEmails.rows
+        }
+      });
     }
 
     console.log('Email found:', result.rows[0]);
@@ -604,7 +632,37 @@ app.post('/api/password/reset-request', async (req, res) => {
   }
 });
 
-// Debug SMTP status
+// Public debug endpoint (no authentication required)
+app.get('/api/debug/public', async (req, res) => {
+  try {
+    // Check database connection
+    const dbTest = await pool.query('SELECT NOW()');
+    
+    // Check sent_emails table structure
+    const sentEmailsCheck = await pool.query(`
+      SELECT COUNT(*) as count FROM sent_emails
+    `);
+    
+    // Check emails table structure
+    const emailsCheck = await pool.query(`
+      SELECT COUNT(*) as count FROM emails
+    `);
+    
+    res.json({
+      database_connected: true,
+      sent_emails_count: sentEmailsCheck.rows[0].count,
+      emails_count: emailsCheck.rows[0].count,
+      timestamp: dbTest.rows[0].now
+    });
+  } catch (error) {
+    res.status(500).json({ 
+      error: 'Database check failed',
+      message: error.message 
+    });
+  }
+});
+
+// Debug SMTP status (requires authentication)
 app.get('/api/debug/smtp', authenticateToken, async (req, res) => {
   try {
     res.json({
