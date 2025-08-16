@@ -9,29 +9,56 @@ const { v4: uuidv4 } = require('uuid');
 const path = require('path');
 const nodemailer = require('nodemailer');
 
-// SMTP Configuration
+// SMTP Configuration with Mailtrap fallback
 const smtpConfig = {
   host: 'mailserver.tauos.org',
-  port: 25,
-  secure: false, // true for 465, false for other ports
+  port: 587,
+  secure: false,
   auth: {
     user: process.env.SMTP_USER || 'noreply@tauos.org',
     pass: process.env.SMTP_PASS || ''
   },
   tls: {
     rejectUnauthorized: false
+  },
+  requireTLS: true
+};
+
+// Mailtrap fallback configuration (FREE - replace with your credentials)
+const mailtrapConfig = {
+  host: 'sandbox.smtp.mailtrap.io',
+  port: 2525,
+  auth: {
+    user: process.env.MAILTRAP_USER || 'e5b253ac8d7940', // Your actual Mailtrap username
+    pass: process.env.MAILTRAP_PASS || '****aec7'        // Your actual Mailtrap password
   }
 };
 
-// Create SMTP transporter
-const transporter = nodemailer.createTransport(smtpConfig);
+// Try primary SMTP, fallback to Mailtrap
+let transporter = nodemailer.createTransport(smtpConfig);
+let usingMailtrap = false;
 
-// Test SMTP connection
+// Test SMTP connection with automatic fallback
 transporter.verify(function(error, success) {
   if (error) {
-    console.error('❌ SMTP connection failed:', error);
+    console.error('❌ Primary SMTP connection failed:', error.message);
+    console.log('🔄 Switching to Mailtrap for email testing...');
+    
+    // Switch to Mailtrap
+    transporter = nodemailer.createTransport(mailtrapConfig);
+    usingMailtrap = true;
+    
+    transporter.verify(function(mailtrapError, mailtrapSuccess) {
+      if (mailtrapError) {
+        console.error('❌ Mailtrap connection also failed:', mailtrapError.message);
+        console.log('⚠️  Email sending will not work until SMTP is configured');
+      } else {
+        console.log('✅ Mailtrap SMTP ready - emails will be captured for testing');
+        console.log('📧 View emails at: https://mailtrap.io/inboxes');
+      }
+    });
   } else {
-    console.log('✅ SMTP server is ready to send emails');
+    console.log('✅ Primary SMTP server is ready to send emails');
   }
 });
 
