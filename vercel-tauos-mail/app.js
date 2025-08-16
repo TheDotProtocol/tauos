@@ -288,13 +288,15 @@ app.post('/api/emails/send', authenticateToken, async (req, res) => {
   try {
     const { to, subject, body } = req.body;
     
+    console.log('Email send attempt:', { to, subject, body: body.substring(0, 50) + '...' });
+    
     if (!to || !subject || !body) {
       return res.status(400).json({ error: 'To, subject, and body are required' });
     }
 
-    // Get sender info
+    // Get sender info with organization_id
     const senderResult = await pool.query(
-      'SELECT id, username, email FROM users WHERE id = $1',
+      'SELECT id, username, email, organization_id FROM users WHERE id = $1',
       [req.user.userId]
     );
 
@@ -303,6 +305,7 @@ app.post('/api/emails/send', authenticateToken, async (req, res) => {
     }
 
     const sender = senderResult.rows[0];
+    console.log('Sender found:', { id: sender.id, email: sender.email, org_id: sender.organization_id });
 
     // Check if recipient is a registered user
     const recipientResult = await pool.query(
@@ -313,6 +316,9 @@ app.post('/api/emails/send', authenticateToken, async (req, res) => {
     let recipientId = null;
     if (recipientResult.rows.length > 0) {
       recipientId = recipientResult.rows[0].id;
+      console.log('Recipient found:', recipientId);
+    } else {
+      console.log('Recipient not found in database, will send external email');
     }
 
     // Send email via SMTP
@@ -324,15 +330,19 @@ app.post('/api/emails/send', authenticateToken, async (req, res) => {
       html: `<div>${body}</div>`
     };
 
+    console.log('Sending email via SMTP...');
     const info = await transporter.sendMail(mailOptions);
+    console.log('Email sent successfully:', info.messageId);
 
     // Store email in database (if recipient is registered)
     if (recipientId) {
+      console.log('Storing email in database...');
       const result = await pool.query(
-        `INSERT INTO emails (organization_id, sender_id, recipient_id, subject, body, message_id)
-         VALUES ($1, $2, $3, $4, $5, $6) RETURNING id`,
-        [sender.organization_id, sender.id, recipientId, subject, body, info.messageId]
+        `INSERT INTO emails (organization_id, sender_id, recipient_id, subject, body)
+         VALUES ($1, $2, $3, $4, $5) RETURNING id`,
+        [sender.organization_id, sender.id, recipientId, subject, body]
       );
+      console.log('Email stored in database with ID:', result.rows[0].id);
     }
 
     res.json({
@@ -341,8 +351,15 @@ app.post('/api/emails/send', authenticateToken, async (req, res) => {
       message_id: info.messageId
     });
   } catch (error) {
-    console.error('Send email error:', error);
-    res.status(500).json({ error: 'Failed to send email' });
+    console.error('Send email error details:', {
+      message: error.message,
+      stack: error.stack,
+      code: error.code
+    });
+    res.status(500).json({ 
+      error: 'Failed to send email',
+      details: process.env.NODE_ENV === 'development' ? error.message : 'Internal server error'
+    });
   }
 });
 
