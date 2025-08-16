@@ -42,8 +42,12 @@ let transporter = nodemailer.createTransport(smtpConfig);
 let usingMailtrap = false;
 
 // Test SMTP connection with automatic fallback
-transporter.verify(function(error, success) {
-  if (error) {
+async function initializeSMTP() {
+  try {
+    console.log('🔍 Testing primary SMTP connection...');
+    await transporter.verify();
+    console.log('✅ Primary SMTP server is ready to send emails');
+  } catch (error) {
     console.error('❌ Primary SMTP connection failed:', error.message);
     console.log('🔄 Switching to Mailtrap for email testing...');
     
@@ -51,19 +55,20 @@ transporter.verify(function(error, success) {
     transporter = nodemailer.createTransport(mailtrapConfig);
     usingMailtrap = true;
     
-    transporter.verify(function(mailtrapError, mailtrapSuccess) {
-      if (mailtrapError) {
-        console.error('❌ Mailtrap connection also failed:', mailtrapError.message);
-        console.log('⚠️  Email sending will not work until SMTP is configured');
-      } else {
-        console.log('✅ Mailtrap SMTP ready - emails will be captured for testing');
-        console.log('📧 View emails at: https://mailtrap.io/inboxes');
-      }
-    });
-  } else {
-    console.log('✅ Primary SMTP server is ready to send emails');
+    try {
+      await transporter.verify();
+      console.log('✅ Mailtrap SMTP ready - emails will be captured for testing');
+      console.log('📧 View emails at: https://mailtrap.io/inboxes');
+    } catch (mailtrapError) {
+      console.error('❌ Mailtrap connection also failed:', mailtrapError.message);
+      console.log('⚠️  Email sending will not work until SMTP is configured');
+      transporter = null;
+    }
   }
-});
+}
+
+// Initialize SMTP on startup
+initializeSMTP();
 
 // PostgreSQL connection with local fallback
 let pool;
@@ -331,6 +336,11 @@ app.post('/api/emails/send', authenticateToken, async (req, res) => {
     };
 
     console.log('Sending email via SMTP...');
+    
+    if (!transporter) {
+      throw new Error('SMTP transporter not available. Please check SMTP configuration.');
+    }
+    
     const info = await transporter.sendMail(mailOptions);
     console.log('Email sent successfully:', info.messageId);
 
@@ -338,9 +348,9 @@ app.post('/api/emails/send', authenticateToken, async (req, res) => {
     if (recipientId) {
       console.log('Storing email in database...');
       const result = await pool.query(
-        `INSERT INTO emails (organization_id, sender_id, recipient_id, subject, body)
-         VALUES ($1, $2, $3, $4, $5) RETURNING id`,
-        [sender.organization_id, sender.id, recipientId, subject, body]
+        `INSERT INTO emails (organization_id, sender_id, recipient_id, subject, body, message_id)
+         VALUES ($1, $2, $3, $4, $5, $6) RETURNING id`,
+        [sender.organization_id, sender.id, recipientId, subject, body, info.messageId]
       );
       console.log('Email stored in database with ID:', result.rows[0].id);
     }
