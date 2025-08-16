@@ -440,16 +440,29 @@ app.get('/api/emails/sent', authenticateToken, async (req, res) => {
 // Get single email
 app.get('/api/emails/:id', authenticateToken, async (req, res) => {
   try {
-    const result = await pool.query(
-      `SELECT e.*, 
-              sender.username as sender_username, sender.email as sender_email,
-              recipient.username as recipient_username, recipient.email as recipient_email
-       FROM emails e
-       JOIN users sender ON e.sender_id = sender.id
-       JOIN users recipient ON e.recipient_id = recipient.id
-       WHERE e.id = $1 AND (e.sender_id = $2 OR e.recipient_id = $2)`,
+    // First try to find in sent_emails table
+    let result = await pool.query(
+      `SELECT id, subject, body, recipient_email, recipient_name, smtp_status, created_at,
+              'sent' as email_type
+       FROM sent_emails 
+       WHERE id = $1 AND sender_id = $2`,
       [req.params.id, req.user.userId]
     );
+
+    // If not found in sent_emails, try emails table (inbox)
+    if (result.rows.length === 0) {
+      result = await pool.query(
+        `SELECT e.id, e.subject, e.body, e.is_read, e.is_starred, e.created_at,
+                sender.username as sender_username, sender.email as sender_email,
+                recipient.username as recipient_username, recipient.email as recipient_email,
+                'inbox' as email_type
+         FROM emails e
+         JOIN users sender ON e.sender_id = sender.id
+         JOIN users recipient ON e.recipient_id = recipient.id
+         WHERE e.id = $1 AND (e.sender_id = $2 OR e.recipient_id = $2)`,
+        [req.params.id, req.user.userId]
+      );
+    }
 
     if (result.rows.length === 0) {
       return res.status(404).json({ error: 'Email not found' });
