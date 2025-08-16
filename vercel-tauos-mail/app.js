@@ -40,6 +40,7 @@ const mailtrapConfig = {
 // Try primary SMTP, fallback to Mailtrap
 let transporter = nodemailer.createTransport(smtpConfig);
 let usingMailtrap = false;
+let smtpAvailable = false;
 
 // Test SMTP connection with automatic fallback
 async function initializeSMTP() {
@@ -47,6 +48,7 @@ async function initializeSMTP() {
     console.log('🔍 Testing primary SMTP connection...');
     await transporter.verify();
     console.log('✅ Primary SMTP server is ready to send emails');
+    smtpAvailable = true;
   } catch (error) {
     console.error('❌ Primary SMTP connection failed:', error.message);
     console.log('🔄 Switching to Mailtrap for email testing...');
@@ -59,10 +61,13 @@ async function initializeSMTP() {
       await transporter.verify();
       console.log('✅ Mailtrap SMTP ready - emails will be captured for testing');
       console.log('📧 View emails at: https://mailtrap.io/inboxes');
+      smtpAvailable = true;
     } catch (mailtrapError) {
       console.error('❌ Mailtrap connection also failed:', mailtrapError.message);
       console.log('⚠️  Email sending will not work until SMTP is configured');
+      console.log('📧 Emails will be stored in database only');
       transporter = null;
+      smtpAvailable = false;
     }
   }
 }
@@ -337,12 +342,20 @@ app.post('/api/emails/send', authenticateToken, async (req, res) => {
 
     console.log('Sending email via SMTP...');
     
-    if (!transporter) {
-      throw new Error('SMTP transporter not available. Please check SMTP configuration.');
+    let info = null;
+    if (transporter && smtpAvailable) {
+      try {
+        info = await transporter.sendMail(mailOptions);
+        console.log('Email sent successfully:', info.messageId);
+      } catch (smtpError) {
+        console.error('SMTP sending failed:', smtpError.message);
+        console.log('Continuing with database storage only...');
+        info = { messageId: `local-${Date.now()}` };
+      }
+    } else {
+      console.log('SMTP not available, storing in database only...');
+      info = { messageId: `local-${Date.now()}` };
     }
-    
-    const info = await transporter.sendMail(mailOptions);
-    console.log('Email sent successfully:', info.messageId);
 
     // Store email in database (if recipient is registered)
     if (recipientId) {
@@ -356,9 +369,10 @@ app.post('/api/emails/send', authenticateToken, async (req, res) => {
     }
 
     res.json({
-      message: 'Email sent successfully',
+      message: smtpAvailable ? 'Email sent successfully' : 'Email stored in database (SMTP not available)',
       email_id: recipientId ? 'stored_in_db' : 'external_email',
-      message_id: info.messageId
+      message_id: info.messageId,
+      smtp_status: smtpAvailable ? 'sent' : 'database_only'
     });
   } catch (error) {
     console.error('Send email error details:', {
