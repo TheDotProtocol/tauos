@@ -697,8 +697,13 @@
                 
                 const timeAgo = getTimeAgo(email.created_at);
                 
+                // Handle different email types (inbox vs sent)
+                const displayName = currentFolder === 'sent' 
+                    ? (email.recipient_name || email.recipient_email || 'Unknown Recipient')
+                    : (email.sender_username || email.recipient_username || 'Unknown Sender');
+                
                 emailItem.innerHTML = `
-                    <div class="email-sender">${email.sender_username || email.recipient_username}</div>
+                    <div class="email-sender">${displayName}</div>
                     <div class="email-subject">${email.subject}</div>
                     <div class="email-preview">${email.body.substring(0, 100)}${email.body.length > 100 ? '...' : ''}</div>
                     <div class="email-time">${timeAgo}</div>
@@ -740,15 +745,25 @@
             const emailDetail = document.getElementById('email-detail');
             const timeAgo = getTimeAgo(email.created_at);
             
+            // Handle different email types (inbox vs sent)
+            const displayName = currentFolder === 'sent' 
+                ? (email.recipient_name || email.recipient_email || 'Unknown Recipient')
+                : (email.sender_username || email.recipient_username || 'Unknown Sender');
+            
+            const displayEmail = currentFolder === 'sent'
+                ? email.recipient_email
+                : (email.sender_email || email.recipient_email);
+            
             emailDetail.innerHTML = `
                 <div class="email-header">
                     <div class="email-subject-large">${email.subject}</div>
                     <div class="email-meta">
                         <div class="email-sender-info">
-                            <div class="user-avatar">${(email.sender_username || email.recipient_username).charAt(0).toUpperCase()}</div>
+                            <div class="user-avatar">${displayName.charAt(0).toUpperCase()}</div>
                             <div>
-                                <div>${email.sender_username || email.recipient_username}</div>
-                                <div>${email.sender_email || email.recipient_email}</div>
+                                <div>${displayName}</div>
+                                <div>${displayEmail}</div>
+                                ${currentFolder === 'sent' && email.smtp_status ? `<div style="font-size: 12px; color: #FFD700;">Status: ${email.smtp_status}</div>` : ''}
                             </div>
                         </div>
                         <div>${timeAgo}</div>

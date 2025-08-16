@@ -357,15 +357,25 @@ app.post('/api/emails/send', authenticateToken, async (req, res) => {
       info = { messageId: `local-${Date.now()}` };
     }
 
-    // Store email in database (if recipient is registered)
+    // Store email in database
+    console.log('Storing sent email in database...');
+    
+    // Always store in sent_emails table
+    const sentEmailResult = await pool.query(
+      `INSERT INTO sent_emails (organization_id, sender_id, recipient_email, subject, body, message_id, smtp_status)
+       VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id`,
+      [sender.organization_id, sender.id, to, subject, body, info.messageId, smtpAvailable ? 'sent' : 'database_only']
+    );
+    console.log('Sent email stored with ID:', sentEmailResult.rows[0].id);
+    
+    // Also store in emails table if recipient is registered
     if (recipientId) {
-      console.log('Storing email in database...');
-      const result = await pool.query(
+      const emailResult = await pool.query(
         `INSERT INTO emails (organization_id, sender_id, recipient_id, subject, body, message_id)
          VALUES ($1, $2, $3, $4, $5, $6) RETURNING id`,
         [sender.organization_id, sender.id, recipientId, subject, body, info.messageId]
       );
-      console.log('Email stored in database with ID:', result.rows[0].id);
+      console.log('Email also stored in emails table with ID:', emailResult.rows[0].id);
     }
 
     res.json({
@@ -412,12 +422,10 @@ app.get('/api/emails/inbox', authenticateToken, async (req, res) => {
 app.get('/api/emails/sent', authenticateToken, async (req, res) => {
   try {
     const result = await pool.query(
-      `SELECT e.id, e.subject, e.body, e.created_at,
-              u.username as recipient_username, u.email as recipient_email
-       FROM emails e
-       JOIN users u ON e.recipient_id = u.id
-       WHERE e.sender_id = $1 AND e.is_deleted = false
-       ORDER BY e.created_at DESC`,
+      `SELECT id, subject, body, recipient_email, recipient_name, smtp_status, created_at
+       FROM sent_emails 
+       WHERE sender_id = $1 AND is_deleted = false
+       ORDER BY created_at DESC`,
       [req.user.userId]
     );
 
