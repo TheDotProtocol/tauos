@@ -13,7 +13,7 @@
     }
   ],
   "env": {
-    "DATABASE_URL": "postgresql://postgres:Ak1233%40%405@db.tviqcormikopltejomkc.supabase.co:6543/postgres",
+    "DATABASE_URL": "postgresql://postgres.tviqcormikopltejomkc:Ak1233%40%405@aws-0-ap-southeast-1.pooler.supabase.com:6543/postgres",
     "NODE_ENV": "production",
     "JWT_SECRET": "tauos-secret-key-change-in-production"
   }

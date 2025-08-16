@@ -131,12 +131,16 @@ app.post('/api/register', async (req, res) => {
   try {
     const { username, password, recovery_email } = req.body;
     
+    console.log('Registration attempt for username:', username);
+    
     if (!username || !password) {
       return res.status(400).json({ error: 'Username and password are required' });
     }
 
     const email = `${username}@tauos.org`;
     const passwordHash = await bcrypt.hash(password, 12);
+
+    console.log('Checking if user exists:', email);
 
     // Check if user already exists
     const existingUser = await pool.query(
@@ -148,17 +152,23 @@ app.post('/api/register', async (req, res) => {
       return res.status(409).json({ error: 'User already exists' });
     }
 
+    console.log('Looking for TauOS organization...');
+
     // Get TauOS organization
     const orgResult = await pool.query(
       'SELECT id FROM organizations WHERE domain = $1',
       ['tauos.org']
     );
 
+    console.log('Organization query result:', orgResult.rows);
+
     if (orgResult.rows.length === 0) {
-      return res.status(500).json({ error: 'Organization not found' });
+      console.error('Organization not found in database');
+      return res.status(500).json({ error: 'Organization not found. Please contact support.' });
     }
 
     const organizationId = orgResult.rows[0].id;
+    console.log('Found organization ID:', organizationId);
 
     // Create user
     const result = await pool.query(
@@ -166,6 +176,8 @@ app.post('/api/register', async (req, res) => {
        VALUES ($1, $2, $3, $4, $5) RETURNING id, username, email`,
       [organizationId, username, email, passwordHash, recovery_email]
     );
+
+    console.log('User created successfully:', result.rows[0]);
 
     const token = generateToken(result.rows[0].id, result.rows[0].username);
 
@@ -179,8 +191,24 @@ app.post('/api/register', async (req, res) => {
       }
     });
   } catch (error) {
-    console.error('Registration error:', error);
-    res.status(500).json({ error: 'Registration failed' });
+    console.error('Registration error details:', {
+      message: error.message,
+      stack: error.stack,
+      code: error.code,
+      detail: error.detail
+    });
+    
+    // Provide more specific error messages
+    if (error.code === '23505') { // Unique violation
+      res.status(409).json({ error: 'Username already exists' });
+    } else if (error.code === '23503') { // Foreign key violation
+      res.status(500).json({ error: 'Database configuration error. Please contact support.' });
+    } else {
+      res.status(500).json({ 
+        error: 'Registration failed',
+        details: process.env.NODE_ENV === 'development' ? error.message : 'Internal server error'
+      });
+    }
   }
 });
 
