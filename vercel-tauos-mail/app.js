@@ -440,6 +440,8 @@ app.get('/api/emails/sent', authenticateToken, async (req, res) => {
 // Get single email
 app.get('/api/emails/:id', authenticateToken, async (req, res) => {
   try {
+    console.log('Getting email details for ID:', req.params.id, 'User ID:', req.user.userId);
+    
     // First try to find in sent_emails table
     let result = await pool.query(
       `SELECT id, subject, body, recipient_email, recipient_name, smtp_status, created_at,
@@ -449,8 +451,11 @@ app.get('/api/emails/:id', authenticateToken, async (req, res) => {
       [req.params.id, req.user.userId]
     );
 
+    console.log('Sent emails query result:', result.rows.length, 'rows');
+
     // If not found in sent_emails, try emails table (inbox)
     if (result.rows.length === 0) {
+      console.log('Not found in sent_emails, checking emails table...');
       result = await pool.query(
         `SELECT e.id, e.subject, e.body, e.is_read, e.is_starred, e.created_at,
                 sender.username as sender_username, sender.email as sender_email,
@@ -462,12 +467,15 @@ app.get('/api/emails/:id', authenticateToken, async (req, res) => {
          WHERE e.id = $1 AND (e.sender_id = $2 OR e.recipient_id = $2)`,
         [req.params.id, req.user.userId]
       );
+      console.log('Emails table query result:', result.rows.length, 'rows');
     }
 
     if (result.rows.length === 0) {
+      console.log('Email not found in either table');
       return res.status(404).json({ error: 'Email not found' });
     }
 
+    console.log('Email found:', result.rows[0]);
     res.json(result.rows[0]);
 
   } catch (error) {
@@ -593,6 +601,31 @@ app.post('/api/password/reset-request', async (req, res) => {
   } catch (error) {
     console.error('Password reset error:', error);
     res.status(500).json({ error: 'Failed to send reset email' });
+  }
+});
+
+// Debug SMTP status
+app.get('/api/debug/smtp', authenticateToken, async (req, res) => {
+  try {
+    res.json({
+      smtp_available: smtpAvailable,
+      using_mailtrap: usingMailtrap,
+      transporter_exists: !!transporter,
+      mailtrap_config: {
+        host: mailtrapConfig.host,
+        port: mailtrapConfig.port,
+        user: mailtrapConfig.auth.user,
+        pass: mailtrapConfig.auth.pass ? '***' : 'not_set'
+      },
+      primary_smtp_config: {
+        host: smtpConfig.host,
+        port: smtpConfig.port,
+        user: smtpConfig.auth.user,
+        pass: smtpConfig.auth.pass ? '***' : 'not_set'
+      }
+    });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to get SMTP debug info' });
   }
 });
 
