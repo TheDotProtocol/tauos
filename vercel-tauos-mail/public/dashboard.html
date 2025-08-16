@@ -725,17 +725,19 @@
         // Select email
         async function selectEmail(emailId) {
             try {
+                console.log('Selecting email with ID:', emailId, 'Current folder:', currentFolder);
                 const email = await apiCall(`/emails/${emailId}`);
                 selectedEmail = email;
                 renderEmailDetail(email);
                 
-                // Mark as read if not already
-                if (!email.is_read) {
+                // Mark as read if not already (only for inbox emails)
+                if (currentFolder !== 'sent' && !email.is_read) {
                     await apiCall(`/emails/${emailId}/read`, { method: 'PUT' });
                     loadEmails(currentFolder);
                 }
             } catch (error) {
                 console.error('Failed to load email:', error);
+                console.error('Email ID that failed:', emailId);
                 showError('Failed to load email');
             }
         }

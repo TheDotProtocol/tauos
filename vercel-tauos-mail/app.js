@@ -648,11 +648,23 @@ app.get('/api/debug/public', async (req, res) => {
       SELECT COUNT(*) as count FROM emails
     `);
     
+    // Get sample sent emails to see the ID structure
+    const sampleSentEmails = await pool.query(`
+      SELECT id, subject, recipient_email, created_at FROM sent_emails ORDER BY created_at DESC LIMIT 3
+    `);
+    
+    // Get sample emails to see the ID structure
+    const sampleEmails = await pool.query(`
+      SELECT id, subject, created_at FROM emails ORDER BY created_at DESC LIMIT 3
+    `);
+    
     res.json({
       database_connected: true,
       sent_emails_count: sentEmailsCheck.rows[0].count,
       emails_count: emailsCheck.rows[0].count,
-      timestamp: dbTest.rows[0].now
+      timestamp: dbTest.rows[0].now,
+      sample_sent_emails: sampleSentEmails.rows,
+      sample_emails: sampleEmails.rows
     });
   } catch (error) {
     res.status(500).json({ 
