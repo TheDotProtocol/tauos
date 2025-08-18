@@ -4,8 +4,8 @@
 -- Create sent_emails table to track all sent emails
 CREATE TABLE IF NOT EXISTS sent_emails (
     id SERIAL PRIMARY KEY,
-    organization_id INTEGER NOT NULL REFERENCES organizations(id),
-    sender_id INTEGER NOT NULL REFERENCES users(id),
+    organization_id UUID NOT NULL REFERENCES organizations(id),
+    sender_id UUID NOT NULL REFERENCES users(id),
     recipient_email VARCHAR(255) NOT NULL,
     recipient_name VARCHAR(255),
     subject VARCHAR(500) NOT NULL,
