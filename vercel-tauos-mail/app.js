@@ -14,11 +14,11 @@ const JWT_SECRET = process.env.JWT_SECRET || 'tauos-secret-key-change-in-product
 
 // SMTP Configuration - TauOS Sovereign Email Infrastructure
 const smtpConfig = {
-  host: process.env.SMTP_HOST || 'mailserver.tauos.org',
+  host: process.env.SMTP_HOST || '34.30.189.200',
   port: parseInt(process.env.SMTP_PORT) || 587,
   secure: false,
   auth: {
-    user: process.env.SMTP_USER || 'noreply@tauos.org',
+    user: process.env.SMTP_USER || 'noreply',
     pass: process.env.SMTP_PASS || ''
   },
   tls: {
