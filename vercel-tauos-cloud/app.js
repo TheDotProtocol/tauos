@@ -11,11 +11,11 @@ const nodemailer = require('nodemailer');
 
 // SMTP Configuration with Mailtrap fallback
 const smtpConfig = {
-  host: 'mailserver.tauos.org',
-  port: 587,
+  host: process.env.SMTP_HOST || '34.30.189.200',
+  port: parseInt(process.env.SMTP_PORT) || 587,
   secure: false,
   auth: {
-    user: process.env.SMTP_USER || 'noreply@tauos.org',
+    user: process.env.SMTP_USER || 'noreply',
     pass: process.env.SMTP_PASS || ''
   },
   tls: {

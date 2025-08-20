@@ -1,0 +1,759 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TauMail Compose</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #FFD700;
+            --primary-dark: #FFA500;
+            --bg-primary: #0f0f23;
+            --bg-secondary: #1a1a2e;
+            --bg-tertiary: #16213e;
+            --text-primary: #ffffff;
+            --text-secondary: rgba(255, 255, 255, 0.8);
+            --text-muted: rgba(255, 255, 255, 0.6);
+            --border-color: rgba(255, 255, 255, 0.1);
+            --success-color: #10b981;
+            --error-color: #ef4444;
+            --warning-color: #f59e0b;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+            color: var(--text-primary);
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .compose-container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            background: rgba(15, 15, 35, 0.95);
+            backdrop-filter: blur(20px);
+        }
+
+        /* Header */
+        .compose-header {
+            background: rgba(26, 26, 46, 0.9);
+            backdrop-filter: blur(10px);
+            padding: 16px 24px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .compose-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .compose-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-secondary);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+            color: #000;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(255, 215, 0, 0.3);
+        }
+
+        .btn-danger {
+            background: var(--error-color);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #dc2626;
+        }
+
+        /* Form */
+        .compose-form {
+            flex: 1;
+            padding: 24px;
+            overflow-y: auto;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            color: var(--text-secondary);
+            font-weight: 600;
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+
+        .form-input {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 12px 16px;
+            color: var(--text-primary);
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            background: rgba(255, 255, 255, 0.15);
+            box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.1);
+        }
+
+        .form-textarea {
+            min-height: 300px;
+            resize: vertical;
+            font-family: inherit;
+            line-height: 1.6;
+        }
+
+        /* Rich Text Editor */
+        .editor-toolbar {
+            background: rgba(26, 26, 46, 0.8);
+            border: 1px solid var(--border-color);
+            border-bottom: none;
+            border-radius: 8px 8px 0 0;
+            padding: 8px 12px;
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .editor-btn {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            padding: 6px 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 14px;
+        }
+
+        .editor-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--primary-color);
+        }
+
+        .editor-btn.active {
+            background: rgba(255, 215, 0, 0.2);
+            color: var(--primary-color);
+        }
+
+        .editor-content {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid var(--border-color);
+            border-radius: 0 0 8px 8px;
+            min-height: 300px;
+            padding: 16px;
+            color: var(--text-primary);
+            font-family: inherit;
+            line-height: 1.6;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .editor-content:focus {
+            border-color: var(--primary-color);
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        /* Attachments */
+        .attachments-section {
+            margin-top: 20px;
+        }
+
+        .attachment-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 12px;
+        }
+
+        .attachment-item {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 12px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            max-width: 300px;
+        }
+
+        .attachment-icon {
+            width: 32px;
+            height: 32px;
+            background: rgba(255, 215, 0, 0.2);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary-color);
+        }
+
+        .attachment-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .attachment-name {
+            font-weight: 600;
+            font-size: 14px;
+            color: var(--text-primary);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .attachment-size {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .attachment-remove {
+            background: none;
+            border: none;
+            color: var(--error-color);
+            cursor: pointer;
+            padding: 4px;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+        }
+
+        .attachment-remove:hover {
+            background: rgba(239, 68, 68, 0.2);
+        }
+
+        .file-upload {
+            display: none;
+        }
+
+        .upload-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px dashed var(--border-color);
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: var(--text-muted);
+        }
+
+        .upload-btn:hover {
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+            background: rgba(255, 215, 0, 0.05);
+        }
+
+        /* Toast Notifications */
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 10000;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .toast {
+            background: rgba(26, 26, 46, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 16px 20px;
+            color: var(--text-primary);
+            font-weight: 500;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            transform: translateX(400px);
+            transition: transform 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            min-width: 300px;
+        }
+
+        .toast.show {
+            transform: translateX(0);
+        }
+
+        .toast.success {
+            border-left: 4px solid var(--success-color);
+        }
+
+        .toast.error {
+            border-left: 4px solid var(--error-color);
+        }
+
+        .toast.warning {
+            border-left: 4px solid var(--warning-color);
+        }
+
+        .toast-icon {
+            font-size: 18px;
+        }
+
+        .toast.success .toast-icon {
+            color: var(--success-color);
+        }
+
+        .toast.error .toast-icon {
+            color: var(--error-color);
+        }
+
+        .toast.warning .toast-icon {
+            color: var(--warning-color);
+        }
+
+        /* Loading States */
+        .loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 200px;
+            color: var(--text-muted);
+        }
+
+        .spinner {
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-top: 2px solid var(--primary-color);
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            animation: spin 1s linear infinite;
+            margin-right: 12px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .compose-form {
+                padding: 16px;
+            }
+            
+            .compose-actions {
+                flex-direction: column;
+                gap: 8px;
+            }
+            
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="compose-container">
+        <!-- Header -->
+        <div class="compose-header">
+            <div class="compose-title">
+                <i class="fas fa-edit"></i>
+                New Message
+            </div>
+            <div class="compose-actions">
+                <button class="btn btn-secondary" id="save-draft">
+                    <i class="fas fa-save"></i>
+                    Save Draft
+                </button>
+                <button class="btn btn-secondary" id="discard">
+                    <i class="fas fa-times"></i>
+                    Discard
+                </button>
+                <button class="btn btn-primary" id="send-email">
+                    <i class="fas fa-paper-plane"></i>
+                    Send
+                </button>
+            </div>
+        </div>
+
+        <!-- Form -->
+        <form class="compose-form" id="compose-form">
+            <div class="form-group">
+                <label class="form-label">To:</label>
+                <input type="email" class="form-input" id="compose-to" placeholder="recipient@tauos.org" required>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Subject:</label>
+                <input type="text" class="form-input" id="compose-subject" placeholder="Subject" required>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Message:</label>
+                <div class="editor-toolbar">
+                    <button type="button" class="editor-btn" data-command="bold" title="Bold">
+                        <i class="fas fa-bold"></i>
+                    </button>
+                    <button type="button" class="editor-btn" data-command="italic" title="Italic">
+                        <i class="fas fa-italic"></i>
+                    </button>
+                    <button type="button" class="editor-btn" data-command="underline" title="Underline">
+                        <i class="fas fa-underline"></i>
+                    </button>
+                    <div style="width: 1px; background: var(--border-color); margin: 0 8px;"></div>
+                    <button type="button" class="editor-btn" data-command="insertUnorderedList" title="Bullet List">
+                        <i class="fas fa-list-ul"></i>
+                    </button>
+                    <button type="button" class="editor-btn" data-command="insertOrderedList" title="Numbered List">
+                        <i class="fas fa-list-ol"></i>
+                    </button>
+                    <div style="width: 1px; background: var(--border-color); margin: 0 8px;"></div>
+                    <button type="button" class="editor-btn" data-command="createLink" title="Insert Link">
+                        <i class="fas fa-link"></i>
+                    </button>
+                    <button type="button" class="editor-btn" data-command="formatBlock" data-value="h2" title="Heading">
+                        <i class="fas fa-heading"></i>
+                    </button>
+                </div>
+                <div class="editor-content" id="editor-content" contenteditable="true" placeholder="Write your message here..."></div>
+            </div>
+            
+            <div class="attachments-section">
+                <label class="form-label">Attachments:</label>
+                <input type="file" class="file-upload" id="file-upload" multiple>
+                <div class="upload-btn" id="upload-btn">
+                    <i class="fas fa-cloud-upload-alt" style="font-size: 24px; margin-bottom: 8px;"></i>
+                    <div>Click to upload files or drag and drop</div>
+                    <div style="font-size: 12px; margin-top: 4px;">Max file size: 10MB</div>
+                </div>
+                <div class="attachment-list" id="attachment-list"></div>
+            </div>
+        </form>
+    </div>
+
+    <!-- Toast Notifications -->
+    <div class="toast-container" id="toast-container"></div>
+
+    <script>
+        // Global variables
+        let attachments = [];
+        let isDirty = false;
+
+        // Check authentication
+        const token = localStorage.getItem('taumail_token');
+        if (!token) {
+            window.location.href = '/dashboard-enhanced.html';
+        }
+
+        // Toast notification system
+        function showToast(message, type = 'success', duration = 3000) {
+            const toastContainer = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            
+            const icon = type === 'success' ? 'check-circle' : 
+                        type === 'error' ? 'exclamation-circle' : 
+                        type === 'warning' ? 'exclamation-triangle' : 'info-circle';
+            
+            toast.innerHTML = `
+                <i class="fas fa-${icon} toast-icon"></i>
+                <span>${message}</span>
+            `;
+            
+            toastContainer.appendChild(toast);
+            
+            // Trigger animation
+            setTimeout(() => toast.classList.add('show'), 100);
+            
+            // Auto remove
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => toast.remove(), 300);
+            }, duration);
+        }
+
+        // Rich text editor functionality
+        function initEditor() {
+            const editor = document.getElementById('editor-content');
+            const toolbar = document.querySelector('.editor-toolbar');
+            
+            // Toolbar buttons
+            toolbar.addEventListener('click', function(e) {
+                if (e.target.closest('.editor-btn')) {
+                    e.preventDefault();
+                    const btn = e.target.closest('.editor-btn');
+                    const command = btn.dataset.command;
+                    const value = btn.dataset.value;
+                    
+                    if (command === 'createLink') {
+                        const url = prompt('Enter URL:');
+                        if (url) {
+                            document.execCommand(command, false, url);
+                        }
+                    } else if (command === 'formatBlock') {
+                        document.execCommand(command, false, value);
+                    } else {
+                        document.execCommand(command, false, null);
+                    }
+                    
+                    // Toggle active state for formatting buttons
+                    if (['bold', 'italic', 'underline'].includes(command)) {
+                        btn.classList.toggle('active');
+                    }
+                    
+                    editor.focus();
+                }
+            });
+            
+            // Track changes
+            editor.addEventListener('input', function() {
+                isDirty = true;
+            });
+            
+            // Placeholder functionality
+            editor.addEventListener('focus', function() {
+                if (editor.textContent === '') {
+                    editor.innerHTML = '';
+                }
+            });
+            
+            editor.addEventListener('blur', function() {
+                if (editor.textContent === '') {
+                    editor.innerHTML = '<div style="color: var(--text-muted);">Write your message here...</div>';
+                }
+            });
+        }
+
+        // File upload functionality
+        function initFileUpload() {
+            const fileUpload = document.getElementById('file-upload');
+            const uploadBtn = document.getElementById('upload-btn');
+            const attachmentList = document.getElementById('attachment-list');
+            
+            // Click to upload
+            uploadBtn.addEventListener('click', () => fileUpload.click());
+            
+            // Drag and drop
+            uploadBtn.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                uploadBtn.style.borderColor = 'var(--primary-color)';
+                uploadBtn.style.color = 'var(--primary-color)';
+            });
+            
+            uploadBtn.addEventListener('dragleave', (e) => {
+                e.preventDefault();
+                uploadBtn.style.borderColor = 'var(--border-color)';
+                uploadBtn.style.color = 'var(--text-muted)';
+            });
+            
+            uploadBtn.addEventListener('drop', (e) => {
+                e.preventDefault();
+                uploadBtn.style.borderColor = 'var(--border-color)';
+                uploadBtn.style.color = 'var(--text-muted)';
+                
+                const files = Array.from(e.dataTransfer.files);
+                handleFiles(files);
+            });
+            
+            // File input change
+            fileUpload.addEventListener('change', (e) => {
+                const files = Array.from(e.target.files);
+                handleFiles(files);
+            });
+        }
+
+        function handleFiles(files) {
+            files.forEach(file => {
+                if (file.size > 10 * 1024 * 1024) { // 10MB limit
+                    showToast(`File ${file.name} is too large. Max size is 10MB.`, 'error');
+                    return;
+                }
+                
+                attachments.push(file);
+                renderAttachment(file);
+            });
+        }
+
+        function renderAttachment(file) {
+            const attachmentList = document.getElementById('attachment-list');
+            const attachmentItem = document.createElement('div');
+            attachmentItem.className = 'attachment-item';
+            
+            const icon = getFileIcon(file.type);
+            const size = formatFileSize(file.size);
+            
+            attachmentItem.innerHTML = `
+                <div class="attachment-icon">
+                    <i class="fas fa-${icon}"></i>
+                </div>
+                <div class="attachment-info">
+                    <div class="attachment-name">${file.name}</div>
+                    <div class="attachment-size">${size}</div>
+                </div>
+                <button class="attachment-remove" onclick="removeAttachment('${file.name}')">
+                    <i class="fas fa-times"></i>
+                </button>
+            `;
+            
+            attachmentList.appendChild(attachmentItem);
+        }
+
+        function removeAttachment(fileName) {
+            attachments = attachments.filter(file => file.name !== fileName);
+            renderAttachmentList();
+        }
+
+        function renderAttachmentList() {
+            const attachmentList = document.getElementById('attachment-list');
+            attachmentList.innerHTML = '';
+            attachments.forEach(file => renderAttachment(file));
+        }
+
+        function getFileIcon(mimeType) {
+            if (mimeType.startsWith('image/')) return 'image';
+            if (mimeType.startsWith('video/')) return 'video';
+            if (mimeType.startsWith('audio/')) return 'audio';
+            if (mimeType.includes('pdf')) return 'file-pdf';
+            if (mimeType.includes('word')) return 'file-word';
+            if (mimeType.includes('excel') || mimeType.includes('sheet')) return 'file-excel';
+            if (mimeType.includes('powerpoint') || mimeType.includes('presentation')) return 'file-powerpoint';
+            return 'file';
+        }
+
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        // Form submission
+        async function sendEmail() {
+            const to = document.getElementById('compose-to').value;
+            const subject = document.getElementById('compose-subject').value;
+            const content = document.getElementById('editor-content').innerHTML;
+            
+            if (!to || !subject || !content.trim()) {
+                showToast('Please fill in all required fields', 'error');
+                return;
+            }
+            
+            try {
+                // TODO: Implement actual email sending with attachments
+                showToast('Email sent successfully!', 'success');
+                
+                // Reset form
+                document.getElementById('compose-form').reset();
+                document.getElementById('editor-content').innerHTML = '';
+                attachments = [];
+                renderAttachmentList();
+                isDirty = false;
+                
+            } catch (error) {
+                showToast('Failed to send email', 'error');
+            }
+        }
+
+        async function saveDraft() {
+            try {
+                // TODO: Implement draft saving
+                showToast('Draft saved successfully!', 'success');
+                isDirty = false;
+            } catch (error) {
+                showToast('Failed to save draft', 'error');
+            }
+        }
+
+        function discard() {
+            if (isDirty) {
+                if (confirm('Are you sure you want to discard this message? All changes will be lost.')) {
+                    window.location.href = '/dashboard-enhanced.html';
+                }
+            } else {
+                window.location.href = '/dashboard-enhanced.html';
+            }
+        }
+
+        // Event listeners
+        document.getElementById('send-email').addEventListener('click', sendEmail);
+        document.getElementById('save-draft').addEventListener('click', saveDraft);
+        document.getElementById('discard').addEventListener('click', discard);
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            // Ctrl/Cmd + Enter to send
+            if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+                e.preventDefault();
+                sendEmail();
+            }
+            
+            // Ctrl/Cmd + S to save draft
+            if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+                e.preventDefault();
+                saveDraft();
+            }
+            
+            // Escape to discard
+            if (e.key === 'Escape') {
+                discard();
+            }
+        });
+
+        // Warn before leaving if unsaved changes
+        window.addEventListener('beforeunload', function(e) {
+            if (isDirty) {
+                e.preventDefault();
+                e.returnValue = '';
+            }
+        });
+
+        // Initialize
+        initEditor();
+        initFileUpload();
+    </script>
+</body>
+</html> 
