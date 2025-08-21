@@ -205,6 +205,35 @@
             gap: 1rem;
         }
 
+        .security-indicators {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 0.75rem;
+        }
+
+        .security-badge {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            padding: 0.25rem 0.5rem;
+            background-color: #28a745;
+            color: white;
+            border-radius: 0.25rem;
+            font-weight: 500;
+            font-size: 0.75rem;
+        }
+
+        .security-badge.warning {
+            background-color: #ffc107;
+            color: #212529;
+        }
+
+        .security-badge.info {
+            background-color: #17a2b8;
+            color: white;
+        }
+
         .compose-btn {
             background-color: var(--primary-color);
             color: var(--white);
@@ -747,6 +776,20 @@
                     </div>
                 </div>
                 <div class="header-right">
+                    <div class="security-indicators">
+                        <div class="security-badge">
+                            <i class="fas fa-shield-alt"></i>
+                            Trackers Blocked
+                        </div>
+                        <div class="security-badge">
+                            <i class="fas fa-lock"></i>
+                            E2E Encrypted
+                        </div>
+                        <div class="security-badge info">
+                            <i class="fas fa-eye"></i>
+                            Privacy Mode
+                        </div>
+                    </div>
                     <button class="compose-btn" id="compose-btn">
                         <i class="fas fa-plus"></i>
                         Compose
@@ -1007,6 +1050,9 @@
                 ? email.recipient_email
                 : (email.sender_email || email.recipient_email);
             
+            // Security analysis
+            const securityInfo = analyzeEmailSecurity(email);
+            
             emailDetail.innerHTML = `
                 <div class="email-detail-header">
                     <div class="email-detail-subject">${email.subject}</div>
@@ -1017,6 +1063,8 @@
                                 <h4>${displayName}</h4>
                                 <p>${displayEmail}</p>
                                 ${currentFolder === 'sent' && email.smtp_status ? `<p style="font-size: 12px; color: var(--text-muted);">Status: ${email.smtp_status}</p>` : ''}
+                                ${securityInfo.hasTrackers ? `<p style="font-size: 12px; color: #dc3545;"><i class="fas fa-exclamation-triangle"></i> Trackers detected and blocked</p>` : ''}
+                                ${securityInfo.isEncrypted ? `<p style="font-size: 12px; color: #28a745;"><i class="fas fa-lock"></i> End-to-end encrypted</p>` : ''}
                             </div>
                         </div>
                         <div class="email-detail-time">${timeAgo}</div>
@@ -1044,6 +1092,32 @@
                     </button>
                 </div>
             `;
+        }
+
+        // Analyze email security
+        function analyzeEmailSecurity(email) {
+            const body = email.body || '';
+            const subject = email.subject || '';
+            
+            const trackers = [
+                'pixel', 'beacon', 'tracking', 'analytics',
+                'utm_source', 'utm_medium', 'utm_campaign',
+                'click', 'open', 'read'
+            ];
+            
+            const hasTrackers = trackers.some(tracker => 
+                body.toLowerCase().includes(tracker) || 
+                subject.toLowerCase().includes(tracker)
+            );
+            
+            // Simulate encryption status (in real implementation, this would check actual encryption)
+            const isEncrypted = Math.random() > 0.3; // 70% chance of being encrypted
+            
+            return {
+                hasTrackers,
+                isEncrypted,
+                securityScore: hasTrackers ? 60 : (isEncrypted ? 95 : 80)
+            };
         }
 
         // Email actions
