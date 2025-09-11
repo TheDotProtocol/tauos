@@ -11,6 +11,7 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const { Pool } = require('pg');
 const nodemailer = require('nodemailer');
+const sgMail = require('@sendgrid/mail');
 const rateLimit = require('express-rate-limit');
 const { body, validationResult } = require('express-validator');
 const multer = require('multer');
@@ -39,6 +40,14 @@ const pool = new Pool({
         rejectUnauthorized: false
     }
 });
+
+// Initialize SendGrid
+if (process.env.SENDGRID_API_KEY) {
+    sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+    logger.info('SendGrid initialized successfully');
+} else {
+    logger.warn('SendGrid API key not found, using SMTP fallback');
+}
 
 // Test database connection
 pool.on('connect', () => {
@@ -225,33 +234,55 @@ app.post('/api/auth/send-test-email', async (req, res) => {
     try {
         const { to, subject, text } = req.body;
 
-        // Create transporter
-        const transporter = nodemailer.createTransport({
-            host: process.env.SMTP_HOST,
-            port: parseInt(process.env.SMTP_PORT),
-            secure: process.env.SMTP_SECURE === 'true',
-            auth: {
-                user: process.env.SMTP_USER,
-                pass: process.env.SMTP_PASS
-            },
-            tls: {
-                rejectUnauthorized: false // Allow self-signed certificates
-            }
-        });
+        // Use SendGrid if available, otherwise fallback to SMTP
+        if (process.env.SENDGRID_API_KEY) {
+            const msg = {
+                to: to,
+                from: {
+                    email: process.env.SENDGRID_FROM_EMAIL || 'noreply@tauos.org',
+                    name: process.env.SENDGRID_FROM_NAME || 'TauOS Mail'
+                },
+                subject: subject,
+                text: text,
+                html: `<p>${text}</p><br><p>Sent from TauOS Mail - Privacy-First Email</p>`
+            };
 
-        // Send email
-        const info = await transporter.sendMail({
-            from: `TauOS Test <${process.env.SMTP_USER}>`,
-            to: to,
-            subject: subject,
-            text: text
-        });
+            const response = await sgMail.send(msg);
+            logger.info(`Test email sent via SendGrid: ${response[0].headers['x-message-id']}`);
+            res.json({
+                message: 'Test email sent successfully via SendGrid!',
+                messageId: response[0].headers['x-message-id'],
+                provider: 'SendGrid'
+            });
+        } else {
+            // Fallback to SMTP
+            const transporter = nodemailer.createTransport({
+                host: process.env.SMTP_HOST,
+                port: parseInt(process.env.SMTP_PORT),
+                secure: process.env.SMTP_SECURE === 'true',
+                auth: {
+                    user: process.env.SMTP_USER,
+                    pass: process.env.SMTP_PASS
+                },
+                tls: {
+                    rejectUnauthorized: false // Allow self-signed certificates
+                }
+            });
 
-        logger.info(`Test email sent: ${info.messageId}`);
-        res.json({
-            message: 'Test email sent successfully',
-            messageId: info.messageId
-        });
+            const info = await transporter.sendMail({
+                from: `TauOS Test <${process.env.SMTP_USER}>`,
+                to: to,
+                subject: subject,
+                text: text
+            });
+
+            logger.info(`Test email sent via SMTP: ${info.messageId}`);
+            res.json({
+                message: 'Test email sent successfully via SMTP!',
+                messageId: info.messageId,
+                provider: 'SMTP'
+            });
+        }
 
     } catch (error) {
         logger.error('Test email error:', error);
