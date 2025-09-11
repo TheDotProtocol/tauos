@@ -6,7 +6,7 @@ import {
   Grid, List, Heart, Eye, CheckCircle, AlertCircle, 
   BarChart3, Settings, Plus, Edit3, Trash2, Users, 
   Smartphone, Monitor, Tablet, Zap, Key, Database, ArrowRight, ArrowLeft,
-  Globe, Lock, Award, Code, Building, Target, Mail
+  Globe, Lock, Award, Code, Building, Target, Mail, Upload
 } from 'lucide-react';
 
 export default function TauStorePage() {

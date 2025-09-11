@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 import {
   Shield, AlertTriangle, Users, Globe, Mail, Phone, MapPin,
   ArrowRight, ExternalLink, CheckCircle, Star, Zap, Code, Building,
-  Target, Award, Heart, Scale, Monitor, Smartphone, FileText, Database, Lock
+  Target, Award, Heart, Scale, Monitor, Smartphone, FileText, Database, Lock, Eye
 } from 'lucide-react';
 
 export default function AcceptableUsePolicyPage() {
