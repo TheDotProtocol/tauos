@@ -43,9 +43,7 @@ export default function CareersPage() {
               className="flex items-center space-x-4"
             >
               <a href="/" className="flex items-center space-x-3">
-                <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-blue-500 rounded-xl flex items-center justify-center shadow-lg">
-                  <span className="text-white font-bold text-xl">τ</span>
-                </div>
+                <img src="/brand/tauos-logo.svg" alt="TauOS" className="w-10 h-10" />
                 <span className="text-2xl font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
                   TauOS
                 </span>
@@ -62,8 +60,8 @@ export default function CareersPage() {
                 { href: '/governance', label: 'Governance' },
                 { href: '/careers', label: 'Careers', active: true },
                 { href: '/legal', label: 'Legal' },
-                { href: 'https://mail.tauos.org', label: 'TauMail', external: true },
-                { href: 'https://cloud.tauos.org', label: 'TauCloud', external: true }
+                { href: '/taumail', label: 'TauMail' },
+                { href: '/taucloud', label: 'TauCloud' }
               ].map((item) => (
                 <a
                   key={item.label}
@@ -534,6 +532,52 @@ export default function CareersPage() {
           </motion.div>
         </div>
       </section>
+
+      {/* Footer */}
+      <footer className="bg-gray-900/50 border-t border-gray-800 py-12 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+            <div>
+              <h3 className="text-lg font-semibold text-white mb-4">Legal</h3>
+              <ul className="space-y-2">
+                <li><a href="/legal/privacy" className="text-gray-400 hover:text-white">Privacy Policy</a></li>
+                <li><a href="/legal/terms" className="text-gray-400 hover:text-white">Terms of Service</a></li>
+                <li><a href="/legal/dpa" className="text-gray-400 hover:text-white">Data Protection</a></li>
+                <li><a href="/legal/cookies" className="text-gray-400 hover:text-white">Cookies Policy</a></li>
+                <li><a href="/legal/acceptable-use" className="text-gray-400 hover:text-white">Acceptable Use</a></li>
+              </ul>
+            </div>
+            <div>
+              <h3 className="text-lg font-semibold text-white mb-4">Support</h3>
+              <ul className="space-y-2">
+                <li><a href="/help" className="text-gray-400 hover:text-white">Help Center</a></li>
+                <li><a href="/contact" className="text-gray-400 hover:text-white">Contact Us</a></li>
+                <li><a href="/status" className="text-gray-400 hover:text-white">Status</a></li>
+              </ul>
+            </div>
+            <div>
+              <h3 className="text-lg font-semibold text-white mb-4">Company</h3>
+              <ul className="space-y-2">
+                <li><a href="/about" className="text-gray-400 hover:text-white">About</a></li>
+                <li><a href="/press" className="text-gray-400 hover:text-white">Press</a></li>
+                <li><a href="/careers" className="text-gray-400 hover:text-white">Careers</a></li>
+              </ul>
+            </div>
+            <div>
+              <h3 className="text-lg font-semibold text-white mb-4">Community</h3>
+              <ul className="space-y-2">
+                <li><a href="/blog" className="text-gray-400 hover:text-white">Blog</a></li>
+                <li><a href="https://github.com/tauos" className="text-gray-400 hover:text-white">GitHub</a></li>
+                <li><a href="https://x.com/tauos" className="text-gray-400 hover:text-white">Twitter</a></li>
+                <li><a href="https://mastodon.social/@tauos" className="text-gray-400 hover:text-white">Mastodon</a></li>
+              </ul>
+            </div>
+          </div>
+          <div className="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
+            <p>&copy; 2025 TauOS. All rights reserved. Privacy-first computing.</p>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 } 
