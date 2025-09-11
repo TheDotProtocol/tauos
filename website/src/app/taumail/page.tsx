@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { 
   Mail, Inbox, Send, Archive, Trash2, Star, Search, Plus, 
@@ -12,12 +12,25 @@ import {
 export default function TauMailDashboard() {
   const [activeTab, setActiveTab] = useState('inbox');
   const [showRegistration, setShowRegistration] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [user, setUser] = useState(null);
   const [registrationData, setRegistrationData] = useState({
     email: '',
     password: '',
     username: '',
     fullName: ''
   });
+
+  // Check if user is already logged in
+  React.useEffect(() => {
+    const storedUser = localStorage.getItem('tauos_user');
+    const storedToken = localStorage.getItem('tauos_token');
+    
+    if (storedUser && storedToken) {
+      setUser(JSON.parse(storedUser));
+      setIsLoggedIn(true);
+    }
+  }, []);
 
   const emailMetrics = {
     totalEmails: 2847,
@@ -125,9 +138,16 @@ export default function TauMailDashboard() {
                     });
                     const result = await response.json();
                     if (response.ok) {
-                      alert('✅ Registration successful! You can now use your @tauos.org email.');
+                      // Store user data and token
+                      localStorage.setItem('tauos_user', JSON.stringify(result.user));
+                      localStorage.setItem('tauos_token', result.token);
+                      
+                      alert('✅ Registration successful! Welcome to TauOS Mail!');
                       setShowRegistration(false);
                       setRegistrationData({ email: '', password: '', username: '', fullName: '' });
+                      
+                      // Redirect to inbox
+                      setActiveTab('inbox');
                     } else {
                       alert('❌ Error: ' + result.error);
                     }
