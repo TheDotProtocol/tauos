@@ -1,18 +1,41 @@
 'use client';
 
-import { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { 
   Cloud, Shield, Lock, Eye, CheckCircle, AlertCircle, BarChart3, 
   Activity, Settings, Search, Plus, Edit3, Download, Users, 
   Folder, File, Upload, Share2, Trash2, MoreHorizontal, RefreshCw,
   Filter, Calendar, Clock, Bell, User, ChevronRight, Zap,
-  HardDrive, Database, Server
+  HardDrive, Database, Server, LogOut, ArrowLeft
 } from 'lucide-react';
+import Link from 'next/link';
 
 export default function TauCloudDashboard() {
   const [activeTab, setActiveTab] = useState('files');
   const [searchTerm, setSearchTerm] = useState('');
+  const [user, setUser] = useState(null);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  // Check if user is logged in
+  useEffect(() => {
+    const storedUser = localStorage.getItem('tauos_user');
+    const storedToken = localStorage.getItem('tauos_token');
+    
+    if (storedUser && storedToken) {
+      setUser(JSON.parse(storedUser));
+      setIsLoggedIn(true);
+    } else {
+      // Redirect to landing page if not logged in
+      window.location.href = '/taucloud';
+    }
+  }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem('tauos_user');
+    localStorage.removeItem('tauos_token');
+    window.location.href = '/taucloud';
+  };
 
   const cloudMetrics = {
     totalStorage: 1024,
@@ -89,30 +112,45 @@ export default function TauCloudDashboard() {
     }
   };
 
+  if (!isLoggedIn) {
+    return (
+      <div className="min-h-screen bg-black text-white flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-400 mx-auto mb-4"></div>
+          <p className="text-gray-400">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-black text-white">
       <header className="bg-gray-900/50 backdrop-blur-xl border-b border-gray-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center space-x-4">
-              <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-xl flex items-center justify-center">
-                <Cloud className="w-6 h-6 text-white" />
-              </div>
-              <div>
-                <h1 className="text-xl font-bold text-white">TauCloud</h1>
-                <p className="text-sm text-gray-400">Secure Cloud Storage</p>
-              </div>
+              <Link href="/" className="flex items-center space-x-2">
+                <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-xl flex items-center justify-center">
+                  <Cloud className="w-6 h-6 text-white" />
+                </div>
+                <div>
+                  <h1 className="text-xl font-bold text-white">TauCloud</h1>
+                  <p className="text-sm text-gray-400">Secure Cloud Storage</p>
+                </div>
+              </Link>
             </div>
             <div className="flex items-center space-x-4">
-              <button className="p-2 text-gray-400 hover:text-white transition-colors">
-                <Bell className="w-5 h-5" />
-              </button>
-              <button className="p-2 text-gray-400 hover:text-white transition-colors">
-                <Settings className="w-5 h-5" />
-              </button>
-              <div className="w-8 h-8 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full flex items-center justify-center">
-                <User className="w-4 h-4 text-black" />
+              <div className="flex items-center space-x-2 text-sm text-gray-300">
+                <User className="w-4 h-4" />
+                <span>{user?.email}</span>
               </div>
+              <button
+                onClick={handleLogout}
+                className="flex items-center space-x-2 text-gray-400 hover:text-white transition-colors"
+              >
+                <LogOut className="w-4 h-4" />
+                <span>Logout</span>
+              </button>
             </div>
           </div>
         </div>

@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TauOS Mobile Phone</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <!-- Phone Frame -->
+    <div class="phone-frame">
+        <!-- Status Bar -->
+        <div class="status-bar">
+            <div class="status-left">
+                <span class="time" id="current-time">9:41</span>
+            </div>
+            <div class="status-right">
+                <i class="fas fa-signal"></i>
+                <i class="fas fa-wifi"></i>
+                <span class="battery">85%</span>
+                <i class="fas fa-battery-three-quarters"></i>
+            </div>
+        </div>
+
+        <!-- Dynamic Content Area -->
+        <div class="content-area" id="content-area">
+            <!-- Home Screen -->
+            <div class="screen home-screen active" id="home-screen">
+                <div class="wallpaper">
+                    <div class="wallpaper-overlay"></div>
+                </div>
+                
+                <!-- App Grid -->
+                <div class="app-grid">
+                    <div class="app-icon" data-app="camera">
+                        <div class="app-icon-bg">📷</div>
+                        <span class="app-name">Camera</span>
+                    </div>
+                    <div class="app-icon" data-app="messages">
+                        <div class="app-icon-bg">💬</div>
+                        <span class="app-name">Messages</span>
+                    </div>
+                    <div class="app-icon" data-app="phone">
+                        <div class="app-icon-bg">📞</div>
+                        <span class="app-name">Phone</span>
+                    </div>
+                    <div class="app-icon" data-app="tautalk">
+                        <div class="app-icon-bg">📹</div>
+                        <span class="app-name">TauTalk</span>
+                    </div>
+                    <div class="app-icon" data-app="whatsapp">
+                        <div class="app-icon-bg">💚</div>
+                        <span class="app-name">WhatsApp</span>
+                    </div>
+                    <div class="app-icon" data-app="contacts">
+                        <div class="app-icon-bg">👥</div>
+                        <span class="app-name">Contacts</span>
+                    </div>
+                    <div class="app-icon" data-app="gallery">
+                        <div class="app-icon-bg">🖼️</div>
+                        <span class="app-name">Gallery</span>
+                    </div>
+                    <div class="app-icon" data-app="music">
+                        <div class="app-icon-bg">🎵</div>
+                        <span class="app-name">Music</span>
+                    </div>
+                    <div class="app-icon" data-app="maps">
+                        <div class="app-icon-bg">🗺️</div>
+                        <span class="app-name">Maps</span>
+                    </div>
+                    <div class="app-icon" data-app="weather">
+                        <div class="app-icon-bg">🌤️</div>
+                        <span class="app-name">Weather</span>
+                    </div>
+                    <div class="app-icon" data-app="notes">
+                        <div class="app-icon-bg">📝</div>
+                        <span class="app-name">Notes</span>
+                    </div>
+                    <div class="app-icon" data-app="settings">
+                        <div class="app-icon-bg">⚙️</div>
+                        <span class="app-name">Settings</span>
+                    </div>
+                </div>
+
+                <!-- Dock -->
+                <div class="dock">
+                    <div class="dock-app" data-app="phone">
+                        <div class="dock-icon">📞</div>
+                    </div>
+                    <div class="dock-app" data-app="messages">
+                        <div class="dock-icon">💬</div>
+                    </div>
+                    <div class="dock-app" data-app="camera">
+                        <div class="dock-icon">📷</div>
+                    </div>
+                    <div class="dock-app" data-app="tautalk">
+                        <div class="dock-icon">📹</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Camera App -->
+            <div class="screen camera-screen" id="camera-screen">
+                <div class="camera-header">
+                    <button class="back-btn" onclick="showScreen('home-screen')">
+                        <i class="fas fa-arrow-left"></i>
+                    </button>
+                    <div class="camera-controls">
+                        <button class="camera-btn" id="flash-btn">
+                            <i class="fas fa-bolt"></i>
+                        </button>
+                        <button class="camera-btn" id="timer-btn">
+                            <i class="fas fa-clock"></i>
+                        </button>
+                        <button class="camera-btn" id="effects-btn">
+                            <i class="fas fa-magic"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="camera-viewfinder">
+                    <video id="camera-video" autoplay muted></video>
+                    <canvas id="camera-canvas"></canvas>
+                    
+                    <!-- Camera Effects Overlay -->
+                    <div class="effects-overlay" id="effects-overlay">
+                        <div class="effect-filter" id="effect-filter"></div>
+                    </div>
+                </div>
+
+                <div class="camera-controls-bottom">
+                    <button class="gallery-btn" onclick="showScreen('gallery-screen')">
+                        <i class="fas fa-images"></i>
+                    </button>
+                    <button class="capture-btn" id="capture-btn">
+                        <div class="capture-inner"></div>
+                    </button>
+                    <button class="switch-camera-btn" id="switch-camera-btn">
+                        <i class="fas fa-sync-alt"></i>
+                    </button>
+                </div>
+
+                <!-- Camera Mode Selector -->
+                <div class="camera-modes">
+                    <button class="mode-btn active" data-mode="photo">Photo</button>
+                    <button class="mode-btn" data-mode="video">Video</button>
+                    <button class="mode-btn" data-mode="portrait">Portrait</button>
+                    <button class="mode-btn" data-mode="panorama">Panorama</button>
+                </div>
+            </div>
+
+            <!-- Messages App -->
+            <div class="screen messages-screen" id="messages-screen">
+                <div class="messages-header">
+                    <button class="back-btn" onclick="showScreen('home-screen')">
+                        <i class="fas fa-arrow-left"></i>
+                    </button>
+                    <h1>Messages</h1>
+                    <button class="compose-btn">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                </div>
+
+                <div class="messages-list" id="messages-list">
+                    <!-- Messages will be loaded here -->
+                </div>
+            </div>
+
+            <!-- Individual Chat Screen -->
+            <div class="screen chat-screen" id="chat-screen">
+                <div class="chat-header">
+                    <button class="back-btn" onclick="showScreen('messages-screen')">
+                        <i class="fas fa-arrow-left"></i>
+                    </button>
+                    <div class="contact-info">
+                        <div class="contact-avatar" id="chat-avatar">👨‍💼</div>
+                        <div class="contact-details">
+                            <h3 id="chat-name">John Doe</h3>
+                            <span id="chat-status">Online</span>
+                        </div>
+                    </div>
+                    <div class="chat-actions">
+                        <button class="call-btn" onclick="startCall()">
+                            <i class="fas fa-phone"></i>
+                        </button>
+                        <button class="video-call-btn" onclick="startVideoCall()">
+                            <i class="fas fa-video"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="chat-messages" id="chat-messages">
+                    <!-- Chat messages will be loaded here -->
+                </div>
+
+                <div class="chat-input-area">
+                    <button class="attachment-btn">
+                        <i class="fas fa-plus"></i>
+                    </button>
+                    <div class="message-input-container">
+                        <input type="text" class="message-input" id="message-input" placeholder="Message">
+                        <button class="emoji-btn">
+                            <i class="fas fa-smile"></i>
+                        </button>
+                    </div>
+                    <button class="send-btn" id="send-btn">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- TauTalk Video Call Screen -->
+            <div class="screen tautalk-screen" id="tautalk-screen">
+                <div class="tautalk-header">
+                    <button class="back-btn" onclick="showScreen('home-screen')">
+                        <i class="fas fa-arrow-left"></i>
+                    </button>
+                    <h1>TauTalk</h1>
+                    <button class="contacts-btn" onclick="showScreen('contacts-screen')">
+                        <i class="fas fa-address-book"></i>
+                    </button>
+                </div>
+
+                <div class="tautalk-content">
+                    <div class="recent-calls" id="recent-calls">
+                        <h3>Recent Calls</h3>
+                        <!-- Recent calls will be loaded here -->
+                    </div>
+
+                    <div class="tautalk-actions">
+                        <button class="audio-call-btn" onclick="startAudioCall()">
+                            <i class="fas fa-phone"></i>
+                            <span>Audio Call</span>
+                        </button>
+                        <button class="video-call-btn" onclick="startVideoCall()">
+                            <i class="fas fa-video"></i>
+                            <span>Video Call</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Video Call Interface -->
+            <div class="screen video-call-screen" id="video-call-screen">
+                <div class="video-call-container">
+                    <div class="remote-video">
+                        <video id="remote-video" autoplay></video>
+                        <div class="call-info">
+                            <h3 id="call-contact-name">John Doe</h3>
+                            <span id="call-status">Connecting...</span>
+                        </div>
+                    </div>
+                    
+                    <div class="local-video">
+                        <video id="local-video" autoplay muted></video>
+                    </div>
+
+                    <div class="call-controls">
+                        <button class="call-control-btn mute-btn" id="mute-btn">
+                            <i class="fas fa-microphone"></i>
+                        </button>
+                        <button class="call-control-btn video-btn" id="video-btn">
+                            <i class="fas fa-video"></i>
+                        </button>
+                        <button class="call-control-btn speaker-btn" id="speaker-btn">
+                            <i class="fas fa-volume-up"></i>
+                        </button>
+                        <button class="call-control-btn end-call-btn" onclick="endCall()">
+                            <i class="fas fa-phone-slash"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Gallery App -->
+            <div class="screen gallery-screen" id="gallery-screen">
+                <div class="gallery-header">
+                    <button class="back-btn" onclick="showScreen('home-screen')">
+                        <i class="fas fa-arrow-left"></i>
+                    </button>
+                    <h1>Gallery</h1>
+                    <button class="select-btn">
+                        <i class="fas fa-check-square"></i>
+                    </button>
+                </div>
+
+                <div class="gallery-content">
+                    <div class="gallery-grid" id="gallery-grid">
+                        <!-- Photos will be loaded here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Contacts App -->
+            <div class="screen contacts-screen" id="contacts-screen">
+                <div class="contacts-header">
+                    <button class="back-btn" onclick="showScreen('home-screen')">
+                        <i class="fas fa-arrow-left"></i>
+                    </button>
+                    <h1>Contacts</h1>
+                    <button class="add-contact-btn" onclick="addContact()">
+                        <i class="fas fa-plus"></i>
+                    </button>
+                </div>
+
+                <div class="contacts-content">
+                    <div class="search-bar">
+                        <input type="text" placeholder="Search contacts" id="contact-search">
+                        <i class="fas fa-search"></i>
+                    </div>
+                    <div class="contacts-list" id="contacts-list">
+                        <!-- Contacts will be loaded here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Home Indicator -->
+        <div class="home-indicator"></div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.2/socket.io.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>

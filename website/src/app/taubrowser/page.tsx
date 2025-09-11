@@ -3,13 +3,13 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { 
-  Cloud, Shield, Lock, Eye, CheckCircle, AlertCircle, 
-  ArrowRight, Users, Globe, Zap, Star, ArrowLeft, Upload,
-  Download, Folder, File, HardDrive, Database, Server
+  Globe, Shield, Lock, Eye, CheckCircle, AlertCircle, 
+  ArrowRight, Users, Zap, Star, ArrowLeft, Search,
+  Download, Filter, Settings, Heart, BarChart3, Activity
 } from 'lucide-react';
 import Link from 'next/link';
 
-export default function TauCloudLanding() {
+export default function TauBrowserLanding() {
   const [showRegistration, setShowRegistration] = useState(false);
   const [showLogin, setShowLogin] = useState(false);
   const [registrationData, setRegistrationData] = useState({
@@ -26,23 +26,23 @@ export default function TauCloudLanding() {
   const features = [
     {
       icon: Shield,
-      title: "Client-Side Encryption",
-      description: "Your files are encrypted on your device before upload. We can't see your data even if we wanted to."
+      title: "Built-in Ad Blocking",
+      description: "Block ads, trackers, and malicious content automatically. Browse faster and safer."
     },
     {
       icon: Lock,
-      title: "Zero-Knowledge Storage",
-      description: "End-to-end encryption ensures your files remain private. Only you have the keys to decrypt them."
+      title: "Privacy by Default",
+      description: "No data collection, no tracking, no cookies. Your browsing stays private."
     },
     {
       icon: Eye,
       title: "No Data Mining",
-      description: "We don't scan, analyze, or monetize your files. Your privacy is absolute and uncompromised."
+      description: "We don't collect your browsing history, search queries, or personal information."
     },
     {
-      icon: Globe,
-      title: "Open Standards",
-      description: "Built on WebDAV and S3 standards. Access your files from any compatible client or app."
+      icon: Zap,
+      title: "Lightning Fast",
+      description: "Optimized for speed with minimal resource usage. Browse without lag or slowdowns."
     }
   ];
 
@@ -65,9 +65,9 @@ export default function TauCloudLanding() {
         localStorage.setItem('tauos_user', JSON.stringify(result.user));
         localStorage.setItem('tauos_token', result.token);
         
-        alert('✅ Registration successful! Welcome to TauCloud!');
+        alert('✅ Registration successful! Welcome to TauBrowser!');
         // Redirect to dashboard
-        window.location.href = '/taucloud/dashboard';
+        window.location.href = '/taubrowser/dashboard';
       } else {
         alert('❌ Error: ' + result.error);
       }
@@ -94,7 +94,7 @@ export default function TauCloudLanding() {
         
         alert('✅ Login successful! Welcome back!');
         // Redirect to dashboard
-        window.location.href = '/taucloud/dashboard';
+        window.location.href = '/taubrowser/dashboard';
       } else {
         alert('❌ Error: ' + result.error);
       }
@@ -135,15 +135,15 @@ export default function TauCloudLanding() {
               transition={{ duration: 0.8 }}
               className="mb-8"
             >
-              <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-2xl mb-6">
-                <Cloud className="w-10 h-10 text-white" />
+              <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-r from-cyan-500 to-blue-500 rounded-2xl mb-6">
+                <Globe className="w-10 h-10 text-white" />
               </div>
               <h1 className="text-5xl md:text-6xl font-bold text-white mb-6">
-                TauCloud
+                TauBrowser
               </h1>
               <p className="text-xl text-gray-300 mb-8 max-w-3xl mx-auto">
-                Private cloud storage that puts you in control. Client-side encryption, 
-                zero-knowledge architecture, and complete privacy by design.
+                The privacy-first web browser. Browse the internet without being tracked, 
+                monitored, or having your data collected.
               </p>
             </motion.div>
 
@@ -155,7 +155,7 @@ export default function TauCloudLanding() {
             >
               <button
                 onClick={() => setShowRegistration(true)}
-                className="bg-gradient-to-r from-blue-500 to-cyan-500 text-white px-8 py-4 rounded-xl font-semibold text-lg hover:shadow-lg hover:shadow-blue-500/25 transition-all duration-200 flex items-center"
+                className="bg-gradient-to-r from-cyan-500 to-blue-500 text-white px-8 py-4 rounded-xl font-semibold text-lg hover:shadow-lg hover:shadow-cyan-500/25 transition-all duration-200 flex items-center"
               >
                 Get Started Free
                 <ArrowRight className="w-5 h-5 ml-2" />
@@ -175,16 +175,16 @@ export default function TauCloudLanding() {
               className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto"
             >
               <div className="text-center">
-                <div className="text-3xl font-bold text-blue-400 mb-2">1TB</div>
-                <div className="text-gray-400">Free Storage</div>
+                <div className="text-3xl font-bold text-cyan-400 mb-2">Zero</div>
+                <div className="text-gray-400">Tracking</div>
               </div>
               <div className="text-center">
-                <div className="text-3xl font-bold text-blue-400 mb-2">100%</div>
-                <div className="text-gray-400">Encrypted</div>
+                <div className="text-3xl font-bold text-cyan-400 mb-2">100%</div>
+                <div className="text-gray-400">Private</div>
               </div>
               <div className="text-center">
-                <div className="text-3xl font-bold text-blue-400 mb-2">Zero</div>
-                <div className="text-gray-400">Data Access</div>
+                <div className="text-3xl font-bold text-cyan-400 mb-2">Fast</div>
+                <div className="text-gray-400">Browsing</div>
               </div>
             </motion.div>
           </div>
@@ -201,10 +201,10 @@ export default function TauCloudLanding() {
             className="text-center mb-16"
           >
             <h2 className="text-4xl font-bold text-white mb-6">
-              Privacy by Design
+              Privacy-First Browsing
             </h2>
             <p className="text-xl text-gray-300 max-w-3xl mx-auto">
-              Every feature is built with your privacy and security as the foundation.
+              Built from the ground up with privacy and security as the foundation.
             </p>
           </motion.div>
 
@@ -215,9 +215,9 @@ export default function TauCloudLanding() {
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8, delay: index * 0.1 }}
-                className="p-6 bg-gray-900/30 backdrop-blur-sm border border-gray-800 rounded-2xl hover:border-blue-400/30 transition-all duration-300"
+                className="p-6 bg-gray-900/30 backdrop-blur-sm border border-gray-800 rounded-2xl hover:border-cyan-400/30 transition-all duration-300"
               >
-                <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-xl flex items-center justify-center mb-4">
+                <div className="w-12 h-12 bg-gradient-to-r from-cyan-500 to-blue-500 rounded-xl flex items-center justify-center mb-4">
                   <feature.icon className="w-6 h-6 text-white" />
                 </div>
                 <h3 className="text-xl font-bold text-white mb-3">{feature.title}</h3>
@@ -241,7 +241,7 @@ export default function TauCloudLanding() {
               How It Works
             </h2>
             <p className="text-xl text-gray-300 max-w-3xl mx-auto">
-              Simple, secure, and private file storage in three easy steps.
+              Simple, secure, and private browsing in three easy steps.
             </p>
           </motion.div>
 
@@ -252,11 +252,11 @@ export default function TauCloudLanding() {
               transition={{ duration: 0.8, delay: 0.1 }}
               className="text-center"
             >
-              <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-2xl flex items-center justify-center mx-auto mb-6">
-                <Upload className="w-8 h-8 text-white" />
+              <div className="w-16 h-16 bg-gradient-to-r from-cyan-500 to-blue-500 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                <Download className="w-8 h-8 text-white" />
               </div>
-              <h3 className="text-xl font-bold text-white mb-4">1. Upload</h3>
-              <p className="text-gray-400">Upload your files through our secure web interface or compatible apps.</p>
+              <h3 className="text-xl font-bold text-white mb-4">1. Download</h3>
+              <p className="text-gray-400">Download TauBrowser and install it on your device.</p>
             </motion.div>
 
             <motion.div
@@ -265,11 +265,11 @@ export default function TauCloudLanding() {
               transition={{ duration: 0.8, delay: 0.2 }}
               className="text-center"
             >
-              <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-2xl flex items-center justify-center mx-auto mb-6">
-                <Lock className="w-8 h-8 text-white" />
+              <div className="w-16 h-16 bg-gradient-to-r from-cyan-500 to-blue-500 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                <Shield className="w-8 h-8 text-white" />
               </div>
-              <h3 className="text-xl font-bold text-white mb-4">2. Encrypt</h3>
-              <p className="text-gray-400">Files are encrypted on your device before being stored on our servers.</p>
+              <h3 className="text-xl font-bold text-white mb-4">2. Browse</h3>
+              <p className="text-gray-400">Browse the web with automatic privacy protection and ad blocking.</p>
             </motion.div>
 
             <motion.div
@@ -278,11 +278,11 @@ export default function TauCloudLanding() {
               transition={{ duration: 0.8, delay: 0.3 }}
               className="text-center"
             >
-              <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-2xl flex items-center justify-center mx-auto mb-6">
-                <Download className="w-8 h-8 text-white" />
+              <div className="w-16 h-16 bg-gradient-to-r from-cyan-500 to-blue-500 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                <Lock className="w-8 h-8 text-white" />
               </div>
-              <h3 className="text-xl font-bold text-white mb-4">3. Access</h3>
-              <p className="text-gray-400">Access your files anywhere, anytime, with complete privacy and security.</p>
+              <h3 className="text-xl font-bold text-white mb-4">3. Stay Private</h3>
+              <p className="text-gray-400">Your browsing data stays on your device. No tracking, no collection.</p>
             </motion.div>
           </div>
         </div>
@@ -297,7 +297,7 @@ export default function TauCloudLanding() {
             className="bg-gray-900 border border-gray-800 rounded-2xl p-8 w-full max-w-md"
           >
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-bold text-white">Get Started with TauCloud</h2>
+              <h2 className="text-2xl font-bold text-white">Get Started with TauBrowser</h2>
               <button
                 onClick={() => setShowRegistration(false)}
                 className="text-gray-400 hover:text-white"
@@ -316,7 +316,7 @@ export default function TauCloudLanding() {
                     type="text"
                     value={registrationData.username}
                     onChange={(e) => setRegistrationData({...registrationData, username: e.target.value})}
-                    className="flex-1 px-4 py-3 bg-gray-800 border border-gray-700 rounded-l-lg text-white placeholder-gray-400 focus:outline-none focus:border-blue-400"
+                    className="flex-1 px-4 py-3 bg-gray-800 border border-gray-700 rounded-l-lg text-white placeholder-gray-400 focus:outline-none focus:border-cyan-400"
                     placeholder="yourname"
                     required
                   />
@@ -334,7 +334,7 @@ export default function TauCloudLanding() {
                   type="text"
                   value={registrationData.fullName}
                   onChange={(e) => setRegistrationData({...registrationData, fullName: e.target.value})}
-                  className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-blue-400"
+                  className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-cyan-400"
                   placeholder="Your full name"
                   required
                 />
@@ -348,7 +348,7 @@ export default function TauCloudLanding() {
                   type="password"
                   value={registrationData.password}
                   onChange={(e) => setRegistrationData({...registrationData, password: e.target.value})}
-                  className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-blue-400"
+                  className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-cyan-400"
                   placeholder="Create a strong password"
                   required
                 />
@@ -356,7 +356,7 @@ export default function TauCloudLanding() {
               
               <button
                 type="submit"
-                className="w-full bg-gradient-to-r from-blue-500 to-cyan-500 text-white py-3 rounded-lg font-semibold hover:shadow-lg hover:shadow-blue-500/25 transition-all duration-200"
+                className="w-full bg-gradient-to-r from-cyan-500 to-blue-500 text-white py-3 rounded-lg font-semibold hover:shadow-lg hover:shadow-cyan-500/25 transition-all duration-200"
               >
                 Create Account
               </button>
@@ -369,7 +369,7 @@ export default function TauCloudLanding() {
                   setShowRegistration(false);
                   setShowLogin(true);
                 }}
-                className="text-blue-400 hover:text-blue-300"
+                className="text-cyan-400 hover:text-cyan-300"
               >
                 Sign in
               </button>
@@ -387,7 +387,7 @@ export default function TauCloudLanding() {
             className="bg-gray-900 border border-gray-800 rounded-2xl p-8 w-full max-w-md"
           >
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-bold text-white">Sign In to TauCloud</h2>
+              <h2 className="text-2xl font-bold text-white">Sign In to TauBrowser</h2>
               <button
                 onClick={() => setShowLogin(false)}
                 className="text-gray-400 hover:text-white"
@@ -405,7 +405,7 @@ export default function TauCloudLanding() {
                   type="email"
                   value={loginData.email}
                   onChange={(e) => setLoginData({...loginData, email: e.target.value})}
-                  className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-blue-400"
+                  className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-cyan-400"
                   placeholder="yourname@tauos.org"
                   required
                 />
@@ -419,7 +419,7 @@ export default function TauCloudLanding() {
                   type="password"
                   value={loginData.password}
                   onChange={(e) => setLoginData({...loginData, password: e.target.value})}
-                  className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-blue-400"
+                  className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-cyan-400"
                   placeholder="Your password"
                   required
                 />
@@ -427,7 +427,7 @@ export default function TauCloudLanding() {
               
               <button
                 type="submit"
-                className="w-full bg-gradient-to-r from-blue-500 to-cyan-500 text-white py-3 rounded-lg font-semibold hover:shadow-lg hover:shadow-blue-500/25 transition-all duration-200"
+                className="w-full bg-gradient-to-r from-cyan-500 to-blue-500 text-white py-3 rounded-lg font-semibold hover:shadow-lg hover:shadow-cyan-500/25 transition-all duration-200"
               >
                 Sign In
               </button>
@@ -440,7 +440,7 @@ export default function TauCloudLanding() {
                   setShowLogin(false);
                   setShowRegistration(true);
                 }}
-                className="text-blue-400 hover:text-blue-300"
+                className="text-cyan-400 hover:text-cyan-300"
               >
                 Create one
               </button>

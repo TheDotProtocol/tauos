@@ -395,9 +395,11 @@ export default function TauMailLanding() {
             <div>
               <h3 className="text-lg font-semibold text-white mb-4">Legal</h3>
               <ul className="space-y-2">
-                <li><Link href="/privacy" className="text-gray-400 hover:text-white">Privacy Policy</Link></li>
-                <li><Link href="/terms" className="text-gray-400 hover:text-white">Terms of Service</Link></li>
-                <li><Link href="/data-protection" className="text-gray-400 hover:text-white">Data Protection</Link></li>
+                <li><Link href="/legal/privacy" className="text-gray-400 hover:text-white">Privacy Policy</Link></li>
+                <li><Link href="/legal/terms" className="text-gray-400 hover:text-white">Terms of Service</Link></li>
+                <li><Link href="/legal/dpa" className="text-gray-400 hover:text-white">Data Protection</Link></li>
+                <li><Link href="/legal/cookies" className="text-gray-400 hover:text-white">Cookies Policy</Link></li>
+                <li><Link href="/legal/acceptable-use" className="text-gray-400 hover:text-white">Acceptable Use</Link></li>
               </ul>
             </div>
             <div>
@@ -420,8 +422,9 @@ export default function TauMailLanding() {
               <h3 className="text-lg font-semibold text-white mb-4">Community</h3>
               <ul className="space-y-2">
                 <li><Link href="/blog" className="text-gray-400 hover:text-white">Blog</Link></li>
-                <li><Link href="/github" className="text-gray-400 hover:text-white">GitHub</Link></li>
-                <li><Link href="/twitter" className="text-gray-400 hover:text-white">Twitter</Link></li>
+                <li><Link href="https://github.com/tauos" className="text-gray-400 hover:text-white">GitHub</Link></li>
+                <li><Link href="https://x.com/tauos" className="text-gray-400 hover:text-white">Twitter</Link></li>
+                <li><Link href="https://mastodon.social/@tauos" className="text-gray-400 hover:text-white">Mastodon</Link></li>
               </ul>
             </div>
           </div>

@@ -2092,6 +2092,24 @@ export default function TauOSLandingPage() {
                 <li><a href="https://status.tauos.org" className="text-gray-400 hover:text-yellow-400 transition-colors text-sm">Status</a></li>
               </ul>
             </div>
+
+            {/* Contact */}
+            <div>
+              <h3 className="text-white font-semibold mb-4">Contact</h3>
+              <div className="space-y-3">
+                <div>
+                  <p className="text-gray-400 text-sm font-medium">Tau Foundation & Tau LLC</p>
+                  <p className="text-gray-500 text-xs">2261 Market St, San Francisco, CA 94114</p>
+                  <p className="text-gray-500 text-xs">+1 1800 TauOS</p>
+                </div>
+                <div>
+                  <p className="text-gray-400 text-sm font-medium">Malaysia Office</p>
+                  <p className="text-gray-500 text-xs">IB Tower, Level 33, 8, Lrg Binjai</p>
+                  <p className="text-gray-500 text-xs">Kuala Lumpur, 50450 Kuala Lumpur</p>
+                  <p className="text-gray-500 text-xs">+60 178446206</p>
+                </div>
+              </div>
+            </div>
           </div>
 
           {/* Cookie Banner */}

@@ -1,389 +1,499 @@
 'use client';
 
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { 
-  Shield, User, Lock, Eye, CheckCircle, AlertCircle, BarChart3, 
-  Activity, Settings, Search, Plus, Edit3, Download, Users, 
-  UserCheck, Fingerprint, Smartphone, Monitor, Tablet
+  Shield, User, Lock, Eye, CheckCircle, AlertCircle, 
+  ArrowRight, Users, Globe, Zap, Star, ArrowLeft, Fingerprint,
+  Smartphone, Monitor, Tablet, Key, Database, Server
 } from 'lucide-react';
+import Link from 'next/link';
 
-export default function TauIDDashboard() {
-  const [activeTab, setActiveTab] = useState('overview');
+export default function TauIDLanding() {
+  const [showRegistration, setShowRegistration] = useState(false);
+  const [showLogin, setShowLogin] = useState(false);
+  const [registrationData, setRegistrationData] = useState({
+    email: '',
+    password: '',
+    username: '',
+    fullName: ''
+  });
+  const [loginData, setLoginData] = useState({
+    email: '',
+    password: ''
+  });
 
-  const identityMetrics = {
-    totalUsers: 1247,
-    activeUsers: 1189,
-    verifiedUsers: 1156,
-    privacyScore: 94,
-    securityEvents: 3
-  };
-
-  const privacyBreakdown = [
-    { category: 'Data Collection', score: 98, status: 'excellent' },
-    { category: 'Data Sharing', score: 95, status: 'excellent' },
-    { category: 'Data Retention', score: 92, status: 'good' },
-    { category: 'Access Control', score: 96, status: 'excellent' },
-    { category: 'Encryption', score: 100, status: 'excellent' }
+  const features = [
+    {
+      icon: Shield,
+      title: "Zero-Knowledge Identity",
+      description: "Your identity data is encrypted and stored locally. We never see your personal information."
+    },
+    {
+      icon: Fingerprint,
+      title: "Biometric Authentication",
+      description: "Secure login with fingerprint, face recognition, and other biometric methods."
+    },
+    {
+      icon: Lock,
+      title: "End-to-End Encryption",
+      description: "All identity data is encrypted with keys only you control. Complete privacy guaranteed."
+    },
+    {
+      icon: Globe,
+      title: "Universal Identity",
+      description: "One secure identity that works across all TauOS applications and services."
+    }
   ];
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'active': return 'text-green-400 bg-green-400/10';
-      case 'excellent': return 'text-green-400 bg-green-400/10';
-      case 'good': return 'text-yellow-400 bg-yellow-400/10';
-      default: return 'text-gray-400 bg-gray-400/10';
+  const handleRegistration = async (e) => {
+    e.preventDefault();
+    try {
+      const response = await fetch('https://tauos-cbh3.vercel.app/api/auth/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          ...registrationData,
+          email: `${registrationData.username}@tauos.org`
+        })
+      });
+      const result = await response.json();
+      if (response.ok) {
+        // Store user data and token
+        localStorage.setItem('tauos_user', JSON.stringify(result.user));
+        localStorage.setItem('tauos_token', result.token);
+        
+        alert('✅ Registration successful! Welcome to TauID!');
+        // Redirect to dashboard
+        window.location.href = '/tauid/dashboard';
+      } else {
+        alert('❌ Error: ' + result.error);
+      }
+    } catch (error) {
+      alert('❌ Connection error: ' + error.message);
+    }
+  };
+
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    try {
+      const response = await fetch('https://tauos-cbh3.vercel.app/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(loginData)
+      });
+      const result = await response.json();
+      if (response.ok) {
+        // Store user data and token
+        localStorage.setItem('tauos_user', JSON.stringify(result.user));
+        localStorage.setItem('tauos_token', result.token);
+        
+        alert('✅ Login successful! Welcome back!');
+        // Redirect to dashboard
+        window.location.href = '/tauid/dashboard';
+      } else {
+        alert('❌ Error: ' + result.error);
+      }
+    } catch (error) {
+      alert('❌ Connection error: ' + error.message);
     }
   };
 
   return (
     <div className="min-h-screen bg-black text-white">
+      {/* Header */}
       <header className="bg-gray-900/50 backdrop-blur-xl border-b border-gray-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center space-x-4">
-              <img src="/brand/tauos-logo.svg" alt="TauOS" className="w-10 h-10" />
-              <div>
-                <h1 className="text-xl font-bold text-white">TauID</h1>
-                <p className="text-sm text-gray-400">Identity & Access Management</p>
-              </div>
+              <Link href="/" className="flex items-center space-x-2">
+                <img src="/brand/tauos-logo.svg" alt="TauOS" className="w-10 h-10" />
+                <span className="text-xl font-bold text-white">TauOS</span>
+              </Link>
             </div>
             <div className="flex items-center space-x-4">
-              <button className="p-2 text-gray-400 hover:text-white transition-colors">
-                <Settings className="w-5 h-5" />
-              </button>
-              <div className="w-8 h-8 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full flex items-center justify-center">
-                <User className="w-4 h-4 text-black" />
-              </div>
+              <Link href="/" className="text-gray-400 hover:text-white transition-colors">
+                <ArrowLeft className="w-4 h-4 mr-2 inline" />
+                Back to Home
+              </Link>
             </div>
           </div>
         </div>
       </header>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            className="p-6 bg-gray-900/30 backdrop-blur-sm border border-gray-800 rounded-2xl"
-          >
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-400">Total Users</p>
-                <p className="text-2xl font-bold text-white">{identityMetrics.totalUsers}</p>
-              </div>
-              <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-xl flex items-center justify-center">
-                <Users className="w-6 h-6 text-white" />
-              </div>
-            </div>
-            <div className="mt-4 flex items-center text-sm text-green-400">
-              <UserCheck className="w-4 h-4 mr-1" />
-              <span>{identityMetrics.activeUsers} active</span>
-            </div>
-          </motion.div>
-
-          <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.1 }}
-            className="p-6 bg-gray-900/30 backdrop-blur-sm border border-gray-800 rounded-2xl"
-          >
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-400">Privacy Score</p>
-                <p className="text-2xl font-bold text-white">{identityMetrics.privacyScore}/100</p>
-              </div>
-              <div className="w-12 h-12 bg-gradient-to-r from-green-500 to-emerald-500 rounded-xl flex items-center justify-center">
-                <Shield className="w-6 h-6 text-white" />
-              </div>
-            </div>
-            <div className="mt-4">
-              <div className="w-full bg-gray-800 rounded-full h-2">
-                <div 
-                  className="bg-gradient-to-r from-green-500 to-emerald-500 h-2 rounded-full transition-all duration-300"
-                  style={{ width: `${identityMetrics.privacyScore}%` }}
-                ></div>
-              </div>
-            </div>
-          </motion.div>
-
-          <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.2 }}
-            className="p-6 bg-gray-900/30 backdrop-blur-sm border border-gray-800 rounded-2xl"
-          >
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-400">Verified Users</p>
-                <p className="text-2xl font-bold text-white">{identityMetrics.verifiedUsers}</p>
-              </div>
-              <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-500 rounded-xl flex items-center justify-center">
-                <UserCheck className="w-6 h-6 text-white" />
-              </div>
-            </div>
-            <div className="mt-4 flex items-center text-sm text-purple-400">
-              <CheckCircle className="w-4 h-4 mr-1" />
-              <span>92.7% verified</span>
-            </div>
-          </motion.div>
-
-          <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.3 }}
-            className="p-6 bg-gray-900/30 backdrop-blur-sm border border-gray-800 rounded-2xl"
-          >
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-400">Security Events</p>
-                <p className="text-2xl font-bold text-white">{identityMetrics.securityEvents}</p>
-              </div>
-              <div className="w-12 h-12 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-xl flex items-center justify-center">
-                <AlertCircle className="w-6 h-6 text-white" />
-              </div>
-            </div>
-            <div className="mt-4 flex items-center text-sm text-yellow-400">
-              <AlertCircle className="w-4 h-4 mr-1" />
-              <span>Last 24 hours</span>
-            </div>
-          </motion.div>
-        </div>
-
-        <div className="flex space-x-1 bg-gray-900/30 backdrop-blur-sm border border-gray-800 rounded-xl p-1 mb-8">
-          {[
-            { id: 'overview', label: 'Overview', icon: BarChart3 },
-            { id: 'devices', label: 'Devices', icon: Smartphone },
-            { id: 'permissions', label: 'Permissions', icon: Lock },
-            { id: 'activity', label: 'Activity', icon: Activity }
-          ].map((tab) => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
-              className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-all duration-200 ${
-                activeTab === tab.id
-                  ? 'bg-gradient-to-r from-yellow-400 to-orange-500 text-black'
-                  : 'text-gray-400 hover:text-white'
-              }`}
-            >
-              <tab.icon className="w-4 h-4" />
-              <span className="font-medium">{tab.label}</span>
-            </button>
-          ))}
-        </div>
-
-        <div className="space-y-8">
-          {activeTab === 'overview' && (
+      {/* Hero Section */}
+      <section className="relative py-20 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5 }}
+              transition={{ duration: 0.8 }}
+              className="mb-8"
             >
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                <div className="p-6 bg-gray-900/30 backdrop-blur-sm border border-gray-800 rounded-2xl">
-                  <h3 className="text-lg font-bold text-white mb-6">Privacy Score Breakdown</h3>
-                  <div className="space-y-4">
-                    {privacyBreakdown.map((item) => (
-                      <div key={item.category} className="p-4 bg-gray-800/30 rounded-lg">
-                        <div className="flex items-center justify-between mb-2">
-                          <h4 className="font-semibold text-white">{item.category}</h4>
-                          <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(item.status)}`}>
-                            {item.score}/100
-                          </span>
-                        </div>
-                        <div className="w-full bg-gray-700 rounded-full h-2">
-                          <div 
-                            className={`h-2 rounded-full transition-all duration-300 ${
-                              item.score >= 95 ? 'bg-green-500' : 
-                              item.score >= 85 ? 'bg-yellow-500' : 'bg-red-500'
-                            }`}
-                            style={{ width: `${item.score}%` }}
-                          ></div>
-                        </div>
-                      </div>
-                    ))}
+              <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-r from-green-500 to-emerald-500 rounded-2xl mb-6">
+                <Shield className="w-10 h-10 text-white" />
+              </div>
+              <h1 className="text-5xl md:text-6xl font-bold text-white mb-6">
+                TauID
+              </h1>
+              <p className="text-xl text-gray-300 mb-8 max-w-3xl mx-auto">
+                Your secure digital identity. Zero-knowledge authentication, 
+                biometric security, and complete privacy protection.
+              </p>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.2 }}
+              className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12"
+            >
+              <button
+                onClick={() => setShowRegistration(true)}
+                className="bg-gradient-to-r from-green-500 to-emerald-500 text-white px-8 py-4 rounded-xl font-semibold text-lg hover:shadow-lg hover:shadow-green-500/25 transition-all duration-200 flex items-center"
+              >
+                Get Started Free
+                <ArrowRight className="w-5 h-5 ml-2" />
+              </button>
+              <button
+                onClick={() => setShowLogin(true)}
+                className="border border-gray-600 text-white px-8 py-4 rounded-xl font-semibold text-lg hover:bg-gray-800/50 transition-all duration-200"
+              >
+                Sign In
+              </button>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.4 }}
+              className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto"
+            >
+              <div className="text-center">
+                <div className="text-3xl font-bold text-green-400 mb-2">Zero</div>
+                <div className="text-gray-400">Data Access</div>
+              </div>
+              <div className="text-center">
+                <div className="text-3xl font-bold text-green-400 mb-2">100%</div>
+                <div className="text-gray-400">Encrypted</div>
+              </div>
+              <div className="text-center">
+                <div className="text-3xl font-bold text-green-400 mb-2">Biometric</div>
+                <div className="text-gray-400">Security</div>
+              </div>
+            </motion.div>
+          </div>
+        </div>
+      </section>
+
+      {/* Features Section */}
+      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gray-900/30">
+        <div className="max-w-7xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            className="text-center mb-16"
+          >
+            <h2 className="text-4xl font-bold text-white mb-6">
+              Privacy-First Identity
+            </h2>
+            <p className="text-xl text-gray-300 max-w-3xl mx-auto">
+              Your identity, your control. Built with zero-knowledge architecture and biometric security.
+            </p>
+          </motion.div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            {features.map((feature, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, delay: index * 0.1 }}
+                className="p-6 bg-gray-900/30 backdrop-blur-sm border border-gray-800 rounded-2xl hover:border-green-400/30 transition-all duration-300"
+              >
+                <div className="w-12 h-12 bg-gradient-to-r from-green-500 to-emerald-500 rounded-xl flex items-center justify-center mb-4">
+                  <feature.icon className="w-6 h-6 text-white" />
+                </div>
+                <h3 className="text-xl font-bold text-white mb-3">{feature.title}</h3>
+                <p className="text-gray-400">{feature.description}</p>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* How It Works Section */}
+      <section className="py-20 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            className="text-center mb-16"
+          >
+            <h2 className="text-4xl font-bold text-white mb-6">
+              How It Works
+            </h2>
+            <p className="text-xl text-gray-300 max-w-3xl mx-auto">
+              Secure identity management in three simple steps.
+            </p>
+          </motion.div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.1 }}
+              className="text-center"
+            >
+              <div className="w-16 h-16 bg-gradient-to-r from-green-500 to-emerald-500 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                <User className="w-8 h-8 text-white" />
+              </div>
+              <h3 className="text-xl font-bold text-white mb-4">1. Create Identity</h3>
+              <p className="text-gray-400">Set up your secure digital identity with biometric authentication.</p>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.2 }}
+              className="text-center"
+            >
+              <div className="w-16 h-16 bg-gradient-to-r from-green-500 to-emerald-500 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                <Lock className="w-8 h-8 text-white" />
+              </div>
+              <h3 className="text-xl font-bold text-white mb-4">2. Encrypt Data</h3>
+              <p className="text-gray-400">Your identity data is encrypted locally with keys only you control.</p>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.3 }}
+              className="text-center"
+            >
+              <div className="w-16 h-16 bg-gradient-to-r from-green-500 to-emerald-500 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                <Shield className="w-8 h-8 text-white" />
+              </div>
+              <h3 className="text-xl font-bold text-white mb-4">3. Secure Access</h3>
+              <p className="text-gray-400">Use your identity across all TauOS apps with complete privacy.</p>
+            </motion.div>
+          </div>
+        </div>
+      </section>
+
+      {/* Registration Modal */}
+      {showRegistration && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="bg-gray-900 border border-gray-800 rounded-2xl p-8 w-full max-w-md"
+          >
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-2xl font-bold text-white">Get Started with TauID</h2>
+              <button
+                onClick={() => setShowRegistration(false)}
+                className="text-gray-400 hover:text-white"
+              >
+                ×
+              </button>
+            </div>
+            
+            <form onSubmit={handleRegistration} className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">
+                  Username
+                </label>
+                <div className="flex">
+                  <input
+                    type="text"
+                    value={registrationData.username}
+                    onChange={(e) => setRegistrationData({...registrationData, username: e.target.value})}
+                    className="flex-1 px-4 py-3 bg-gray-800 border border-gray-700 rounded-l-lg text-white placeholder-gray-400 focus:outline-none focus:border-green-400"
+                    placeholder="yourname"
+                    required
+                  />
+                  <div className="px-4 py-3 bg-gray-700 border border-l-0 border-gray-700 rounded-r-lg text-gray-300">
+                    @tauos.org
                   </div>
                 </div>
-
-                <div className="p-6 bg-gray-900/30 backdrop-blur-sm border border-gray-800 rounded-2xl">
-                  <h3 className="text-lg font-bold text-white mb-6">Recent Activities</h3>
-                  <div className="space-y-4">
-                    {[
-                      { action: 'Login from new device', user: 'john.doe@company.com', time: '2 minutes ago' },
-                      { action: 'Permission change', user: 'sarah.smith@company.com', time: '5 minutes ago' },
-                      { action: 'User account created', user: 'admin@company.com', time: '10 minutes ago' },
-                      { action: 'Failed login attempt', user: 'unknown@external.com', time: '15 minutes ago' }
-                    ].map((activity, index) => (
-                      <div key={index} className="flex items-start space-x-3 p-3 bg-gray-800/30 rounded-lg">
-                        <div className="w-2 h-2 rounded-full mt-2 flex-shrink-0 bg-green-400"></div>
-                        <div className="flex-1">
-                          <p className="text-white text-sm font-medium">{activity.action}</p>
-                          <p className="text-gray-400 text-xs">{activity.user}</p>
-                          <p className="text-gray-500 text-xs">{activity.time}</p>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
               </div>
-            </motion.div>
-          )}
-
-          {activeTab === 'devices' && (
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5 }}
-            >
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-2xl font-bold text-white">Connected Devices</h2>
-                <button className="flex items-center space-x-2 bg-gradient-to-r from-yellow-400 to-orange-500 text-black px-4 py-2 rounded-lg font-semibold hover:shadow-lg hover:shadow-yellow-400/25 transition-all duration-200">
-                  <Plus className="w-4 h-4" />
-                  <span>Add Device</span>
-                </button>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">
+                  Full Name
+                </label>
+                <input
+                  type="text"
+                  value={registrationData.fullName}
+                  onChange={(e) => setRegistrationData({...registrationData, fullName: e.target.value})}
+                  className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-green-400"
+                  placeholder="Your full name"
+                  required
+                />
               </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {[
-                  { name: 'MacBook Pro - John Doe', type: 'desktop', status: 'active', lastSeen: '2 minutes ago' },
-                  { name: 'iPhone 15 - Sarah Smith', type: 'mobile', status: 'active', lastSeen: '5 minutes ago' },
-                  { name: 'iPad Pro - Marketing Team', type: 'tablet', status: 'inactive', lastSeen: '2 hours ago' }
-                ].map((device, index) => (
-                  <div key={index} className="p-6 bg-gray-900/30 backdrop-blur-sm border border-gray-800 rounded-2xl">
-                    <div className="flex items-center space-x-3 mb-4">
-                      <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-lg flex items-center justify-center">
-                        {device.type === 'desktop' && <Monitor className="w-5 h-5 text-white" />}
-                        {device.type === 'mobile' && <Smartphone className="w-5 h-5 text-white" />}
-                        {device.type === 'tablet' && <Tablet className="w-5 h-5 text-white" />}
-                      </div>
-                      <div>
-                        <h3 className="font-medium text-white">{device.name}</h3>
-                        <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(device.status)}`}>
-                          {device.status}
-                        </span>
-                      </div>
-                    </div>
-                    <p className="text-gray-400 text-sm mb-4">Last seen: {device.lastSeen}</p>
-                    <div className="flex items-center space-x-2">
-                      <button className="flex-1 bg-gray-800/50 text-white px-3 py-2 rounded-lg text-sm hover:bg-gray-700/50 transition-colors">
-                        View Details
-                      </button>
-                      <button className="flex-1 bg-gray-800/50 text-white px-3 py-2 rounded-lg text-sm hover:bg-gray-700/50 transition-colors">
-                        Manage
-                      </button>
-                    </div>
-                  </div>
-                ))}
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">
+                  Password
+                </label>
+                <input
+                  type="password"
+                  value={registrationData.password}
+                  onChange={(e) => setRegistrationData({...registrationData, password: e.target.value})}
+                  className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-green-400"
+                  placeholder="Create a strong password"
+                  required
+                />
               </div>
-            </motion.div>
-          )}
-
-          {activeTab === 'permissions' && (
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5 }}
-            >
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-2xl font-bold text-white">Permission Management</h2>
-                <button className="flex items-center space-x-2 bg-gradient-to-r from-yellow-400 to-orange-500 text-black px-4 py-2 rounded-lg font-semibold hover:shadow-lg hover:shadow-yellow-400/25 transition-all duration-200">
-                  <Plus className="w-4 h-4" />
-                  <span>Create Policy</span>
-                </button>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {[
-                  { name: 'TauMail', users: 1247, permissions: ['Read', 'Write', 'Delete'] },
-                  { name: 'TauCloud', users: 1189, permissions: ['Read', 'Write', 'Share'] },
-                  { name: 'TauStore', users: 892, permissions: ['Browse', 'Install', 'Update'] },
-                  { name: 'TauID', users: 1247, permissions: ['View', 'Edit', 'Manage'] },
-                  { name: 'Enterprise Tools', users: 156, permissions: ['Admin', 'Monitor', 'Configure'] },
-                  { name: 'API Access', users: 45, permissions: ['Read', 'Write', 'Execute'] }
-                ].map((service, index) => (
-                  <div key={index} className="p-6 bg-gray-900/30 backdrop-blur-sm border border-gray-800 rounded-2xl">
-                    <h3 className="text-lg font-bold text-white mb-2">{service.name}</h3>
-                    <p className="text-gray-400 text-sm mb-4">{service.users} users</p>
-                    <div className="space-y-2 mb-4">
-                      {service.permissions.map((permission, pIndex) => (
-                        <div key={pIndex} className="flex items-center justify-between">
-                          <span className="text-gray-300 text-sm">{permission}</span>
-                          <CheckCircle className="w-4 h-4 text-green-400" />
-                        </div>
-                      ))}
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <button className="flex-1 bg-gray-800/50 text-white px-3 py-2 rounded-lg text-sm hover:bg-gray-700/50 transition-colors">
-                        Edit
-                      </button>
-                      <button className="flex-1 bg-gray-800/50 text-white px-3 py-2 rounded-lg text-sm hover:bg-gray-700/50 transition-colors">
-                        View Users
-                      </button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </motion.div>
-          )}
-
-          {activeTab === 'activity' && (
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5 }}
-            >
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-2xl font-bold text-white">Activity Log</h2>
-                <button className="flex items-center space-x-2 bg-gradient-to-r from-yellow-400 to-orange-500 text-black px-4 py-2 rounded-lg font-semibold hover:shadow-lg hover:shadow-yellow-400/25 transition-all duration-200">
-                  <Download className="w-4 h-4" />
-                  <span>Export Log</span>
-                </button>
-              </div>
-
-              <div className="bg-gray-900/30 backdrop-blur-sm border border-gray-800 rounded-2xl overflow-hidden">
-                <div className="overflow-x-auto">
-                  <table className="w-full">
-                    <thead className="bg-gray-800/50">
-                      <tr>
-                        <th className="px-6 py-4 text-left text-sm font-medium text-gray-300">User</th>
-                        <th className="px-6 py-4 text-left text-sm font-medium text-gray-300">Action</th>
-                        <th className="px-6 py-4 text-left text-sm font-medium text-gray-300">Resource</th>
-                        <th className="px-6 py-4 text-left text-sm font-medium text-gray-300">Timestamp</th>
-                        <th className="px-6 py-4 text-left text-sm font-medium text-gray-300">Status</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-gray-800">
-                      {[
-                        { user: 'john.doe@company.com', action: 'Login from new device', resource: 'MacBook Pro', timestamp: '2 minutes ago', status: 'success' },
-                        { user: 'sarah.smith@company.com', action: 'Permission change', resource: 'TauCloud', timestamp: '5 minutes ago', status: 'success' },
-                        { user: 'admin@company.com', action: 'User account created', resource: 'New employee', timestamp: '10 minutes ago', status: 'success' },
-                        { user: 'unknown@external.com', action: 'Failed login attempt', resource: 'Unknown location', timestamp: '15 minutes ago', status: 'failed' }
-                      ].map((activity, index) => (
-                        <tr key={index} className="hover:bg-gray-800/30 transition-colors">
-                          <td className="px-6 py-4">
-                            <p className="font-medium text-white">{activity.user}</p>
-                          </td>
-                          <td className="px-6 py-4">
-                            <p className="text-white">{activity.action}</p>
-                          </td>
-                          <td className="px-6 py-4 text-sm text-gray-300">{activity.resource}</td>
-                          <td className="px-6 py-4 text-sm text-gray-300">{activity.timestamp}</td>
-                          <td className="px-6 py-4">
-                            <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(activity.status)}`}>
-                              {activity.status}
-                            </span>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            </motion.div>
-          )}
+              
+              <button
+                type="submit"
+                className="w-full bg-gradient-to-r from-green-500 to-emerald-500 text-white py-3 rounded-lg font-semibold hover:shadow-lg hover:shadow-green-500/25 transition-all duration-200"
+              >
+                Create Account
+              </button>
+            </form>
+            
+            <p className="text-center text-sm text-gray-400 mt-4">
+              Already have an account?{' '}
+              <button
+                onClick={() => {
+                  setShowRegistration(false);
+                  setShowLogin(true);
+                }}
+                className="text-green-400 hover:text-green-300"
+              >
+                Sign in
+              </button>
+            </p>
+          </motion.div>
         </div>
-      </div>
+      )}
+
+      {/* Login Modal */}
+      {showLogin && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="bg-gray-900 border border-gray-800 rounded-2xl p-8 w-full max-w-md"
+          >
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-2xl font-bold text-white">Sign In to TauID</h2>
+              <button
+                onClick={() => setShowLogin(false)}
+                className="text-gray-400 hover:text-white"
+              >
+                ×
+              </button>
+            </div>
+            
+            <form onSubmit={handleLogin} className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">
+                  Email
+                </label>
+                <input
+                  type="email"
+                  value={loginData.email}
+                  onChange={(e) => setLoginData({...loginData, email: e.target.value})}
+                  className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-green-400"
+                  placeholder="yourname@tauos.org"
+                  required
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">
+                  Password
+                </label>
+                <input
+                  type="password"
+                  value={loginData.password}
+                  onChange={(e) => setLoginData({...loginData, password: e.target.value})}
+                  className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-green-400"
+                  placeholder="Your password"
+                  required
+                />
+              </div>
+              
+              <button
+                type="submit"
+                className="w-full bg-gradient-to-r from-green-500 to-emerald-500 text-white py-3 rounded-lg font-semibold hover:shadow-lg hover:shadow-green-500/25 transition-all duration-200"
+              >
+                Sign In
+              </button>
+            </form>
+            
+            <p className="text-center text-sm text-gray-400 mt-4">
+              Don't have an account?{' '}
+              <button
+                onClick={() => {
+                  setShowLogin(false);
+                  setShowRegistration(true);
+                }}
+                className="text-green-400 hover:text-green-300"
+              >
+                Create one
+              </button>
+            </p>
+          </motion.div>
+        </div>
+      )}
+
+      {/* Footer */}
+      <footer className="bg-gray-900/50 border-t border-gray-800 py-12 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+            <div>
+              <h3 className="text-lg font-semibold text-white mb-4">Legal</h3>
+              <ul className="space-y-2">
+                <li><Link href="/legal/privacy" className="text-gray-400 hover:text-white">Privacy Policy</Link></li>
+                <li><Link href="/legal/terms" className="text-gray-400 hover:text-white">Terms of Service</Link></li>
+                <li><Link href="/legal/dpa" className="text-gray-400 hover:text-white">Data Protection</Link></li>
+                <li><Link href="/legal/cookies" className="text-gray-400 hover:text-white">Cookies Policy</Link></li>
+                <li><Link href="/legal/acceptable-use" className="text-gray-400 hover:text-white">Acceptable Use</Link></li>
+              </ul>
+            </div>
+            <div>
+              <h3 className="text-lg font-semibold text-white mb-4">Support</h3>
+              <ul className="space-y-2">
+                <li><Link href="/help" className="text-gray-400 hover:text-white">Help Center</Link></li>
+                <li><Link href="/contact" className="text-gray-400 hover:text-white">Contact Us</Link></li>
+                <li><Link href="/status" className="text-gray-400 hover:text-white">Status</Link></li>
+              </ul>
+            </div>
+            <div>
+              <h3 className="text-lg font-semibold text-white mb-4">Company</h3>
+              <ul className="space-y-2">
+                <li><Link href="/about" className="text-gray-400 hover:text-white">About</Link></li>
+                <li><Link href="/press" className="text-gray-400 hover:text-white">Press</Link></li>
+                <li><Link href="/careers" className="text-gray-400 hover:text-white">Careers</Link></li>
+              </ul>
+            </div>
+            <div>
+              <h3 className="text-lg font-semibold text-white mb-4">Community</h3>
+              <ul className="space-y-2">
+                <li><Link href="/blog" className="text-gray-400 hover:text-white">Blog</Link></li>
+                <li><Link href="https://github.com/tauos" className="text-gray-400 hover:text-white">GitHub</Link></li>
+                <li><Link href="https://x.com/tauos" className="text-gray-400 hover:text-white">Twitter</Link></li>
+                <li><Link href="https://mastodon.social/@tauos" className="text-gray-400 hover:text-white">Mastodon</Link></li>
+              </ul>
+            </div>
+          </div>
+          <div className="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
+            <p>&copy; 2025 TauOS. All rights reserved. Privacy-first computing.</p>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }
