@@ -725,14 +725,19 @@ app.use('*', (req, res) => {
     res.status(404).json({ error: 'Endpoint not found' });
 });
 
-// Start server
-app.listen(PORT, () => {
-    logger.info(`🚀 TauOS Mail Backend v2.0 running on http://localhost:${PORT}`);
-    logger.info(`📧 Email domain: @${process.env.EMAIL_DOMAIN}`);
-    logger.info(`💾 Database: PostgreSQL (Supabase)`);
-    logger.info(`🔒 Security: Rate limiting, input validation, JWT auth`);
-    logger.info(`📊 Health check: http://localhost:${PORT}/api/health`);
-});
+// Start server (only if not in Vercel environment)
+if (process.env.NODE_ENV !== 'production' || process.env.VERCEL !== '1') {
+    app.listen(PORT, () => {
+        logger.info(`🚀 TauOS Mail Backend v2.0 running on http://localhost:${PORT}`);
+        logger.info(`📧 Email domain: @${process.env.EMAIL_DOMAIN}`);
+        logger.info(`💾 Database: PostgreSQL (Supabase)`);
+        logger.info(`🔒 Security: Rate limiting, input validation, JWT auth`);
+        logger.info(`📊 Health check: http://localhost:${PORT}/api/health`);
+    });
+}
+
+// Export for Vercel
+module.exports = app;
 
 // Graceful shutdown
 process.on('SIGTERM', () => {
