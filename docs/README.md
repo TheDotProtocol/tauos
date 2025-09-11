@@ -1,71 +1,187 @@
-# TauOS Project Documentation
+# TauID - Decentralized Identity System
 
 ## Overview
 
-TauOS is a privacy-first, security-focused operating system designed to provide users with complete control over their Gateway to the Future of Computing. This documentation provides comprehensive technical details for whitepaper creation, branding, and community governance.
+TauID is a privacy-first decentralized identity system built on the DID:WEB standard. It provides secure, self-sovereign identity management without blockchain dependencies.
 
-## Documentation Structure
+## Features
 
-### 📋 [System Architecture](./architecture/)
-- **Kernel & Bootloader**: Custom Linux kernel, U-Boot, GRUB integration
-- **Desktop Environment**: GTK4 stack, TauHome, TauDock, TauStore
-- **Applications**: TauMail, TauCloud backend architecture
-- **Service Interaction**: Detailed system component diagrams
+- **DID:WEB Implementation**: Identity documents stored at `.well-known/did.json`
+- **Local Key Generation**: Secure key generation and storage
+- **Zero Blockchain Dependency**: Works without any blockchain
+- **Privacy-First**: No tracking, no telemetry, complete user control
+- **TauOS Integration**: Seamless integration with TauOS desktop
 
-### 👨‍💻 [Developer Documentation](./developer/)
-- **Module Breakdown**: Technical details for each component
-- **Build System**: Cargo workspace, testing, deployment
-- **Contributing Guide**: Development environment setup
-- **API Documentation**: REST endpoints and authentication
+## Architecture
 
-### 🔐 [Compliance Strategy](./compliance/)
-- **GDPR + DPDP**: Privacy dashboard implementation
-- **TauID System**: DID:WEB decentralized identity
-- **TauVoice**: Privacy-first STT/TTS architecture
-- **Data Management**: Export, delete, reset functionality
+```
+TauID System
+├── DID Document (.well-known/did.json)
+├── Local Key Storage
+├── Authentication Service
+├── Identity Management UI
+└── TauOS Integration
+```
 
-### 🎨 [Release Assets](./assets/)
-- **Screenshots**: High-quality images of all applications
-- **App Icons**: SVG assets and branding materials
-- **UI Components**: Design system and visual elements
-- **Marketing Assets**: Professional presentation materials
+## Components
 
-### 📦 [Release Documentation](./releases/)
-- **Changelog**: Detailed version history
-- **QA Results**: Testing reports and quality metrics
-- **Release Notes**: Component-specific documentation
-- **Deployment Guides**: Production setup instructions
+### 1. DID Document Structure
+```json
+{
+  "@context": ["https://www.w3.org/ns/did/v1"],
+  "id": "did:web:tauos.org",
+  "verificationMethod": [
+    {
+      "id": "did:web:tauos.org#key-1",
+      "type": "Ed25519VerificationKey2020",
+      "controller": "did:web:tauos.org",
+      "publicKeyMultibase": "z..."
+    }
+  ],
+  "authentication": ["did:web:tauos.org#key-1"],
+  "service": [
+    {
+      "id": "did:web:tauos.org#tauid",
+      "type": "TauIDService",
+      "serviceEndpoint": "https://tauid.tauos.org"
+    }
+  ]
+}
+```
 
-## Quick Links
+### 2. Local Key Management
+- Ed25519 key pairs for authentication
+- Secure local storage with encryption
+- Key rotation capabilities
+- Backup and recovery options
 
-- **Live Applications**: 
-  - [TauMail](https://mail.tauos.org) - Email service
-  - [TauCloud](https://cloud.tauos.org) - Cloud storage
-  - [TauOS Website](https://www.tauos.org) - Main site
-- **GitHub Repository**: [TheDotProtocol/tauos](https://github.com/TheDotProtocol/tauos)
-- **Production Status**: All systems operational with PostgreSQL integration
+### 3. Authentication Flow
+1. User creates TauID account
+2. Local keys generated and stored
+3. DID document created and published
+4. Authentication via cryptographic proofs
+5. Session management with JWT tokens
 
-## Technology Stack
+## Implementation
 
-- **Kernel**: Custom Linux (6.6.30)
-- **Desktop**: GTK4 with Rust backend
-- **Applications**: Node.js/Express with PostgreSQL
-- **Database**: Supabase PostgreSQL
-- **Deployment**: Vercel with custom domains
-- **Security**: JWT authentication, bcryptjs hashing
-- **Privacy**: Zero telemetry, GDPR compliant
+### Prerequisites
+- Node.js 18+
+- PostgreSQL
+- Redis
+- Docker & Docker Compose
 
-## Production Status
+### Quick Start
 
-✅ **All Systems Operational**
-- TauMail: https://mail.tauos.org
-- TauCloud: https://cloud.tauos.org
-- Website: https://www.tauos.org
-- Database: Supabase PostgreSQL connected
-- Authentication: JWT tokens working
-- Health Monitoring: All endpoints operational
+1. **Clone and Setup**:
+```bash
+cd tauos/tauid
+npm install
+```
 
----
+2. **Environment Configuration**:
+```bash
+cp .env.example .env
+# Edit .env with your configuration
+```
 
-*Last Updated: August 2, 2025*
-*Status: Production Ready for Public Launch* 
+3. **Database Setup**:
+```bash
+npm run db:migrate
+npm run db:seed
+```
+
+4. **Start Services**:
+```bash
+docker-compose up -d
+```
+
+5. **Access TauID**:
+- Web Interface: https://tauid.tauos.org
+- API Documentation: https://tauid.tauos.org/docs
+
+## API Endpoints
+
+### Identity Management
+- `POST /api/identity/create` - Create new TauID
+- `GET /api/identity/:did` - Get identity document
+- `PUT /api/identity/:did` - Update identity document
+- `DELETE /api/identity/:did` - Delete identity
+
+### Authentication
+- `POST /api/auth/login` - Login with TauID
+- `POST /api/auth/logout` - Logout
+- `GET /api/auth/verify` - Verify session
+- `POST /api/auth/refresh` - Refresh token
+
+### Key Management
+- `POST /api/keys/generate` - Generate new key pair
+- `GET /api/keys/:did` - Get public keys
+- `PUT /api/keys/:did` - Update keys
+- `DELETE /api/keys/:did` - Revoke keys
+
+## Security Features
+
+- **Zero Knowledge**: No personal data stored
+- **End-to-End Encryption**: All communications encrypted
+- **Local Key Storage**: Keys never leave user's device
+- **Audit Logging**: Complete audit trail
+- **GDPR Compliant**: Full privacy compliance
+
+## Integration with TauOS
+
+### Desktop Integration
+- TauOS login screen integration
+- System-wide identity management
+- Application authentication
+- File encryption with TauID keys
+
+### Service Integration
+- TauMail authentication
+- TauCloud access control
+- Tau Store user management
+- System settings integration
+
+## Development
+
+### Local Development
+```bash
+npm run dev
+npm run test
+npm run build
+```
+
+### Docker Development
+```bash
+docker-compose -f docker-compose.dev.yml up
+```
+
+## Deployment
+
+### Production Deployment
+```bash
+./deploy.sh
+```
+
+### Environment Variables
+- `TAUID_DOMAIN` - TauID domain (default: tauid.tauos.org)
+- `TAUID_SECRET` - JWT secret key
+- `DATABASE_URL` - PostgreSQL connection string
+- `REDIS_URL` - Redis connection string
+
+## Monitoring
+
+- **Health Checks**: `/health` endpoint
+- **Metrics**: Prometheus metrics
+- **Logs**: Structured JSON logging
+- **Alerts**: Automated alerting
+
+## Support
+
+- **Documentation**: https://docs.tauos.org/tauid
+- **Issues**: GitHub Issues
+- **Community**: Discord #tauid
+- **Email**: tauid@tauos.org
+
+## License
+
+MIT License - See LICENSE file for details. 

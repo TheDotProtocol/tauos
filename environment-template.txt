@@ -1,0 +1,31 @@
+# Copy these environment variables to your Vercel deployments
+# DO NOT commit this file to git
+
+# MAIN WEBSITE (tauos.org)
+DATABASE_URL=your_database_url_here
+JWT_SECRET=your_jwt_secret_here
+LOG_LEVEL=info
+NODE_ENV=production
+
+# MAIL BACKEND
+DATABASE_URL=your_database_url_here
+JWT_SECRET=your_jwt_secret_here
+SENDGRID_API_KEY=your_new_sendgrid_api_key_here
+SENDGRID_FROM_EMAIL=noreply@tauos.org
+SENDGRID_FROM_NAME=TauOS Mail
+SMTP_HOST=your_smtp_host
+SMTP_PORT=587
+SMTP_SECURE=false
+SMTP_USER=your_smtp_user
+SMTP_PASS=your_smtp_password
+MAX_FILE_SIZE=10485760
+LOG_LEVEL=info
+NODE_ENV=production
+
+# CLOUD BACKEND
+DATABASE_URL=your_database_url_here
+JWT_SECRET=your_jwt_secret_here
+MAX_FILE_SIZE=104857600
+UPLOAD_DIR=uploads
+LOG_LEVEL=info
+NODE_ENV=production
