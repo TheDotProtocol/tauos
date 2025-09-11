@@ -1,78 +1,361 @@
-import React from 'react';
-import Link from 'next/link';
-import { Newspaper, Calendar, Download } from 'lucide-react';
+'use client';
 
-export default function Press() {
+import { motion } from 'framer-motion';
+import {
+  Newspaper, Download, Mail, ExternalLink, Calendar, Users, Globe, Award,
+  ArrowRight, CheckCircle, Star, Zap, Shield, Lock, Eye, Code, Building
+} from 'lucide-react';
+
+export default function PressPage() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
-      <header className="bg-black/20 backdrop-blur-md border-b border-white/10">
+    <div className="min-h-screen bg-black text-white">
+      {/* Header */}
+      <header className="bg-gray-900/50 backdrop-blur-xl border-b border-gray-800 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-6">
-            <Link href="/" className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-xl">τ</span>
-              </div>
-              <span className="text-white text-xl font-bold">TauOS</span>
-            </Link>
+          <div className="flex items-center justify-between h-16">
+            <div className="flex items-center space-x-4">
+              <img src="/brand/tauos-logo.svg" alt="TauOS" className="h-8 w-auto" />
+              <span className="text-xl font-bold text-white">Tau OS</span>
+            </div>
+            <nav className="hidden md:flex items-center space-x-8">
+              <a href="/" className="text-gray-300 hover:text-white transition-colors">Home</a>
+              <a href="/about" className="text-gray-300 hover:text-white transition-colors">About</a>
+              <a href="/developers" className="text-gray-300 hover:text-white transition-colors">Developers</a>
+              <a href="/governance" className="text-gray-300 hover:text-white transition-colors">Governance</a>
+            </nav>
           </div>
         </div>
       </header>
 
-      <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="bg-white/5 backdrop-blur-md rounded-2xl border border-white/10 p-8">
-          <div className="flex items-center space-x-3 mb-8">
-            <Newspaper className="w-8 h-8 text-purple-400" />
-            <h1 className="text-4xl font-bold text-white">Press & Media</h1>
-          </div>
-          
-          <div className="space-y-8">
-            <section>
-              <h2 className="text-2xl font-semibold text-white mb-4 flex items-center">
-                <Calendar className="w-6 h-6 text-purple-400 mr-3" />
-                Press Releases
-              </h2>
-              <div className="space-y-4">
-                <div className="bg-white/5 rounded-lg p-4 border border-white/10">
-                  <h3 className="text-lg font-semibold text-white mb-2">TauOS Launches Privacy-First Operating System</h3>
-                  <p className="text-white/60 text-sm mb-2">September 12, 2025</p>
-                  <p className="text-white/80">TauOS announces the launch of the world's first truly privacy-first operating system...</p>
+      {/* Hero Section */}
+      <section className="py-20 bg-gradient-to-b from-gray-900 to-black">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            className="text-center mb-16"
+          >
+            <h1 className="text-5xl md:text-7xl font-bold mb-6">
+              <span className="bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">
+                Press Center
+              </span>
+            </h1>
+            <p className="text-xl md:text-2xl text-gray-300 max-w-4xl mx-auto leading-relaxed">
+              Media resources, press releases, and information for <span className="text-yellow-400 font-semibold">journalists and media professionals</span>.
+              <br />
+              Stay updated on TauOS developments and announcements.
+            </p>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Press Kit Section */}
+      <section className="py-20 bg-black">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            viewport={{ once: true }}
+            className="text-center mb-16"
+          >
+            <h2 className="text-4xl md:text-5xl font-bold mb-6">
+              <Download className="w-12 h-12 text-yellow-400 mx-auto mb-4" />
+              <span className="bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">
+                Press Kit
+              </span>
+            </h2>
+            <p className="text-xl text-gray-300 max-w-3xl mx-auto">
+              Download our complete press kit with logos, images, and media resources.
+            </p>
+          </motion.div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            {[
+              {
+                icon: Download,
+                title: "Logo Pack",
+                description: "High-resolution logos in various formats",
+                size: "25 MB"
+              },
+              {
+                icon: Globe,
+                title: "Screenshots",
+                description: "UI screenshots and interface images",
+                size: "50 MB"
+              },
+              {
+                icon: Users,
+                title: "Team Photos",
+                description: "Official team and leadership photos",
+                size: "30 MB"
+              },
+              {
+                icon: FileText,
+                title: "Brand Guidelines",
+                description: "Complete brand and style guidelines",
+                size: "15 MB"
+              }
+            ].map((item, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, delay: index * 0.1 }}
+                viewport={{ once: true }}
+                className="p-6 bg-gray-900/30 backdrop-blur-sm border border-gray-800 rounded-2xl hover:border-yellow-400/30 transition-all duration-300 group cursor-pointer"
+              >
+                <item.icon className="w-12 h-12 text-yellow-400 mb-4 group-hover:scale-110 transition-transform" />
+                <h3 className="text-xl font-bold text-white mb-3">{item.title}</h3>
+                <p className="text-gray-300 mb-4">{item.description}</p>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-gray-400">{item.size}</span>
+                  <div className="flex items-center text-yellow-400 group-hover:text-yellow-300 transition-colors">
+                    <span className="text-sm font-medium">Download</span>
+                    <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
+                  </div>
                 </div>
-              </div>
-            </section>
-
-            <section>
-              <h2 className="text-2xl font-semibold text-white mb-4 flex items-center">
-                <Download className="w-6 h-6 text-purple-400 mr-3" />
-                Media Kit
-              </h2>
-              <p className="text-white/80 leading-relaxed">
-                Download our press kit including logos, screenshots, and company information for media use.
-              </p>
-              <div className="mt-4">
-                <button className="bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-lg transition-colors">
-                  Download Media Kit
-                </button>
-              </div>
-            </section>
-
-            <section>
-              <h2 className="text-2xl font-semibold text-white mb-4">Contact</h2>
-              <p className="text-white/80 leading-relaxed">
-                For press inquiries, please contact:
-              </p>
-              <div className="mt-4 space-y-2 text-white/80">
-                <p><strong>Email:</strong> press@tauos.org</p>
-                <p><strong>Phone:</strong> +1 1800 TauOS</p>
-              </div>
-            </section>
+              </motion.div>
+            ))}
           </div>
         </div>
-      </main>
+      </section>
 
-      <footer className="bg-black/20 backdrop-blur-md border-t border-white/10 mt-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      {/* Press Releases Section */}
+      <section className="py-20 bg-gradient-to-b from-black to-gray-900">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            viewport={{ once: true }}
+            className="text-center mb-16"
+          >
+            <h2 className="text-4xl md:text-5xl font-bold mb-6">
+              <Newspaper className="w-12 h-12 text-yellow-400 mx-auto mb-4" />
+              <span className="bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">
+                Press Releases
+              </span>
+            </h2>
+          </motion.div>
+
+          <div className="space-y-8">
+            {[
+              {
+                title: "TauOS Launches World's First Privacy-First Operating System",
+                date: "September 11, 2025",
+                summary: "TauOS officially launches with complete email, cloud, and identity services, offering users a truly private computing experience.",
+                category: "Product Launch"
+              },
+              {
+                title: "Tau Foundation Announces Open Source Governance Model",
+                date: "August 15, 2025",
+                summary: "The Tau Foundation reveals its governance structure, ensuring community-driven development and transparent decision-making.",
+                category: "Governance"
+              },
+              {
+                title: "TauOS Partners with Leading Privacy Organizations",
+                date: "July 20, 2025",
+                summary: "Strategic partnerships with privacy advocacy groups to promote digital rights and user sovereignty.",
+                category: "Partnerships"
+              },
+              {
+                title: "TauOS Achieves 99.9% Uptime in Beta Testing",
+                date: "June 10, 2025",
+                summary: "Comprehensive beta testing shows exceptional reliability and performance across all TauOS services.",
+                category: "Performance"
+              }
+            ].map((release, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, delay: index * 0.1 }}
+                viewport={{ once: true }}
+                className="p-8 bg-gray-900/30 backdrop-blur-sm border border-gray-800 rounded-2xl hover:border-yellow-400/30 transition-all duration-300"
+              >
+                <div className="flex items-start justify-between mb-4">
+                  <div className="flex-1">
+                    <div className="flex items-center space-x-3 mb-2">
+                      <span className="px-3 py-1 bg-yellow-400/20 text-yellow-400 text-sm rounded-full">{release.category}</span>
+                      <span className="text-gray-400 text-sm">{release.date}</span>
+                    </div>
+                    <h3 className="text-2xl font-bold text-white mb-3">{release.title}</h3>
+                    <p className="text-gray-300 leading-relaxed">{release.summary}</p>
+                  </div>
+                  <ExternalLink className="w-6 h-6 text-gray-400 hover:text-yellow-400 transition-colors cursor-pointer" />
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Media Coverage Section */}
+      <section className="py-20 bg-black">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            viewport={{ once: true }}
+            className="text-center mb-16"
+          >
+            <h2 className="text-4xl md:text-5xl font-bold mb-6">
+              <Globe className="w-12 h-12 text-yellow-400 mx-auto mb-4" />
+              <span className="bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">
+                Media Coverage
+              </span>
+            </h2>
+            <p className="text-xl text-gray-300 max-w-3xl mx-auto">
+              What the media is saying about TauOS and the privacy-first computing movement.
+            </p>
+          </motion.div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {[
+              {
+                outlet: "TechCrunch",
+                title: "TauOS Challenges Big Tech with Privacy-First OS",
+                date: "September 10, 2025",
+                excerpt: "A new operating system that puts privacy first could be the answer to growing concerns about data surveillance."
+              },
+              {
+                outlet: "Wired",
+                title: "The Operating System That Refuses to Spy on You",
+                date: "September 8, 2025",
+                excerpt: "TauOS represents a fundamental shift in how we think about computing and digital privacy."
+              },
+              {
+                outlet: "Ars Technica",
+                title: "TauOS: A Complete Privacy-First Computing Platform",
+                date: "September 5, 2025",
+                excerpt: "From email to cloud storage, TauOS offers a complete alternative to surveillance capitalism."
+              }
+            ].map((article, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, delay: index * 0.1 }}
+                viewport={{ once: true }}
+                className="p-6 bg-gray-900/30 backdrop-blur-sm border border-gray-800 rounded-2xl hover:border-yellow-400/30 transition-all duration-300"
+              >
+                <div className="flex items-center space-x-3 mb-4">
+                  <div className="w-3 h-3 bg-yellow-400 rounded-full"></div>
+                  <span className="text-yellow-400 font-semibold">{article.outlet}</span>
+                </div>
+                <h3 className="text-xl font-bold text-white mb-3">{article.title}</h3>
+                <p className="text-gray-300 text-sm mb-4">{article.excerpt}</p>
+                <p className="text-gray-400 text-xs">{article.date}</p>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Contact Section */}
+      <section className="py-20 bg-gradient-to-b from-gray-900 to-black">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            viewport={{ once: true }}
+            className="text-center mb-16"
+          >
+            <h2 className="text-4xl md:text-5xl font-bold mb-6">
+              <Mail className="w-12 h-12 text-yellow-400 mx-auto mb-4" />
+              <span className="bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">
+                Press Contact
+              </span>
+            </h2>
+            <p className="text-xl text-gray-300 max-w-3xl mx-auto">
+              For media inquiries, interview requests, or press materials, contact our press team.
+            </p>
+          </motion.div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
+            {[
+              {
+                icon: Mail,
+                title: "Press Inquiries",
+                description: "General press questions and interview requests",
+                contact: "press@tauos.org",
+                responseTime: "24 hours"
+              },
+              {
+                icon: Users,
+                title: "Media Relations",
+                description: "Partnership opportunities and media collaborations",
+                contact: "media@tauos.org",
+                responseTime: "48 hours"
+              }
+            ].map((contact, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, delay: index * 0.1 }}
+                viewport={{ once: true }}
+                className="p-8 bg-gray-900/30 backdrop-blur-sm border border-gray-800 rounded-2xl hover:border-yellow-400/30 transition-all duration-300"
+              >
+                <contact.icon className="w-16 h-16 text-yellow-400 mb-6" />
+                <h3 className="text-2xl font-bold text-white mb-4">{contact.title}</h3>
+                <p className="text-gray-300 leading-relaxed mb-4">{contact.description}</p>
+                <div className="space-y-2">
+                  <p className="text-yellow-400 font-semibold">{contact.contact}</p>
+                  <p className="text-sm text-gray-400">Response time: {contact.responseTime}</p>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            viewport={{ once: true }}
+            className="text-center"
+          >
+            <div className="bg-gradient-to-r from-gray-900 to-black border border-gray-800 rounded-2xl p-8 max-w-4xl mx-auto mb-8">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div>
+                  <h3 className="text-xl font-bold text-white mb-4">Press Office</h3>
+                  <p className="text-gray-300 mb-2">Tau Foundation & Tau LLC</p>
+                  <p className="text-gray-300 mb-2">2261 Market St, San Francisco, CA 94114</p>
+                  <p className="text-gray-300 mb-2">Phone: +1 1800 TauOS</p>
+                </div>
+                <div>
+                  <h3 className="text-xl font-bold text-white mb-4">International</h3>
+                  <p className="text-gray-300 mb-2">Malaysia Office</p>
+                  <p className="text-gray-300 mb-2">IB Tower, Level 33, Kuala Lumpur</p>
+                  <p className="text-gray-300 mb-2">Phone: +60 178446206</p>
+                </div>
+              </div>
+            </div>
+
+            <a
+              href="mailto:press@tauos.org"
+              className="inline-flex items-center space-x-2 bg-gradient-to-r from-yellow-400 to-orange-500 text-black px-8 py-4 rounded-xl font-semibold hover:shadow-lg hover:shadow-yellow-400/25 transition-all duration-300"
+            >
+              <Mail className="w-5 h-5" />
+              <span>Contact Press Team</span>
+            </a>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="bg-gray-900/50 border-t border-gray-800 py-12">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
-            <p className="text-white/60 text-sm">© 2025 TauOS. All rights reserved.</p>
+            <div className="flex items-center justify-center space-x-4 mb-4">
+              <img src="/brand/tauos-logo.svg" alt="TauOS" className="h-8 w-auto" />
+              <span className="text-xl font-bold text-white">Tau OS</span>
+            </div>
+            <p className="text-gray-400">© 2025 Tau Foundation & Tau LLC. All rights reserved.</p>
           </div>
         </div>
       </footer>
