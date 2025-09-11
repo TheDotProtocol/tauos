@@ -21,22 +21,25 @@ const winston = require('winston');
 
 // Initialize logger
 const logger = winston.createLogger({
-    level: 'info',
+    level: process.env.LOG_LEVEL || 'info',
     format: winston.format.combine(
         winston.format.timestamp(),
         winston.format.errors({ stack: true }),
         winston.format.json()
     ),
     transports: [
-        new winston.transports.Console(),
-        new winston.transports.File({ filename: 'logs/error.log', level: 'error' }),
-        new winston.transports.File({ filename: 'logs/combined.log' })
+        new winston.transports.Console()
     ]
 });
 
-// Create logs directory if it doesn't exist
-if (!fs.existsSync('logs')) {
-    fs.mkdirSync('logs');
+// Add file logging only in non-serverless environments
+if (process.env.NODE_ENV !== 'production' || process.env.VERCEL !== '1') {
+    // Create logs directory if it doesn't exist
+    if (!fs.existsSync('logs')) {
+        fs.mkdirSync('logs');
+    }
+    logger.add(new winston.transports.File({ filename: 'logs/error.log', level: 'error' }));
+    logger.add(new winston.transports.File({ filename: 'logs/combined.log' }));
 }
 
 const app = express();
@@ -128,20 +131,8 @@ const authLimiter = rateLimit({
 app.use('/api/', generalLimiter);
 app.use('/api/auth/', authLimiter);
 
-// File upload configuration
-const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        const uploadDir = process.env.UPLOAD_DIR || './uploads';
-        if (!fs.existsSync(uploadDir)) {
-            fs.mkdirSync(uploadDir, { recursive: true });
-        }
-        cb(null, uploadDir);
-    },
-    filename: (req, file, cb) => {
-        const uniqueName = `${uuidv4()}-${file.originalname}`;
-        cb(null, uniqueName);
-    }
-});
+// File upload configuration (using memory storage for Vercel)
+const storage = multer.memoryStorage();
 
 const upload = multer({
     storage: storage,
