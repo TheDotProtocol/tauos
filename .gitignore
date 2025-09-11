@@ -4,15 +4,6 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
-# Next.js
-.next/
-out/
-build/
-
-# Production
-/build
-/dist
-
 # Environment variables
 .env
 .env.local
@@ -20,30 +11,48 @@ build/
 .env.test.local
 .env.production.local
 
-# Vercel
-.vercel
+# Config files with secrets
+config/
+env.local/
+*.env
+*.config
 
-# IDE
+# Build outputs
+.next/
+out/
+build/
+dist/
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# IDE files
 .vscode/
 .idea/
 *.swp
 *.swo
 
-# OS
-.DS_Store
-Thumbs.db
-
 # Logs
+logs/
 *.log
 
 # Runtime data
-pids
+pids/
 *.pid
 *.seed
 *.pid.lock
 
 # Coverage directory used by tools like istanbul
 coverage/
+
+# nyc test coverage
+.nyc_output
 
 # Dependency directories
 jspm_packages/
@@ -60,20 +69,44 @@ jspm_packages/
 # Yarn Integrity file
 .yarn-integrity
 
-# Rust
-target/
-Cargo.lock
+# dotenv environment variables file
+.env
 
-# Docker
-.dockerignore
+# parcel-bundler cache (https://parceljs.org/)
+.cache
+.parcel-cache
 
-# Temporary files
-*.tmp
-*.temp .terraform/
-# Large installer files (use Git LFS or host separately)
-tauos-installer/dist/
+# next.js build output
+.next
+
+# nuxt.js build output
+.nuxt
+
+# vuepress build output
+.vuepress/dist
+
+# Serverless directories
+.serverless
+
+# FuseBox cache
+.fusebox/
+
+# DynamoDB Local files
+.dynamodb/
+
+# TernJS port file
+.tern-port
+
+# Stores VSCode versions used for testing VSCode extensions
+.vscode-test
+
+# Installer files
 *.exe
 *.dmg
 *.deb
 *.AppImage
 *.iso
+
+# Supabase
+supabase/.branches
+supabase/.temp

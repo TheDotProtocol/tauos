@@ -1,0 +1,9 @@
+/Users/macbook/Desktop/tauos/target/release/deps/gtk4_macros-52f31e01ad1e85f9.d: /Users/macbook/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/gtk4-macros-0.8.2/src/lib.rs /Users/macbook/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/gtk4-macros-0.8.2/src/attribute_parser.rs /Users/macbook/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/gtk4-macros-0.8.2/src/composite_template_derive.rs /Users/macbook/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/gtk4-macros-0.8.2/src/template_callbacks_attribute.rs /Users/macbook/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/gtk4-macros-0.8.2/src/util.rs
+
+/Users/macbook/Desktop/tauos/target/release/deps/libgtk4_macros-52f31e01ad1e85f9.dylib: /Users/macbook/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/gtk4-macros-0.8.2/src/lib.rs /Users/macbook/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/gtk4-macros-0.8.2/src/attribute_parser.rs /Users/macbook/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/gtk4-macros-0.8.2/src/composite_template_derive.rs /Users/macbook/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/gtk4-macros-0.8.2/src/template_callbacks_attribute.rs /Users/macbook/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/gtk4-macros-0.8.2/src/util.rs
+
+/Users/macbook/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/gtk4-macros-0.8.2/src/lib.rs:
+/Users/macbook/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/gtk4-macros-0.8.2/src/attribute_parser.rs:
+/Users/macbook/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/gtk4-macros-0.8.2/src/composite_template_derive.rs:
+/Users/macbook/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/gtk4-macros-0.8.2/src/template_callbacks_attribute.rs:
+/Users/macbook/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/gtk4-macros-0.8.2/src/util.rs:
