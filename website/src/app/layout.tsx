@@ -2,9 +2,9 @@ import type { Metadata } from 'next'
 import './globals.css'
 
 export const metadata: Metadata = {
-  title: 'TauOS - The OS for the Intelligence Age',
-  description: 'TauOS intelligently orchestrates advanced agents and AI models to create a seamless, context-aware experience that understands your preferences and needs.',
-  keywords: 'TauOS, operating system, privacy, AI, artificial intelligence, Linux, open source, security',
+  title: 'Tau OS - Sovereign Privacy First OS',
+  description: 'TauOS is a complete, secure, zero-telemetry operating system for desktop and mobile—with first-party apps, encrypted services, and enterprise controls.',
+  keywords: 'TauOS, operating system, privacy, security, Linux, open source, zero telemetry, encrypted, sovereign',
   authors: [{ name: 'TauOS Team' }],
   creator: 'TauOS',
   publisher: 'TauOS',
@@ -18,8 +18,8 @@ export const metadata: Metadata = {
     canonical: '/',
   },
   openGraph: {
-    title: 'TauOS - The OS for the Intelligence Age',
-    description: 'TauOS intelligently orchestrates advanced agents and AI models to create a seamless, context-aware experience.',
+    title: 'Tau OS - Sovereign Privacy First OS',
+    description: 'TauOS is a complete, secure, zero-telemetry operating system for desktop and mobile—with first-party apps, encrypted services, and enterprise controls.',
     url: 'https://www.tauos.org',
     siteName: 'TauOS',
     images: [
@@ -27,7 +27,7 @@ export const metadata: Metadata = {
         url: '/og-image.png',
         width: 1200,
         height: 630,
-        alt: 'TauOS - The OS for the Intelligence Age',
+        alt: 'Tau OS - Sovereign Privacy First OS',
       },
     ],
     locale: 'en_US',
@@ -35,8 +35,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'TauOS - The OS for the Intelligence Age',
-    description: 'TauOS intelligently orchestrates advanced agents and AI models to create a seamless, context-aware experience.',
+    title: 'Tau OS - Sovereign Privacy First OS',
+    description: 'TauOS is a complete, secure, zero-telemetry operating system for desktop and mobile—with first-party apps, encrypted services, and enterprise controls.',
     images: ['/og-image.png'],
   },
   robots: {
@@ -63,22 +63,23 @@ export default function RootLayout({
   return (
     <html lang="en" className="scroll-smooth">
       <head>
-        <link rel="icon" href="/favicon.ico" />
+        <link rel="icon" href="/favicon.ico" sizes="32x32" />
+        <link rel="icon" href="/favicon-32x32.png" sizes="32x32" type="image/png" />
         <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
         <link rel="manifest" href="/manifest.json" />
-        <meta name="theme-color" content="#8b5cf6" />
+        <meta name="theme-color" content="#fbbf24" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <meta name="robots" content="index, follow" />
         <meta name="author" content="TauOS Team" />
-        <meta name="description" content="TauOS intelligently orchestrates advanced agents and AI models to create a seamless, context-aware experience that understands your preferences and needs." />
-        <meta property="og:title" content="TauOS - The OS for the Intelligence Age" />
-        <meta property="og:description" content="TauOS intelligently orchestrates advanced agents and AI models to create a seamless, context-aware experience." />
+        <meta name="description" content="TauOS is a complete, secure, zero-telemetry operating system for desktop and mobile—with first-party apps, encrypted services, and enterprise controls." />
+        <meta property="og:title" content="Tau OS - Sovereign Privacy First OS" />
+        <meta property="og:description" content="TauOS is a complete, secure, zero-telemetry operating system for desktop and mobile—with first-party apps, encrypted services, and enterprise controls." />
         <meta property="og:type" content="website" />
         <meta property="og:url" content="https://www.tauos.org" />
         <meta property="og:image" content="/og-image.png" />
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="TauOS - The OS for the Intelligence Age" />
-        <meta name="twitter:description" content="TauOS intelligently orchestrates advanced agents and AI models to create a seamless, context-aware experience." />
+        <meta name="twitter:title" content="Tau OS - Sovereign Privacy First OS" />
+        <meta name="twitter:description" content="TauOS is a complete, secure, zero-telemetry operating system for desktop and mobile—with first-party apps, encrypted services, and enterprise controls." />
         <meta name="twitter:image" content="/og-image.png" />
       </head>
       <body className="antialiased">

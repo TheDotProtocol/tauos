@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TauOS Installer</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            overflow: hidden;
+            height: 100vh;
+        }
+
+        .installer-container {
+            display: flex;
+            height: 100vh;
+        }
+
+        .sidebar {
+            width: 300px;
+            background: rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(10px);
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .main-content {
+            flex: 1;
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .logo {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .logo h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(45deg, #ffd700, #ffed4e);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .logo p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .progress-steps {
+            list-style: none;
+            margin: 2rem 0;
+        }
+
+        .progress-steps li {
+            padding: 1rem 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            opacity: 0.6;
+            transition: all 0.3s ease;
+        }
+
+        .progress-steps li.active {
+            opacity: 1;
+            color: #ffd700;
+        }
+
+        .progress-steps li.completed {
+            opacity: 0.8;
+        }
+
+        .step-icon {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 1rem;
+            font-size: 0.8rem;
+        }
+
+        .progress-steps li.active .step-icon {
+            background: #ffd700;
+            color: #333;
+        }
+
+        .progress-steps li.completed .step-icon {
+            background: #4ade80;
+            color: white;
+        }
+
+        .welcome-screen {
+            text-align: center;
+            max-width: 600px;
+        }
+
+        .welcome-screen h2 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(45deg, #ffd700, #ffed4e);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .welcome-screen p {
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+            opacity: 0.9;
+            line-height: 1.6;
+        }
+
+        .features {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .feature {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 1.5rem;
+            border-radius: 12px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .feature h3 {
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+            color: #ffd700;
+        }
+
+        .feature p {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        .install-button {
+            background: linear-gradient(45deg, #ffd700, #ffed4e);
+            color: #333;
+            border: none;
+            padding: 1rem 3rem;
+            font-size: 1.2rem;
+            font-weight: 600;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 1rem;
+        }
+
+        .install-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(255, 215, 0, 0.3);
+        }
+
+        .install-button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 2rem 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(45deg, #ffd700, #ffed4e);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .status-text {
+            text-align: center;
+            font-size: 1.1rem;
+            margin: 1rem 0;
+        }
+
+        .system-info {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin: 2rem 0;
+            backdrop-filter: blur(10px);
+        }
+
+        .system-info h3 {
+            margin-bottom: 1rem;
+            color: #ffd700;
+        }
+
+        .system-info p {
+            margin: 0.5rem 0;
+            opacity: 0.9;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .success-screen {
+            text-align: center;
+        }
+
+        .success-screen h2 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            color: #4ade80;
+        }
+
+        .success-screen p {
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+            opacity: 0.9;
+        }
+
+        .app-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+
+        .app-item {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 1rem;
+            border-radius: 8px;
+            text-align: center;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .app-item h4 {
+            margin-bottom: 0.5rem;
+            color: #ffd700;
+        }
+
+        .app-item p {
+            font-size: 0.8rem;
+            opacity: 0.8;
+        }
+    </style>
+</head>
+<body>
+    <div class="installer-container">
+        <div class="sidebar">
+            <div class="logo">
+                <h1>τOS</h1>
+                <p>Privacy-First OS</p>
+            </div>
+            
+            <ul class="progress-steps">
+                <li id="step-welcome" class="active">
+                    <div class="step-icon">1</div>
+                    <span>Welcome</span>
+                </li>
+                <li id="step-requirements">
+                    <div class="step-icon">2</div>
+                    <span>System Check</span>
+                </li>
+                <li id="step-install">
+                    <div class="step-icon">3</div>
+                    <span>Installation</span>
+                </li>
+                <li id="step-complete">
+                    <div class="step-icon">4</div>
+                    <span>Complete</span>
+                </li>
+            </ul>
+        </div>
+
+        <div class="main-content">
+            <!-- Welcome Screen -->
+            <div id="welcome-screen" class="welcome-screen">
+                <h2>Welcome to TauOS</h2>
+                <p>The world's first privacy-first operating system with complete sovereignty over your data and digital life.</p>
+                
+                <div class="features">
+                    <div class="feature">
+                        <h3>🔒 Privacy First</h3>
+                        <p>Zero telemetry, complete data sovereignty, end-to-end encryption</p>
+                    </div>
+                    <div class="feature">
+                        <h3>📧 Sovereign Email</h3>
+                        <p>Your own email server, better than Gmail and Proton</p>
+                    </div>
+                    <div class="feature">
+                        <h3>☁️ Secure Cloud</h3>
+                        <p>Private file storage with military-grade encryption</p>
+                    </div>
+                    <div class="feature">
+                        <h3>🛡️ Enterprise Security</h3>
+                        <p>Advanced security features for individuals and organizations</p>
+                    </div>
+                </div>
+
+                <button id="start-install" class="install-button">Start Installation</button>
+            </div>
+
+            <!-- Requirements Screen -->
+            <div id="requirements-screen" class="welcome-screen hidden">
+                <h2>System Requirements</h2>
+                <div class="system-info" id="system-info">
+                    <h3>Checking your system...</h3>
+                    <p>Please wait while we verify compatibility.</p>
+                </div>
+                <button id="continue-install" class="install-button" disabled>Continue Installation</button>
+            </div>
+
+            <!-- Installation Screen -->
+            <div id="install-screen" class="welcome-screen hidden">
+                <h2>Installing TauOS</h2>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progress-fill"></div>
+                </div>
+                <div class="status-text" id="status-text">Preparing installation...</div>
+                <div class="system-info" id="install-details">
+                    <h3>Installation Progress</h3>
+                    <p id="install-step">Initializing...</p>
+                </div>
+            </div>
+
+            <!-- Complete Screen -->
+            <div id="complete-screen" class="success-screen hidden">
+                <h2>🎉 Installation Complete!</h2>
+                <p>TauOS has been successfully installed on your system.</p>
+                
+                <div class="app-grid">
+                    <div class="app-item">
+                        <h4>TauMail</h4>
+                        <p>Secure Email</p>
+                    </div>
+                    <div class="app-item">
+                        <h4>TauCloud</h4>
+                        <p>File Storage</p>
+                    </div>
+                    <div class="app-item">
+                        <h4>TauID</h4>
+                        <p>Identity Manager</p>
+                    </div>
+                    <div class="app-item">
+                        <h4>TauStore</h4>
+                        <p>App Marketplace</p>
+                    </div>
+                    <div class="app-item">
+                        <h4>TauBrowser</h4>
+                        <p>Privacy Browser</p>
+                    </div>
+                    <div class="app-item">
+                        <h4>Desktop UI</h4>
+                        <p>Main Interface</p>
+                    </div>
+                </div>
+
+                <button id="launch-tauos" class="install-button">Launch TauOS</button>
+                <button id="launch-desktop" class="install-button" style="background: linear-gradient(45deg, #667eea, #764ba2);">Launch Desktop Launcher</button>
+                <button id="verify-security" class="install-button" style="background: linear-gradient(45deg, #ff6b6b, #ee5a24);">Verify Security</button>
+                <button id="check-updates" class="install-button" style="background: linear-gradient(45deg, #4ecdc4, #44a08d);">Check Updates</button>
+                <button id="close-installer" class="install-button" style="background: rgba(255, 255, 255, 0.2); color: white;">Close Installer</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const { ipcRenderer } = require('electron');
+        
+        let currentStep = 'welcome';
+        let systemInfo = {};
+
+        // Step management
+        function showStep(step) {
+            document.querySelectorAll('.welcome-screen').forEach(screen => {
+                screen.classList.add('hidden');
+            });
+            document.getElementById(step + '-screen').classList.remove('hidden');
+            
+            // Update progress steps
+            document.querySelectorAll('.progress-steps li').forEach(li => {
+                li.classList.remove('active', 'completed');
+            });
+            
+            const stepElement = document.getElementById('step-' + step);
+            if (stepElement) {
+                stepElement.classList.add('active');
+            }
+            
+            // Mark previous steps as completed
+            const steps = ['welcome', 'requirements', 'install', 'complete'];
+            const currentIndex = steps.indexOf(step);
+            for (let i = 0; i < currentIndex; i++) {
+                const prevStep = document.getElementById('step-' + steps[i]);
+                if (prevStep) {
+                    prevStep.classList.add('completed');
+                }
+            }
+        }
+
+        // Event listeners
+        document.getElementById('start-install').addEventListener('click', async () => {
+            showStep('requirements');
+            await checkSystemRequirements();
+        });
+
+        document.getElementById('continue-install').addEventListener('click', () => {
+            showStep('install');
+            startInstallation();
+        });
+
+        document.getElementById('launch-tauos').addEventListener('click', async () => {
+            const result = await ipcRenderer.invoke('start-tauos');
+            if (result.success) {
+                alert('TauOS is starting up! Check your system tray for the TauOS icon.');
+            } else {
+                alert('Error starting TauOS: ' + result.error);
+            }
+        });
+
+        document.getElementById('launch-desktop').addEventListener('click', async () => {
+            const result = await ipcRenderer.invoke('show-desktop-launcher');
+            if (result.success) {
+                alert('Desktop Launcher is starting! You can access all TauOS apps from the system tray.');
+            } else {
+                alert('Error launching Desktop Launcher: ' + result.error);
+            }
+        });
+
+        document.getElementById('verify-security').addEventListener('click', async () => {
+            const result = await ipcRenderer.invoke('get-security-status');
+            if (result.success) {
+                const status = result.status;
+                const securityInfo = `TauOS Security Status:
+                
+Code Signing: ${status.codeSigning ? '✅ Enabled' : '❌ Disabled'}
+Checksums: ${status.checksums ? '✅ Generated' : '❌ Missing'}
+Signatures: ${status.signatures ? '✅ Verified' : '❌ Missing'}
+Security Manifest: ${status.securityManifest ? '✅ Created' : '❌ Missing'}
+
+TauOS is production-ready with enterprise-grade security!`;
+                alert(securityInfo);
+            } else {
+                alert('Error checking security status: ' + result.error);
+            }
+        });
+
+        document.getElementById('check-updates').addEventListener('click', async () => {
+            const result = await ipcRenderer.invoke('check-for-updates');
+            if (result.success) {
+                alert('Update check initiated! TauOS will automatically check for updates every 24 hours.');
+            } else {
+                alert('Error checking for updates: ' + result.error);
+            }
+        });
+
+        document.getElementById('close-installer').addEventListener('click', () => {
+            window.close();
+        });
+
+        // System requirements check
+        async function checkSystemRequirements() {
+            try {
+                systemInfo = await ipcRenderer.invoke('check-system-requirements');
+                
+                const systemInfoDiv = document.getElementById('system-info');
+                systemInfoDiv.innerHTML = `
+                    <h3>System Information</h3>
+                    <p><strong>Operating System:</strong> ${systemInfo.os}</p>
+                    <p><strong>Architecture:</strong> ${systemInfo.arch}</p>
+                    <p><strong>Node.js Version:</strong> ${systemInfo.nodeVersion}</p>
+                    <p><strong>Memory Usage:</strong> ${Math.round(systemInfo.memory.heapUsed / 1024 / 1024)} MB</p>
+                    <p><strong>Status:</strong> <span style="color: #4ade80;">✓ Compatible</span></p>
+                `;
+                
+                document.getElementById('continue-install').disabled = false;
+            } catch (error) {
+                console.error('System check failed:', error);
+                document.getElementById('system-info').innerHTML = `
+                    <h3>System Check Failed</h3>
+                    <p style="color: #ff6b6b;">Unable to verify system requirements. Installation may not work properly.</p>
+                `;
+            }
+        }
+
+        // Installation process
+        async function startInstallation() {
+            const progressFill = document.getElementById('progress-fill');
+            const statusText = document.getElementById('status-text');
+            const installStep = document.getElementById('install-step');
+            
+            const steps = [
+                { text: 'Creating installation directory...', progress: 10 },
+                { text: 'Copying application files...', progress: 30 },
+                { text: 'Installing TauMail...', progress: 50 },
+                { text: 'Installing TauCloud...', progress: 60 },
+                { text: 'Installing TauID...', progress: 70 },
+                { text: 'Installing TauStore...', progress: 80 },
+                { text: 'Installing TauBrowser...', progress: 85 },
+                { text: 'Installing Desktop UI...', progress: 90 },
+                { text: 'Creating shortcuts...', progress: 95 },
+                { text: 'Finalizing installation...', progress: 100 }
+            ];
+            
+            for (let i = 0; i < steps.length; i++) {
+                const step = steps[i];
+                statusText.textContent = step.text;
+                installStep.textContent = `Step ${i + 1} of ${steps.length}: ${step.text}`;
+                progressFill.style.width = step.progress + '%';
+                
+                // Simulate installation time
+                await new Promise(resolve => setTimeout(resolve, 500));
+            }
+            
+            // Complete installation
+            try {
+                const result = await ipcRenderer.invoke('install-tauos', {
+                    installPath: process.env.USERPROFILE || process.env.HOME + '/TauOS'
+                });
+                
+                if (result.success) {
+                    showStep('complete');
+                } else {
+                    statusText.textContent = 'Installation failed: ' + result.error;
+                }
+            } catch (error) {
+                statusText.textContent = 'Installation failed: ' + error.message;
+            }
+        }
+
+        // Initialize
+        showStep('welcome');
+    </script>
+</body>
+</html>

@@ -70,3 +70,10 @@ Cargo.lock
 # Temporary files
 *.tmp
 *.temp .terraform/
+# Large installer files (use Git LFS or host separately)
+tauos-installer/dist/
+*.exe
+*.dmg
+*.deb
+*.AppImage
+*.iso

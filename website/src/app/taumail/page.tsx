@@ -3,664 +3,457 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { 
-  Mail,
-  Shield,
-  Lock,
-  EyeOff,
-  ArrowRight,
-  CheckCircle,
-  Users,
-  Zap,
-  Globe,
-  Search,
-  Edit3,
-  FileText,
-  Inbox,
-  Send,
-  Star,
-  Archive,
-  Settings,
-  Bell,
-  User,
-  ChevronRight,
-  Play,
-  Sparkles,
-  Key,
-  Smartphone,
-  Monitor,
-  Tablet,
-  Server,
-  Database,
-  Cpu,
-  HardDrive,
-  Wifi,
-  Battery,
-  Heart,
-  Code,
-  GitBranch,
-  Github,
-  Twitter,
-  Linkedin,
-  Clock,
-  Calendar,
-  MessageSquare,
-  Video,
-  Phone as PhoneIcon,
-  FileImage,
-  FileVideo,
-  FileAudio,
-  FileText as FileTextIcon,
-  FolderOpen,
-  Share2,
-  Copy,
-  Trash2,
-  MoreHorizontal,
-  Plus,
-  Minus,
-  X,
-  Check,
-  AlertCircle,
-  Info,
-  ExternalLink,
-  Download as DownloadIcon,
-  Upload,
-  RefreshCw,
-  RotateCcw,
-  Save,
-  Eye,
-  EyeOff as EyeOffIcon,
-  Unlock,
-  Key as KeyIcon,
-  Fingerprint,
-  Shield as ShieldIcon,
-  Zap as ZapIcon,
-  Globe as GlobeIcon,
-  Cloud,
-  Database as DatabaseIcon,
-  Server as ServerIcon,
-  Cpu as CpuIcon,
-  HardDrive as HardDriveIcon,
-  Wifi as WifiIcon,
-  Battery as BatteryIcon,
-  Smartphone as SmartphoneIcon,
-  Monitor as MonitorIcon,
-  Tablet as TabletIcon,
-  Server as ServerIcon2,
-  Database as DatabaseIcon2,
-  Cpu as CpuIcon2,
-  HardDrive as HardDriveIcon2,
-  Wifi as WifiIcon2,
-  Battery as BatteryIcon2,
-  Smartphone as SmartphoneIcon2,
-  Monitor as MonitorIcon2,
-  Tablet as TabletIcon2,
-  Server as ServerIcon3,
-  Database as DatabaseIcon3,
-  Cpu as CpuIcon3,
-  HardDrive as HardDriveIcon3,
-  Wifi as WifiIcon3,
-  Battery as BatteryIcon3,
-  Smartphone as SmartphoneIcon3,
-  Monitor as MonitorIcon3,
-  Tablet as TabletIcon3
+  Mail, Inbox, Send, Archive, Trash2, Star, Search, Plus, 
+  Filter, Download, Reply, Forward, MoreVertical, Users, 
+  Shield, Lock, Eye, CheckCircle, AlertCircle, BarChart3, 
+  Activity, Settings, Calendar, Clock
 } from 'lucide-react';
 
-export default function TauMailPage() {
-  const [email, setEmail] = useState('');
-  const [domain, setDomain] = useState('');
+export default function TauMailDashboard() {
+  const [activeTab, setActiveTab] = useState('inbox');
+  const [showRegistration, setShowRegistration] = useState(false);
+  const [registrationData, setRegistrationData] = useState({
+    email: '',
+    password: '',
+    username: '',
+    fullName: ''
+  });
 
-  const features = [
-    {
-      icon: <Shield className="w-8 h-8 text-green-500" />,
-      title: "End-to-End Encryption",
-      description: "Your emails are encrypted before they leave your device with military-grade AES-256 encryption",
-      color: "from-green-500/20 to-emerald-500/20"
-    },
-    {
-      icon: <EyeOff className="w-8 h-8 text-blue-500" />,
-      title: "Zero Tracking",
-      description: "No tracking pixels, no data mining, no surveillance. Complete privacy by design",
-      color: "from-blue-500/20 to-cyan-500/20"
-    },
-    {
-      icon: <Globe className="w-8 h-8 text-purple-500" />,
-      title: "Custom Domains",
-      description: "Use your own domain with full control. Professional email addresses for your brand",
-      color: "from-purple-500/20 to-pink-500/20"
-    },
-    {
-      icon: <Server className="w-8 h-8 text-orange-500" />,
-      title: "Self-Host Option",
-      description: "Deploy on your own servers for maximum control and complete sovereignty",
-      color: "from-orange-500/20 to-red-500/20"
+  const emailMetrics = {
+    totalEmails: 2847,
+    unreadEmails: 23,
+    sentEmails: 156,
+    privacyScore: 98,
+    securityEvents: 1
+  };
+
+  const privacyBreakdown = [
+    { category: 'End-to-End Encryption', score: 100, status: 'excellent' },
+    { category: 'Phishing Protection', score: 98, status: 'excellent' },
+    { category: 'Spam Filtering', score: 96, status: 'excellent' },
+    { category: 'Data Retention', score: 95, status: 'excellent' },
+    { category: 'Access Control', score: 99, status: 'excellent' }
+  ];
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'active': return 'text-green-400 bg-green-400/10';
+      case 'excellent': return 'text-green-400 bg-green-400/10';
+      case 'good': return 'text-yellow-400 bg-yellow-400/10';
+      case 'success': return 'text-green-400 bg-green-400/10';
+      case 'failed': return 'text-red-400 bg-red-400/10';
+      default: return 'text-gray-400 bg-gray-400/10';
     }
-  ];
-
-  const stats = [
-    { number: "99.9%", label: "Uptime Guarantee", icon: <Zap className="w-6 h-6 text-yellow-500" /> },
-    { number: "256-bit", label: "AES Encryption", icon: <Lock className="w-6 h-6 text-green-500" /> },
-    { number: "0", label: "Tracking Pixels", icon: <EyeOff className="w-6 h-6 text-blue-500" /> },
-    { number: "∞", label: "Custom Domains", icon: <Globe className="w-6 h-6 text-purple-500" /> }
-  ];
-
-  const integrations = [
-    { name: "TauCloud", icon: <Cloud className="w-6 h-6 text-blue-500" />, desc: "Seamless file sharing" },
-    { name: "TauCalendar", icon: <Calendar className="w-6 h-6 text-green-500" />, desc: "Smart scheduling" },
-    { name: "TauContacts", icon: <Users className="w-6 h-6 text-purple-500" />, desc: "Contact management" },
-    { name: "TauTasks", icon: <CheckCircle className="w-6 h-6 text-orange-500" />, desc: "Task organization" }
-  ];
+  };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black text-white overflow-hidden">
-      {/* Animated Background */}
-      <div className="fixed inset-0 -z-10">
-        <div className="absolute inset-0 bg-gradient-to-br from-gray-900 via-gray-800 to-black" />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(139,92,246,0.15),transparent_50%)]" />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom,rgba(59,130,246,0.1),transparent_50%)]" />
-        <motion.div 
-          className="absolute inset-0 opacity-30"
-          animate={{ 
-            background: [
-              "radial-gradient(circle at 20% 80%, rgba(139,92,246,0.1) 0%, transparent 50%)",
-              "radial-gradient(circle at 80% 20%, rgba(59,130,246,0.1) 0%, transparent 50%)",
-              "radial-gradient(circle at 40% 40%, rgba(16,185,129,0.1) 0%, transparent 50%)",
-              "radial-gradient(circle at 20% 80%, rgba(139,92,246,0.1) 0%, transparent 50%)"
-            ]
-          }}
-          transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
-        />
-      </div>
-
-      {/* Header */}
-      <header className="relative z-50 bg-black/20 backdrop-blur-xl border-b border-white/10">
+    <div className="min-h-screen bg-black text-white">
+      <header className="bg-gray-900/50 backdrop-blur-xl border-b border-gray-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-20">
-            <motion.div 
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              className="flex items-center space-x-4"
-            >
-              <div className="flex items-center space-x-3">
-                <div className="w-10 h-10 bg-gradient-to-br from-red-500 to-red-600 rounded-xl flex items-center justify-center shadow-lg">
-                  <Mail className="w-6 h-6 text-white" />
-                </div>
-                <span className="text-2xl font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
-                  TauMail
-                </span>
+          <div className="flex items-center justify-between h-16">
+            <div className="flex items-center space-x-4">
+              <img src="/brand/tauos-logo.svg" alt="TauOS" className="w-10 h-10" />
+              <div>
+                <h1 className="text-xl font-bold text-white">TauMail</h1>
+                <p className="text-sm text-gray-400">Private Email Platform</p>
               </div>
-            </motion.div>
-            
-            <motion.div 
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              className="flex items-center space-x-6"
-            >
-              <a href="/" className="text-gray-300 hover:text-white transition-all duration-300 hover:scale-105">
-                Back to TauOS
-              </a>
-              <button className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white px-6 py-3 rounded-xl font-medium transition-all duration-300 hover:scale-105 shadow-lg">
-                Sign In
+            </div>
+            <div className="flex items-center space-x-4">
+              <button
+                onClick={() => setShowRegistration(!showRegistration)}
+                className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+              >
+                {showRegistration ? 'Hide Registration' : 'Get @tauos.org Email'}
               </button>
-            </motion.div>
+              <button
+                onClick={async () => {
+                  try {
+                    const response = await fetch('http://localhost:3001/api/auth/send-test-email', {
+                      method: 'POST',
+                      headers: {
+                        'Content-Type': 'application/json',
+                      },
+                      body: JSON.stringify({
+                        to: 'saleenafalcon@gmail.com',
+                        subject: 'TauOS Frontend Test',
+                        text: 'This email was sent from the TauOS frontend interface!'
+                      })
+                    });
+                    const result = await response.json();
+                    if (response.ok) {
+                      alert('✅ Email sent successfully! Check your inbox.');
+                    } else {
+                      alert('❌ Error: ' + result.error);
+                    }
+                  } catch (error) {
+                    alert('❌ Connection error: ' + error.message);
+                  }
+                }}
+                className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+              >
+                Test Email
+              </button>
+              <button className="p-2 text-gray-400 hover:text-white transition-colors">
+                <Settings className="w-5 h-5" />
+              </button>
+              <div className="w-8 h-8 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full flex items-center justify-center">
+                <Mail className="w-4 h-4 text-black" />
+              </div>
+            </div>
           </div>
         </div>
       </header>
 
-      {/* Hero Section */}
-      <section className="relative py-32 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center">
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8 }}
-              className="space-y-8"
-            >
-              {/* Main Heading */}
-              <div className="space-y-6">
-                <motion.h1 
-                  className="text-6xl md:text-7xl font-black leading-tight"
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.8, delay: 0.2 }}
+      {showRegistration && (
+        <div className="bg-gray-900/50 backdrop-blur-xl border-b border-gray-800">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+            <div className="max-w-md mx-auto">
+              <h2 className="text-2xl font-bold text-white mb-4 text-center">Get Your @tauos.org Email</h2>
+              <form
+                onSubmit={async (e) => {
+                  e.preventDefault();
+                  try {
+                    const response = await fetch('http://localhost:3001/api/auth/register', {
+                      method: 'POST',
+                      headers: {
+                        'Content-Type': 'application/json',
+                      },
+                      body: JSON.stringify({
+                        ...registrationData,
+                        email: `${registrationData.username}@tauos.org`
+                      })
+                    });
+                    const result = await response.json();
+                    if (response.ok) {
+                      alert('✅ Registration successful! You can now use your @tauos.org email.');
+                      setShowRegistration(false);
+                      setRegistrationData({ email: '', password: '', username: '', fullName: '' });
+                    } else {
+                      alert('❌ Error: ' + result.error);
+                    }
+                  } catch (error) {
+                    alert('❌ Connection error: ' + error.message);
+                  }
+                }}
+                className="space-y-4"
+              >
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">Username</label>
+                  <div className="flex">
+                    <input
+                      type="text"
+                      value={registrationData.username}
+                      onChange={(e) => setRegistrationData({...registrationData, username: e.target.value})}
+                      className="flex-1 px-3 py-2 bg-gray-800 border border-gray-700 rounded-l-lg text-white placeholder-gray-400 focus:outline-none focus:border-yellow-400"
+                      placeholder="yourname"
+                      required
+                    />
+                    <span className="px-3 py-2 bg-gray-700 border border-l-0 border-gray-700 rounded-r-lg text-gray-300">@tauos.org</span>
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">Full Name</label>
+                  <input
+                    type="text"
+                    value={registrationData.fullName}
+                    onChange={(e) => setRegistrationData({...registrationData, fullName: e.target.value})}
+                    className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-yellow-400"
+                    placeholder="Your Full Name"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">Password</label>
+                  <input
+                    type="password"
+                    value={registrationData.password}
+                    onChange={(e) => setRegistrationData({...registrationData, password: e.target.value})}
+                    className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-yellow-400"
+                    placeholder="Choose a secure password"
+                    required
+                  />
+                </div>
+                <button
+                  type="submit"
+                  className="w-full bg-gradient-to-r from-yellow-400 to-orange-500 text-black px-4 py-2 rounded-lg font-semibold hover:shadow-lg hover:shadow-yellow-400/25 transition-all duration-200"
                 >
-                  <span className="text-white">Secure, smart, and</span>
-                  <br />
-                  <span className="bg-gradient-to-r from-red-400 via-pink-400 to-purple-400 bg-clip-text text-transparent">
-                    private email
-                  </span>
-                  <br />
-                  <span className="text-blue-400">for everyone</span>
-                </motion.h1>
-                
-                <motion.p 
-                  className="text-xl md:text-2xl text-gray-300 max-w-4xl mx-auto leading-relaxed"
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.8, delay: 0.4 }}
-                >
-                  Get more done with TauMail. Now integrated with TauCloud, TauCalendar, and more, all in one place. 
-                  Built with privacy-first principles and zero tracking.
-                </motion.p>
-              </div>
-
-              {/* CTA Buttons */}
-              <motion.div 
-                className="flex flex-col sm:flex-row items-center justify-center space-y-4 sm:space-y-0 sm:space-x-6"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, delay: 0.6 }}
-              >
-                <button className="group relative px-8 py-4 bg-gradient-to-r from-red-500 to-red-600 rounded-xl text-lg font-semibold flex items-center space-x-3 transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:shadow-red-500/25">
-                  <span>Get Started Free</span>
-                  <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-x-1" />
+                  Create @tauos.org Account
                 </button>
-                
-                <button className="px-8 py-4 border border-white/20 rounded-xl text-lg font-semibold flex items-center space-x-3 transition-all duration-300 hover:bg-white/10 hover:scale-105 backdrop-blur-sm">
-                  <Play className="w-5 h-5" />
-                  <span>Watch Demo</span>
-                </button>
-              </motion.div>
-
-              {/* Floating Elements */}
-              <motion.div 
-                className="absolute top-1/4 left-1/4 opacity-20"
-                animate={{ y: [-10, 10, -10] }}
-                transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-              >
-                <Sparkles className="w-8 h-8 text-red-400" />
-              </motion.div>
-              
-              <motion.div 
-                className="absolute top-1/3 right-1/4 opacity-20"
-                animate={{ y: [10, -10, 10] }}
-                transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
-              >
-                <Sparkles className="w-6 h-6 text-blue-400" />
-              </motion.div>
-            </motion.div>
+              </form>
+            </div>
           </div>
         </div>
-      </section>
+      )}
 
-      {/* AI Features Section */}
-      <section className="py-24 px-4 sm:px-6 lg:px-8 relative">
-        <div className="max-w-7xl mx-auto">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            viewport={{ once: true }}
-            className="text-center mb-20"
-          >
-            <h2 className="text-5xl md:text-6xl font-bold mb-6">
-              <span className="text-white">TauAI in </span>
-              <span className="bg-gradient-to-r from-red-400 to-purple-400 bg-clip-text text-transparent">TauMail</span>
-            </h2>
-            <p className="text-xl text-gray-300 max-w-3xl mx-auto">
-              Save time managing your inbox at home or on the go with TauAI. Use TauAI with your TauOS Premium plan 
-              for personal use or as part of your TauOS Workspace plan for work.
-            </p>
-          </motion.div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            {[
-              {
-                title: "Write better emails with the help of AI",
-                description: "TauAI in TauMail can compose well-written drafts or replies for you to edit, personalize and quickly hit send.",
-                icon: <Edit3 className="w-12 h-12 text-red-400" />,
-                color: "from-red-500/20 to-pink-500/20"
-              },
-              {
-                title: "Search your inbox in a whole new way",
-                description: "TauAI can answer complex questions from your inbox or TauCloud files to help find what you're looking for.",
-                icon: <Search className="w-12 h-12 text-blue-400" />,
-                color: "from-blue-500/20 to-cyan-500/20"
-              },
-              {
-                title: "See the important details, summarized",
-                description: "Stay on top of lengthy email chains with built-in email summarization powered by TauAI.",
-                icon: <FileText className="w-12 h-12 text-green-400" />,
-                color: "from-green-500/20 to-emerald-500/20"
-              }
-            ].map((feature, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, delay: index * 0.1 }}
-                viewport={{ once: true }}
-                className="group relative"
-              >
-                <div className={`relative p-8 rounded-2xl bg-gradient-to-br ${feature.color} border border-white/10 backdrop-blur-sm transition-all duration-300 hover:scale-105 hover:shadow-2xl`}>
-                  <div className="flex justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
-                    {feature.icon}
-                  </div>
-                  <h3 className="text-2xl font-bold mb-4 text-white">{feature.title}</h3>
-                  <p className="text-gray-300 leading-relaxed">{feature.description}</p>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Security Section */}
-      <section className="py-24 px-4 sm:px-6 lg:px-8 bg-black/20">
-        <div className="max-w-7xl mx-auto">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            viewport={{ once: true }}
-            className="text-center mb-20"
-          >
-            <h2 className="text-5xl md:text-6xl font-bold mb-6">
-              Email that's <span className="bg-gradient-to-r from-green-400 to-emerald-400 bg-clip-text text-transparent">secure</span>, 
-              <span className="bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent"> private</span>, and 
-              <span className="bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent"> puts you in control</span>
-            </h2>
-          </motion.div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-            <motion.div
-              initial={{ opacity: 0, x: -30 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.8 }}
-              viewport={{ once: true }}
-              className="space-y-8"
-            >
-              <div className="space-y-6">
-                <div className="flex items-start space-x-4">
-                  <div className="w-12 h-12 bg-green-600 rounded-xl flex items-center justify-center mt-1">
-                    <Shield className="w-6 h-6 text-white" />
-                  </div>
-                  <div>
-                    <h3 className="text-2xl font-bold text-white mb-2">We never use your TauMail content for any ads purposes</h3>
-                    <p className="text-gray-300 text-lg">TauMail uses industry-leading encryption for all messages you receive and send. We never use your TauMail content to personalize ads.</p>
-                  </div>
-                </div>
-                
-                <div className="flex items-start space-x-4">
-                  <div className="w-12 h-12 bg-blue-600 rounded-xl flex items-center justify-center mt-1">
-                    <EyeOff className="w-6 h-6 text-white" />
-                  </div>
-                  <div>
-                    <h3 className="text-2xl font-bold text-white mb-2">TauMail keeps over a billion people safe every day</h3>
-                    <p className="text-gray-300 text-lg">TauMail blocks 99.9% of spam, malware, and dangerous links from ever reaching your inbox.</p>
-                  </div>
-                </div>
-                
-                <div className="flex items-start space-x-4">
-                  <div className="w-12 h-12 bg-purple-600 rounded-xl flex items-center justify-center mt-1">
-                    <Lock className="w-6 h-6 text-white" />
-                  </div>
-                  <div>
-                    <h3 className="text-2xl font-bold text-white mb-2">The most advanced phishing protections available</h3>
-                    <p className="text-gray-300 text-lg">When a suspicious email arrives that could be legitimate, TauMail lets you know, keeping you in control.</p>
-                  </div>
-                </div>
-              </div>
-            </motion.div>
-
-            <motion.div
-              initial={{ opacity: 0, x: 30 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.8 }}
-              viewport={{ once: true }}
-              className="space-y-8"
-            >
-              <div className="space-y-6">
-                <div className="flex items-start space-x-4">
-                  <div className="w-12 h-12 bg-orange-600 rounded-xl flex items-center justify-center mt-1">
-                    <Key className="w-6 h-6 text-white" />
-                  </div>
-                  <div>
-                    <h3 className="text-2xl font-bold text-white mb-2">Best-in-class controls over emails you send</h3>
-                    <p className="text-gray-300 text-lg">Confidential Mode lets you set expirations and require recipients to verify by text. You can also remove options to forward, copy, download, and print.</p>
-                  </div>
-                </div>
-                
-                <div className="flex items-start space-x-4">
-                  <div className="w-12 h-12 bg-red-600 rounded-xl flex items-center justify-center mt-1">
-                    <Fingerprint className="w-6 h-6 text-white" />
-                  </div>
-                  <div>
-                    <h3 className="text-2xl font-bold text-white mb-2">End-to-end encryption by default</h3>
-                    <p className="text-gray-300 text-lg">All your emails are encrypted with AES-256 before transmission. Only you and your recipients can read the content.</p>
-                  </div>
-                </div>
-                
-                <div className="flex items-start space-x-4">
-                  <div className="w-12 h-12 bg-indigo-600 rounded-xl flex items-center justify-center mt-1">
-                    <Globe className="w-6 h-6 text-white" />
-                  </div>
-                  <div>
-                    <h3 className="text-2xl font-bold text-white mb-2">Custom domains with full control</h3>
-                    <p className="text-gray-300 text-lg">Use your own domain for professional email addresses. Full DNS control and custom branding options.</p>
-                  </div>
-                </div>
-              </div>
-            </motion.div>
-          </div>
-        </div>
-      </section>
-
-      {/* Features Section */}
-      <section className="py-24 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            viewport={{ once: true }}
-            className="text-center mb-20"
-          >
-            <h2 className="text-5xl md:text-6xl font-bold mb-6">
-              Get more done with <span className="bg-gradient-to-r from-red-400 to-purple-400 bg-clip-text text-transparent">TauMail</span>
-            </h2>
-            <p className="text-xl text-gray-300 max-w-3xl mx-auto">
-              Stay connected and get organized. Start a Chat, jump into a video call with Meet, or collaborate in a Doc, all right from TauMail.
-            </p>
-          </motion.div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {features.map((feature, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, delay: index * 0.1 }}
-                viewport={{ once: true }}
-                className="group relative"
-              >
-                <div className={`relative p-8 rounded-2xl bg-gradient-to-br ${feature.color} border border-white/10 backdrop-blur-sm transition-all duration-300 hover:scale-105 hover:shadow-2xl`}>
-                  <div className="flex justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
-                    {feature.icon}
-                  </div>
-                  <h3 className="text-xl font-bold mb-4 text-white">{feature.title}</h3>
-                  <p className="text-gray-300 leading-relaxed">{feature.description}</p>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Stats Section */}
-      <section className="py-24 px-4 sm:px-6 lg:px-8 bg-black/20">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-            {stats.map((stat, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, delay: index * 0.1 }}
-                viewport={{ once: true }}
-                className="text-center"
-              >
-                <div className="flex justify-center mb-4">
-                  {stat.icon}
-                </div>
-                <div className="text-4xl font-bold text-white mb-2">{stat.number}</div>
-                <div className="text-gray-400">{stat.label}</div>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Integrations Section */}
-      <section className="py-24 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            viewport={{ once: true }}
-            className="text-center mb-20"
-          >
-            <h2 className="text-5xl md:text-6xl font-bold mb-6">
-              TauMail is now part of <span className="bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">TauOS Workspace</span>
-            </h2>
-            <p className="text-xl text-gray-300 max-w-3xl mx-auto">
-              Collaborate faster, from any device, anytime, all in one place. TauOS Workspace is a set of productivity 
-              and collaboration tools that helps individuals, teams, and businesses stay on top of everything.
-            </p>
-          </motion.div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {integrations.map((integration, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, delay: index * 0.1 }}
-                viewport={{ once: true }}
-                className="group relative"
-              >
-                <div className="relative p-8 rounded-2xl bg-gradient-to-br from-gray-800/50 to-gray-900/50 border border-white/10 backdrop-blur-sm transition-all duration-300 hover:scale-105 hover:shadow-2xl">
-                  <div className="flex justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
-                    {integration.icon}
-                  </div>
-                  <h3 className="text-xl font-bold mb-4 text-white">{integration.name}</h3>
-                  <p className="text-gray-300 leading-relaxed">{integration.desc}</p>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Sign Up Section */}
-      <section className="py-24 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-4xl mx-auto">
-          <motion.div
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+          <motion.div 
             initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            viewport={{ once: true }}
-            className="bg-gradient-to-br from-gray-800/50 to-gray-900/50 rounded-3xl p-12 border border-white/10 backdrop-blur-sm"
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="p-6 bg-gray-900/30 backdrop-blur-sm border border-gray-800 rounded-2xl"
           >
-            <div className="text-center mb-12">
-              <h2 className="text-4xl font-bold mb-4">Ready to Get Started?</h2>
-              <p className="text-xl text-gray-300">Join thousands of users who have taken control of their email privacy</p>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              <div className="space-y-6">
-                <label className="block text-lg font-semibold text-gray-200">Email Address</label>
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="your@email.com"
-                  className="w-full px-6 py-4 bg-gray-700/50 border border-gray-600 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent text-white placeholder-gray-400 text-lg"
-                />
-                <button 
-                  onClick={() => {
-                    if (email) {
-                      // Redirect to actual TauMail application for registration
-                      window.open('https://mail.tauos.org', '_blank');
-                    }
-                  }}
-                  className="w-full bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white py-4 rounded-xl font-semibold text-lg transition-all duration-300 hover:scale-105"
-                >
-                  Create Free Account
-                </button>
-                <div className="text-center">
-                  <p className="text-gray-400 text-sm">Already have an account?</p>
-                  <button 
-                    onClick={() => window.open('https://mail.tauos.org', '_blank')}
-                    className="text-red-400 hover:text-red-300 transition-colors text-sm underline"
-                  >
-                    Sign in to TauMail
-                  </button>
-                </div>
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-gray-400">Total Emails</p>
+                <p className="text-2xl font-bold text-white">{emailMetrics.totalEmails}</p>
               </div>
-
-              <div className="space-y-6">
-                <label className="block text-lg font-semibold text-gray-200">Custom Domain</label>
-                <input
-                  type="text"
-                  value={domain}
-                  onChange={(e) => setDomain(e.target.value)}
-                  placeholder="yourdomain.com"
-                  className="w-full px-6 py-4 bg-gray-700/50 border border-gray-600 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent text-white placeholder-gray-400 text-lg"
-                />
-                <button 
-                  onClick={() => {
-                    if (domain) {
-                      // Redirect to actual TauMail application for domain configuration
-                      window.open('https://mail.tauos.org', '_blank');
-                    }
-                  }}
-                  className="w-full bg-gray-700/50 hover:bg-gray-600/50 text-white py-4 rounded-xl font-semibold text-lg border border-gray-600 transition-all duration-300 hover:scale-105"
-                >
-                  Configure Domain
-                </button>
-                <div className="text-center">
-                  <p className="text-gray-400 text-sm">Need help with setup?</p>
-                  <a href="#" className="text-red-400 hover:text-red-300 transition-colors text-sm underline">
-                    View Documentation
-                  </a>
-                </div>
+              <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-xl flex items-center justify-center">
+                <Inbox className="w-6 h-6 text-white" />
               </div>
             </div>
+            <div className="mt-4 flex items-center text-sm text-blue-400">
+              <Mail className="w-4 h-4 mr-1" />
+              <span>{emailMetrics.unreadEmails} unread</span>
+            </div>
+          </motion.div>
 
-            <div className="mt-8 text-center">
-              <p className="text-gray-400">
-                By signing up, you agree to our{' '}
-                <a href="#" className="text-red-400 hover:text-red-300 transition-colors">Terms of Service</a>
-                {' '}and{' '}
-                <a href="#" className="text-red-400 hover:text-red-300 transition-colors">Privacy Policy</a>
-              </p>
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.1 }}
+            className="p-6 bg-gray-900/30 backdrop-blur-sm border border-gray-800 rounded-2xl"
+          >
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-gray-400">Privacy Score</p>
+                <p className="text-2xl font-bold text-white">{emailMetrics.privacyScore}/100</p>
+              </div>
+              <div className="w-12 h-12 bg-gradient-to-r from-green-500 to-emerald-500 rounded-xl flex items-center justify-center">
+                <Shield className="w-6 h-6 text-white" />
+              </div>
+            </div>
+            <div className="mt-4">
+              <div className="w-full bg-gray-800 rounded-full h-2">
+                <div 
+                  className="bg-gradient-to-r from-green-500 to-emerald-500 h-2 rounded-full transition-all duration-300"
+                  style={{ width: `${emailMetrics.privacyScore}%` }}
+                ></div>
+              </div>
+            </div>
+          </motion.div>
+
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+            className="p-6 bg-gray-900/30 backdrop-blur-sm border border-gray-800 rounded-2xl"
+          >
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-gray-400">Sent Emails</p>
+                <p className="text-2xl font-bold text-white">{emailMetrics.sentEmails}</p>
+              </div>
+              <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-500 rounded-xl flex items-center justify-center">
+                <Send className="w-6 h-6 text-white" />
+              </div>
+            </div>
+            <div className="mt-4 flex items-center text-sm text-purple-400">
+              <CheckCircle className="w-4 h-4 mr-1" />
+              <span>This month</span>
+            </div>
+          </motion.div>
+
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.3 }}
+            className="p-6 bg-gray-900/30 backdrop-blur-sm border border-gray-800 rounded-2xl"
+          >
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-gray-400">Security Events</p>
+                <p className="text-2xl font-bold text-white">{emailMetrics.securityEvents}</p>
+              </div>
+              <div className="w-12 h-12 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-xl flex items-center justify-center">
+                <AlertCircle className="w-6 h-6 text-white" />
+              </div>
+            </div>
+            <div className="mt-4 flex items-center text-sm text-yellow-400">
+              <AlertCircle className="w-4 h-4 mr-1" />
+              <span>Last 24 hours</span>
             </div>
           </motion.div>
         </div>
-      </section>
 
-      {/* Footer */}
-      <footer className="bg-black/20 border-t border-white/10 py-12">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col md:flex-row justify-between items-center">
-            <div className="flex items-center space-x-4 mb-6 md:mb-0">
-              <div className="w-8 h-8 bg-gradient-to-br from-red-500 to-red-600 rounded-lg flex items-center justify-center">
-                <Mail className="w-5 h-5 text-white" />
-              </div>
-              <span className="text-xl font-bold">TauMail</span>
-            </div>
-            
-            <div className="flex space-x-8 text-sm text-gray-400">
-              <a href="#" className="hover:text-white transition-colors">Documentation</a>
-              <a href="#" className="hover:text-white transition-colors">Privacy Policy</a>
-              <a href="#" className="hover:text-white transition-colors">Terms of Service</a>
-              <a href="/" className="hover:text-white transition-colors">Back to TauOS</a>
-            </div>
-          </div>
+        <div className="flex space-x-1 bg-gray-900/30 backdrop-blur-sm border border-gray-800 rounded-xl p-1 mb-8">
+          {[
+            { id: 'inbox', label: 'Inbox', icon: Inbox },
+            { id: 'sent', label: 'Sent', icon: Send },
+            { id: 'drafts', label: 'Drafts', icon: Archive },
+            { id: 'trash', label: 'Trash', icon: Trash2 }
+          ].map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-all duration-200 ${
+                activeTab === tab.id
+                  ? 'bg-gradient-to-r from-yellow-400 to-orange-500 text-black'
+                  : 'text-gray-400 hover:text-white'
+              }`}
+            >
+              <tab.icon className="w-4 h-4" />
+              <span className="font-medium">{tab.label}</span>
+            </button>
+          ))}
         </div>
-      </footer>
+
+        <div className="space-y-8">
+          {activeTab === 'inbox' && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+            >
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <div className="p-6 bg-gray-900/30 backdrop-blur-sm border border-gray-800 rounded-2xl">
+                  <h3 className="text-lg font-bold text-white mb-6">Privacy Score Breakdown</h3>
+                  <div className="space-y-4">
+                    {privacyBreakdown.map((item) => (
+                      <div key={item.category} className="p-4 bg-gray-800/30 rounded-lg">
+                        <div className="flex items-center justify-between mb-2">
+                          <h4 className="font-semibold text-white">{item.category}</h4>
+                          <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(item.status)}`}>
+                            {item.score}/100
+                          </span>
+                        </div>
+                        <div className="w-full bg-gray-700 rounded-full h-2">
+                          <div 
+                            className={`h-2 rounded-full transition-all duration-300 ${
+                              item.score >= 95 ? 'bg-green-500' : 
+                              item.score >= 85 ? 'bg-yellow-500' : 'bg-red-500'
+                            }`}
+                            style={{ width: `${item.score}%` }}
+                          ></div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="p-6 bg-gray-900/30 backdrop-blur-sm border border-gray-800 rounded-2xl">
+                  <h3 className="text-lg font-bold text-white mb-6">Recent Emails</h3>
+                  <div className="space-y-4">
+                    {[
+                      { subject: 'Project Update - Q4 Goals', sender: 'john.doe@company.com', time: '2 minutes ago', unread: true },
+                      { subject: 'Security Alert - New Login', sender: 'security@tauos.org', time: '5 minutes ago', unread: false },
+                      { subject: 'Meeting Reminder - Tomorrow', sender: 'calendar@company.com', time: '10 minutes ago', unread: false },
+                      { subject: 'Invoice #2024-001', sender: 'billing@vendor.com', time: '15 minutes ago', unread: true }
+                    ].map((email, index) => (
+                      <div key={index} className={`flex items-start space-x-3 p-3 rounded-lg ${email.unread ? 'bg-blue-500/10 border border-blue-500/20' : 'bg-gray-800/30'}`}>
+                        <div className={`w-2 h-2 rounded-full mt-2 flex-shrink-0 ${email.unread ? 'bg-blue-400' : 'bg-gray-400'}`}></div>
+                        <div className="flex-1">
+                          <p className={`text-sm font-medium ${email.unread ? 'text-white' : 'text-gray-300'}`}>{email.subject}</p>
+                          <p className="text-gray-400 text-xs">{email.sender}</p>
+                          <p className="text-gray-500 text-xs">{email.time}</p>
+                        </div>
+                        <button className="p-1 text-gray-400 hover:text-white transition-colors">
+                          <MoreVertical className="w-4 h-4" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          )}
+
+          {activeTab === 'sent' && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+            >
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-2xl font-bold text-white">Sent Emails</h2>
+                <button className="flex items-center space-x-2 bg-gradient-to-r from-yellow-400 to-orange-500 text-black px-4 py-2 rounded-lg font-semibold hover:shadow-lg hover:shadow-yellow-400/25 transition-all duration-200">
+                  <Plus className="w-4 h-4" />
+                  <span>Compose Email</span>
+                </button>
+              </div>
+
+              <div className="bg-gray-900/30 backdrop-blur-sm border border-gray-800 rounded-2xl overflow-hidden">
+                <div className="overflow-x-auto">
+                  <table className="w-full">
+                    <thead className="bg-gray-800/50">
+                      <tr>
+                        <th className="px-6 py-4 text-left text-sm font-medium text-gray-300">Recipient</th>
+                        <th className="px-6 py-4 text-left text-sm font-medium text-gray-300">Subject</th>
+                        <th className="px-6 py-4 text-left text-sm font-medium text-gray-300">Status</th>
+                        <th className="px-6 py-4 text-left text-sm font-medium text-gray-300">Sent</th>
+                        <th className="px-6 py-4 text-left text-sm font-medium text-gray-300">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-800">
+                      {[
+                        { recipient: 'team@company.com', subject: 'Weekly Update', status: 'delivered', sent: '2 hours ago' },
+                        { recipient: 'client@external.com', subject: 'Project Proposal', status: 'delivered', sent: '1 day ago' },
+                        { recipient: 'support@vendor.com', subject: 'Technical Issue', status: 'delivered', sent: '2 days ago' }
+                      ].map((email, index) => (
+                        <tr key={index} className="hover:bg-gray-800/30 transition-colors">
+                          <td className="px-6 py-4">
+                            <p className="font-medium text-white">{email.recipient}</p>
+                          </td>
+                          <td className="px-6 py-4">
+                            <p className="text-white">{email.subject}</p>
+                          </td>
+                          <td className="px-6 py-4">
+                            <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(email.status)}`}>
+                              {email.status}
+                            </span>
+                          </td>
+                          <td className="px-6 py-4 text-sm text-gray-300">{email.sent}</td>
+                          <td className="px-6 py-4">
+                            <div className="flex items-center space-x-2">
+                              <button className="p-1 text-gray-400 hover:text-white transition-colors">
+                                <Eye className="w-4 h-4" />
+                              </button>
+                              <button className="p-1 text-gray-400 hover:text-white transition-colors">
+                                <Reply className="w-4 h-4" />
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </motion.div>
+          )}
+
+          {activeTab === 'drafts' && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+            >
+              <div className="text-center py-12">
+                <Archive className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+                <h3 className="text-xl font-bold text-white mb-2">No Drafts</h3>
+                <p className="text-gray-400 mb-6">You don't have any saved drafts</p>
+                <button className="bg-gradient-to-r from-yellow-400 to-orange-500 text-black px-6 py-3 rounded-lg font-semibold hover:shadow-lg hover:shadow-yellow-400/25 transition-all duration-200">
+                  Compose New Email
+                </button>
+              </div>
+            </motion.div>
+          )}
+
+          {activeTab === 'trash' && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+            >
+              <div className="text-center py-12">
+                <Trash2 className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+                <h3 className="text-xl font-bold text-white mb-2">Trash is Empty</h3>
+                <p className="text-gray-400">Deleted emails will appear here</p>
+              </div>
+            </motion.div>
+          )}
+        </div>
+      </div>
     </div>
   );
 } 

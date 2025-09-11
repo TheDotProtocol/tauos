@@ -1,125 +1,61 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { 
-  Users, 
-  GitBranch, 
-  Heart, 
-  Star, 
-  Code, 
-  Shield, 
-  Globe, 
-  Zap,
-  CheckCircle,
-  Clock,
-  TrendingUp,
-  Award,
-  MessageCircle,
-  Vote,
-  FileText,
-  Calendar,
-  ArrowRight
+import {
+  Building, Users, Shield, Eye, Heart, Target, Zap, Globe,
+  ArrowRight, Mail, ExternalLink, CheckCircle, Star,
+  GitBranch, Code, Server, Database, Smartphone, Monitor,
+  Tablet, Award, TrendingUp, Clock, Calendar, Scale, Lock,
+  FileText, GitCommit, GitMerge, GitPullRequest
 } from 'lucide-react';
 
 export default function GovernancePage() {
   return (
     <div className="min-h-screen bg-black text-white">
-      {/* Animated Background */}
-      <div className="fixed inset-0 -z-10">
-        <div className="absolute inset-0 bg-gradient-to-br from-black via-gray-900 to-black" />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(139,92,246,0.15),transparent_50%)]" />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom,rgba(59,130,246,0.1),transparent_50%)]" />
-      </div>
-
-      {/* Navigation */}
-      <nav className="fixed top-0 w-full z-50">
+      {/* Header */}
+      <header className="bg-gray-900/50 backdrop-blur-xl border-b border-gray-800 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-20">
-            <motion.div 
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              className="flex items-center space-x-4"
-            >
-              <a href="/" className="flex items-center space-x-3">
-                <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-blue-500 rounded-xl flex items-center justify-center shadow-lg">
-                  <span className="text-white font-bold text-xl">τ</span>
-                </div>
-                <span className="text-2xl font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
-                  TauOS
-                </span>
-              </a>
-            </motion.div>
-
-            <motion.div 
-              initial={{ opacity: 0, y: -20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="hidden md:flex items-center space-x-8"
-            >
-              {[
-                { href: '/', label: 'Home' },
-                { href: '/governance', label: 'Governance', active: true },
-                { href: '/careers', label: 'Careers' },
-                { href: '/legal', label: 'Legal' },
-                { href: 'https://mail.tauos.org', label: 'TauMail', external: true },
-                { href: 'https://cloud.tauos.org', label: 'TauCloud', external: true }
-              ].map((item) => (
-                <a
-                  key={item.label}
-                  href={item.href}
-                  target={item.external ? '_blank' : undefined}
-                  rel={item.external ? 'noopener noreferrer' : undefined}
-                  className={`transition-all duration-300 hover:scale-105 focus-tau ${
-                    item.active ? 'text-purple-400' : 'text-gray-300 hover:text-white'
-                  }`}
-                >
-                  {item.label}
-                </a>
-              ))}
-            </motion.div>
+          <div className="flex items-center justify-between h-16">
+            <div className="flex items-center space-x-4">
+              <img src="/brand/tauos-logo.svg" alt="TauOS" className="h-8 w-auto" />
+              <span className="text-xl font-bold text-white">Tau OS</span>
+            </div>
+            <nav className="hidden md:flex items-center space-x-8">
+              <a href="/" className="text-gray-300 hover:text-white transition-colors">Home</a>
+              <a href="/about" className="text-gray-300 hover:text-white transition-colors">About</a>
+              <a href="/developers" className="text-gray-300 hover:text-white transition-colors">Developers</a>
+              <a href="/governance" className="text-yellow-400 font-semibold">Governance</a>
+            </nav>
           </div>
         </div>
-      </nav>
+      </header>
 
       {/* Hero Section */}
-      <section className="pt-32 pb-16 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto text-center">
+      <section className="py-20 bg-gradient-to-b from-gray-900 to-black">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
-            className="space-y-8"
+            className="text-center mb-16"
           >
-            <h1 className="text-5xl md:text-6xl font-bold mb-6">
-              <span className="text-white">TauOS</span>
-              <br />
-              <span className="tau-gradient">Collective</span>
+            <h1 className="text-5xl md:text-7xl font-bold mb-6">
+              <span className="bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">
+                Governance
+              </span>
             </h1>
             <p className="text-xl md:text-2xl text-gray-300 max-w-4xl mx-auto leading-relaxed">
-              Welcome to the TauOS Collective, where the future of computing is shaped by the community, 
-              for the community. Join us in building the most privacy-focused, user-friendly operating system.
+              The Tau Project is built on <span className="text-yellow-400 font-semibold">trust, transparency, and independence</span>.
+              <br />
+              To ensure long-term sustainability and openness, governance is split between <span className="text-yellow-400 font-semibold">The Tau Foundation</span> and <span className="text-yellow-400 font-semibold">Tau LLC</span>.
             </p>
-            
-            <div className="flex items-center justify-center space-x-8 text-gray-400">
-              <div className="flex items-center space-x-2">
-                <Users className="w-5 h-5" />
-                <span>1,247 Contributors</span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <GitBranch className="w-5 h-5" />
-                <span>2,891 Commits</span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <Heart className="w-5 h-5" />
-                <span>15.2k Stars</span>
-              </div>
-            </div>
           </motion.div>
         </div>
       </section>
 
-      {/* Constitution Section */}
-      <section className="py-16 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto">
+      {/* The Tau Foundation Section */}
+      <section className="py-20 bg-black">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -127,157 +63,72 @@ export default function GovernancePage() {
             viewport={{ once: true }}
             className="text-center mb-16"
           >
-            <h2 className="text-4xl font-bold mb-6">Our Constitution</h2>
+            <h2 className="text-4xl md:text-5xl font-bold mb-6">
+              <Building className="w-12 h-12 text-yellow-400 mx-auto mb-4" />
+              <span className="bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">
+                The Tau Foundation
+              </span>
+            </h2>
             <p className="text-xl text-gray-300 max-w-3xl mx-auto">
-              The living document that guides our community and defines our core principles.
+              The Tau Foundation is a <span className="text-yellow-400 font-semibold">non-profit entity</span>, modeled after the Linux Foundation, that safeguards the vision of Tau OS.
             </p>
           </motion.div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {[
               {
-                icon: Shield,
-                title: "Privacy First",
-                description: "User privacy is non-negotiable. Every feature, every line of code must respect user autonomy."
-              },
-              {
-                icon: Globe,
-                title: "Open Source",
-                description: "Transparency and collaboration are fundamental. All code is open for review and contribution."
-              },
-              {
                 icon: Users,
-                title: "Community Driven",
-                description: "Decisions are made by the community, not by a single entity. Your voice matters."
-              },
-              {
-                icon: Zap,
-                title: "Performance",
-                description: "Speed and efficiency are core values. TauOS should run smoothly on any hardware."
-              },
-              {
-                icon: Heart,
-                title: "User Experience",
-                description: "Beautiful, intuitive design that delights users without compromising functionality."
+                title: "Community Oversight",
+                description: "Ensuring contributions remain open, transparent, and community-driven."
               },
               {
                 icon: Code,
-                title: "Innovation",
-                description: "Pushing the boundaries of what's possible while maintaining stability and security."
+                title: "Open Standards",
+                description: "Defining and maintaining Tau's technical direction, free from corporate lock-in."
+              },
+              {
+                icon: Scale,
+                title: "Neutral Governance",
+                description: "No single company, government, or individual can dominate decision-making."
+              },
+              {
+                icon: Eye,
+                title: "Transparency",
+                description: "Publishing policies, sub-processor lists, and open meeting notes."
               }
-            ].map((principle, index) => (
+            ].map((item, index) => (
               <motion.div
-                key={principle.title}
+                key={index}
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8, delay: index * 0.1 }}
                 viewport={{ once: true }}
-                className="glass-strong p-8 rounded-2xl border border-white/10"
+                className="p-6 bg-gray-900/30 backdrop-blur-sm border border-gray-800 rounded-2xl hover:border-yellow-400/30 transition-all duration-300"
               >
-                <div className="w-16 h-16 bg-gradient-to-br from-purple-500/20 to-blue-500/20 rounded-2xl flex items-center justify-center mb-6">
-                  <principle.icon className="w-8 h-8 text-purple-400" />
-                </div>
-                <h3 className="text-xl font-bold mb-4 text-white">{principle.title}</h3>
-                <p className="text-gray-300 leading-relaxed">{principle.description}</p>
+                <item.icon className="w-12 h-12 text-yellow-400 mb-4" />
+                <h3 className="text-xl font-bold text-white mb-3">{item.title}</h3>
+                <p className="text-gray-300">{item.description}</p>
               </motion.div>
             ))}
           </div>
-        </div>
-      </section>
 
-      {/* Contributor Guidelines */}
-      <section className="py-16 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
+            transition={{ duration: 0.8, delay: 0.4 }}
             viewport={{ once: true }}
-            className="text-center mb-16"
+            className="text-center mt-12"
           >
-            <h2 className="text-4xl font-bold mb-6">Getting Started</h2>
-            <p className="text-xl text-gray-300 max-w-3xl mx-auto">
-              Ready to contribute? Here's how to get involved in the TauOS community.
+            <p className="text-lg text-gray-300 max-w-3xl mx-auto">
+              The foundation acts as the <span className="text-yellow-400 font-semibold">guardian of the Tau ecosystem</span>, ensuring Tau OS remains sovereign and open to all.
             </p>
           </motion.div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-            <motion.div
-              initial={{ opacity: 0, x: -30 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.8 }}
-              viewport={{ once: true }}
-              className="space-y-8"
-            >
-              <div className="glass-strong p-8 rounded-2xl">
-                <h3 className="text-2xl font-bold mb-6 text-purple-400">Code of Conduct</h3>
-                <div className="space-y-4">
-                  <div className="flex items-start space-x-3">
-                    <CheckCircle className="w-5 h-5 text-green-400 mt-1" />
-                    <div>
-                      <h4 className="font-semibold text-white">Be Respectful</h4>
-                      <p className="text-gray-300 text-sm">Treat all community members with respect and kindness.</p>
-                    </div>
-                  </div>
-                  <div className="flex items-start space-x-3">
-                    <CheckCircle className="w-5 h-5 text-green-400 mt-1" />
-                    <div>
-                      <h4 className="font-semibold text-white">Be Inclusive</h4>
-                      <p className="text-gray-300 text-sm">Welcome contributors from all backgrounds and experience levels.</p>
-                    </div>
-                  </div>
-                  <div className="flex items-start space-x-3">
-                    <CheckCircle className="w-5 h-5 text-green-400 mt-1" />
-                    <div>
-                      <h4 className="font-semibold text-white">Be Constructive</h4>
-                      <p className="text-gray-300 text-sm">Provide helpful feedback and focus on solutions.</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </motion.div>
-
-            <motion.div
-              initial={{ opacity: 0, x: 30 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.8 }}
-              viewport={{ once: true }}
-              className="space-y-8"
-            >
-              <div className="glass-strong p-8 rounded-2xl">
-                <h3 className="text-2xl font-bold mb-6 text-blue-400">Recognition System</h3>
-                <div className="space-y-4">
-                  <div className="flex items-center space-x-3">
-                    <Star className="w-5 h-5 text-yellow-400" />
-                    <div>
-                      <h4 className="font-semibold text-white">Core Contributors</h4>
-                      <p className="text-gray-300 text-sm">Long-term contributors with significant impact</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center space-x-3">
-                    <Award className="w-5 h-5 text-purple-400" />
-                    <div>
-                      <h4 className="font-semibold text-white">Innovation Awards</h4>
-                      <p className="text-gray-300 text-sm">Recognition for breakthrough contributions</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center space-x-3">
-                    <TrendingUp className="w-5 h-5 text-green-400" />
-                    <div>
-                      <h4 className="font-semibold text-white">Rising Stars</h4>
-                      <p className="text-gray-300 text-sm">New contributors showing exceptional promise</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </motion.div>
-          </div>
         </div>
       </section>
 
-      {/* Community Roadmap */}
-      <section className="py-16 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto">
+      {/* Tau LLC Section */}
+      <section className="py-20 bg-gradient-to-b from-black to-gray-900">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -285,124 +136,67 @@ export default function GovernancePage() {
             viewport={{ once: true }}
             className="text-center mb-16"
           >
-            <h2 className="text-4xl font-bold mb-6">Community Roadmap</h2>
-            <p className="text-xl text-gray-300 max-w-3xl mx-auto">
-              Our quarterly milestones and current focus areas for the TauOS project.
-            </p>
-          </motion.div>
-
-          <div className="space-y-8">
-            {[
-              {
-                quarter: "Q1 2025",
-                title: "Foundation & Core",
-                description: "Establishing the core architecture and basic functionality",
-                status: "Completed",
-                color: "text-green-400"
-              },
-              {
-                quarter: "Q2 2025",
-                title: "Ecosystem Development",
-                description: "Building TauMail, TauCloud, and TauStore applications",
-                status: "In Progress",
-                color: "text-blue-400"
-              },
-              {
-                quarter: "Q3 2025",
-                title: "Mobile & AI",
-                description: "Mobile development and AI integration features",
-                status: "Planned",
-                color: "text-purple-400"
-              },
-              {
-                quarter: "Q4 2025",
-                title: "Enterprise & Scale",
-                description: "Enterprise features and large-scale deployment",
-                status: "Planned",
-                color: "text-yellow-400"
-              }
-            ].map((milestone, index) => (
-              <motion.div
-                key={milestone.quarter}
-                initial={{ opacity: 0, x: -30 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.8, delay: index * 0.1 }}
-                viewport={{ once: true }}
-                className="glass-strong p-8 rounded-2xl border border-white/10"
-              >
-                <div className="flex items-center justify-between mb-4">
-                  <div className="flex items-center space-x-4">
-                    <Calendar className="w-6 h-6 text-purple-400" />
-                    <span className="text-lg font-semibold text-white">{milestone.quarter}</span>
-                  </div>
-                  <span className={`text-sm font-semibold ${milestone.color}`}>
-                    {milestone.status}
-                  </span>
-                </div>
-                <h3 className="text-xl font-bold mb-2 text-white">{milestone.title}</h3>
-                <p className="text-gray-300">{milestone.description}</p>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Voting System */}
-      <section className="py-16 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            viewport={{ once: true }}
-            className="text-center mb-16"
-          >
-            <h2 className="text-4xl font-bold mb-6">Governance System</h2>
-            <p className="text-xl text-gray-300 max-w-3xl mx-auto">
-              How decisions are made in the TauOS community through transparent voting and discussion.
+            <h2 className="text-4xl md:text-5xl font-bold mb-6">
+              <Code className="w-12 h-12 text-yellow-400 mx-auto mb-4" />
+              <span className="bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">
+                Tau LLC
+              </span>
+            </h2>
+            <p className="text-xl text-gray-300 max-w-3xl mx-auto mb-8">
+              Tau LLC is the <span className="text-yellow-400 font-semibold">for-profit arm</span> that builds commercial value while maintaining community alignment.
             </p>
           </motion.div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {[
               {
-                icon: MessageCircle,
-                title: "Discussion Period",
-                description: "Proposals are discussed for 2 weeks before voting begins"
+                icon: Server,
+                title: "Commercial Applications",
+                description: "Builds commercial applications and enterprise solutions on Tau OS."
               },
               {
-                icon: Vote,
-                title: "Community Vote",
-                description: "All contributors can vote on proposals based on their contribution level"
+                icon: Users,
+                title: "Professional Support",
+                description: "Provides paid support, consulting, and integrations for businesses."
               },
               {
-                icon: FileText,
-                title: "Implementation",
-                description: "Approved proposals are implemented by the community"
+                icon: TrendingUp,
+                title: "Research & Development",
+                description: "Helps fund ongoing research and development of the Tau ecosystem."
               }
-            ].map((step, index) => (
+            ].map((item, index) => (
               <motion.div
-                key={step.title}
+                key={index}
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8, delay: index * 0.1 }}
                 viewport={{ once: true }}
-                className="glass-strong p-8 rounded-2xl text-center"
+                className="p-6 bg-gray-900/30 backdrop-blur-sm border border-gray-800 rounded-2xl hover:border-yellow-400/30 transition-all duration-300"
               >
-                <div className="w-16 h-16 bg-gradient-to-br from-purple-500/20 to-blue-500/20 rounded-2xl flex items-center justify-center mx-auto mb-6">
-                  <step.icon className="w-8 h-8 text-purple-400" />
-                </div>
-                <h3 className="text-xl font-bold mb-4 text-white">{step.title}</h3>
-                <p className="text-gray-300 leading-relaxed">{step.description}</p>
+                <item.icon className="w-12 h-12 text-yellow-400 mb-4" />
+                <h3 className="text-xl font-bold text-white mb-3">{item.title}</h3>
+                <p className="text-gray-300">{item.description}</p>
               </motion.div>
             ))}
           </div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.3 }}
+            viewport={{ once: true }}
+            className="text-center mt-12"
+          >
+            <p className="text-lg text-gray-300 max-w-3xl mx-auto">
+              Tau LLC operates <span className="text-yellow-400 font-semibold">under the oversight of the Tau Foundation</span> to maintain alignment with community principles.
+            </p>
+          </motion.div>
         </div>
       </section>
 
-      {/* Current Proposals */}
-      <section className="py-16 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto">
+      {/* Governance Model Section */}
+      <section className="py-20 bg-black">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -410,100 +204,193 @@ export default function GovernancePage() {
             viewport={{ once: true }}
             className="text-center mb-16"
           >
-            <h2 className="text-4xl font-bold mb-6">Current Proposals</h2>
-            <p className="text-xl text-gray-300 max-w-3xl mx-auto">
-              Active governance proposals that need your input and vote.
-            </p>
+            <h2 className="text-4xl md:text-5xl font-bold mb-6">
+              <Scale className="w-12 h-12 text-yellow-400 mx-auto mb-4" />
+              <span className="bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">
+                Governance Model
+              </span>
+            </h2>
           </motion.div>
 
-          <div className="space-y-6">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {[
               {
-                title: "Mobile App Development",
-                description: "Proposal to develop native mobile applications for TauOS ecosystem",
-                status: "Voting",
-                votes: "1,247 votes",
-                timeLeft: "3 days left"
+                icon: GitCommit,
+                title: "Technical Steering Committee (TSC)",
+                description: "Composed of senior contributors and security experts. Guides technical direction, system architecture, and feature development."
               },
               {
-                title: "AI Assistant Integration",
-                description: "Integrate advanced AI capabilities into the TauOS desktop environment",
-                status: "Discussion",
-                votes: "892 votes",
-                timeLeft: "1 week left"
+                icon: Users,
+                title: "Community Board",
+                description: "Represents developers, users, and partners. Ensures inclusivity and fairness in governance."
               },
               {
-                title: "Enterprise Features",
-                description: "Add enterprise-grade security and management features",
-                status: "Draft",
-                votes: "156 votes",
-                timeLeft: "2 weeks left"
+                icon: Award,
+                title: "Advisory Council",
+                description: "External experts in law, ethics, and technology. Provides independent oversight and accountability."
               }
-            ].map((proposal, index) => (
+            ].map((item, index) => (
               <motion.div
-                key={proposal.title}
-                initial={{ opacity: 0, x: -30 }}
-                whileInView={{ opacity: 1, x: 0 }}
+                key={index}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8, delay: index * 0.1 }}
                 viewport={{ once: true }}
-                className="glass-strong p-6 rounded-2xl border border-white/10"
+                className="p-8 bg-gray-900/30 backdrop-blur-sm border border-gray-800 rounded-2xl hover:border-yellow-400/30 transition-all duration-300"
               >
-                <div className="flex items-center justify-between">
-                  <div className="flex-1">
-                    <h3 className="text-lg font-bold text-white mb-2">{proposal.title}</h3>
-                    <p className="text-gray-300 text-sm mb-3">{proposal.description}</p>
-                    <div className="flex items-center space-x-4 text-sm text-gray-400">
-                      <span>{proposal.votes}</span>
-                      <span>{proposal.timeLeft}</span>
-                    </div>
-                  </div>
-                  <div className="flex items-center space-x-4">
-                    <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                      proposal.status === 'Voting' ? 'bg-green-500/20 text-green-400' :
-                      proposal.status === 'Discussion' ? 'bg-blue-500/20 text-blue-400' :
-                      'bg-yellow-500/20 text-yellow-400'
-                    }`}>
-                      {proposal.status}
-                    </span>
-                    <button className="px-4 py-2 bg-gradient-to-r from-purple-600 to-blue-600 rounded-lg text-sm font-semibold transition-all duration-300 hover:scale-105">
-                      Vote
-                    </button>
-                  </div>
-                </div>
+                <item.icon className="w-16 h-16 text-yellow-400 mb-6" />
+                <h3 className="text-2xl font-bold text-white mb-4">{item.title}</h3>
+                <p className="text-gray-300 leading-relaxed">{item.description}</p>
               </motion.div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="py-16 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-4xl mx-auto text-center">
+      {/* Transparency & Legal Section */}
+      <section className="py-20 bg-gradient-to-b from-gray-900 to-black">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
             viewport={{ once: true }}
-            className="glass-strong p-12 rounded-2xl"
+            className="text-center mb-16"
           >
-            <h2 className="text-3xl font-bold mb-6">Ready to Contribute?</h2>
-            <p className="text-xl text-gray-300 mb-8">
-              Join the TauOS Collective and help shape the future of privacy-first computing.
+            <h2 className="text-4xl md:text-5xl font-bold mb-6">
+              <Lock className="w-12 h-12 text-yellow-400 mx-auto mb-4" />
+              <span className="bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">
+                Transparency & Legal
+              </span>
+            </h2>
+          </motion.div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
+            {[
+              "All governance documents, Data Protection Addendum (DPA), and Sub-processor Lists are public.",
+              "Foundation meetings are documented and published openly.",
+              "Tau Foundation ensures Tau OS is legally incorporated, transparent, and accountable to its users."
+            ].map((item, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, delay: index * 0.1 }}
+                viewport={{ once: true }}
+                className="flex items-center space-x-4 p-6 bg-gray-900/30 backdrop-blur-sm border border-gray-800 rounded-2xl hover:border-yellow-400/30 transition-all duration-300"
+              >
+                <CheckCircle className="w-6 h-6 text-yellow-400 flex-shrink-0" />
+                <p className="text-gray-300">{item}</p>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Why This Matters Section */}
+      <section className="py-20 bg-black">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            viewport={{ once: true }}
+            className="text-center mb-16"
+          >
+            <h2 className="text-4xl md:text-5xl font-bold mb-6">
+              <Globe className="w-12 h-12 text-yellow-400 mx-auto mb-4" />
+              <span className="bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">
+                Why This Matters
+              </span>
+            </h2>
+            <p className="text-xl text-gray-300 max-w-4xl mx-auto mb-8">
+              Most operating systems are controlled by a single corporation with closed decision-making. Tau flips that model:
             </p>
-            <div className="flex flex-col sm:flex-row items-center justify-center space-y-4 sm:space-y-0 sm:space-x-6">
-              <button className="px-8 py-4 bg-gradient-to-r from-purple-600 to-blue-600 rounded-xl text-lg font-semibold flex items-center space-x-3 transition-all duration-300 hover:scale-105">
-                <Code className="w-5 h-5" />
-                <span>Start Contributing</span>
-                <ArrowRight className="w-5 h-5" />
-              </button>
-              <button className="px-8 py-4 border border-white/20 rounded-xl text-lg font-semibold flex items-center space-x-3 transition-all duration-300 hover:bg-white/10">
-                <MessageCircle className="w-5 h-5" />
-                <span>Join Discussion</span>
-              </button>
+          </motion.div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
+            {[
+              {
+                icon: Shield,
+                title: "The Foundation protects users.",
+                color: "from-blue-500 to-cyan-500"
+              },
+              {
+                icon: TrendingUp,
+                title: "The Company builds value.",
+                color: "from-green-500 to-emerald-500"
+              },
+              {
+                icon: Users,
+                title: "The Community drives innovation.",
+                color: "from-purple-500 to-indigo-500"
+              }
+            ].map((item, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, delay: index * 0.1 }}
+                viewport={{ once: true }}
+                className="p-6 bg-gray-900/30 backdrop-blur-sm border border-gray-800 rounded-2xl hover:border-yellow-400/30 transition-all duration-300"
+              >
+                <div className={`w-12 h-12 bg-gradient-to-r ${item.color} rounded-xl flex items-center justify-center mb-4`}>
+                  <item.icon className="w-6 h-6 text-white" />
+                </div>
+                <h3 className="text-xl font-bold text-white mb-3">{item.title}</h3>
+              </motion.div>
+            ))}
+          </div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            viewport={{ once: true }}
+            className="text-center"
+          >
+            <div className="bg-gradient-to-r from-gray-900 to-black border border-gray-800 rounded-2xl p-8 max-w-4xl mx-auto">
+              <p className="text-2xl md:text-3xl font-bold text-white">
+                Together, this ensures Tau is <span className="text-yellow-400">built to last for generations, not quarterly profits</span>.
+              </p>
             </div>
           </motion.div>
         </div>
       </section>
+
+      {/* CTA Section */}
+      <section className="py-20 bg-gradient-to-b from-gray-900 to-black">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            viewport={{ once: true }}
+            className="text-center"
+          >
+            <a
+              href="mailto:verify@tauos.org"
+              className="inline-flex items-center space-x-2 bg-gradient-to-r from-yellow-400 to-orange-500 text-black px-8 py-4 rounded-xl font-semibold hover:shadow-lg hover:shadow-yellow-400/25 transition-all duration-300"
+            >
+              <Mail className="w-5 h-5" />
+              <span>Learn more or get involved</span>
+            </a>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="bg-gray-900/50 border-t border-gray-800 py-12">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center">
+            <div className="flex items-center justify-center space-x-4 mb-4">
+              <img src="/brand/tauos-logo.svg" alt="TauOS" className="h-8 w-auto" />
+              <span className="text-xl font-bold text-white">Tau OS</span>
+            </div>
+            <p className="text-gray-400">© 2025 Tau Foundation & Tau LLC. All rights reserved.</p>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 } 
