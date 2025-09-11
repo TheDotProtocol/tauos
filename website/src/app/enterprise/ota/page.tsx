@@ -35,7 +35,7 @@ import {
   X,
   Check,
   Info,
-  Warning,
+  AlertTriangle,
   Zap,
   Key,
   Shield,
