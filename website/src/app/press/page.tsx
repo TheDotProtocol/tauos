@@ -3,7 +3,7 @@
 import { motion } from 'framer-motion';
 import {
   Newspaper, Download, Mail, ExternalLink, Calendar, Users, Globe, Award,
-  ArrowRight, CheckCircle, Star, Zap, Shield, Lock, Eye, Code, Building
+  ArrowRight, CheckCircle, Star, Zap, Shield, Lock, Eye, Code, Building, FileText
 } from 'lucide-react';
 
 export default function PressPage() {
