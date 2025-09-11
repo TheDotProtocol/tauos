@@ -66,8 +66,6 @@ export default function CareersPage() {
                 <a
                   key={item.label}
                   href={item.href}
-                  target={item.external ? '_blank' : undefined}
-                  rel={item.external ? 'noopener noreferrer' : undefined}
                   className={`transition-all duration-300 hover:scale-105 focus-tau ${
                     item.active ? 'text-purple-400' : 'text-gray-300 hover:text-white'
                   }`}
