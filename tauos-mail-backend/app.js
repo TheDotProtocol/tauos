@@ -374,11 +374,12 @@ app.post('/api/auth/register-custom-domain', validateRegister, async (req, res) 
 
         const user = result.rows[0];
         const token = jwt.sign(
-        const token = jwt.sign(
             { userId: user.id, email: user.email, username: user.username, customDomain: user.custom_domain },
             process.env.JWT_SECRET,
             { expiresIn: '24h' }
-        );        logger.info(`New custom domain user registered: ${email} for domain ${customDomain}`);
+        );
+        
+        logger.info(`New custom domain user registered: ${email} for domain ${customDomain}`);
         res.status(201).json({
             message: 'Custom domain registration successful',
             token,
