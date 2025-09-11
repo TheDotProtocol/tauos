@@ -728,9 +728,6 @@ if (process.env.NODE_ENV !== 'production' || process.env.VERCEL !== '1') {
     });
 }
 
-// Export for Vercel
-module.exports = app;
-
 // Graceful shutdown
 process.on('SIGTERM', () => {
     logger.info('SIGTERM received, shutting down gracefully');
@@ -747,3 +744,6 @@ process.on('SIGINT', () => {
         process.exit(0);
     });
 });
+
+// Export for Vercel
+module.exports = app;
