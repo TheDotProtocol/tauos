@@ -68,7 +68,7 @@ export default function TauMailDashboard() {
               <button
                 onClick={async () => {
                   try {
-                    const response = await fetch('http://localhost:3001/api/auth/send-test-email', {
+                    const response = await fetch('https://tauos-cbh3.vercel.app/api/auth/send-test-email', {
                       method: 'POST',
                       headers: {
                         'Content-Type': 'application/json',
@@ -113,7 +113,7 @@ export default function TauMailDashboard() {
                 onSubmit={async (e) => {
                   e.preventDefault();
                   try {
-                    const response = await fetch('http://localhost:3001/api/auth/register', {
+                    const response = await fetch('https://tauos-cbh3.vercel.app/api/auth/register', {
                       method: 'POST',
                       headers: {
                         'Content-Type': 'application/json',
