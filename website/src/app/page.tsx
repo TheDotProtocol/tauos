@@ -271,14 +271,15 @@ export default function TauOSLandingPage() {
             </div>
 
             {/* CTA Button */}
-            <motion.button
+            <motion.a
+              href="#downloads"
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               className="hidden md:flex items-center space-x-2 bg-gradient-to-r from-yellow-400 to-orange-500 text-black px-6 py-2 rounded-lg font-semibold hover:shadow-lg hover:shadow-yellow-400/25 transition-all duration-200"
             >
               <Download className="w-4 h-4" />
               <span>Download Beta</span>
-            </motion.button>
+            </motion.a>
 
             {/* Mobile Menu Button */}
             <button
@@ -395,21 +396,21 @@ export default function TauOSLandingPage() {
               transition={{ duration: 0.8, delay: 0.6 }}
               className="flex flex-col sm:flex-row gap-4 justify-center items-center"
             >
-              <button className="group flex items-center space-x-3 bg-gradient-to-r from-yellow-400 to-orange-500 text-black px-8 py-4 rounded-xl font-bold text-lg hover:shadow-2xl hover:shadow-yellow-400/25 transition-all duration-300 transform hover:scale-105">
+              <a href="#downloads" className="group flex items-center space-x-3 bg-gradient-to-r from-yellow-400 to-orange-500 text-black px-8 py-4 rounded-xl font-bold text-lg hover:shadow-2xl hover:shadow-yellow-400/25 transition-all duration-300 transform hover:scale-105">
                 <Download className="w-6 h-6" />
                 <span>Download TauOS Desktop</span>
                 <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-              </button>
+              </a>
               
-              <button className="flex items-center space-x-3 border-2 border-blue-400/30 text-blue-400 px-8 py-4 rounded-xl font-bold text-lg hover:bg-blue-400/10 transition-all duration-300">
+              <a href="/taumail" className="flex items-center space-x-3 border-2 border-blue-400/30 text-blue-400 px-8 py-4 rounded-xl font-bold text-lg hover:bg-blue-400/10 transition-all duration-300">
                 <MailIcon className="w-6 h-6" />
                 <span>Open TauMail</span>
-              </button>
+              </a>
 
-              <button className="flex items-center space-x-3 border-2 border-green-400/30 text-green-400 px-8 py-4 rounded-xl font-bold text-lg hover:bg-green-400/10 transition-all duration-300">
+              <a href="/taucloud" className="flex items-center space-x-3 border-2 border-green-400/30 text-green-400 px-8 py-4 rounded-xl font-bold text-lg hover:bg-green-400/10 transition-all duration-300">
                 <Cloud className="w-6 h-6" />
                 <span>Open TauCloud</span>
-              </button>
+              </a>
             </motion.div>
 
             {/* Trust Strip */}
@@ -778,10 +779,10 @@ export default function TauOSLandingPage() {
             viewport={{ once: true }}
             className="text-center"
           >
-            <button className="inline-flex items-center space-x-2 bg-gradient-to-r from-yellow-400 to-orange-500 text-black px-8 py-4 rounded-xl font-semibold hover:shadow-lg hover:shadow-yellow-400/25 transition-all duration-300">
+            <a href="#why-tauos" className="inline-flex items-center space-x-2 bg-gradient-to-r from-yellow-400 to-orange-500 text-black px-8 py-4 rounded-xl font-semibold hover:shadow-lg hover:shadow-yellow-400/25 transition-all duration-300">
               <ArrowRight className="w-5 h-5" />
               <span>See the Difference</span>
-            </button>
+            </a>
           </motion.div>
         </div>
       </section>
@@ -1723,10 +1724,10 @@ export default function TauOSLandingPage() {
             viewport={{ once: true }}
             className="text-center"
           >
-            <button className="inline-flex items-center space-x-2 bg-gradient-to-r from-yellow-400 to-orange-500 text-black px-8 py-4 rounded-xl font-semibold hover:shadow-lg hover:shadow-yellow-400/25 transition-all duration-300">
+            <a href="#why-tauos" className="inline-flex items-center space-x-2 bg-gradient-to-r from-yellow-400 to-orange-500 text-black px-8 py-4 rounded-xl font-semibold hover:shadow-lg hover:shadow-yellow-400/25 transition-all duration-300">
               <ArrowRight className="w-5 h-5" />
               <span>See the Difference</span>
-            </button>
+            </a>
           </motion.div>
         </div>
       </section>
@@ -1834,18 +1835,18 @@ export default function TauOSLandingPage() {
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-              <button className="inline-flex items-center space-x-2 bg-gradient-to-r from-yellow-400 to-orange-500 text-black px-8 py-4 rounded-xl font-semibold hover:shadow-lg hover:shadow-yellow-400/25 transition-all duration-300">
+              <a href="#downloads" className="inline-flex items-center space-x-2 bg-gradient-to-r from-yellow-400 to-orange-500 text-black px-8 py-4 rounded-xl font-semibold hover:shadow-lg hover:shadow-yellow-400/25 transition-all duration-300">
                 <Download className="w-6 h-6" />
                 <span>Download TauOS</span>
-              </button>
-              <button className="inline-flex items-center space-x-2 border-2 border-blue-400/30 text-blue-400 px-8 py-4 rounded-xl font-semibold hover:bg-blue-400/10 transition-all duration-300">
+              </a>
+              <a href="/taumail" className="inline-flex items-center space-x-2 border-2 border-blue-400/30 text-blue-400 px-8 py-4 rounded-xl font-semibold hover:bg-blue-400/10 transition-all duration-300">
                 <MailIcon className="w-6 h-6" />
                 <span>Try TauMail</span>
-              </button>
-              <button className="inline-flex items-center space-x-2 border-2 border-yellow-400/30 text-yellow-400 px-8 py-4 rounded-xl font-semibold hover:bg-yellow-400/10 transition-all duration-300">
+              </a>
+              <a href="/contact" className="inline-flex items-center space-x-2 border-2 border-yellow-400/30 text-yellow-400 px-8 py-4 rounded-xl font-semibold hover:bg-yellow-400/10 transition-all duration-300">
                 <Users className="w-6 h-6" />
                 <span>Contact Sales</span>
-              </button>
+              </a>
             </div>
           </motion.div>
         </div>
