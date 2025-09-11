@@ -256,7 +256,10 @@ export default function TauBrowserDashboard() {
                   onError={(e) => {
                     console.log('Iframe load error:', e);
                     // Fallback content
-                    e.target.style.display = 'none';
+                    const target = e.target as HTMLIFrameElement;
+                    if (target) {
+                      target.style.display = 'none';
+                    }
                   }}
                 />
               </div>
