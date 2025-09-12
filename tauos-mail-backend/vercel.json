@@ -1,18 +1,18 @@
 {
   "version": 2,
   "functions": {
-    "api/index.js": {
+    "api/main.js": {
       "maxDuration": 30
     }
   },
   "routes": [
     {
       "src": "/(.*)",
-      "dest": "/api/index.js"
+      "dest": "/api/main.js"
     }
   ],
   "env": {
     "NODE_ENV": "production"
   },
-  "buildCommand": "echo 'Building TauOS Mail Backend'"
+  "buildCommand": "echo 'Building TauOS Mail Backend v3.2'"
 }
