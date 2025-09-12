@@ -35,31 +35,6 @@ export default function TauMailDashboard() {
     window.location.href = '/taumail';
   };
 
-  const handleTestEmail = async () => {
-    try {
-      const response = await fetch('https://tauos-6nec-git-main-the-dot-protocol-co-ltds-projects.vercel.app/api/auth/send-test-email', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          email: user?.email || 'test@example.com',
-          subject: 'TauOS Mail SendGrid Test',
-          text: 'This is a test email from TauOS Mail to verify SendGrid integration is working correctly!'
-        })
-      });
-
-      const result = await response.json();
-      
-      if (response.ok) {
-        alert(`✅ Test email sent successfully!\n\nProvider: ${result.provider}\nMessage ID: ${result.messageId}`);
-      } else {
-        alert(`❌ Failed to send test email:\n${result.message || 'Unknown error'}`);
-      }
-    } catch (error) {
-      alert(`❌ Error sending test email:\n${error.message}`);
-    }
-  };
 
   const emailMetrics = {
     totalEmails: 2847,
@@ -383,13 +358,6 @@ export default function TauMailDashboard() {
                 <button className="w-full flex items-center space-x-3 p-3 bg-gradient-to-r from-yellow-400 to-orange-500 text-black rounded-lg font-semibold hover:shadow-lg hover:shadow-yellow-400/25 transition-all duration-200">
                   <Plus className="w-5 h-5" />
                   <span>Compose Email</span>
-                </button>
-                <button 
-                  onClick={handleTestEmail}
-                  className="w-full flex items-center space-x-3 p-3 bg-gradient-to-r from-green-500 to-emerald-500 text-white rounded-lg font-semibold hover:shadow-lg hover:shadow-green-500/25 transition-all duration-200"
-                >
-                  <Mail className="w-5 h-5" />
-                  <span>Test SendGrid</span>
                 </button>
                 <button className="w-full flex items-center space-x-3 p-3 bg-gray-800/50 text-white rounded-lg hover:bg-gray-700/50 transition-colors">
                   <Settings className="w-5 h-5" />
