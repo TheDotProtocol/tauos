@@ -402,7 +402,7 @@ app.post('/api/emails/send', async (req, res) => {
             
             // Store sent email in database
             await pool.query(
-                'INSERT INTO sent_emails (user_id, to_email, subject, content, message_id, provider, sent_at) VALUES ($1, $2, $3, $4, $5, $6, NOW())',
+                'INSERT INTO sent_emails (user_id, recipient_email, subject, body, message_id, smtp_status, sent_at) VALUES ($1, $2, $3, $4, $5, $6, NOW())',
                 [userId, to, subject, text, messageId, 'SendGrid']
             );
             
@@ -438,7 +438,7 @@ app.post('/api/emails/send', async (req, res) => {
 
             // Store sent email in database
             await pool.query(
-                'INSERT INTO sent_emails (user_id, to_email, subject, content, message_id, provider, sent_at) VALUES ($1, $2, $3, $4, $5, $6, NOW())',
+                'INSERT INTO sent_emails (user_id, recipient_email, subject, body, message_id, smtp_status, sent_at) VALUES ($1, $2, $3, $4, $5, $6, NOW())',
                 [userId, to, subject, text, info.messageId, 'SMTP']
             );
 
@@ -474,31 +474,31 @@ app.get('/api/emails/sent', async (req, res) => {
         // Check if table exists, create if not
         await pool.query(`
             CREATE TABLE IF NOT EXISTS sent_emails (
-                id SERIAL PRIMARY KEY,
+                id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
                 user_id VARCHAR(255) NOT NULL,
-                to_email VARCHAR(255) NOT NULL,
-                subject TEXT NOT NULL,
-                content TEXT NOT NULL,
+                recipient_email VARCHAR(255) NOT NULL,
+                subject VARCHAR(255) NOT NULL,
+                body TEXT NOT NULL,
                 message_id VARCHAR(255),
-                provider VARCHAR(50),
+                smtp_status VARCHAR(50),
                 sent_at TIMESTAMP DEFAULT NOW()
             )
         `);
 
         // Get sent emails from database
         const result = await pool.query(
-            'SELECT id, to_email, subject, content, message_id, provider, sent_at FROM sent_emails WHERE user_id = $1 ORDER BY sent_at DESC',
+            'SELECT * FROM sent_emails WHERE user_id = $1 ORDER BY sent_at DESC',
             [userId]
         );
 
         const sentEmails = result.rows.map(email => ({
             id: email.id,
-            to: email.to_email,
+            to: email.recipient_email,
             subject: email.subject,
-            text: email.content,
+            text: email.body,
             messageId: email.message_id,
-            provider: email.provider,
-            sentAt: email.sent_at,
+            provider: email.smtp_status || 'unknown',
+            sentAt: email.sent_at || email.created_at,
             unread: false // Sent emails are always "read"
         }));
 
