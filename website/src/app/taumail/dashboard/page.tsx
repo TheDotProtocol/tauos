@@ -1,4 +1,5 @@
 'use client';
+// Force rebuild - Database tables fixed, backend ready
 
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
