@@ -290,6 +290,92 @@ app.post('/api/auth/send-test-email', async (req, res) => {
     }
 });
 
+// Send email endpoint (authenticated)
+app.post('/api/emails/send', async (req, res) => {
+    try {
+        const { to, subject, text } = req.body;
+        const token = req.headers.authorization?.replace('Bearer ', '');
+        
+        if (!token) {
+            return res.status(401).json({ error: 'Authentication required' });
+        }
+
+        // Verify JWT token
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        const userId = decoded.userId;
+
+        // Get user details from database
+        const userResult = await pool.query(
+            'SELECT username, email, fullName FROM users WHERE id = $1',
+            [userId]
+        );
+
+        if (userResult.rows.length === 0) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+
+        const user = userResult.rows[0];
+
+        // Use SendGrid if available, otherwise fallback to SMTP
+        if (process.env.SENDGRID_API_KEY) {
+            const msg = {
+                to: to,
+                from: {
+                    email: user.email, // Use user's email as sender
+                    name: user.fullName || user.username // Use user's name
+                },
+                subject: subject,
+                text: text,
+                html: `<p>${text}</p><br><p>Sent from TauOS Mail - Privacy-First Email</p>`
+            };
+
+            const response = await sgMail.send(msg);
+            logger.info(`Email sent via SendGrid from ${user.email}: ${response[0].headers['x-message-id']}`);
+            res.json({
+                message: 'Email sent successfully via SendGrid!',
+                messageId: response[0].headers['x-message-id'],
+                provider: 'SendGrid',
+                from: user.email,
+                fromName: user.fullName || user.username
+            });
+        } else {
+            // Fallback to SMTP
+            const transporter = nodemailer.createTransporter({
+                host: process.env.SMTP_HOST,
+                port: parseInt(process.env.SMTP_PORT),
+                secure: process.env.SMTP_SECURE === 'true',
+                auth: {
+                    user: process.env.SMTP_USER,
+                    pass: process.env.SMTP_PASS
+                },
+                tls: {
+                    rejectUnauthorized: false
+                }
+            });
+
+            const info = await transporter.sendMail({
+                from: `${user.fullName || user.username} <${user.email}>`,
+                to: to,
+                subject: subject,
+                text: text
+            });
+
+            logger.info(`Email sent via SMTP from ${user.email}: ${info.messageId}`);
+            res.json({
+                message: 'Email sent successfully via SMTP!',
+                messageId: info.messageId,
+                provider: 'SMTP',
+                from: user.email,
+                fromName: user.fullName || user.username
+            });
+        }
+
+    } catch (error) {
+        logger.error('Email sending error:', error);
+        res.status(500).json({ error: 'Failed to send email', details: error.message });
+    }
+});
+
 // 404 handler
 app.use('*', (req, res) => {
     res.status(404).json({ error: 'Endpoint not found' });
