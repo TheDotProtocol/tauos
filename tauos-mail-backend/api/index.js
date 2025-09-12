@@ -376,6 +376,11 @@ app.post('/api/emails/send', async (req, res) => {
     }
 });
 
+// Health check endpoint
+app.get('/health', (req, res) => {
+    res.json({ status: 'ok', timestamp: new Date().toISOString() });
+});
+
 // 404 handler
 app.use('*', (req, res) => {
     res.status(404).json({ error: 'Endpoint not found' });
