@@ -49,13 +49,17 @@ export default function TauMailDashboard() {
     
     try {
       const token = localStorage.getItem('tauos_token');
-      const response = await fetch('https://tauos-6nec-git-main-the-dot-protocol-co-ltds-projects.vercel.app/api/emails/send', {
+      const response = await fetch('https://tauos-6nec-git-main-the-dot-protocol-co-ltds-projects.vercel.app/api/auth/send-test-email', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         },
-        body: JSON.stringify(composeData)
+        body: JSON.stringify({
+          to: composeData.to,
+          subject: composeData.subject,
+          text: composeData.text
+        })
       });
 
       const result = await response.json();
