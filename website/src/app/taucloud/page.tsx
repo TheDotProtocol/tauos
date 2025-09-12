@@ -4,10 +4,42 @@ import { motion } from 'framer-motion';
 import {
   Cloud, Lock, Eye, Upload, Download, Shield, Database, Globe,
   ArrowRight, ExternalLink, CheckCircle, Star, Zap, Code, Building,
-  Target, Mail, Award, Heart, Scale, Monitor, Smartphone, Users
+  Target, Mail, Award, Heart, Scale, Monitor, Smartphone, Users,
+  Laptop, Smartphone as Mobile
 } from 'lucide-react';
 
 export default function TauCloudPage() {
+  const downloadOptions = [
+    {
+      icon: Monitor,
+      title: "Windows",
+      description: "Windows 10/11 (64-bit)",
+      downloadUrl: "#",
+      comingSoon: true
+    },
+    {
+      icon: Laptop,
+      title: "macOS",
+      description: "macOS 10.15+ (Intel & Apple Silicon)",
+      downloadUrl: "#",
+      comingSoon: true
+    },
+    {
+      icon: Globe,
+      title: "Linux",
+      description: "Ubuntu, Debian, Fedora, Arch",
+      downloadUrl: "#",
+      comingSoon: true
+    },
+    {
+      icon: Mobile,
+      title: "Mobile",
+      description: "iOS & Android (Coming Soon)",
+      downloadUrl: "#",
+      comingSoon: true
+    }
+  ];
+
   return (
     <div className="min-h-screen bg-black text-white">
       {/* Header */}
@@ -46,6 +78,46 @@ export default function TauCloudPage() {
               Private cloud storage that puts you in control. <span className="text-yellow-400 font-semibold">Client-side encryption, zero-knowledge architecture, and complete privacy by design</span>.
               <br />
               <span className="text-lg text-gray-400">1TB Free Storage • 100% Encrypted • Zero Data Access</span>
+            </p>
+          </motion.div>
+
+          {/* Download Section */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.4 }}
+            className="text-center mb-16"
+          >
+            <h2 className="text-3xl font-bold text-white mb-8">Download TauCloud</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto">
+              {downloadOptions.map((option, index) => (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.8, delay: 0.5 + index * 0.1 }}
+                  className="p-6 bg-gray-900/30 backdrop-blur-sm border border-gray-800 rounded-2xl hover:border-yellow-400/30 transition-all duration-300"
+                >
+                  <div className="w-12 h-12 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-xl flex items-center justify-center mx-auto mb-4">
+                    <option.icon className="w-6 h-6 text-black" />
+                  </div>
+                  <h3 className="text-lg font-bold text-white mb-2">{option.title}</h3>
+                  <p className="text-sm text-gray-400 mb-4">{option.description}</p>
+                  <button
+                    className={`w-full py-2 px-4 rounded-lg font-semibold transition-all duration-200 ${
+                      option.comingSoon
+                        ? 'bg-gray-700 text-gray-400 cursor-not-allowed'
+                        : 'bg-gradient-to-r from-yellow-400 to-orange-500 text-black hover:shadow-lg hover:shadow-yellow-400/25'
+                    }`}
+                    disabled={option.comingSoon}
+                  >
+                    {option.comingSoon ? 'Coming Soon' : 'Download'}
+                  </button>
+                </motion.div>
+              ))}
+            </div>
+            <p className="text-gray-400 mt-6 text-sm">
+              Desktop apps will be available via OTA updates. Web version available now.
             </p>
           </motion.div>
         </div>
