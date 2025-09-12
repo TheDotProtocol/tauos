@@ -1,37 +1,16 @@
-/**
- * TauOS Mail Backend - Vercel Serverless Function
- * Production-ready email system with proper error handling
- */
-
-require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
-const helmet = require('helmet');
-const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const bcrypt = require('bcrypt');
 const { Pool } = require('pg');
-const nodemailer = require('nodemailer');
 const sgMail = require('@sendgrid/mail');
-const rateLimit = require('express-rate-limit');
-const { body, validationResult } = require('express-validator');
-const multer = require('multer');
-const { v4: uuidv4 } = require('uuid');
-const winston = require('winston');
-
-// Initialize logger
-const logger = winston.createLogger({
-    level: process.env.LOG_LEVEL || 'info',
-    format: winston.format.combine(
-        winston.format.timestamp(),
-        winston.format.errors({ stack: true }),
-        winston.format.json()
-    ),
-    transports: [
-        new winston.transports.Console()
-    ]
-});
+const nodemailer = require('nodemailer');
 
 const app = express();
+
+// Middleware
+app.use(cors());
+app.use(express.json());
 
 // Database connection
 const pool = new Pool({
@@ -41,193 +20,31 @@ const pool = new Pool({
     }
 });
 
-// Initialize database tables
-const initializeDatabase = async () => {
-    try {
-        // Create sent_emails table
-        await pool.query(`
-            CREATE TABLE IF NOT EXISTS sent_emails (
-                id SERIAL PRIMARY KEY,
-                user_id VARCHAR(255) NOT NULL,
-                to_email VARCHAR(255) NOT NULL,
-                subject TEXT NOT NULL,
-                content TEXT NOT NULL,
-                message_id VARCHAR(255),
-                provider VARCHAR(50),
-                sent_at TIMESTAMP DEFAULT NOW()
-            )
-        `);
-
-        // Create incoming_emails table
-        await pool.query(`
-            CREATE TABLE IF NOT EXISTS incoming_emails (
-                id SERIAL PRIMARY KEY,
-                from_email VARCHAR(255) NOT NULL,
-                to_email VARCHAR(255) NOT NULL,
-                subject TEXT NOT NULL,
-                content TEXT,
-                html_content TEXT,
-                message_id VARCHAR(255),
-                provider VARCHAR(50),
-                received_at TIMESTAMP DEFAULT NOW()
-            )
-        `);
-
-        logger.info('Database tables initialized successfully');
-    } catch (error) {
-        logger.error('Database initialization error:', error);
-    }
-};
-
-// Initialize database on startup
-initializeDatabase();
-
 // Initialize SendGrid
 if (process.env.SENDGRID_API_KEY) {
     sgMail.setApiKey(process.env.SENDGRID_API_KEY);
-    logger.info('SendGrid initialized successfully');
-} else {
-    logger.warn('SendGrid API key not found, using SMTP fallback');
 }
 
-// Test database connection
-pool.on('connect', () => {
-    logger.info('Connected to PostgreSQL database');
-});
-
-pool.on('error', (err) => {
-    logger.error('Database connection error:', err);
-});
-
-// Middleware
-app.use(helmet());
-app.use(cors({
-    origin: ['http://localhost:3000', 'https://www.tauos.org', 'https://tauos.org'],
-    credentials: true
-}));
-app.use(express.json({ limit: '10mb' }));
-app.use(express.urlencoded({ extended: true, limit: '10mb' }));
-
-// Rate limiting
-const generalLimiter = rateLimit({
-    windowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS) || 15 * 60 * 1000, // 15 minutes
-    max: parseInt(process.env.RATE_LIMIT_MAX_REQUESTS) || 100,
-    message: { error: 'Too many requests, please try again later' }
-});
-
-const authLimiter = rateLimit({
-    windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 5, // 5 attempts per window
-    message: { error: 'Too many authentication attempts, please try again later' }
-});
-
-app.use('/api/', generalLimiter);
-app.use('/api/auth/', authLimiter);
-
-// File upload configuration (using memory storage for Vercel)
-const storage = multer.memoryStorage();
-
-const upload = multer({
-    storage: storage,
-    limits: {
-        fileSize: parseInt(process.env.MAX_FILE_SIZE) || 10 * 1024 * 1024 // 10MB
-    },
-    fileFilter: (req, file, cb) => {
-        // Allow all file types for email attachments
-        cb(null, true);
-    }
-});
-
-// Validation middleware
-const validateRegister = [
-    body('email').isEmail().normalizeEmail(),
-    body('password').isLength({ min: 6 }),
-    body('username').isLength({ min: 3 }).isAlphanumeric(),
-    body('fullName').isLength({ min: 2 })
-];
-
-const validateLogin = [
-    body('email').isEmail().normalizeEmail(),
-    body('password').isLength({ min: 1 })
-];
-
-// Health check endpoint
-app.get('/api/health', (req, res) => {
-    res.json({
-        status: 'ok',
-        message: 'TauOS Mail Backend is running',
-        timestamp: new Date().toISOString(),
-        version: '2.0.0'
+// Test endpoint
+app.get('/api/test', (req, res) => {
+    res.json({ 
+        status: 'ok', 
+        timestamp: new Date().toISOString(), 
+        version: '2.5 - Minimal working version',
+        sendgrid: process.env.SENDGRID_API_KEY ? 'configured' : 'not configured'
     });
 });
 
-// Authentication routes
-app.post('/api/auth/register', validateRegister, async (req, res) => {
-    try {
-        const errors = validationResult(req);
-        if (!errors.isEmpty()) {
-            return res.status(400).json({ error: 'Invalid input data', details: errors.array() });
-        }
-
-        const { email, password, username, fullName } = req.body;
-
-        // Check if user already exists
-        const existingUser = await pool.query(
-            'SELECT id FROM users WHERE email = $1 OR username = $2',
-            [email, username]
-        );
-
-        if (existingUser.rows.length > 0) {
-            return res.status(400).json({ error: 'User already exists' });
-        }
-
-        // Hash password
-        const saltRounds = 12;
-        const passwordHash = await bcrypt.hash(password, saltRounds);
-
-        // Create user
-        const result = await pool.query(
-            `INSERT INTO users (username, email, password_hash, full_name, created_at) 
-             VALUES ($1, $2, $3, $4, NOW()) 
-             RETURNING id, username, email, full_name`,
-            [username, email, passwordHash, fullName]
-        );
-
-        const user = result.rows[0];
-        const token = jwt.sign(
-            { userId: user.id, email: user.email, username: user.username },
-            process.env.JWT_SECRET,
-            { expiresIn: '24h' }
-        );
-
-        logger.info(`New user registered: ${email}`);
-        res.status(201).json({
-            message: 'Registration successful',
-            token,
-            user: {
-                id: user.id,
-                username: user.username,
-                email: user.email,
-                fullName: user.full_name
-            }
-        });
-
-    } catch (error) {
-        logger.error('Registration error:', error);
-        res.status(500).json({ error: 'Internal server error' });
-    }
+// Health check endpoint
+app.get('/health', (req, res) => {
+    res.json({ status: 'ok', timestamp: new Date().toISOString(), version: '2.5 - Minimal working version' });
 });
 
-app.post('/api/auth/login', validateLogin, async (req, res) => {
+// Login endpoint
+app.post('/api/auth/login', async (req, res) => {
     try {
-        const errors = validationResult(req);
-        if (!errors.isEmpty()) {
-            return res.status(400).json({ error: 'Invalid input data', details: errors.array() });
-        }
-
         const { email, password } = req.body;
-
-        // Find user
+        
         const result = await pool.query(
             'SELECT id, username, email, password_hash, full_name FROM users WHERE email = $1',
             [email]
@@ -238,21 +55,18 @@ app.post('/api/auth/login', validateLogin, async (req, res) => {
         }
 
         const user = result.rows[0];
-
-        // Verify password
         const isValidPassword = await bcrypt.compare(password, user.password_hash);
+        
         if (!isValidPassword) {
             return res.status(401).json({ error: 'Invalid credentials' });
         }
 
-        // Generate token
         const token = jwt.sign(
             { userId: user.id, email: user.email, username: user.username },
             process.env.JWT_SECRET,
             { expiresIn: '24h' }
         );
 
-        logger.info(`User logged in: ${email}`);
         res.json({
             message: 'Login successful',
             token,
@@ -265,100 +79,12 @@ app.post('/api/auth/login', validateLogin, async (req, res) => {
         });
 
     } catch (error) {
-        logger.error('Login error:', error);
+        console.error('Login error:', error);
         res.status(500).json({ error: 'Internal server error' });
     }
 });
 
-// Test email endpoint
-app.post('/api/auth/send-test-email', async (req, res) => {
-    try {
-        const { to, subject, text, userEmail, userName } = req.body;
-        const token = req.headers.authorization?.replace('Bearer ', '');
-        
-        let fromEmail = process.env.SENDGRID_FROM_EMAIL || 'noreply@tauos.org';
-        let fromName = process.env.SENDGRID_FROM_NAME || 'TauOS Mail';
-        
-        // If user information is provided, use it
-        if (userEmail && userName) {
-            fromEmail = userEmail;
-            fromName = userName;
-        } else if (token) {
-            // Try to get user info from token
-            try {
-                const decoded = jwt.verify(token, process.env.JWT_SECRET);
-                const userResult = await pool.query(
-                    'SELECT email, fullName FROM users WHERE id = $1',
-                    [decoded.userId]
-                );
-                if (userResult.rows.length > 0) {
-                    fromEmail = userResult.rows[0].email;
-                    fromName = userResult.rows[0].fullName || userResult.rows[0].email.split('@')[0];
-                }
-            } catch (error) {
-                logger.warn('Could not decode token for user info:', error.message);
-            }
-        }
-
-        // Use SendGrid if available, otherwise fallback to SMTP
-        if (process.env.SENDGRID_API_KEY) {
-            const msg = {
-                to: to,
-                from: {
-                    email: fromEmail,
-                    name: fromName
-                },
-                subject: subject,
-                text: text,
-                html: `<p>${text}</p><br><p>Sent from TauOS Mail - Privacy-First Email</p>`
-            };
-
-            const response = await sgMail.send(msg);
-            logger.info(`Test email sent via SendGrid: ${response[0].headers['x-message-id']}`);
-            res.json({
-                message: 'Test email sent successfully via SendGrid!',
-                messageId: response[0].headers['x-message-id'],
-                provider: 'SendGrid',
-                from: fromEmail,
-                fromName: fromName
-            });
-        } else {
-            // Fallback to SMTP
-            const transporter = nodemailer.createTransport({
-                host: process.env.SMTP_HOST,
-                port: parseInt(process.env.SMTP_PORT),
-                secure: process.env.SMTP_SECURE === 'true',
-                auth: {
-                    user: process.env.SMTP_USER,
-                    pass: process.env.SMTP_PASS
-                },
-                tls: {
-                    rejectUnauthorized: false // Allow self-signed certificates
-                }
-            });
-
-            const info = await transporter.sendMail({
-                from: `TauOS Test <${process.env.SMTP_USER}>`,
-                to: to,
-                subject: subject,
-                text: text
-            });
-
-            logger.info(`Test email sent via SMTP: ${info.messageId}`);
-            res.json({
-                message: 'Test email sent successfully via SMTP!',
-                messageId: info.messageId,
-                provider: 'SMTP'
-            });
-        }
-
-    } catch (error) {
-        logger.error('Test email error:', error);
-        res.status(500).json({ error: 'Failed to send test email', details: error.message });
-    }
-});
-
-// Send email endpoint (authenticated)
+// Send email endpoint
 app.post('/api/emails/send', async (req, res) => {
     try {
         const { to, subject, text } = req.body;
@@ -368,11 +94,9 @@ app.post('/api/emails/send', async (req, res) => {
             return res.status(401).json({ error: 'Authentication required' });
         }
 
-        // Verify JWT token
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
         const userId = decoded.userId;
 
-        // Get user details from database
         const userResult = await pool.query(
             'SELECT username, email, fullName FROM users WHERE id = $1',
             [userId]
@@ -384,13 +108,12 @@ app.post('/api/emails/send', async (req, res) => {
 
         const user = userResult.rows[0];
 
-        // Use SendGrid if available, otherwise fallback to SMTP
         if (process.env.SENDGRID_API_KEY) {
             const msg = {
                 to: to,
                 from: {
-                    email: user.email, // Use user's email as sender
-                    name: user.fullName || user.username // Use user's name
+                    email: user.email,
+                    name: user.fullName || user.username
                 },
                 subject: subject,
                 text: text,
@@ -400,13 +123,6 @@ app.post('/api/emails/send', async (req, res) => {
             const response = await sgMail.send(msg);
             const messageId = response[0].headers['x-message-id'];
             
-            // Store sent email in database
-            await pool.query(
-                'INSERT INTO sent_emails (user_id, recipient_email, subject, body, message_id, smtp_status, sent_at) VALUES ($1, $2, $3, $4, $5, $6, NOW())',
-                [userId, to, subject, text, messageId, 'SendGrid']
-            );
-            
-            logger.info(`Email sent via SendGrid from ${user.email}: ${messageId}`);
             res.json({
                 message: 'Email sent successfully via SendGrid!',
                 messageId: messageId,
@@ -415,45 +131,11 @@ app.post('/api/emails/send', async (req, res) => {
                 fromName: user.fullName || user.username
             });
         } else {
-            // Fallback to SMTP
-            const transporter = nodemailer.createTransporter({
-                host: process.env.SMTP_HOST,
-                port: parseInt(process.env.SMTP_PORT),
-                secure: process.env.SMTP_SECURE === 'true',
-                auth: {
-                    user: process.env.SMTP_USER,
-                    pass: process.env.SMTP_PASS
-                },
-                tls: {
-                    rejectUnauthorized: false
-                }
-            });
-
-            const info = await transporter.sendMail({
-                from: `${user.fullName || user.username} <${user.email}>`,
-                to: to,
-                subject: subject,
-                text: text
-            });
-
-            // Store sent email in database
-            await pool.query(
-                'INSERT INTO sent_emails (user_id, recipient_email, subject, body, message_id, smtp_status, sent_at) VALUES ($1, $2, $3, $4, $5, $6, NOW())',
-                [userId, to, subject, text, info.messageId, 'SMTP']
-            );
-
-            logger.info(`Email sent via SMTP from ${user.email}: ${info.messageId}`);
-            res.json({
-                message: 'Email sent successfully via SMTP!',
-                messageId: info.messageId,
-                provider: 'SMTP',
-                from: user.email,
-                fromName: user.fullName || user.username
-            });
+            res.status(500).json({ error: 'SendGrid not configured' });
         }
 
     } catch (error) {
-        logger.error('Email sending error:', error);
+        console.error('Email sending error:', error);
         res.status(500).json({ error: 'Failed to send email', details: error.message });
     }
 });
@@ -467,25 +149,9 @@ app.get('/api/emails/sent', async (req, res) => {
             return res.status(401).json({ error: 'Authentication required' });
         }
 
-        // Verify JWT token
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
         const userId = decoded.userId;
 
-        // Check if table exists, create if not
-        await pool.query(`
-            CREATE TABLE IF NOT EXISTS sent_emails (
-                id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-                user_id VARCHAR(255) NOT NULL,
-                recipient_email VARCHAR(255) NOT NULL,
-                subject VARCHAR(255) NOT NULL,
-                body TEXT NOT NULL,
-                message_id VARCHAR(255),
-                smtp_status VARCHAR(50),
-                sent_at TIMESTAMP DEFAULT NOW()
-            )
-        `);
-
-        // Get sent emails from database
         const result = await pool.query(
             'SELECT * FROM sent_emails WHERE user_id = $1 ORDER BY sent_at DESC',
             [userId]
@@ -499,115 +165,15 @@ app.get('/api/emails/sent', async (req, res) => {
             messageId: email.message_id,
             provider: email.smtp_status || 'unknown',
             sentAt: email.sent_at || email.created_at,
-            unread: false // Sent emails are always "read"
+            unread: false
         }));
 
         res.json(sentEmails);
 
     } catch (error) {
-        logger.error('Get sent emails error:', error);
+        console.error('Get sent emails error:', error);
         res.status(500).json({ error: 'Failed to fetch sent emails', details: error.message });
     }
-});
-
-// Get inbox emails endpoint
-app.get('/api/emails/inbox', async (req, res) => {
-    try {
-        const token = req.headers.authorization?.replace('Bearer ', '');
-        
-        if (!token) {
-            return res.status(401).json({ error: 'Authentication required' });
-        }
-
-        // Verify JWT token
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        const userId = decoded.userId;
-
-        // Get user's email address
-        const userResult = await pool.query(
-            'SELECT email FROM users WHERE id = $1',
-            [userId]
-        );
-
-        if (userResult.rows.length === 0) {
-            return res.status(404).json({ error: 'User not found' });
-        }
-
-        const userEmail = userResult.rows[0].email;
-
-        // Check if table exists, create if not
-        await pool.query(`
-            CREATE TABLE IF NOT EXISTS incoming_emails (
-                id SERIAL PRIMARY KEY,
-                from_email VARCHAR(255) NOT NULL,
-                to_email VARCHAR(255) NOT NULL,
-                subject TEXT NOT NULL,
-                content TEXT,
-                html_content TEXT,
-                message_id VARCHAR(255),
-                provider VARCHAR(50),
-                received_at TIMESTAMP DEFAULT NOW()
-            )
-        `);
-
-        // Get incoming emails from database (emails sent TO this user)
-        const result = await pool.query(
-            'SELECT id, from_email, subject, content, message_id, provider, received_at FROM incoming_emails WHERE to_email = $1 ORDER BY received_at DESC',
-            [userEmail]
-        );
-
-        const inboxEmails = result.rows.map(email => ({
-            id: email.id,
-            from: email.from_email,
-            subject: email.subject,
-            preview: email.content ? email.content.substring(0, 100) + '...' : 'No content',
-            time: new Date(email.received_at).toLocaleString(),
-            unread: true, // For now, all emails are marked as unread
-            starred: false
-        }));
-
-        res.json({ emails: inboxEmails });
-
-    } catch (error) {
-        logger.error('Get inbox emails error:', error);
-        res.status(500).json({ error: 'Failed to fetch inbox emails', details: error.message });
-    }
-});
-
-// Webhook endpoint to receive incoming emails
-app.post('/api/webhook/incoming-email', async (req, res) => {
-    try {
-        const { from, to, subject, text, html, messageId } = req.body;
-        
-        // Store incoming email in database
-        await pool.query(
-            'INSERT INTO incoming_emails (from_email, to_email, subject, content, html_content, message_id, provider, received_at) VALUES ($1, $2, $3, $4, $5, $6, $7, NOW())',
-            [from, to, subject, text, html, messageId, 'webhook']
-        );
-        
-        logger.info(`Incoming email stored: ${from} -> ${to}`);
-        res.json({ status: 'success', message: 'Email received and stored' });
-        
-    } catch (error) {
-        logger.error('Webhook error:', error);
-        res.status(500).json({ error: 'Failed to process incoming email' });
-    }
-});
-
-// Test endpoint for debugging
-app.get('/api/test', (req, res) => {
-    res.json({ 
-        status: 'ok', 
-        timestamp: new Date().toISOString(), 
-        version: '2.4 - Database schema fixed, email sending working',
-        sendgrid: process.env.SENDGRID_API_KEY ? 'configured' : 'not configured',
-        database: 'connected'
-    });
-});
-
-// Health check endpoint
-app.get('/health', (req, res) => {
-    res.json({ status: 'ok', timestamp: new Date().toISOString(), version: '2.4 - Database schema fixed, email sending working' });
 });
 
 // 404 handler
@@ -615,13 +181,4 @@ app.use('*', (req, res) => {
     res.status(404).json({ error: 'Endpoint not found' });
 });
 
-// Error handler
-app.use((error, req, res, next) => {
-    logger.error('Unhandled error:', error);
-    res.status(500).json({ error: 'Internal server error' });
-});
-
-// Export for Vercel
 module.exports = app;
-
-// Version: 2.1 - User email support enabled
