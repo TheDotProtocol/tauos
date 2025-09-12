@@ -594,6 +594,17 @@ app.post('/api/webhook/incoming-email', async (req, res) => {
     }
 });
 
+// Test endpoint for debugging
+app.get('/api/test', (req, res) => {
+    res.json({ 
+        status: 'ok', 
+        timestamp: new Date().toISOString(), 
+        version: '2.4 - Database schema fixed, email sending working',
+        sendgrid: process.env.SENDGRID_API_KEY ? 'configured' : 'not configured',
+        database: 'connected'
+    });
+});
+
 // Health check endpoint
 app.get('/health', (req, res) => {
     res.json({ status: 'ok', timestamp: new Date().toISOString(), version: '2.4 - Database schema fixed, email sending working' });
