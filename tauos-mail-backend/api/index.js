@@ -4,7 +4,6 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const { Pool } = require('pg');
 const sgMail = require('@sendgrid/mail');
-const nodemailer = require('nodemailer');
 
 const app = express();
 
@@ -30,14 +29,14 @@ app.get('/api/test', (req, res) => {
     res.json({ 
         status: 'ok', 
         timestamp: new Date().toISOString(), 
-        version: '2.5 - Minimal working version',
+        version: '2.6 - Fixed endpoints',
         sendgrid: process.env.SENDGRID_API_KEY ? 'configured' : 'not configured'
     });
 });
 
 // Health check endpoint
 app.get('/health', (req, res) => {
-    res.json({ status: 'ok', timestamp: new Date().toISOString(), version: '2.5 - Minimal working version' });
+    res.json({ status: 'ok', timestamp: new Date().toISOString(), version: '2.6 - Fixed endpoints' });
 });
 
 // Login endpoint
@@ -98,7 +97,7 @@ app.post('/api/emails/send', async (req, res) => {
         const userId = decoded.userId;
 
         const userResult = await pool.query(
-            'SELECT username, email, fullName FROM users WHERE id = $1',
+            'SELECT username, email, full_name FROM users WHERE id = $1',
             [userId]
         );
 
@@ -113,7 +112,7 @@ app.post('/api/emails/send', async (req, res) => {
                 to: to,
                 from: {
                     email: user.email,
-                    name: user.fullName || user.username
+                    name: user.full_name || user.username
                 },
                 subject: subject,
                 text: text,
@@ -123,12 +122,18 @@ app.post('/api/emails/send', async (req, res) => {
             const response = await sgMail.send(msg);
             const messageId = response[0].headers['x-message-id'];
             
+            // Store sent email in database
+            await pool.query(
+                'INSERT INTO sent_emails (user_id, recipient_email, subject, body, message_id, smtp_status, sent_at) VALUES ($1, $2, $3, $4, $5, $6, NOW())',
+                [userId, to, subject, text, messageId, 'SendGrid']
+            );
+            
             res.json({
                 message: 'Email sent successfully via SendGrid!',
                 messageId: messageId,
                 provider: 'SendGrid',
                 from: user.email,
-                fromName: user.fullName || user.username
+                fromName: user.full_name || user.username
             });
         } else {
             res.status(500).json({ error: 'SendGrid not configured' });
