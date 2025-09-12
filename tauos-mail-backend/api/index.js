@@ -471,6 +471,20 @@ app.get('/api/emails/sent', async (req, res) => {
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
         const userId = decoded.userId;
 
+        // Check if table exists, create if not
+        await pool.query(`
+            CREATE TABLE IF NOT EXISTS sent_emails (
+                id SERIAL PRIMARY KEY,
+                user_id INTEGER NOT NULL,
+                to_email VARCHAR(255) NOT NULL,
+                subject TEXT NOT NULL,
+                content TEXT NOT NULL,
+                message_id VARCHAR(255),
+                provider VARCHAR(50),
+                sent_at TIMESTAMP DEFAULT NOW()
+            )
+        `);
+
         // Get sent emails from database
         const result = await pool.query(
             'SELECT id, to_email, subject, content, message_id, provider, sent_at FROM sent_emails WHERE user_id = $1 ORDER BY sent_at DESC',
@@ -521,6 +535,21 @@ app.get('/api/emails/inbox', async (req, res) => {
 
         const userEmail = userResult.rows[0].email;
 
+        // Check if table exists, create if not
+        await pool.query(`
+            CREATE TABLE IF NOT EXISTS incoming_emails (
+                id SERIAL PRIMARY KEY,
+                from_email VARCHAR(255) NOT NULL,
+                to_email VARCHAR(255) NOT NULL,
+                subject TEXT NOT NULL,
+                content TEXT,
+                html_content TEXT,
+                message_id VARCHAR(255),
+                provider VARCHAR(50),
+                received_at TIMESTAMP DEFAULT NOW()
+            )
+        `);
+
         // Get incoming emails from database (emails sent TO this user)
         const result = await pool.query(
             'SELECT id, from_email, subject, content, message_id, provider, received_at FROM incoming_emails WHERE to_email = $1 ORDER BY received_at DESC',
@@ -531,7 +560,7 @@ app.get('/api/emails/inbox', async (req, res) => {
             id: email.id,
             from: email.from_email,
             subject: email.subject,
-            preview: email.content.substring(0, 100) + '...',
+            preview: email.content ? email.content.substring(0, 100) + '...' : 'No content',
             time: new Date(email.received_at).toLocaleString(),
             unread: true, // For now, all emails are marked as unread
             starred: false
