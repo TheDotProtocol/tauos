@@ -36,7 +36,7 @@ app.get('/api/test', (req, res) => {
 
 // Health check endpoint
 app.get('/health', (req, res) => {
-    res.json({ status: 'ok', timestamp: new Date().toISOString(), version: '2.6 - Fixed endpoints' });
+    res.json({ status: 'ok', timestamp: new Date().toISOString(), version: '2.7 - Force redeploy' });
 });
 
 // Login endpoint
