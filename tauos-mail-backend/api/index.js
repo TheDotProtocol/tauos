@@ -232,15 +232,40 @@ app.post('/api/auth/login', validateLogin, async (req, res) => {
 // Test email endpoint
 app.post('/api/auth/send-test-email', async (req, res) => {
     try {
-        const { to, subject, text } = req.body;
+        const { to, subject, text, userEmail, userName } = req.body;
+        const token = req.headers.authorization?.replace('Bearer ', '');
+        
+        let fromEmail = process.env.SENDGRID_FROM_EMAIL || 'noreply@tauos.org';
+        let fromName = process.env.SENDGRID_FROM_NAME || 'TauOS Mail';
+        
+        // If user information is provided, use it
+        if (userEmail && userName) {
+            fromEmail = userEmail;
+            fromName = userName;
+        } else if (token) {
+            // Try to get user info from token
+            try {
+                const decoded = jwt.verify(token, process.env.JWT_SECRET);
+                const userResult = await pool.query(
+                    'SELECT email, fullName FROM users WHERE id = $1',
+                    [decoded.userId]
+                );
+                if (userResult.rows.length > 0) {
+                    fromEmail = userResult.rows[0].email;
+                    fromName = userResult.rows[0].fullName || userResult.rows[0].email.split('@')[0];
+                }
+            } catch (error) {
+                logger.warn('Could not decode token for user info:', error.message);
+            }
+        }
 
         // Use SendGrid if available, otherwise fallback to SMTP
         if (process.env.SENDGRID_API_KEY) {
             const msg = {
                 to: to,
                 from: {
-                    email: process.env.SENDGRID_FROM_EMAIL || 'noreply@tauos.org',
-                    name: process.env.SENDGRID_FROM_NAME || 'TauOS Mail'
+                    email: fromEmail,
+                    name: fromName
                 },
                 subject: subject,
                 text: text,
@@ -252,7 +277,9 @@ app.post('/api/auth/send-test-email', async (req, res) => {
             res.json({
                 message: 'Test email sent successfully via SendGrid!',
                 messageId: response[0].headers['x-message-id'],
-                provider: 'SendGrid'
+                provider: 'SendGrid',
+                from: fromEmail,
+                fromName: fromName
             });
         } else {
             // Fallback to SMTP

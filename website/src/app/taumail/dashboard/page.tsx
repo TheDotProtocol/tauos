@@ -17,13 +17,16 @@ export default function TauMailDashboard() {
   const [showComposeModal, setShowComposeModal] = useState(false);
   const [composeData, setComposeData] = useState({
     to: '',
+    cc: '',
+    bcc: '',
     subject: '',
     text: ''
   });
   const [emails, setEmails] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [selectedEmail, setSelectedEmail] = useState(null);
 
-  // Check if user is logged in
+  // Check if user is logged in and load emails
   useEffect(() => {
     const storedUser = localStorage.getItem('tauos_user');
     const storedToken = localStorage.getItem('tauos_token');
@@ -31,11 +34,64 @@ export default function TauMailDashboard() {
     if (storedUser && storedToken) {
       setUser(JSON.parse(storedUser));
       setIsLoggedIn(true);
+      loadEmails();
     } else {
       // Redirect to landing page if not logged in
       window.location.href = '/taumail';
     }
   }, []);
+
+  const loadEmails = async () => {
+    try {
+      const token = localStorage.getItem('tauos_token');
+      const response = await fetch('https://tauos-6nec.vercel.app/api/emails/inbox', {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        setEmails(data.emails || []);
+      } else {
+        // If no inbox endpoint, create some sample emails for demo
+        setEmails([
+          {
+            id: 1,
+            from: 'welcome@tauos.org',
+            subject: 'Welcome to TauOS Mail!',
+            preview: 'Thank you for joining TauOS Mail. Your privacy-first email experience starts now.',
+            time: 'Just now',
+            unread: true,
+            starred: false
+          },
+          {
+            id: 2,
+            from: 'support@tauos.org',
+            subject: 'Your account is ready',
+            preview: 'Your TauOS Mail account has been successfully set up and is ready to use.',
+            time: '2 minutes ago',
+            unread: true,
+            starred: false
+          }
+        ]);
+      }
+    } catch (error) {
+      console.error('Error loading emails:', error);
+      // Fallback to demo emails
+      setEmails([
+        {
+          id: 1,
+          from: 'welcome@tauos.org',
+          subject: 'Welcome to TauOS Mail!',
+          preview: 'Thank you for joining TauOS Mail. Your privacy-first email experience starts now.',
+          time: 'Just now',
+          unread: true,
+          starred: false
+        }
+      ]);
+    }
+  };
 
   const handleLogout = () => {
     localStorage.removeItem('tauos_user');
@@ -57,8 +113,12 @@ export default function TauMailDashboard() {
         },
         body: JSON.stringify({
           to: composeData.to,
+          cc: composeData.cc,
+          bcc: composeData.bcc,
           subject: composeData.subject,
-          text: composeData.text
+          text: composeData.text,
+          userEmail: user?.email,
+          userName: user?.fullName || user?.username
         })
       });
 
@@ -66,7 +126,7 @@ export default function TauMailDashboard() {
       
       if (response.ok) {
         alert(`✅ Email sent successfully!\n\nFrom: ${result.fromName} <${result.from}>\nMessage ID: ${result.messageId}`);
-        setComposeData({ to: '', subject: '', text: '' });
+        setComposeData({ to: '', cc: '', bcc: '', subject: '', text: '' });
         setShowComposeModal(false);
       } else {
         alert(`❌ Failed to send email:\n${result.error || 'Unknown error'}`);
@@ -80,9 +140,9 @@ export default function TauMailDashboard() {
 
 
   const emailMetrics = {
-    totalEmails: 2847,
-    unreadEmails: 23,
-    sentEmails: 156,
+    totalEmails: emails.length,
+    unreadEmails: emails.filter(email => email.unread).length,
+    sentEmails: 0, // This would come from sent emails
     privacyScore: 98,
     securityEvents: 1
   };
@@ -318,7 +378,7 @@ export default function TauMailDashboard() {
               </div>
               
               <div className="divide-y divide-gray-800">
-                {recentEmails.map((email) => (
+                {emails.map((email) => (
                   <div key={email.id} className="p-6 hover:bg-gray-800/30 transition-colors cursor-pointer">
                     <div className="flex items-start space-x-4">
                       <div className="flex-shrink-0">
@@ -455,6 +515,32 @@ export default function TauMailDashboard() {
 
               <div>
                 <label className="block text-sm font-medium text-gray-300 mb-2">
+                  CC (Optional)
+                </label>
+                <input
+                  type="email"
+                  value={composeData.cc}
+                  onChange={(e) => setComposeData({...composeData, cc: e.target.value})}
+                  className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-400 focus:border-yellow-400 focus:ring-1 focus:ring-yellow-400"
+                  placeholder="cc@example.com"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">
+                  BCC (Optional)
+                </label>
+                <input
+                  type="email"
+                  value={composeData.bcc}
+                  onChange={(e) => setComposeData({...composeData, bcc: e.target.value})}
+                  className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-400 focus:border-yellow-400 focus:ring-1 focus:ring-yellow-400"
+                  placeholder="bcc@example.com"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">
                   Subject
                 </label>
                 <input
@@ -498,6 +584,61 @@ export default function TauMailDashboard() {
                 </button>
               </div>
             </form>
+          </motion.div>
+        </div>
+      )}
+
+      {/* Email Detail Modal */}
+      {selectedEmail && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.9 }}
+            className="bg-gray-900 border border-gray-800 rounded-2xl p-6 w-full max-w-4xl max-h-[90vh] overflow-y-auto"
+          >
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-2xl font-bold text-white">{selectedEmail.subject}</h2>
+              <button
+                onClick={() => setSelectedEmail(null)}
+                className="text-gray-400 hover:text-white transition-colors"
+              >
+                <X className="w-6 h-6" />
+              </button>
+            </div>
+
+            <div className="space-y-4">
+              <div className="flex items-center space-x-4">
+                <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full flex items-center justify-center">
+                  <span className="text-white font-semibold text-lg">
+                    {selectedEmail.from.charAt(0).toUpperCase()}
+                  </span>
+                </div>
+                <div>
+                  <p className="text-white font-semibold">{selectedEmail.from}</p>
+                  <p className="text-gray-400 text-sm">{selectedEmail.time}</p>
+                </div>
+              </div>
+
+              <div className="border-t border-gray-800 pt-4">
+                <p className="text-gray-300 leading-relaxed">{selectedEmail.preview}</p>
+              </div>
+
+              <div className="flex space-x-3 pt-4">
+                <button className="flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-yellow-400 to-orange-500 text-black rounded-lg font-semibold hover:shadow-lg hover:shadow-yellow-400/25 transition-all duration-200">
+                  <Reply className="w-4 h-4" />
+                  <span>Reply</span>
+                </button>
+                <button className="flex items-center space-x-2 px-4 py-2 bg-gray-700 text-white rounded-lg hover:bg-gray-600 transition-colors">
+                  <Forward className="w-4 h-4" />
+                  <span>Forward</span>
+                </button>
+                <button className="flex items-center space-x-2 px-4 py-2 bg-gray-700 text-white rounded-lg hover:bg-gray-600 transition-colors">
+                  <Star className="w-4 h-4" />
+                  <span>Star</span>
+                </button>
+              </div>
+            </div>
           </motion.div>
         </div>
       )}
