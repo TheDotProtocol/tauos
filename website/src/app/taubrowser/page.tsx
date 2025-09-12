@@ -256,7 +256,6 @@ export default function TauBrowserLanding() {
               <div className="text-gray-400">Browsing</div>
             </div>
           </motion.div>
-          </div>
         </div>
       </section>
 
