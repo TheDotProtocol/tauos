@@ -48,7 +48,7 @@ const initializeDatabase = async () => {
         await pool.query(`
             CREATE TABLE IF NOT EXISTS sent_emails (
                 id SERIAL PRIMARY KEY,
-                user_id INTEGER NOT NULL,
+                user_id VARCHAR(255) NOT NULL,
                 to_email VARCHAR(255) NOT NULL,
                 subject TEXT NOT NULL,
                 content TEXT NOT NULL,
@@ -475,7 +475,7 @@ app.get('/api/emails/sent', async (req, res) => {
         await pool.query(`
             CREATE TABLE IF NOT EXISTS sent_emails (
                 id SERIAL PRIMARY KEY,
-                user_id INTEGER NOT NULL,
+                user_id VARCHAR(255) NOT NULL,
                 to_email VARCHAR(255) NOT NULL,
                 subject TEXT NOT NULL,
                 content TEXT NOT NULL,
@@ -596,7 +596,7 @@ app.post('/api/webhook/incoming-email', async (req, res) => {
 
 // Health check endpoint
 app.get('/health', (req, res) => {
-    res.json({ status: 'ok', timestamp: new Date().toISOString(), version: '2.2 - Database tables fixed' });
+    res.json({ status: 'ok', timestamp: new Date().toISOString(), version: '2.3 - Database tables created, endpoints fixed' });
 });
 
 // 404 handler
