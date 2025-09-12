@@ -23,6 +23,7 @@ export default function TauMailDashboard() {
     text: ''
   });
   const [emails, setEmails] = useState([]);
+  const [sentEmails, setSentEmails] = useState([]);
   const [loading, setLoading] = useState(false);
   const [selectedEmail, setSelectedEmail] = useState(null);
 
@@ -125,6 +126,20 @@ export default function TauMailDashboard() {
       const result = await response.json();
       
       if (response.ok) {
+        // Add to sent emails
+        const newSentEmail = {
+          id: Date.now(),
+          to: composeData.to,
+          cc: composeData.cc,
+          bcc: composeData.bcc,
+          subject: composeData.subject,
+          preview: composeData.text.substring(0, 100) + '...',
+          time: 'Just now',
+          unread: false,
+          starred: false
+        };
+        setSentEmails(prev => [newSentEmail, ...prev]);
+        
         alert(`✅ Email sent successfully!\n\nFrom: ${result.fromName} <${result.from}>\nMessage ID: ${result.messageId}`);
         setComposeData({ to: '', cc: '', bcc: '', subject: '', text: '' });
         setShowComposeModal(false);
@@ -379,7 +394,11 @@ export default function TauMailDashboard() {
               
               <div className="divide-y divide-gray-800">
                 {emails.map((email) => (
-                  <div key={email.id} className="p-6 hover:bg-gray-800/30 transition-colors cursor-pointer">
+                  <div 
+                    key={email.id} 
+                    onClick={() => setSelectedEmail(email)}
+                    className="p-6 hover:bg-gray-800/30 transition-colors cursor-pointer"
+                  >
                     <div className="flex items-start space-x-4">
                       <div className="flex-shrink-0">
                         <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full flex items-center justify-center">

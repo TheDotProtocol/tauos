@@ -405,7 +405,7 @@ app.post('/api/emails/send', async (req, res) => {
 
 // Health check endpoint
 app.get('/health', (req, res) => {
-    res.json({ status: 'ok', timestamp: new Date().toISOString() });
+    res.json({ status: 'ok', timestamp: new Date().toISOString(), version: '2.0' });
 });
 
 // 404 handler
