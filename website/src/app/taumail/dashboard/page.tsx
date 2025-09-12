@@ -36,6 +36,7 @@ export default function TauMailDashboard() {
       setUser(JSON.parse(storedUser));
       setIsLoggedIn(true);
       loadEmails();
+      loadSentEmails();
     } else {
       // Redirect to landing page if not logged in
       window.location.href = '/taumail';
@@ -100,13 +101,35 @@ export default function TauMailDashboard() {
     window.location.href = '/taumail';
   };
 
+  const loadSentEmails = async () => {
+    try {
+      const token = localStorage.getItem('tauos_token');
+      const response = await fetch('https://tauos-pbv9.vercel.app/api/emails/sent', {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        setSentEmails(data);
+      } else {
+        console.log('No sent emails endpoint available');
+        setSentEmails([]);
+      }
+    } catch (error) {
+      console.error('Error loading sent emails:', error);
+      setSentEmails([]);
+    }
+  };
+
   const handleComposeEmail = async (e) => {
     e.preventDefault();
     setLoading(true);
     
     try {
       const token = localStorage.getItem('tauos_token');
-      const response = await fetch('https://tauos-pbv9.vercel.app/api/auth/send-test-email', {
+      const response = await fetch('https://tauos-pbv9.vercel.app/api/emails/send', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -114,31 +137,16 @@ export default function TauMailDashboard() {
         },
         body: JSON.stringify({
           to: composeData.to,
-          cc: composeData.cc,
-          bcc: composeData.bcc,
           subject: composeData.subject,
-          text: composeData.text,
-          userEmail: user?.email,
-          userName: user?.fullName || user?.username
+          text: composeData.text
         })
       });
 
       const result = await response.json();
       
       if (response.ok) {
-        // Add to sent emails
-        const newSentEmail = {
-          id: Date.now(),
-          to: composeData.to,
-          cc: composeData.cc,
-          bcc: composeData.bcc,
-          subject: composeData.subject,
-          preview: composeData.text.substring(0, 100) + '...',
-          time: 'Just now',
-          unread: false,
-          starred: false
-        };
-        setSentEmails(prev => [newSentEmail, ...prev]);
+        // Reload sent emails from server
+        await loadSentEmails();
         
         alert(`✅ Email sent successfully!\n\nFrom: ${result.fromName} <${result.from}>\nMessage ID: ${result.messageId}`);
         setComposeData({ to: '', cc: '', bcc: '', subject: '', text: '' });
@@ -157,7 +165,7 @@ export default function TauMailDashboard() {
   const emailMetrics = {
     totalEmails: emails.length,
     unreadEmails: emails.filter(email => email.unread).length,
-    sentEmails: 0, // This would come from sent emails
+    sentEmails: sentEmails.length,
     privacyScore: 98,
     securityEvents: 1
   };
@@ -393,7 +401,7 @@ export default function TauMailDashboard() {
               </div>
               
               <div className="divide-y divide-gray-800">
-                {emails.map((email) => (
+                {(activeTab === 'sent' ? sentEmails : emails).map((email) => (
                   <div 
                     key={email.id} 
                     onClick={() => setSelectedEmail(email)}
@@ -409,18 +417,22 @@ export default function TauMailDashboard() {
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center justify-between">
-                          <div className="flex items-center space-x-2">
-                            <p className={`font-medium ${email.unread ? 'text-white' : 'text-gray-300'}`}>
-                              {email.from}
-                            </p>
-                            {email.starred && <Star className="w-4 h-4 text-yellow-400 fill-current" />}
-                          </div>
-                          <p className="text-sm text-gray-400">{email.time}</p>
+                        <div className="flex items-center space-x-2">
+                          <p className={`font-medium ${email.unread ? 'text-white' : 'text-gray-300'}`}>
+                            {activeTab === 'sent' ? email.to : email.from}
+                          </p>
+                          {email.starred && <Star className="w-4 h-4 text-yellow-400 fill-current" />}
+                        </div>
+                          <p className="text-sm text-gray-400">
+                            {activeTab === 'sent' ? new Date(email.sentAt).toLocaleString() : email.time}
+                          </p>
                         </div>
                         <p className={`text-sm mt-1 ${email.unread ? 'text-white font-medium' : 'text-gray-400'}`}>
                           {email.subject}
                         </p>
-                        <p className="text-sm text-gray-500 mt-1 truncate">{email.preview}</p>
+                        <p className="text-sm text-gray-500 mt-1 truncate">
+                          {activeTab === 'sent' ? email.text.substring(0, 100) + '...' : email.preview}
+                        </p>
                       </div>
                       <div className="flex items-center space-x-2">
                         <button className="p-1 text-gray-400 hover:text-white transition-colors">

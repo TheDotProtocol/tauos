@@ -357,10 +357,18 @@ app.post('/api/emails/send', async (req, res) => {
             };
 
             const response = await sgMail.send(msg);
-            logger.info(`Email sent via SendGrid from ${user.email}: ${response[0].headers['x-message-id']}`);
+            const messageId = response[0].headers['x-message-id'];
+            
+            // Store sent email in database
+            await pool.query(
+                'INSERT INTO sent_emails (user_id, to_email, subject, content, message_id, provider, sent_at) VALUES ($1, $2, $3, $4, $5, $6, NOW())',
+                [userId, to, subject, text, messageId, 'SendGrid']
+            );
+            
+            logger.info(`Email sent via SendGrid from ${user.email}: ${messageId}`);
             res.json({
                 message: 'Email sent successfully via SendGrid!',
-                messageId: response[0].headers['x-message-id'],
+                messageId: messageId,
                 provider: 'SendGrid',
                 from: user.email,
                 fromName: user.fullName || user.username
@@ -387,6 +395,12 @@ app.post('/api/emails/send', async (req, res) => {
                 text: text
             });
 
+            // Store sent email in database
+            await pool.query(
+                'INSERT INTO sent_emails (user_id, to_email, subject, content, message_id, provider, sent_at) VALUES ($1, $2, $3, $4, $5, $6, NOW())',
+                [userId, to, subject, text, info.messageId, 'SMTP']
+            );
+
             logger.info(`Email sent via SMTP from ${user.email}: ${info.messageId}`);
             res.json({
                 message: 'Email sent successfully via SMTP!',
@@ -400,6 +414,113 @@ app.post('/api/emails/send', async (req, res) => {
     } catch (error) {
         logger.error('Email sending error:', error);
         res.status(500).json({ error: 'Failed to send email', details: error.message });
+    }
+});
+
+// Get sent emails endpoint
+app.get('/api/emails/sent', async (req, res) => {
+    try {
+        const token = req.headers.authorization?.replace('Bearer ', '');
+        
+        if (!token) {
+            return res.status(401).json({ error: 'Authentication required' });
+        }
+
+        // Verify JWT token
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        const userId = decoded.userId;
+
+        // Get sent emails from database
+        const result = await pool.query(
+            'SELECT id, to_email, subject, content, message_id, provider, sent_at FROM sent_emails WHERE user_id = $1 ORDER BY sent_at DESC',
+            [userId]
+        );
+
+        const sentEmails = result.rows.map(email => ({
+            id: email.id,
+            to: email.to_email,
+            subject: email.subject,
+            text: email.content,
+            messageId: email.message_id,
+            provider: email.provider,
+            sentAt: email.sent_at,
+            unread: false // Sent emails are always "read"
+        }));
+
+        res.json(sentEmails);
+
+    } catch (error) {
+        logger.error('Get sent emails error:', error);
+        res.status(500).json({ error: 'Failed to fetch sent emails', details: error.message });
+    }
+});
+
+// Get inbox emails endpoint
+app.get('/api/emails/inbox', async (req, res) => {
+    try {
+        const token = req.headers.authorization?.replace('Bearer ', '');
+        
+        if (!token) {
+            return res.status(401).json({ error: 'Authentication required' });
+        }
+
+        // Verify JWT token
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        const userId = decoded.userId;
+
+        // Get user's email address
+        const userResult = await pool.query(
+            'SELECT email FROM users WHERE id = $1',
+            [userId]
+        );
+
+        if (userResult.rows.length === 0) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+
+        const userEmail = userResult.rows[0].email;
+
+        // Get incoming emails from database (emails sent TO this user)
+        const result = await pool.query(
+            'SELECT id, from_email, subject, content, message_id, provider, received_at FROM incoming_emails WHERE to_email = $1 ORDER BY received_at DESC',
+            [userEmail]
+        );
+
+        const inboxEmails = result.rows.map(email => ({
+            id: email.id,
+            from: email.from_email,
+            subject: email.subject,
+            preview: email.content.substring(0, 100) + '...',
+            time: new Date(email.received_at).toLocaleString(),
+            unread: true, // For now, all emails are marked as unread
+            starred: false
+        }));
+
+        res.json({ emails: inboxEmails });
+
+    } catch (error) {
+        logger.error('Get inbox emails error:', error);
+        res.status(500).json({ error: 'Failed to fetch inbox emails', details: error.message });
+    }
+});
+
+// Webhook endpoint to receive incoming emails
+app.post('/api/webhook/incoming-email', async (req, res) => {
+    try {
+        const { from, to, subject, text, html, messageId } = req.body;
+        
+        // Store incoming email in database
+        await pool.query(
+            'INSERT INTO incoming_emails (from_email, to_email, subject, content, html_content, message_id, provider, received_at) VALUES ($1, $2, $3, $4, $5, $6, $7, NOW())',
+            [from, to, subject, text, html, messageId, 'webhook']
+        );
+        
+        logger.info(`Incoming email stored: ${from} -> ${to}`);
+        res.json({ status: 'success', message: 'Email received and stored' });
+        
+    } catch (error) {
+        logger.error('Webhook error:', error);
+        res.status(500).json({ error: 'Failed to process incoming email' });
     }
 });
 
