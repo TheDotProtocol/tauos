@@ -6,7 +6,7 @@ import {
   Mail, Inbox, Send, Archive, Trash2, Star, Search, Plus, 
   Filter, Download, Reply, Forward, MoreVertical, Users, 
   Shield, Lock, Eye, CheckCircle, AlertCircle, BarChart3, 
-  Activity, Settings, Calendar, Clock, LogOut, User
+  Activity, Settings, Calendar, Clock, LogOut, User, X
 } from 'lucide-react';
 import Link from 'next/link';
 
@@ -14,6 +14,14 @@ export default function TauMailDashboard() {
   const [activeTab, setActiveTab] = useState('inbox');
   const [user, setUser] = useState(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [showComposeModal, setShowComposeModal] = useState(false);
+  const [composeData, setComposeData] = useState({
+    to: '',
+    subject: '',
+    text: ''
+  });
+  const [emails, setEmails] = useState([]);
+  const [loading, setLoading] = useState(false);
 
   // Check if user is logged in
   useEffect(() => {
@@ -33,6 +41,37 @@ export default function TauMailDashboard() {
     localStorage.removeItem('tauos_user');
     localStorage.removeItem('tauos_token');
     window.location.href = '/taumail';
+  };
+
+  const handleComposeEmail = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    
+    try {
+      const token = localStorage.getItem('tauos_token');
+      const response = await fetch('https://tauos-6nec-git-main-the-dot-protocol-co-ltds-projects.vercel.app/api/emails/send', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(composeData)
+      });
+
+      const result = await response.json();
+      
+      if (response.ok) {
+        alert(`✅ Email sent successfully!\n\nFrom: ${result.fromName} <${result.from}>\nMessage ID: ${result.messageId}`);
+        setComposeData({ to: '', subject: '', text: '' });
+        setShowComposeModal(false);
+      } else {
+        alert(`❌ Failed to send email:\n${result.error || 'Unknown error'}`);
+      }
+    } catch (error) {
+      alert(`❌ Error sending email:\n${error.message}`);
+    } finally {
+      setLoading(false);
+    }
   };
 
 
@@ -355,7 +394,10 @@ export default function TauMailDashboard() {
             >
               <h3 className="text-lg font-bold text-white mb-4">Quick Actions</h3>
               <div className="space-y-3">
-                <button className="w-full flex items-center space-x-3 p-3 bg-gradient-to-r from-yellow-400 to-orange-500 text-black rounded-lg font-semibold hover:shadow-lg hover:shadow-yellow-400/25 transition-all duration-200">
+                <button 
+                  onClick={() => setShowComposeModal(true)}
+                  className="w-full flex items-center space-x-3 p-3 bg-gradient-to-r from-yellow-400 to-orange-500 text-black rounded-lg font-semibold hover:shadow-lg hover:shadow-yellow-400/25 transition-all duration-200"
+                >
                   <Plus className="w-5 h-5" />
                   <span>Compose Email</span>
                 </button>
@@ -372,6 +414,89 @@ export default function TauMailDashboard() {
           </div>
         </div>
       </div>
+
+      {/* Compose Email Modal */}
+      {showComposeModal && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.9 }}
+            className="bg-gray-900 border border-gray-800 rounded-2xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto"
+          >
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-2xl font-bold text-white">Compose Email</h2>
+              <button
+                onClick={() => setShowComposeModal(false)}
+                className="text-gray-400 hover:text-white transition-colors"
+              >
+                <X className="w-6 h-6" />
+              </button>
+            </div>
+
+            <form onSubmit={handleComposeEmail} className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">
+                  To
+                </label>
+                <input
+                  type="email"
+                  value={composeData.to}
+                  onChange={(e) => setComposeData({...composeData, to: e.target.value})}
+                  className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-400 focus:border-yellow-400 focus:ring-1 focus:ring-yellow-400"
+                  placeholder="recipient@example.com"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">
+                  Subject
+                </label>
+                <input
+                  type="text"
+                  value={composeData.subject}
+                  onChange={(e) => setComposeData({...composeData, subject: e.target.value})}
+                  className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-400 focus:border-yellow-400 focus:ring-1 focus:ring-yellow-400"
+                  placeholder="Email subject"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">
+                  Message
+                </label>
+                <textarea
+                  value={composeData.text}
+                  onChange={(e) => setComposeData({...composeData, text: e.target.value})}
+                  rows={8}
+                  className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-400 focus:border-yellow-400 focus:ring-1 focus:ring-yellow-400 resize-none"
+                  placeholder="Type your message here..."
+                  required
+                />
+              </div>
+
+              <div className="flex space-x-3 pt-4">
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="flex-1 bg-gradient-to-r from-yellow-400 to-orange-500 text-black font-semibold py-3 px-6 rounded-lg hover:shadow-lg hover:shadow-yellow-400/25 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {loading ? 'Sending...' : 'Send Email'}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setShowComposeModal(false)}
+                  className="px-6 py-3 bg-gray-700 text-white rounded-lg hover:bg-gray-600 transition-colors"
+                >
+                  Cancel
+                </button>
+              </div>
+            </form>
+          </motion.div>
+        </div>
+      )}
     </div>
   );
 }
