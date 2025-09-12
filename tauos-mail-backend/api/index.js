@@ -421,3 +421,5 @@ app.use((error, req, res, next) => {
 
 // Export for Vercel
 module.exports = app;
+
+// Version: 2.1 - User email support enabled
