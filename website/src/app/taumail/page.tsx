@@ -255,7 +255,6 @@ export default function TauMailLanding() {
               <div className="text-gray-400">Data Collection</div>
             </div>
           </motion.div>
-          </div>
         </div>
       </section>
 
