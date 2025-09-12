@@ -5,7 +5,8 @@ import { motion } from 'framer-motion';
 import { 
   Globe, Shield, Lock, Eye, CheckCircle, AlertCircle, 
   ArrowRight, Users, Zap, Star, ArrowLeft, Search,
-  Download, Filter, Settings, Heart, BarChart3, Activity
+  Download, Filter, Settings, Heart, BarChart3, Activity,
+  Monitor, Smartphone, Laptop, Smartphone as Mobile
 } from 'lucide-react';
 import Link from 'next/link';
 
@@ -43,6 +44,37 @@ export default function TauBrowserLanding() {
       icon: Zap,
       title: "Lightning Fast",
       description: "Optimized for speed with minimal resource usage. Browse without lag or slowdowns."
+    }
+  ];
+
+  const downloadOptions = [
+    {
+      icon: Monitor,
+      title: "Windows",
+      description: "Windows 10/11 (64-bit)",
+      downloadUrl: "#",
+      comingSoon: true
+    },
+    {
+      icon: Laptop,
+      title: "macOS",
+      description: "macOS 10.15+ (Intel & Apple Silicon)",
+      downloadUrl: "#",
+      comingSoon: true
+    },
+    {
+      icon: Globe,
+      title: "Linux",
+      description: "Ubuntu, Debian, Fedora, Arch",
+      downloadUrl: "#",
+      comingSoon: true
+    },
+    {
+      icon: Mobile,
+      title: "Mobile",
+      description: "iOS & Android (Coming Soon)",
+      downloadUrl: "#",
+      comingSoon: true
     }
   ];
 
@@ -106,87 +138,124 @@ export default function TauBrowserLanding() {
   return (
     <div className="min-h-screen bg-black text-white">
       {/* Header */}
-      <header className="bg-gray-900/50 backdrop-blur-xl border-b border-gray-800">
+      <header className="bg-gray-900/50 backdrop-blur-xl border-b border-gray-800 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center space-x-4">
-              <Link href="/" className="flex items-center space-x-2">
-                <img src="/brand/tauos-logo.svg" alt="TauOS" className="w-10 h-10" />
-                <span className="text-xl font-bold text-white">TauOS</span>
-              </Link>
+              <img src="/brand/tauos-logo.svg" alt="TauOS" className="h-8 w-auto" />
+              <span className="text-xl font-bold text-white">Tau OS</span>
             </div>
-            <div className="flex items-center space-x-4">
-              <Link href="/" className="text-gray-400 hover:text-white transition-colors">
-                <ArrowLeft className="w-4 h-4 mr-2 inline" />
-                Back to Home
-              </Link>
-            </div>
+            <nav className="hidden md:flex items-center space-x-8">
+              <a href="/" className="text-gray-300 hover:text-white transition-colors">Home</a>
+              <a href="/about" className="text-gray-300 hover:text-white transition-colors">About</a>
+              <a href="/developers" className="text-gray-300 hover:text-white transition-colors">Developers</a>
+              <a href="/governance" className="text-gray-300 hover:text-white transition-colors">Governance</a>
+            </nav>
           </div>
         </div>
       </header>
 
       {/* Hero Section */}
-      <section className="relative py-20 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8 }}
-              className="mb-8"
-            >
-              <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-r from-cyan-500 to-blue-500 rounded-2xl mb-6">
-                <Globe className="w-10 h-10 text-white" />
-              </div>
-              <h1 className="text-5xl md:text-6xl font-bold text-white mb-6">
+      <section className="py-20 bg-gradient-to-b from-gray-900 to-black">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            className="text-center mb-16"
+          >
+            <h1 className="text-5xl md:text-7xl font-bold mb-6">
+              <span className="bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">
                 TauBrowser
-              </h1>
-              <p className="text-xl text-gray-300 mb-8 max-w-3xl mx-auto">
-                The privacy-first web browser. Browse the internet without being tracked, 
-                monitored, or having your data collected.
-              </p>
-            </motion.div>
+              </span>
+            </h1>
+            <p className="text-xl md:text-2xl text-gray-300 max-w-4xl mx-auto leading-relaxed">
+              The <span className="text-yellow-400 font-semibold">privacy-first web browser</span>.
+              <br />
+              Browse the internet without being tracked, monitored, or having your data collected.
+            </p>
+          </motion.div>
 
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.2 }}
-              className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12"
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.2 }}
+            className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-16"
+          >
+            <button
+              onClick={() => setShowRegistration(true)}
+              className="bg-gradient-to-r from-yellow-400 to-orange-500 text-black px-8 py-4 rounded-xl font-semibold text-lg hover:shadow-lg hover:shadow-yellow-400/25 transition-all duration-200 flex items-center"
             >
-              <button
-                onClick={() => setShowRegistration(true)}
-                className="bg-gradient-to-r from-cyan-500 to-blue-500 text-white px-8 py-4 rounded-xl font-semibold text-lg hover:shadow-lg hover:shadow-cyan-500/25 transition-all duration-200 flex items-center"
-              >
-                Get Started Free
-                <ArrowRight className="w-5 h-5 ml-2" />
-              </button>
-              <button
-                onClick={() => setShowLogin(true)}
-                className="border border-gray-600 text-white px-8 py-4 rounded-xl font-semibold text-lg hover:bg-gray-800/50 transition-all duration-200"
-              >
-                Sign In
-              </button>
-            </motion.div>
+              Get Started Free
+              <ArrowRight className="w-5 h-5 ml-2" />
+            </button>
+            <button
+              onClick={() => setShowLogin(true)}
+              className="border border-gray-600 text-white px-8 py-4 rounded-xl font-semibold text-lg hover:bg-gray-800/50 transition-all duration-200"
+            >
+              Sign In
+            </button>
+          </motion.div>
 
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.4 }}
-              className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto"
-            >
-              <div className="text-center">
-                <div className="text-3xl font-bold text-cyan-400 mb-2">Zero</div>
-                <div className="text-gray-400">Tracking</div>
-              </div>
-              <div className="text-center">
-                <div className="text-3xl font-bold text-cyan-400 mb-2">100%</div>
-                <div className="text-gray-400">Private</div>
-              </div>
-              <div className="text-center">
-                <div className="text-3xl font-bold text-cyan-400 mb-2">Fast</div>
-                <div className="text-gray-400">Browsing</div>
-              </div>
-            </motion.div>
+          {/* Download Section */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.4 }}
+            className="text-center mb-16"
+          >
+            <h2 className="text-3xl font-bold text-white mb-8">Download TauBrowser</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto">
+              {downloadOptions.map((option, index) => (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.8, delay: 0.5 + index * 0.1 }}
+                  className="p-6 bg-gray-900/30 backdrop-blur-sm border border-gray-800 rounded-2xl hover:border-yellow-400/30 transition-all duration-300"
+                >
+                  <div className="w-12 h-12 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-xl flex items-center justify-center mx-auto mb-4">
+                    <option.icon className="w-6 h-6 text-black" />
+                  </div>
+                  <h3 className="text-lg font-bold text-white mb-2">{option.title}</h3>
+                  <p className="text-sm text-gray-400 mb-4">{option.description}</p>
+                  <button
+                    className={`w-full py-2 px-4 rounded-lg font-semibold transition-all duration-200 ${
+                      option.comingSoon
+                        ? 'bg-gray-700 text-gray-400 cursor-not-allowed'
+                        : 'bg-gradient-to-r from-yellow-400 to-orange-500 text-black hover:shadow-lg hover:shadow-yellow-400/25'
+                    }`}
+                    disabled={option.comingSoon}
+                  >
+                    {option.comingSoon ? 'Coming Soon' : 'Download'}
+                  </button>
+                </motion.div>
+              ))}
+            </div>
+            <p className="text-gray-400 mt-6 text-sm">
+              Desktop apps will be available via OTA updates. Web version available now.
+            </p>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.6 }}
+            className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto"
+          >
+            <div className="text-center">
+              <div className="text-3xl font-bold text-yellow-400 mb-2">Zero</div>
+              <div className="text-gray-400">Tracking</div>
+            </div>
+            <div className="text-center">
+              <div className="text-3xl font-bold text-yellow-400 mb-2">100%</div>
+              <div className="text-gray-400">Private</div>
+            </div>
+            <div className="text-center">
+              <div className="text-3xl font-bold text-yellow-400 mb-2">Fast</div>
+              <div className="text-gray-400">Browsing</div>
+            </div>
+          </motion.div>
           </div>
         </div>
       </section>
@@ -215,10 +284,10 @@ export default function TauBrowserLanding() {
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8, delay: index * 0.1 }}
-                className="p-6 bg-gray-900/30 backdrop-blur-sm border border-gray-800 rounded-2xl hover:border-cyan-400/30 transition-all duration-300"
+                className="p-6 bg-gray-900/30 backdrop-blur-sm border border-gray-800 rounded-2xl hover:border-yellow-400/30 transition-all duration-300"
               >
-                <div className="w-12 h-12 bg-gradient-to-r from-cyan-500 to-blue-500 rounded-xl flex items-center justify-center mb-4">
-                  <feature.icon className="w-6 h-6 text-white" />
+                <div className="w-12 h-12 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-xl flex items-center justify-center mb-4">
+                  <feature.icon className="w-6 h-6 text-black" />
                 </div>
                 <h3 className="text-xl font-bold text-white mb-3">{feature.title}</h3>
                 <p className="text-gray-400">{feature.description}</p>
@@ -252,8 +321,8 @@ export default function TauBrowserLanding() {
               transition={{ duration: 0.8, delay: 0.1 }}
               className="text-center"
             >
-              <div className="w-16 h-16 bg-gradient-to-r from-cyan-500 to-blue-500 rounded-2xl flex items-center justify-center mx-auto mb-6">
-                <Download className="w-8 h-8 text-white" />
+              <div className="w-16 h-16 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                <Download className="w-8 h-8 text-black" />
               </div>
               <h3 className="text-xl font-bold text-white mb-4">1. Download</h3>
               <p className="text-gray-400">Download TauBrowser and install it on your device.</p>
@@ -265,8 +334,8 @@ export default function TauBrowserLanding() {
               transition={{ duration: 0.8, delay: 0.2 }}
               className="text-center"
             >
-              <div className="w-16 h-16 bg-gradient-to-r from-cyan-500 to-blue-500 rounded-2xl flex items-center justify-center mx-auto mb-6">
-                <Shield className="w-8 h-8 text-white" />
+              <div className="w-16 h-16 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                <Shield className="w-8 h-8 text-black" />
               </div>
               <h3 className="text-xl font-bold text-white mb-4">2. Browse</h3>
               <p className="text-gray-400">Browse the web with automatic privacy protection and ad blocking.</p>
@@ -278,8 +347,8 @@ export default function TauBrowserLanding() {
               transition={{ duration: 0.8, delay: 0.3 }}
               className="text-center"
             >
-              <div className="w-16 h-16 bg-gradient-to-r from-cyan-500 to-blue-500 rounded-2xl flex items-center justify-center mx-auto mb-6">
-                <Lock className="w-8 h-8 text-white" />
+              <div className="w-16 h-16 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                <Lock className="w-8 h-8 text-black" />
               </div>
               <h3 className="text-xl font-bold text-white mb-4">3. Stay Private</h3>
               <p className="text-gray-400">Your browsing data stays on your device. No tracking, no collection.</p>
@@ -356,7 +425,7 @@ export default function TauBrowserLanding() {
               
               <button
                 type="submit"
-                className="w-full bg-gradient-to-r from-cyan-500 to-blue-500 text-white py-3 rounded-lg font-semibold hover:shadow-lg hover:shadow-cyan-500/25 transition-all duration-200"
+                className="w-full bg-gradient-to-r from-yellow-400 to-orange-500 text-black py-3 rounded-lg font-semibold hover:shadow-lg hover:shadow-yellow-400/25 transition-all duration-200"
               >
                 Create Account
               </button>
@@ -369,7 +438,7 @@ export default function TauBrowserLanding() {
                   setShowRegistration(false);
                   setShowLogin(true);
                 }}
-                className="text-cyan-400 hover:text-cyan-300"
+                className="text-yellow-400 hover:text-yellow-300"
               >
                 Sign in
               </button>
@@ -427,7 +496,7 @@ export default function TauBrowserLanding() {
               
               <button
                 type="submit"
-                className="w-full bg-gradient-to-r from-cyan-500 to-blue-500 text-white py-3 rounded-lg font-semibold hover:shadow-lg hover:shadow-cyan-500/25 transition-all duration-200"
+                className="w-full bg-gradient-to-r from-yellow-400 to-orange-500 text-black py-3 rounded-lg font-semibold hover:shadow-lg hover:shadow-yellow-400/25 transition-all duration-200"
               >
                 Sign In
               </button>
@@ -440,7 +509,7 @@ export default function TauBrowserLanding() {
                   setShowLogin(false);
                   setShowRegistration(true);
                 }}
-                className="text-cyan-400 hover:text-cyan-300"
+                className="text-yellow-400 hover:text-yellow-300"
               >
                 Create one
               </button>
