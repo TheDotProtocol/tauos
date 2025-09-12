@@ -567,7 +567,7 @@ app.post('/api/webhook/incoming-email', async (req, res) => {
 
 // Health check endpoint
 app.get('/health', (req, res) => {
-    res.json({ status: 'ok', timestamp: new Date().toISOString(), version: '2.0' });
+    res.json({ status: 'ok', timestamp: new Date().toISOString(), version: '2.2 - Database tables fixed' });
 });
 
 // 404 handler
