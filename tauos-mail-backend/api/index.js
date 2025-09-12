@@ -29,14 +29,14 @@ app.get('/api/test', (req, res) => {
     res.json({ 
         status: 'ok', 
         timestamp: new Date().toISOString(), 
-        version: '3.1 - Working version',
+        version: '3.2 - PRODUCTION READY',
         sendgrid: process.env.SENDGRID_API_KEY ? 'configured' : 'not configured'
     });
 });
 
 // Health check endpoint
 app.get('/health', (req, res) => {
-    res.json({ status: 'ok', timestamp: new Date().toISOString(), version: '3.1 - Working version' });
+    res.json({ status: 'ok', timestamp: new Date().toISOString(), version: '3.2 - PRODUCTION READY' });
 });
 
 // Login endpoint
