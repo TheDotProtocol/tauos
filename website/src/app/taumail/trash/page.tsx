@@ -326,7 +326,7 @@ export default function TauMailTrash() {
                   }}
                   className="flex items-center space-x-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
                 >
-                  <Restore className="w-4 h-4" />
+                  <RotateCcw className="w-4 h-4" />
                   <span>Restore</span>
                 </button>
                 <button 
