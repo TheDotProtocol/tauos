@@ -7,7 +7,7 @@ import {
   Filter, Download, Reply, Forward, MoreVertical, Users, 
   Shield, Lock, Eye, CheckCircle, AlertCircle, BarChart3, 
   Activity, Settings, Calendar, Clock, LogOut, User, X,
-  RefreshCw, ChevronLeft, Restore, Trash
+  RefreshCw, ChevronLeft, RotateCcw, Trash
 } from 'lucide-react';
 import Link from 'next/link';
 
@@ -258,7 +258,7 @@ export default function TauMailTrash() {
                         className="p-2 text-gray-400 hover:text-green-400 transition-colors"
                         title="Restore email"
                       >
-                        <Restore className="w-4 h-4" />
+                        <RotateCcw className="w-4 h-4" />
                       </button>
                       <button 
                         onClick={(e) => {
