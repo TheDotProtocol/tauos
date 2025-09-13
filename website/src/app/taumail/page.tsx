@@ -1,5 +1,5 @@
 'use client';
-// Force rebuild - Backend URL updated to localhost:3001 for local development
+// Force rebuild - Backend URL updated to production Vercel deployment
 
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
