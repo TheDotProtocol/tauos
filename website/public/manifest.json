@@ -1,0 +1,63 @@
+{
+  "name": "TauOS - Privacy-First Operating System",
+  "short_name": "TauOS",
+  "description": "A complete privacy-first operating system with sovereign email, cloud storage, and identity management.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#000000",
+  "theme_color": "#f59e0b",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/brand/tauos-logo.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["productivity", "utilities", "business"],
+  "lang": "en",
+  "dir": "ltr",
+  "scope": "/",
+  "id": "tauos-app",
+  "screenshots": [
+    {
+      "src": "/screenshots/desktop.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "form_factor": "wide"
+    },
+    {
+      "src": "/screenshots/mobile.png",
+      "sizes": "390x844",
+      "type": "image/png",
+      "form_factor": "narrow"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "TauMail",
+      "short_name": "Mail",
+      "description": "Access your private email",
+      "url": "/apps/mail",
+      "icons": [
+        {
+          "src": "/brand/tauos-logo.svg",
+          "sizes": "96x96"
+        }
+      ]
+    },
+    {
+      "name": "TauCloud",
+      "short_name": "Cloud",
+      "description": "Access your secure cloud storage",
+      "url": "/apps/cloud",
+      "icons": [
+        {
+          "src": "/brand/tauos-logo.svg",
+          "sizes": "96x96"
+        }
+      ]
+    }
+  ]
+}

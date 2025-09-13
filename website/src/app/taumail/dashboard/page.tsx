@@ -352,14 +352,14 @@ export default function TauMailDashboard() {
         {/* Navigation Tabs */}
         <div className="flex space-x-1 bg-gray-900/30 backdrop-blur-sm border border-gray-800 rounded-xl p-1 mb-8">
           {[
-            { id: 'inbox', label: 'Inbox', icon: Inbox },
-            { id: 'sent', label: 'Sent', icon: Send },
-            { id: 'drafts', label: 'Drafts', icon: Archive },
-            { id: 'trash', label: 'Trash', icon: Trash2 }
+            { id: 'inbox', label: 'Inbox', icon: Inbox, href: '/taumail/inbox' },
+            { id: 'sent', label: 'Sent', icon: Send, href: '/taumail/sent' },
+            { id: 'drafts', label: 'Drafts', icon: Archive, href: '/taumail/drafts' },
+            { id: 'trash', label: 'Trash', icon: Trash2, href: '/taumail/trash' }
           ].map((tab) => (
-            <button
+            <Link
               key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
+              href={tab.href}
               className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-all duration-200 ${
                 activeTab === tab.id
                   ? 'bg-gradient-to-r from-yellow-400 to-orange-500 text-black'
@@ -368,7 +368,7 @@ export default function TauMailDashboard() {
             >
               <tab.icon className="w-4 h-4" />
               <span className="font-medium">{tab.label}</span>
-            </button>
+            </Link>
           ))}
         </div>
 
@@ -490,13 +490,13 @@ export default function TauMailDashboard() {
             >
               <h3 className="text-lg font-bold text-white mb-4">Quick Actions</h3>
               <div className="space-y-3">
-                <button 
-                  onClick={() => setShowComposeModal(true)}
+                <Link 
+                  href="/taumail/compose"
                   className="w-full flex items-center space-x-3 p-3 bg-gradient-to-r from-yellow-400 to-orange-500 text-black rounded-lg font-semibold hover:shadow-lg hover:shadow-yellow-400/25 transition-all duration-200"
                 >
                   <Plus className="w-5 h-5" />
                   <span>Compose Email</span>
-                </button>
+                </Link>
                 <button className="w-full flex items-center space-x-3 p-3 bg-gray-800/50 text-white rounded-lg hover:bg-gray-700/50 transition-colors">
                   <Settings className="w-5 h-5" />
                   <span>Settings</span>

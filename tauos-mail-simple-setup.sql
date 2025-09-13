@@ -1,13 +1,7 @@
--- TauOS Mail Database Setup
+-- TauOS Mail Database Setup - SIMPLE VERSION
 -- Run this in Supabase SQL Editor
 
--- First, let's check the structure of the existing users table
-SELECT column_name, data_type 
-FROM information_schema.columns 
-WHERE table_name = 'users' 
-ORDER BY ordinal_position;
-
--- Create sent_emails table (using id instead of user_id to match your users table)
+-- Create sent_emails table
 CREATE TABLE IF NOT EXISTS sent_emails (
     id SERIAL PRIMARY KEY,
     user_id VARCHAR(255) NOT NULL,
