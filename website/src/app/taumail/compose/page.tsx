@@ -46,7 +46,7 @@ export default function TauMailCompose() {
     
     try {
       const token = localStorage.getItem('tauos_token');
-      const response = await fetch('https://tauos-mail-backend.vercel.app/api/emails/send', {
+      const response = await fetch('https://tauos-47am-the-dot-protocol-co-ltds-projects.vercel.app/api/emails/send', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
