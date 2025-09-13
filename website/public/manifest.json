@@ -1,63 +1,21 @@
 {
-  "name": "TauOS - Privacy-First Operating System",
-  "short_name": "TauOS",
-  "description": "A complete privacy-first operating system with sovereign email, cloud storage, and identity management.",
-  "start_url": "/",
+  "name": "TauOS Mail",
+  "short_name": "TauMail",
+  "description": "Privacy-focused email service by TauOS",
+  "start_url": "/taumail",
   "display": "standalone",
-  "background_color": "#000000",
-  "theme_color": "#f59e0b",
-  "orientation": "portrait-primary",
+  "background_color": "#ffffff",
+  "theme_color": "#000000",
   "icons": [
     {
-      "src": "/brand/tauos-logo.svg",
-      "sizes": "any",
-      "type": "image/svg+xml",
-      "purpose": "any maskable"
-    }
-  ],
-  "categories": ["productivity", "utilities", "business"],
-  "lang": "en",
-  "dir": "ltr",
-  "scope": "/",
-  "id": "tauos-app",
-  "screenshots": [
-    {
-      "src": "/screenshots/desktop.png",
-      "sizes": "1280x720",
-      "type": "image/png",
-      "form_factor": "wide"
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
     },
     {
-      "src": "/screenshots/mobile.png",
-      "sizes": "390x844",
-      "type": "image/png",
-      "form_factor": "narrow"
-    }
-  ],
-  "shortcuts": [
-    {
-      "name": "TauMail",
-      "short_name": "Mail",
-      "description": "Access your private email",
-      "url": "/apps/mail",
-      "icons": [
-        {
-          "src": "/brand/tauos-logo.svg",
-          "sizes": "96x96"
-        }
-      ]
-    },
-    {
-      "name": "TauCloud",
-      "short_name": "Cloud",
-      "description": "Access your secure cloud storage",
-      "url": "/apps/cloud",
-      "icons": [
-        {
-          "src": "/brand/tauos-logo.svg",
-          "sizes": "96x96"
-        }
-      ]
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
     }
   ]
 }

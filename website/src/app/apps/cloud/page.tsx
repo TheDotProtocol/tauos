@@ -81,7 +81,7 @@ export default function TauCloudAppPage() {
   const handleRegistration = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch('https://tauos-47am-the-dot-protocol-co-ltds-projects.vercel.app/api/auth/register', {
+      const response = await fetch('https://tauos-47am.vercel.app/api/auth/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -111,7 +111,7 @@ export default function TauCloudAppPage() {
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch('https://tauos-47am-the-dot-protocol-co-ltds-projects.vercel.app/api/auth/login', {
+      const response = await fetch('https://tauos-47am.vercel.app/api/auth/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
