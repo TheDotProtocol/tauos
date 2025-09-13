@@ -8,7 +8,7 @@ import {
   Shield, Lock, Eye, CheckCircle, AlertCircle, BarChart3, 
   Activity, Settings, Calendar, Clock, LogOut, User, X,
   RefreshCw, ChevronLeft, Paperclip, Bold, Italic, Link as LinkIcon,
-  AlignLeft, AlignCenter, AlignRight, List, NumberedList
+  AlignLeft, AlignCenter, AlignRight, List
 } from 'lucide-react';
 import Link from 'next/link';
 
@@ -46,7 +46,7 @@ export default function TauMailCompose() {
     
     try {
       const token = localStorage.getItem('tauos_token');
-      const response = await fetch('http://localhost:3001/api/emails/send', {
+      const response = await fetch('https://tauos-mail-backend.vercel.app/api/emails/send', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -262,7 +262,7 @@ export default function TauMailCompose() {
                     <List className="w-4 h-4" />
                   </button>
                   <button type="button" className="p-2 text-gray-400 hover:text-white transition-colors">
-                    <NumberedList className="w-4 h-4" />
+                    <List className="w-4 h-4" />
                   </button>
                 </div>
                 

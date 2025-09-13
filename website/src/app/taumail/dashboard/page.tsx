@@ -47,7 +47,12 @@ export default function TauMailDashboard() {
   const loadEmails = async () => {
     try {
       const token = localStorage.getItem('tauos_token');
-      const response = await fetch('https://tauos-pbv9.vercel.app/api/emails/inbox', {
+      if (!token) {
+        console.log('No token found, skipping inbox load');
+        return;
+      }
+      
+      const response = await fetch('https://tauos-mail-backend.vercel.app/api/emails/inbox', {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -105,7 +110,12 @@ export default function TauMailDashboard() {
   const loadSentEmails = async () => {
     try {
       const token = localStorage.getItem('tauos_token');
-      const response = await fetch('https://tauos-pbv9.vercel.app/api/emails/sent', {
+      if (!token) {
+        console.log('No token found, skipping sent emails load');
+        return;
+      }
+      
+      const response = await fetch('https://tauos-mail-backend.vercel.app/api/emails/sent', {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -130,7 +140,7 @@ export default function TauMailDashboard() {
     
     try {
       const token = localStorage.getItem('tauos_token');
-      const response = await fetch('https://tauos-pbv9.vercel.app/api/emails/send', {
+      const response = await fetch('https://tauos-mail-backend.vercel.app/api/emails/send', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

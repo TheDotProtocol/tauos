@@ -1,5 +1,5 @@
 'use client';
-// Force rebuild - Backend URL updated to tauos-pbv9.vercel.app
+// Force rebuild - Backend URL updated to localhost:3001 for local development
 
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
@@ -81,7 +81,7 @@ export default function TauMailLanding() {
   const handleRegistration = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch('https://tauos-pbv9.vercel.app/api/auth/register', {
+        const response = await fetch('https://tauos-mail-backend.vercel.app/api/auth/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -111,7 +111,7 @@ export default function TauMailLanding() {
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch('https://tauos-pbv9.vercel.app/api/auth/login', {
+        const response = await fetch('https://tauos-mail-backend.vercel.app/api/auth/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -144,7 +144,7 @@ export default function TauMailLanding() {
             <div className="flex items-center space-x-4">
               <img src="/brand/tauos-logo.svg" alt="TauOS" className="h-8 w-auto" />
               <span className="text-xl font-bold text-white">Tau OS</span>
-            </div>
+                </div>
             <nav className="hidden md:flex items-center space-x-8">
               <a href="/" className="text-gray-300 hover:text-white transition-colors">Home</a>
               <a href="/about" className="text-gray-300 hover:text-white transition-colors">About</a>
@@ -158,10 +158,10 @@ export default function TauMailLanding() {
       {/* Hero Section */}
       <section className="py-20 bg-gradient-to-b from-gray-900 to-black">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8 }}
             className="text-center mb-16"
           >
             <h1 className="text-5xl md:text-7xl font-bold mb-6">
@@ -177,9 +177,9 @@ export default function TauMailLanding() {
           </motion.div>
 
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.2 }}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.8, delay: 0.2 }}
             className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-16"
           >
             <button
@@ -216,7 +216,7 @@ export default function TauMailLanding() {
                 >
                   <div className="w-12 h-12 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-xl flex items-center justify-center mx-auto mb-4">
                     <option.icon className="w-6 h-6 text-black" />
-                  </div>
+              </div>
                   <h3 className="text-lg font-bold text-white mb-2">{option.title}</h3>
                   <p className="text-sm text-gray-400 mb-4">{option.description}</p>
                   <button
@@ -228,10 +228,10 @@ export default function TauMailLanding() {
                     disabled={option.comingSoon}
                   >
                     {option.comingSoon ? 'Coming Soon' : 'Download'}
-                  </button>
-                </motion.div>
+                </button>
+              </motion.div>
               ))}
-            </div>
+          </div>
             <p className="text-gray-400 mt-6 text-sm">
               Desktop apps will be available via OTA updates. Web version available now.
             </p>
@@ -246,16 +246,16 @@ export default function TauMailLanding() {
             <div className="text-center">
               <div className="text-3xl font-bold text-yellow-400 mb-2">50K+</div>
               <div className="text-gray-400">Active Users</div>
-            </div>
+                  </div>
             <div className="text-center">
               <div className="text-3xl font-bold text-yellow-400 mb-2">99.9%</div>
               <div className="text-gray-400">Uptime</div>
-            </div>
+                  </div>
             <div className="text-center">
               <div className="text-3xl font-bold text-yellow-400 mb-2">Zero</div>
               <div className="text-gray-400">Data Collection</div>
-            </div>
-          </motion.div>
+              </div>
+            </motion.div>
         </div>
       </section>
 
@@ -299,7 +299,7 @@ export default function TauMailLanding() {
       {/* Registration Modal */}
       {showRegistration && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-          <motion.div
+              <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             className="bg-gray-900 border border-gray-800 rounded-2xl p-8 w-full max-w-md"
@@ -346,7 +346,7 @@ export default function TauMailLanding() {
                   placeholder="Your full name"
                   required
                 />
-              </div>
+          </div>
               
               <div>
                 <label className="block text-sm font-medium text-gray-300 mb-2">
@@ -360,7 +360,7 @@ export default function TauMailLanding() {
                   placeholder="Create a strong password"
                   required
                 />
-              </div>
+        </div>
               
               <button
                 type="submit"
@@ -403,7 +403,7 @@ export default function TauMailLanding() {
                 ×
               </button>
             </div>
-            
+
             <form onSubmit={handleLogin} className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-300 mb-2">
@@ -418,7 +418,7 @@ export default function TauMailLanding() {
                   required
                 />
               </div>
-              
+
               <div>
                 <label className="block text-sm font-medium text-gray-300 mb-2">
                   Password
@@ -443,15 +443,15 @@ export default function TauMailLanding() {
             
             <p className="text-center text-sm text-gray-400 mt-4">
               Don't have an account?{' '}
-              <button
-                onClick={() => {
+                <button 
+                  onClick={() => {
                   setShowLogin(false);
                   setShowRegistration(true);
                 }}
                 className="text-yellow-400 hover:text-yellow-300"
               >
                 Create one
-              </button>
+                </button>
             </p>
           </motion.div>
         </div>
@@ -478,7 +478,7 @@ export default function TauMailLanding() {
                 <li><Link href="/contact" className="text-gray-400 hover:text-white">Contact Us</Link></li>
                 <li><Link href="/status" className="text-gray-400 hover:text-white">Status</Link></li>
               </ul>
-            </div>
+              </div>
             <div>
               <h3 className="text-lg font-semibold text-white mb-4">Company</h3>
               <ul className="space-y-2">
@@ -504,4 +504,4 @@ export default function TauMailLanding() {
       </footer>
     </div>
   );
-}
+} 

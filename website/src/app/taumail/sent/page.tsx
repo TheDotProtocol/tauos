@@ -38,7 +38,7 @@ export default function TauMailSent() {
     setLoading(true);
     try {
       const token = localStorage.getItem('tauos_token');
-      const response = await fetch('http://localhost:3001/api/emails/sent', {
+      const response = await fetch('https://tauos-mail-backend.vercel.app/api/emails/sent', {
         headers: {
           'Authorization': `Bearer ${token}`
         }

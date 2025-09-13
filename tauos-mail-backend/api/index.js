@@ -14,9 +14,9 @@ app.use(express.json());
 // Database connection
 const pool = new Pool({
     connectionString: process.env.DATABASE_URL || 'postgresql://postgres:Ak1233%40%405@db.tviqcormikopltejomkc.supabase.co:5432/postgres',
-    ssl: process.env.NODE_ENV === 'production' ? {
+    ssl: {
         rejectUnauthorized: false
-    } : false
+    }
 });
 
 // Initialize SendGrid
