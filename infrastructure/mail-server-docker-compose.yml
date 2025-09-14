@@ -1,0 +1,140 @@
+version: '3.8'
+
+services:
+  # Postfix SMTP Server
+  postfix:
+    image: catatnight/postfix
+    container_name: taumail-postfix
+    hostname: smtp.tauos.org
+    ports:
+      - "25:25"
+      - "587:587"
+      - "465:465"
+    environment:
+      maildomain: tauos.org
+      smtp_user: taumail:secure_password
+    volumes:
+      - ./postfix/config:/etc/postfix
+      - ./postfix/logs:/var/log
+      - ./mail:/var/mail
+    networks:
+      - taumail-network
+    restart: unless-stopped
+
+  # Dovecot IMAP/POP3 Server
+  dovecot:
+    image: dovemark/dovecot
+    container_name: taumail-dovecot
+    hostname: mail.tauos.org
+    ports:
+      - "143:143"
+      - "993:993"
+      - "110:110"
+      - "995:995"
+    environment:
+      MAILNAME: mail.tauos.org
+    volumes:
+      - ./dovecot/config:/etc/dovecot
+      - ./dovecot/logs:/var/log
+      - ./mail:/var/mail
+    networks:
+      - taumail-network
+    restart: unless-stopped
+    depends_on:
+      - postfix
+
+  # Rspamd Anti-Spam
+  rspamd:
+    image: rspamd/rspamd:latest
+    container_name: taumail-rspamd
+    hostname: rspamd.tauos.org
+    ports:
+      - "11334:11334"
+    volumes:
+      - ./rspamd/config:/etc/rspamd
+      - ./rspamd/logs:/var/log
+    networks:
+      - taumail-network
+    restart: unless-stopped
+
+  # Nginx Reverse Proxy
+  nginx:
+    image: nginx:alpine
+    container_name: taumail-nginx
+    hostname: mail.tauos.org
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/config:/etc/nginx
+      - ./nginx/ssl:/etc/ssl
+      - ./nginx/logs:/var/log/nginx
+    networks:
+      - taumail-network
+    restart: unless-stopped
+    depends_on:
+      - postfix
+      - dovecot
+
+  # Redis for Session Storage
+  redis:
+    image: redis:alpine
+    container_name: taumail-redis
+    hostname: redis.tauos.org
+    ports:
+      - "6379:6379"
+    volumes:
+      - ./redis/data:/data
+    networks:
+      - taumail-network
+    restart: unless-stopped
+
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: taumail-postgres
+    hostname: db.tauos.org
+    environment:
+      POSTGRES_DB: taumail
+      POSTGRES_USER: taumail_user
+      POSTGRES_PASSWORD: secure_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./postgres/data:/var/lib/postgresql/data
+      - ./postgres/init:/docker-entrypoint-initdb.d
+    networks:
+      - taumail-network
+    restart: unless-stopped
+
+  # TauMail Web Interface
+  taumail-web:
+    image: node:18-alpine
+    container_name: taumail-web
+    hostname: web.mail.tauos.org
+    working_dir: /app
+    ports:
+      - "3001:3001"
+    volumes:
+      - ./taumail-web:/app
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: postgresql://taumail_user:secure_password@postgres:5432/taumail
+      SMTP_HOST: postfix
+      SMTP_PORT: 587
+      SMTP_USER: noreply@tauos.org
+      SMTP_PASSWORD: secure_password
+    networks:
+      - taumail-network
+    restart: unless-stopped
+    depends_on:
+      - postgres
+      - postfix
+      - redis
+
+networks:
+  taumail-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16 

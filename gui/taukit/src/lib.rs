@@ -1,5 +1,5 @@
 use gtk4::prelude::*;
-use gtk4::{Box as GtkBox, Orientation, Switch, Label, ListBox, ListBoxRow, Notebook, Button, Entry, Frame, ScrolledWindow, Image, Separator, Popover, ListBoxRow, EventControllerKey, EventControllerMotion, GestureClick, gdk};
+use gtk4::{Box as GtkBox, Orientation, Switch, Label, ListBox, ListBoxRow, Notebook, Button, Entry, Frame, ScrolledWindow, Image, Separator, Popover, EventControllerKey, EventControllerMotion, GestureClick, gdk, AccessibleRole};
 
 // DockBar widget with enhanced functionality
 pub struct DockBar {
@@ -33,8 +33,7 @@ impl DockBar {
         }
         
         app_button.set_child(Some(&app_box));
-        app_button.set_accessible_name(Some(&format!("Launch {}", name)));
-        app_button.set_accessible_description(Some(&format!("Click to launch {}", name)));
+        app_button.set_accessible_role(AccessibleRole::Button);
         
         self.container.append(&app_button);
         app_button
@@ -98,6 +97,7 @@ impl SettingsPanel {
         let frame = Frame::new(Some(title));
         let box_widget = GtkBox::new(Orientation::Vertical, 8);
         frame.set_child(Some(&box_widget));
+        
         self.container.append(&frame);
         frame
     }
@@ -109,11 +109,20 @@ impl SettingsPanel {
                 box_widget.append(&toggle);
             }
         }
-        toggle
+        
+        // Find the switch in the toggle box
+        if let Some(toggle_child) = toggle.last_child() {
+            if let Some(switch) = toggle_child.downcast::<Switch>().ok() {
+                return switch;
+            }
+        }
+        
+        // Fallback: create a new switch
+        Switch::builder().active(active).build()
     }
 }
 
-// AppGrid widget for launcher-style app grids
+// AppGrid widget for application grid layout
 pub struct AppGrid {
     pub grid: gtk4::Grid,
 }
@@ -136,33 +145,28 @@ impl AppGrid {
         
         let icon = Image::from_file(icon_path);
         let label = Label::new(Some(name));
-        let app_box = GtkBox::new(Orientation::Vertical, 8);
+        let app_box = GtkBox::new(Orientation::Vertical, 4);
         app_box.append(&icon);
         app_box.append(&label);
         
         app_button.set_child(Some(&app_box));
-        app_button.set_accessible_name(Some(&format!("Launch {}", name)));
-        app_button.set_accessible_description(Some(&format!("Click to launch {}", name)));
+        app_button.set_accessible_role(AccessibleRole::Button);
         
         self.grid.attach(&app_button, col, row, 1, 1);
         app_button
     }
 }
 
-// SearchBar widget with enhanced functionality
+// SearchBar widget for search functionality
 pub struct SearchBar {
     pub entry: Entry,
 }
 
 impl SearchBar {
     pub fn new(placeholder: &str) -> Self {
-        let entry = Entry::builder()
-            .placeholder_text(placeholder)
-            .margin_top(24)
-            .margin_bottom(12)
-            .margin_start(24)
-            .margin_end(24)
-            .build();
+        let entry = Entry::new();
+        entry.set_placeholder_text(Some(placeholder));
+        entry.set_hexpand(true);
         
         Self { entry }
     }
@@ -171,59 +175,48 @@ impl SearchBar {
     where
         F: Fn(&str) + 'static,
     {
-        let callback = std::rc::Rc::new(std::cell::RefCell::new(callback));
-        let callback_clone = callback.clone();
         self.entry.connect_changed(move |entry| {
             let text = entry.text();
-            callback_clone.borrow()(&text);
+            callback(&text);
         });
     }
 }
 
-// Notification widget for system notifications
+// Notification widget for displaying notifications
 pub struct Notification {
     pub container: GtkBox,
 }
 
 impl Notification {
     pub fn new(title: &str, message: &str, notification_type: NotificationType) -> Self {
-        let container = GtkBox::new(Orientation::Horizontal, 12);
+        let container = GtkBox::new(Orientation::Vertical, 8);
         container.set_margin_start(16);
         container.set_margin_end(16);
         container.set_margin_top(8);
         container.set_margin_bottom(8);
         
-        // Add notification type icon
-        let icon_label = match notification_type {
-            NotificationType::Info => Label::new(Some("ℹ")),
-            NotificationType::Success => Label::new(Some("✓")),
-            NotificationType::Warning => Label::new(Some("⚠")),
-            NotificationType::Error => Label::new(Some("✗")),
-        };
-        icon_label.set_css_classes(&[&format!("notification-{}", notification_type.to_string().to_lowercase())]);
-        container.append(&icon_label);
-        
-        // Add content
-        let content_box = GtkBox::new(Orientation::Vertical, 4);
         let title_label = Label::new(Some(title));
         title_label.set_css_classes(&["notification-title"]);
+        
         let message_label = Label::new(Some(message));
         message_label.set_css_classes(&["notification-message"]);
         
-        content_box.append(&title_label);
-        content_box.append(&message_label);
-        container.append(&content_box);
+        container.append(&title_label);
+        container.append(&message_label);
         
-        // Add close button
-        let close_button = Button::with_label("×");
-        close_button.set_css_classes(&["notification-close"]);
-        container.append(&close_button);
+        // Add notification type styling
+        let css_class = match notification_type {
+            NotificationType::Info => "notification-info",
+            NotificationType::Success => "notification-success",
+            NotificationType::Warning => "notification-warning",
+            NotificationType::Error => "notification-error",
+        };
+        container.set_css_classes(&[css_class]);
         
         Self { container }
     }
 }
 
-#[derive(Clone, Copy)]
 pub enum NotificationType {
     Info,
     Success,
@@ -234,15 +227,15 @@ pub enum NotificationType {
 impl ToString for NotificationType {
     fn to_string(&self) -> String {
         match self {
-            NotificationType::Info => "info".to_string(),
-            NotificationType::Success => "success".to_string(),
-            NotificationType::Warning => "warning".to_string(),
-            NotificationType::Error => "error".to_string(),
+            NotificationType::Info => "Info".to_string(),
+            NotificationType::Success => "Success".to_string(),
+            NotificationType::Warning => "Warning".to_string(),
+            NotificationType::Error => "Error".to_string(),
         }
     }
 }
 
-// ProgressBar widget with enhanced styling
+// ProgressBar widget for progress indication
 pub struct ProgressBar {
     pub bar: gtk4::ProgressBar,
 }
@@ -250,7 +243,7 @@ pub struct ProgressBar {
 impl ProgressBar {
     pub fn new() -> Self {
         let bar = gtk4::ProgressBar::new();
-        bar.set_css_classes(&["tau-progress-bar"]);
+        bar.set_show_text(true);
         
         Self { bar }
     }
@@ -264,7 +257,7 @@ impl ProgressBar {
     }
 }
 
-// StatusBar widget for application status
+// StatusBar widget for status information
 pub struct StatusBar {
     pub container: GtkBox,
 }
@@ -274,9 +267,8 @@ impl StatusBar {
         let container = GtkBox::new(Orientation::Horizontal, 8);
         container.set_margin_start(16);
         container.set_margin_end(16);
-        container.set_margin_top(8);
-        container.set_margin_bottom(8);
-        container.set_css_classes(&["status-bar"]);
+        container.set_margin_top(4);
+        container.set_margin_bottom(4);
         
         Self { container }
     }
@@ -302,26 +294,24 @@ pub struct Toolbar {
 
 impl Toolbar {
     pub fn new() -> Self {
-        let container = GtkBox::new(Orientation::Horizontal, 8);
-        container.set_margin_start(16);
-        container.set_margin_end(16);
-        container.set_margin_top(8);
-        container.set_margin_bottom(8);
-        container.set_css_classes(&["toolbar"]);
+        let container = GtkBox::new(Orientation::Horizontal, 4);
+        container.set_margin_start(8);
+        container.set_margin_end(8);
+        container.set_margin_top(4);
+        container.set_margin_bottom(4);
         
         Self { container }
     }
     
     pub fn add_button(&self, label: &str, icon: Option<&str>) -> Button {
-        let button = if let Some(icon_path) = icon {
+        let button = Button::new();
+        
+        if let Some(icon_path) = icon {
             let icon_widget = Image::from_file(icon_path);
-            let button = Button::new();
             button.set_child(Some(&icon_widget));
-            button.set_tooltip_text(Some(label));
-            button
         } else {
-            Button::with_label(label)
-        };
+            button.set_label(label);
+        }
         
         self.container.append(&button);
         button
@@ -329,8 +319,8 @@ impl Toolbar {
     
     pub fn add_separator(&self) {
         let separator = Separator::new(Orientation::Vertical);
-        separator.set_margin_start(8);
-        separator.set_margin_end(8);
+        separator.set_margin_start(4);
+        separator.set_margin_end(4);
         self.container.append(&separator);
     }
 } 

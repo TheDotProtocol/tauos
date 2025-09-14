@@ -1,0 +1,20 @@
+# DNS Records for TauMail Infrastructure
+# Add these records to your DNS provider for tauos.org
+
+# A Records
+mail.tauos.org     A     54.224.231.238
+smtp.tauos.org     A     54.224.231.238
+web.mail.tauos.org A     54.224.231.238
+
+# MX Records
+tauos.org          MX    10 mail.tauos.org
+
+# TXT Records (Email Authentication)
+tauos.org          TXT   "v=spf1 include:_spf.tauos.org ~all"
+_spf.tauos.org     TXT   "v=spf1 ip4:54.224.231.238 ~all"
+
+# DMARC Record
+_dmarc.tauos.org   TXT   "v=DMARC1; p=quarantine; rua=mailto:dmarc@tauos.org; ruf=mailto:dmarc@tauos.org; sp=quarantine; adkim=r; aspf=r;"
+
+# CNAME Records
+www.mail.tauos.org CNAME mail.tauos.org

@@ -1,411 +1,396 @@
-import React from 'react';
-import Link from 'next/link';
-import { Shield, Users, FileText, Calendar, Vote, Github, Twitter, MessageCircle } from 'lucide-react';
+'use client';
+
+import { motion } from 'framer-motion';
+import {
+  Building, Users, Shield, Eye, Heart, Target, Zap, Globe,
+  ArrowRight, Mail, ExternalLink, CheckCircle, Star,
+  GitBranch, Code, Server, Database, Smartphone, Monitor,
+  Tablet, Award, TrendingUp, Clock, Calendar, Scale, Lock,
+  FileText, GitCommit, GitMerge, GitPullRequest
+} from 'lucide-react';
 
 export default function GovernancePage() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-900">
+    <div className="min-h-screen bg-black text-white">
+      {/* Header */}
+      <header className="bg-gray-900/50 backdrop-blur-xl border-b border-gray-800 sticky top-0 z-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-16">
+            <div className="flex items-center space-x-4">
+              <img src="/brand/tauos-logo.svg" alt="TauOS" className="h-8 w-auto" />
+              <span className="text-xl font-bold text-white">Tau OS</span>
+            </div>
+            <nav className="hidden md:flex items-center space-x-8">
+              <a href="/" className="text-gray-300 hover:text-white transition-colors">Home</a>
+              <a href="/about" className="text-gray-300 hover:text-white transition-colors">About</a>
+              <a href="/developers" className="text-gray-300 hover:text-white transition-colors">Developers</a>
+              <a href="/governance" className="text-yellow-400 font-semibold">Governance</a>
+            </nav>
+          </div>
+        </div>
+      </header>
+
       {/* Hero Section */}
-      <div className="relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-r from-purple-900/20 to-blue-900/20"></div>
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
-          <div className="text-center">
-            <div className="flex justify-center mb-6">
-              <div className="bg-gradient-to-r from-purple-600 to-blue-600 p-3 rounded-full">
-                <Shield className="h-8 w-8 text-white" />
-              </div>
-            </div>
-            <h1 className="text-4xl md:text-6xl font-bold text-white mb-6">
-              Welcome to the
-              <span className="bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent"> TauOS Collective</span>
+      <section className="py-20 bg-gradient-to-b from-gray-900 to-black">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            className="text-center mb-16"
+          >
+            <h1 className="text-5xl md:text-7xl font-bold mb-6">
+              <span className="bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">
+                Governance
+              </span>
             </h1>
-            <p className="text-xl text-gray-300 max-w-3xl mx-auto mb-8">
-              A decentralized community building the future of privacy-first computing. 
-              Join us in creating an open, transparent, and user-controlled digital ecosystem.
+            <p className="text-xl md:text-2xl text-gray-300 max-w-4xl mx-auto leading-relaxed">
+              The Tau Project is built on <span className="text-yellow-400 font-semibold">trust, transparency, and independence</span>.
+              <br />
+              To ensure long-term sustainability and openness, governance is split between <span className="text-yellow-400 font-semibold">The Tau Foundation</span> and <span className="text-yellow-400 font-semibold">Tau LLC</span>.
             </p>
-            <div className="flex flex-wrap justify-center gap-4">
-              <div className="bg-white/10 backdrop-blur-sm rounded-lg px-6 py-3 border border-white/20">
-                <span className="text-white font-semibold">1,247 Contributors</span>
-              </div>
-              <div className="bg-white/10 backdrop-blur-sm rounded-lg px-6 py-3 border border-white/20">
-                <span className="text-white font-semibold">89 Countries</span>
-              </div>
-              <div className="bg-white/10 backdrop-blur-sm rounded-lg px-6 py-3 border border-white/20">
-                <span className="text-white font-semibold">Open Governance</span>
-              </div>
-            </div>
-          </div>
+          </motion.div>
         </div>
-      </div>
+      </section>
 
-      {/* Navigation Tabs */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="border-b border-gray-700">
-          <nav className="-mb-px flex space-x-8">
+      {/* The Tau Foundation Section */}
+      <section className="py-20 bg-black">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            viewport={{ once: true }}
+            className="text-center mb-16"
+          >
+            <h2 className="text-4xl md:text-5xl font-bold mb-6">
+              <Building className="w-12 h-12 text-yellow-400 mx-auto mb-4" />
+              <span className="bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">
+                The Tau Foundation
+              </span>
+            </h2>
+            <p className="text-xl text-gray-300 max-w-3xl mx-auto">
+              The Tau Foundation is a <span className="text-yellow-400 font-semibold">non-profit entity</span>, modeled after the Linux Foundation, that safeguards the vision of Tau OS.
+            </p>
+          </motion.div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {[
-              { name: 'Constitution', icon: FileText, href: '#constitution' },
-              { name: 'Contributor Guidelines', icon: Users, href: '#guidelines' },
-              { name: 'Community Roadmap', icon: Calendar, href: '#roadmap' },
-              { name: 'Voting System', icon: Vote, href: '#voting' },
-            ].map((item) => (
-              <a
-                key={item.name}
-                href={item.href}
-                className="border-transparent text-gray-400 hover:text-white hover:border-purple-500 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm flex items-center gap-2 transition-colors"
+              {
+                icon: Users,
+                title: "Community Oversight",
+                description: "Ensuring contributions remain open, transparent, and community-driven."
+              },
+              {
+                icon: Code,
+                title: "Open Standards",
+                description: "Defining and maintaining Tau's technical direction, free from corporate lock-in."
+              },
+              {
+                icon: Scale,
+                title: "Neutral Governance",
+                description: "No single company, government, or individual can dominate decision-making."
+              },
+              {
+                icon: Eye,
+                title: "Transparency",
+                description: "Publishing policies, sub-processor lists, and open meeting notes."
+              }
+            ].map((item, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, delay: index * 0.1 }}
+                viewport={{ once: true }}
+                className="p-6 bg-gray-900/30 backdrop-blur-sm border border-gray-800 rounded-2xl hover:border-yellow-400/30 transition-all duration-300"
               >
-                <item.icon className="h-4 w-4" />
-                {item.name}
-              </a>
+                <item.icon className="w-12 h-12 text-yellow-400 mb-4" />
+                <h3 className="text-xl font-bold text-white mb-3">{item.title}</h3>
+                <p className="text-gray-300">{item.description}</p>
+              </motion.div>
             ))}
-          </nav>
-        </div>
-      </div>
-
-      {/* Constitution Section */}
-      <section id="constitution" className="py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="bg-white/5 backdrop-blur-sm rounded-2xl p-8 border border-white/10">
-            <div className="flex items-center gap-3 mb-6">
-              <FileText className="h-6 w-6 text-purple-400" />
-              <h2 className="text-3xl font-bold text-white">TauOS Constitution</h2>
-            </div>
-            <div className="prose prose-invert max-w-none">
-              <div className="bg-gray-800/50 rounded-lg p-6 border border-gray-700">
-                <h3 className="text-xl font-semibold text-white mb-4">Preamble</h3>
-                <p className="text-gray-300 mb-4">
-                  We, the contributors of TauOS, establish this constitution to ensure transparency, 
-                  fairness, and collective ownership in the development of privacy-first computing.
-                </p>
-                
-                <h3 className="text-xl font-semibold text-white mb-4 mt-6">Article I: Core Principles</h3>
-                <ul className="text-gray-300 space-y-2">
-                  <li><strong>Privacy First:</strong> User privacy and data sovereignty are non-negotiable</li>
-                  <li><strong>Open Source:</strong> All core components remain open and auditable</li>
-                  <li><strong>Decentralized Governance:</strong> Community-driven decision making</li>
-                  <li><strong>Transparency:</strong> All processes and decisions are public</li>
-                  <li><strong>Inclusivity:</strong> Welcome contributors from all backgrounds</li>
-                </ul>
-
-                <h3 className="text-xl font-semibold text-white mb-4 mt-6">Article II: Governance Structure</h3>
-                <div className="grid md:grid-cols-2 gap-6">
-                  <div>
-                    <h4 className="text-lg font-semibold text-purple-400 mb-2">Contributor Council</h4>
-                    <p className="text-gray-300 text-sm">
-                      Elected representatives from active contributors who guide strategic decisions.
-                    </p>
-                  </div>
-                  <div>
-                    <h4 className="text-lg font-semibold text-purple-400 mb-2">Technical Committee</h4>
-                    <p className="text-gray-300 text-sm">
-                      Core developers and architects who ensure technical excellence.
-                    </p>
-                  </div>
-                </div>
-
-                <div className="mt-6 p-4 bg-purple-900/20 rounded-lg border border-purple-500/30">
-                  <p className="text-purple-300 text-sm">
-                    <strong>Note:</strong> This is a living document. The constitution will be updated 
-                    through community voting as TauOS evolves.
-                  </p>
-                </div>
-              </div>
-            </div>
           </div>
-        </div>
-      </section>
 
-      {/* Contributor Guidelines Section */}
-      <section id="guidelines" className="py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="bg-white/5 backdrop-blur-sm rounded-2xl p-8 border border-white/10">
-            <div className="flex items-center gap-3 mb-6">
-              <Users className="h-6 w-6 text-blue-400" />
-              <h2 className="text-3xl font-bold text-white">Contributor Guidelines</h2>
-            </div>
-            
-            <div className="grid md:grid-cols-2 gap-8">
-              <div>
-                <h3 className="text-xl font-semibold text-white mb-4">Getting Started</h3>
-                <div className="space-y-4">
-                  <div className="bg-gray-800/50 rounded-lg p-4 border border-gray-700">
-                    <h4 className="text-lg font-semibold text-blue-400 mb-2">1. Join the Community</h4>
-                    <p className="text-gray-300 text-sm">
-                      Start by joining our Discord, GitHub, or Reddit communities to introduce yourself.
-                    </p>
-                  </div>
-                  <div className="bg-gray-800/50 rounded-lg p-4 border border-gray-700">
-                    <h4 className="text-lg font-semibold text-blue-400 mb-2">2. Choose Your Area</h4>
-                    <p className="text-gray-300 text-sm">
-                      Pick an area that interests you: development, design, documentation, testing, or community.
-                    </p>
-                  </div>
-                  <div className="bg-gray-800/50 rounded-lg p-4 border border-gray-700">
-                    <h4 className="text-lg font-semibold text-blue-400 mb-2">3. Start Contributing</h4>
-                    <p className="text-gray-300 text-sm">
-                      Begin with small contributions and gradually take on larger projects.
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              <div>
-                <h3 className="text-xl font-semibold text-white mb-4">Code of Conduct</h3>
-                <div className="space-y-4">
-                  <div className="bg-gray-800/50 rounded-lg p-4 border border-gray-700">
-                    <h4 className="text-lg font-semibold text-green-400 mb-2">✅ Be Respectful</h4>
-                    <p className="text-gray-300 text-sm">
-                      Treat all contributors with respect and kindness, regardless of experience level.
-                    </p>
-                  </div>
-                  <div className="bg-gray-800/50 rounded-lg p-4 border border-gray-700">
-                    <h4 className="text-lg font-semibold text-green-400 mb-2">✅ Be Inclusive</h4>
-                    <p className="text-gray-300 text-sm">
-                      Welcome contributors from all backgrounds and experience levels.
-                    </p>
-                  </div>
-                  <div className="bg-gray-800/50 rounded-lg p-4 border border-gray-700">
-                    <h4 className="text-lg font-semibold text-green-400 mb-2">✅ Be Transparent</h4>
-                    <p className="text-gray-300 text-sm">
-                      Communicate openly about your work and decision-making process.
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="mt-8 p-6 bg-gradient-to-r from-blue-900/20 to-purple-900/20 rounded-lg border border-blue-500/30">
-              <h3 className="text-xl font-semibold text-white mb-4">Recognition & Rewards</h3>
-              <div className="grid md:grid-cols-3 gap-4">
-                <div className="text-center">
-                  <div className="bg-purple-600/20 rounded-full w-12 h-12 flex items-center justify-center mx-auto mb-2">
-                    <Github className="h-6 w-6 text-purple-400" />
-                  </div>
-                  <h4 className="text-white font-semibold">GitHub Recognition</h4>
-                  <p className="text-gray-300 text-sm">Contributions tracked and celebrated</p>
-                </div>
-                <div className="text-center">
-                  <div className="bg-blue-600/20 rounded-full w-12 h-12 flex items-center justify-center mx-auto mb-2">
-                    <Shield className="h-6 w-6 text-blue-400" />
-                  </div>
-                  <h4 className="text-white font-semibold">Governance Rights</h4>
-                  <p className="text-gray-300 text-sm">Voting power in community decisions</p>
-                </div>
-                <div className="text-center">
-                  <div className="bg-green-600/20 rounded-full w-12 h-12 flex items-center justify-center mx-auto mb-2">
-                    <Users className="h-6 w-6 text-green-400" />
-                  </div>
-                  <h4 className="text-white font-semibold">Community Status</h4>
-                  <p className="text-gray-300 text-sm">Recognition as core contributor</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Community Roadmap Section */}
-      <section id="roadmap" className="py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="bg-white/5 backdrop-blur-sm rounded-2xl p-8 border border-white/10">
-            <div className="flex items-center gap-3 mb-6">
-              <Calendar className="h-6 w-6 text-green-400" />
-              <h2 className="text-3xl font-bold text-white">Community Roadmap</h2>
-            </div>
-            
-            <div className="space-y-8">
-              <div className="grid md:grid-cols-3 gap-6">
-                <div className="bg-gradient-to-br from-purple-900/20 to-purple-600/20 rounded-lg p-6 border border-purple-500/30">
-                  <div className="text-purple-400 text-sm font-semibold mb-2">Q1 2024</div>
-                  <h3 className="text-lg font-semibold text-white mb-3">Foundation Phase</h3>
-                  <ul className="text-gray-300 text-sm space-y-2">
-                    <li>• Core OS development</li>
-                    <li>• Basic GUI applications</li>
-                    <li>• Community building</li>
-                    <li>• Documentation setup</li>
-                  </ul>
-                </div>
-                
-                <div className="bg-gradient-to-br from-blue-900/20 to-blue-600/20 rounded-lg p-6 border border-blue-500/30">
-                  <div className="text-blue-400 text-sm font-semibold mb-2">Q2 2024</div>
-                  <h3 className="text-lg font-semibold text-white mb-3">Ecosystem Growth</h3>
-                  <ul className="text-gray-300 text-sm space-y-2">
-                    <li>• TauMail & TauCloud launch</li>
-                    <li>• App Store development</li>
-                    <li>• Governance system</li>
-                    <li>• Beta testing program</li>
-                  </ul>
-                </div>
-                
-                <div className="bg-gradient-to-br from-green-900/20 to-green-600/20 rounded-lg p-6 border border-green-500/30">
-                  <div className="text-green-400 text-sm font-semibold mb-2">Q3 2024</div>
-                  <h3 className="text-lg font-semibold text-white mb-3">Public Launch</h3>
-                  <ul className="text-gray-300 text-sm space-y-2">
-                    <li>• Public beta release</li>
-                    <li>• Community governance</li>
-                    <li>• Third-party apps</li>
-                    <li>• Educational content</li>
-                  </ul>
-                </div>
-              </div>
-
-              <div className="bg-gray-800/50 rounded-lg p-6 border border-gray-700">
-                <h3 className="text-xl font-semibold text-white mb-4">Current Focus Areas</h3>
-                <div className="grid md:grid-cols-2 gap-6">
-                  <div>
-                    <h4 className="text-lg font-semibold text-purple-400 mb-2">Technical Priorities</h4>
-                    <ul className="text-gray-300 text-sm space-y-1">
-                      <li>• TauID integration</li>
-                      <li>• Voice assistant development</li>
-                      <li>• Security hardening</li>
-                      <li>• Performance optimization</li>
-                    </ul>
-                  </div>
-                  <div>
-                    <h4 className="text-lg font-semibold text-blue-400 mb-2">Community Priorities</h4>
-                    <ul className="text-gray-300 text-sm space-y-1">
-                      <li>• Governance framework</li>
-                      <li>• Contributor onboarding</li>
-                      <li>• Documentation improvement</li>
-                      <li>• Educational resources</li>
-                    </ul>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Voting System Section */}
-      <section id="voting" className="py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="bg-white/5 backdrop-blur-sm rounded-2xl p-8 border border-white/10">
-            <div className="flex items-center gap-3 mb-6">
-              <Vote className="h-6 w-6 text-yellow-400" />
-              <h2 className="text-3xl font-bold text-white">Voting System</h2>
-            </div>
-            
-            <div className="grid md:grid-cols-2 gap-8">
-              <div>
-                <h3 className="text-xl font-semibold text-white mb-4">How Voting Works</h3>
-                <div className="space-y-4">
-                  <div className="bg-gray-800/50 rounded-lg p-4 border border-gray-700">
-                    <h4 className="text-lg font-semibold text-yellow-400 mb-2">1. Proposal Submission</h4>
-                    <p className="text-gray-300 text-sm">
-                      Any contributor can submit proposals for community review and discussion.
-                    </p>
-                  </div>
-                  <div className="bg-gray-800/50 rounded-lg p-4 border border-gray-700">
-                    <h4 className="text-lg font-semibold text-yellow-400 mb-2">2. Discussion Period</h4>
-                    <p className="text-gray-300 text-sm">
-                      Proposals are discussed for at least 7 days before voting begins.
-                    </p>
-                  </div>
-                  <div className="bg-gray-800/50 rounded-lg p-4 border border-gray-700">
-                    <h4 className="text-lg font-semibold text-yellow-400 mb-2">3. Community Vote</h4>
-                    <p className="text-gray-300 text-sm">
-                      Active contributors vote using their TauID for secure, verifiable voting.
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              <div>
-                <h3 className="text-xl font-semibold text-white mb-4">Voting Power</h3>
-                <div className="space-y-4">
-                  <div className="bg-gradient-to-r from-green-900/20 to-green-600/20 rounded-lg p-4 border border-green-500/30">
-                    <h4 className="text-lg font-semibold text-green-400 mb-2">Core Contributors</h4>
-                    <p className="text-gray-300 text-sm">
-                      3x voting power for consistent, high-quality contributions over 6+ months.
-                    </p>
-                  </div>
-                  <div className="bg-gradient-to-r from-blue-900/20 to-blue-600/20 rounded-lg p-4 border border-blue-500/30">
-                    <h4 className="text-lg font-semibold text-blue-400 mb-2">Active Contributors</h4>
-                    <p className="text-gray-300 text-sm">
-                      2x voting power for regular contributions over 3+ months.
-                    </p>
-                  </div>
-                  <div className="bg-gradient-to-r from-purple-900/20 to-purple-600/20 rounded-lg p-4 border border-purple-500/30">
-                    <h4 className="text-lg font-semibold text-purple-400 mb-2">New Contributors</h4>
-                    <p className="text-gray-300 text-sm">
-                      1x voting power for all verified contributors.
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="mt-8 p-6 bg-gradient-to-r from-yellow-900/20 to-orange-900/20 rounded-lg border border-yellow-500/30">
-              <h3 className="text-xl font-semibold text-white mb-4">Current Proposals</h3>
-              <div className="space-y-4">
-                <div className="bg-gray-800/50 rounded-lg p-4 border border-gray-700">
-                  <div className="flex justify-between items-start mb-2">
-                    <h4 className="text-white font-semibold">Enhanced Privacy Controls</h4>
-                    <span className="text-green-400 text-sm font-semibold">Active</span>
-                  </div>
-                  <p className="text-gray-300 text-sm mb-3">
-                    Proposal to add granular privacy controls to TauOS settings panel.
-                  </p>
-                  <div className="flex items-center gap-4 text-sm">
-                    <span className="text-gray-400">Votes: 127</span>
-                    <span className="text-green-400">87% Support</span>
-                  </div>
-                </div>
-                
-                <div className="bg-gray-800/50 rounded-lg p-4 border border-gray-700">
-                  <div className="flex justify-between items-start mb-2">
-                    <h4 className="text-white font-semibold">Mobile App Development</h4>
-                    <span className="text-blue-400 text-sm font-semibold">Discussion</span>
-                  </div>
-                  <p className="text-gray-300 text-sm mb-3">
-                    Proposal to begin development of TauOS mobile companion apps.
-                  </p>
-                  <div className="flex items-center gap-4 text-sm">
-                    <span className="text-gray-400">Comments: 23</span>
-                    <span className="text-blue-400">In Discussion</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Call to Action */}
-      <section className="py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="bg-gradient-to-r from-purple-900/20 to-blue-900/20 rounded-2xl p-8 border border-purple-500/30 text-center">
-            <h2 className="text-3xl font-bold text-white mb-4">Join the TauOS Collective</h2>
-            <p className="text-xl text-gray-300 mb-8 max-w-2xl mx-auto">
-              Be part of building the future of privacy-first computing. 
-              Your contributions shape the direction of TauOS.
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.4 }}
+            viewport={{ once: true }}
+            className="text-center mt-12"
+          >
+            <p className="text-lg text-gray-300 max-w-3xl mx-auto">
+              The foundation acts as the <span className="text-yellow-400 font-semibold">guardian of the Tau ecosystem</span>, ensuring Tau OS remains sovereign and open to all.
             </p>
-            <div className="flex flex-wrap justify-center gap-4">
-              <Link 
-                href="https://github.com/TheDotProtocol/tauos"
-                className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white px-6 py-3 rounded-lg font-semibold transition-all duration-200 flex items-center gap-2"
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Tau LLC Section */}
+      <section className="py-20 bg-gradient-to-b from-black to-gray-900">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            viewport={{ once: true }}
+            className="text-center mb-16"
+          >
+            <h2 className="text-4xl md:text-5xl font-bold mb-6">
+              <Code className="w-12 h-12 text-yellow-400 mx-auto mb-4" />
+              <span className="bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">
+                Tau LLC
+              </span>
+            </h2>
+            <p className="text-xl text-gray-300 max-w-3xl mx-auto mb-8">
+              Tau LLC is the <span className="text-yellow-400 font-semibold">for-profit arm</span> that builds commercial value while maintaining community alignment.
+            </p>
+          </motion.div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {[
+              {
+                icon: Server,
+                title: "Commercial Applications",
+                description: "Builds commercial applications and enterprise solutions on Tau OS."
+              },
+              {
+                icon: Users,
+                title: "Professional Support",
+                description: "Provides paid support, consulting, and integrations for businesses."
+              },
+              {
+                icon: TrendingUp,
+                title: "Research & Development",
+                description: "Helps fund ongoing research and development of the Tau ecosystem."
+              }
+            ].map((item, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, delay: index * 0.1 }}
+                viewport={{ once: true }}
+                className="p-6 bg-gray-900/30 backdrop-blur-sm border border-gray-800 rounded-2xl hover:border-yellow-400/30 transition-all duration-300"
               >
-                <Github className="h-5 w-5" />
-                Contribute on GitHub
-              </Link>
-              <Link 
-                href="https://discord.gg/tauos"
-                className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-6 py-3 rounded-lg font-semibold transition-all duration-200 flex items-center gap-2"
+                <item.icon className="w-12 h-12 text-yellow-400 mb-4" />
+                <h3 className="text-xl font-bold text-white mb-3">{item.title}</h3>
+                <p className="text-gray-300">{item.description}</p>
+              </motion.div>
+            ))}
+          </div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.3 }}
+            viewport={{ once: true }}
+            className="text-center mt-12"
+          >
+            <p className="text-lg text-gray-300 max-w-3xl mx-auto">
+              Tau LLC operates <span className="text-yellow-400 font-semibold">under the oversight of the Tau Foundation</span> to maintain alignment with community principles.
+            </p>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Governance Model Section */}
+      <section className="py-20 bg-black">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            viewport={{ once: true }}
+            className="text-center mb-16"
+          >
+            <h2 className="text-4xl md:text-5xl font-bold mb-6">
+              <Scale className="w-12 h-12 text-yellow-400 mx-auto mb-4" />
+              <span className="bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">
+                Governance Model
+              </span>
+            </h2>
+          </motion.div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            {[
+              {
+                icon: GitCommit,
+                title: "Technical Steering Committee (TSC)",
+                description: "Composed of senior contributors and security experts. Guides technical direction, system architecture, and feature development."
+              },
+              {
+                icon: Users,
+                title: "Community Board",
+                description: "Represents developers, users, and partners. Ensures inclusivity and fairness in governance."
+              },
+              {
+                icon: Award,
+                title: "Advisory Council",
+                description: "External experts in law, ethics, and technology. Provides independent oversight and accountability."
+              }
+            ].map((item, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, delay: index * 0.1 }}
+                viewport={{ once: true }}
+                className="p-8 bg-gray-900/30 backdrop-blur-sm border border-gray-800 rounded-2xl hover:border-yellow-400/30 transition-all duration-300"
               >
-                <MessageCircle className="h-5 w-5" />
-                Join Discord
-              </Link>
-              <Link 
-                href="/careers"
-                className="bg-white/10 hover:bg-white/20 text-white px-6 py-3 rounded-lg font-semibold transition-all duration-200 border border-white/20 flex items-center gap-2"
-              >
-                <Users className="h-5 w-5" />
-                View Careers
-              </Link>
-            </div>
+                <item.icon className="w-16 h-16 text-yellow-400 mb-6" />
+                <h3 className="text-2xl font-bold text-white mb-4">{item.title}</h3>
+                <p className="text-gray-300 leading-relaxed">{item.description}</p>
+              </motion.div>
+            ))}
           </div>
         </div>
       </section>
+
+      {/* Transparency & Legal Section */}
+      <section className="py-20 bg-gradient-to-b from-gray-900 to-black">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            viewport={{ once: true }}
+            className="text-center mb-16"
+          >
+            <h2 className="text-4xl md:text-5xl font-bold mb-6">
+              <Lock className="w-12 h-12 text-yellow-400 mx-auto mb-4" />
+              <span className="bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">
+                Transparency & Legal
+              </span>
+            </h2>
+          </motion.div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
+            {[
+              "All governance documents, Data Protection Addendum (DPA), and Sub-processor Lists are public.",
+              "Foundation meetings are documented and published openly.",
+              "Tau Foundation ensures Tau OS is legally incorporated, transparent, and accountable to its users."
+            ].map((item, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, delay: index * 0.1 }}
+                viewport={{ once: true }}
+                className="flex items-center space-x-4 p-6 bg-gray-900/30 backdrop-blur-sm border border-gray-800 rounded-2xl hover:border-yellow-400/30 transition-all duration-300"
+              >
+                <CheckCircle className="w-6 h-6 text-yellow-400 flex-shrink-0" />
+                <p className="text-gray-300">{item}</p>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Why This Matters Section */}
+      <section className="py-20 bg-black">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            viewport={{ once: true }}
+            className="text-center mb-16"
+          >
+            <h2 className="text-4xl md:text-5xl font-bold mb-6">
+              <Globe className="w-12 h-12 text-yellow-400 mx-auto mb-4" />
+              <span className="bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">
+                Why This Matters
+              </span>
+            </h2>
+            <p className="text-xl text-gray-300 max-w-4xl mx-auto mb-8">
+              Most operating systems are controlled by a single corporation with closed decision-making. Tau flips that model:
+            </p>
+          </motion.div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
+            {[
+              {
+                icon: Shield,
+                title: "The Foundation protects users.",
+                color: "from-blue-500 to-cyan-500"
+              },
+              {
+                icon: TrendingUp,
+                title: "The Company builds value.",
+                color: "from-green-500 to-emerald-500"
+              },
+              {
+                icon: Users,
+                title: "The Community drives innovation.",
+                color: "from-purple-500 to-indigo-500"
+              }
+            ].map((item, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, delay: index * 0.1 }}
+                viewport={{ once: true }}
+                className="p-6 bg-gray-900/30 backdrop-blur-sm border border-gray-800 rounded-2xl hover:border-yellow-400/30 transition-all duration-300"
+              >
+                <div className={`w-12 h-12 bg-gradient-to-r ${item.color} rounded-xl flex items-center justify-center mb-4`}>
+                  <item.icon className="w-6 h-6 text-white" />
+                </div>
+                <h3 className="text-xl font-bold text-white mb-3">{item.title}</h3>
+              </motion.div>
+            ))}
+          </div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            viewport={{ once: true }}
+            className="text-center"
+          >
+            <div className="bg-gradient-to-r from-gray-900 to-black border border-gray-800 rounded-2xl p-8 max-w-4xl mx-auto">
+              <p className="text-2xl md:text-3xl font-bold text-white">
+                Together, this ensures Tau is <span className="text-yellow-400">built to last for generations, not quarterly profits</span>.
+              </p>
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* CTA Section */}
+      <section className="py-20 bg-gradient-to-b from-gray-900 to-black">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            viewport={{ once: true }}
+            className="text-center"
+          >
+            <a
+              href="mailto:verify@tauos.org"
+              className="inline-flex items-center space-x-2 bg-gradient-to-r from-yellow-400 to-orange-500 text-black px-8 py-4 rounded-xl font-semibold hover:shadow-lg hover:shadow-yellow-400/25 transition-all duration-300"
+            >
+              <Mail className="w-5 h-5" />
+              <span>Learn more or get involved</span>
+            </a>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="bg-gray-900/50 border-t border-gray-800 py-12">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center">
+            <div className="flex items-center justify-center space-x-4 mb-4">
+              <img src="/brand/tauos-logo.svg" alt="TauOS" className="h-8 w-auto" />
+              <span className="text-xl font-bold text-white">Tau OS</span>
+            </div>
+            <p className="text-gray-400">© 2025 Tau Foundation & Tau LLC. All rights reserved.</p>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 } 

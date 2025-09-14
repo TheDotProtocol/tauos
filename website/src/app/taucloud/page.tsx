@@ -1,451 +1,428 @@
 'use client';
 
-import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { 
-  Cloud,
-  Shield,
-  Lock,
-  EyeOff,
-  Download,
-  Globe,
-  ArrowRight,
-  CheckCircle,
-  Users,
-  Zap,
-  Globe2,
-  FileText,
-  Folder,
-  Image,
-  Music,
-  Video,
-  Archive
+import {
+  Cloud, Lock, Eye, Upload, Download, Shield, Database, Globe,
+  ArrowRight, ExternalLink, CheckCircle, Star, Zap, Code, Building,
+  Target, Mail, Award, Heart, Scale, Monitor, Smartphone, Users,
+  Laptop, Smartphone as Mobile
 } from 'lucide-react';
 
 export default function TauCloudPage() {
-  const [email, setEmail] = useState('');
-  const [domain, setDomain] = useState('');
-
-  const features = [
+  const downloadOptions = [
     {
-      icon: <Shield className="w-6 h-6 text-purple-400" />,
-      title: "Client-Side Encryption",
-      description: "Files are encrypted before they reach our servers"
+      icon: Monitor,
+      title: "Windows",
+      description: "Windows 10/11 (64-bit)",
+      downloadUrl: "#",
+      comingSoon: true
     },
     {
-      icon: <EyeOff className="w-6 h-6 text-purple-400" />,
-      title: "Zero-Knowledge Privacy",
-      description: "We can't see your files, even if we wanted to"
+      icon: Laptop,
+      title: "macOS",
+      description: "macOS 10.15+ (Intel & Apple Silicon)",
+      downloadUrl: "#",
+      comingSoon: true
     },
     {
-      icon: <Download className="w-6 h-6 text-purple-400" />,
-      title: "Self-Host Option",
-      description: "Deploy on your own infrastructure for maximum control"
+      icon: Globe,
+      title: "Linux",
+      description: "Ubuntu, Debian, Fedora, Arch",
+      downloadUrl: "#",
+      comingSoon: true
     },
     {
-      icon: <Globe2 className="w-6 h-6 text-purple-400" />,
-      title: "Cross-Platform Sync",
-      description: "Access your files from any device, anywhere"
-    }
-  ];
-
-  const storagePlans = [
-    {
-      name: "Free",
-      storage: "5 GB",
-      price: "$0",
-      features: ["Client-side encryption", "Zero-knowledge privacy", "Cross-platform sync", "Basic support"]
-    },
-    {
-      name: "Pro",
-      storage: "100 GB",
-      price: "$5/month",
-      features: ["Everything in Free", "Advanced sharing", "Version history", "Priority support"]
-    },
-    {
-      name: "Enterprise",
-      storage: "1 TB",
-      price: "$20/month",
-      features: ["Everything in Pro", "Custom domains", "Admin dashboard", "Dedicated support"]
+      icon: Mobile,
+      title: "Mobile",
+      description: "iOS & Android (Coming Soon)",
+      downloadUrl: "#",
+      comingSoon: true
     }
   ];
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white">
+    <div className="min-h-screen bg-black text-white">
       {/* Header */}
-      <header className="bg-gray-800 border-b border-gray-700">
+      <header className="bg-gray-900/50 backdrop-blur-xl border-b border-gray-800 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center space-x-4">
-              <div className="flex items-center space-x-3">
-                <div className="w-8 h-8 bg-purple-600 rounded-lg flex items-center justify-center">
-                  <Cloud className="w-5 h-5 text-white" />
-                </div>
-                <span className="text-xl font-bold">TauCloud</span>
-              </div>
+              <img src="/brand/tauos-logo.svg" alt="TauOS" className="h-8 w-auto" />
+              <span className="text-xl font-bold text-white">Tau OS</span>
             </div>
-            
-            <div className="flex items-center space-x-4">
-              <a href="/" className="text-gray-300 hover:text-white transition-colors">
-                Back to TauOS
-              </a>
-              <button className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg font-medium transition-colors">
-                Login
-              </button>
-            </div>
+            <nav className="hidden md:flex items-center space-x-8">
+              <a href="/" className="text-gray-300 hover:text-white transition-colors">Home</a>
+              <a href="/about" className="text-gray-300 hover:text-white transition-colors">About</a>
+              <a href="/developers" className="text-gray-300 hover:text-white transition-colors">Developers</a>
+              <a href="/governance" className="text-gray-300 hover:text-white transition-colors">Governance</a>
+            </nav>
           </div>
         </div>
       </header>
 
       {/* Hero Section */}
-      <section className="relative overflow-hidden">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
-          <div className="text-center">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6 }}
-            >
-              <h1 className="text-5xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
-                Welcome to TauCloud
-              </h1>
-              <p className="text-xl md:text-2xl text-gray-300 mb-8 max-w-3xl mx-auto">
-                Private, Secure Cloud Storage for Everyone
-              </p>
-              <p className="text-lg text-gray-400 mb-12 max-w-2xl mx-auto">
-                Store your files with complete privacy. TauCloud uses client-side encryption 
-                and zero-knowledge architecture to ensure your data stays yours.
-              </p>
-            </motion.div>
+      <section className="py-20 bg-gradient-to-b from-gray-900 to-black">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            className="text-center mb-16"
+          >
+            <h1 className="text-5xl md:text-7xl font-bold mb-6">
+              <span className="bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">
+                TauCloud
+              </span>
+            </h1>
+            <p className="text-xl md:text-2xl text-gray-300 max-w-4xl mx-auto leading-relaxed">
+              Private cloud storage that puts you in control. <span className="text-yellow-400 font-semibold">Client-side encryption, zero-knowledge architecture, and complete privacy by design</span>.
+              <br />
+              <span className="text-lg text-gray-400">1TB Free Storage • 100% Encrypted • Zero Data Access</span>
+            </p>
+          </motion.div>
 
-            {/* CTA Buttons */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.2 }}
-              className="flex flex-col sm:flex-row gap-4 justify-center mb-16"
-            >
-              <button className="bg-purple-600 hover:bg-purple-700 text-white px-8 py-4 rounded-lg font-medium text-lg flex items-center justify-center space-x-2 transition-colors">
-                <span>Get Started Free</span>
-                <ArrowRight className="w-5 h-5" />
-              </button>
-              <button className="bg-gray-800 hover:bg-gray-700 text-white px-8 py-4 rounded-lg font-medium text-lg border border-gray-600 transition-colors">
-                View Plans
-              </button>
-            </motion.div>
-          </div>
-        </div>
-
-        {/* Background Pattern */}
-        <div className="absolute inset-0 -z-10">
-          <div className="absolute inset-0 bg-gradient-to-br from-purple-900/20 to-pink-900/20"></div>
-          <div className="absolute top-0 left-0 w-72 h-72 bg-purple-500/10 rounded-full blur-3xl"></div>
-          <div className="absolute bottom-0 right-0 w-72 h-72 bg-pink-500/10 rounded-full blur-3xl"></div>
+          {/* Download Section */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.4 }}
+            className="text-center mb-16"
+          >
+            <h2 className="text-3xl font-bold text-white mb-8">Download TauCloud</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto">
+              {downloadOptions.map((option, index) => (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.8, delay: 0.5 + index * 0.1 }}
+                  className="p-6 bg-gray-900/30 backdrop-blur-sm border border-gray-800 rounded-2xl hover:border-yellow-400/30 transition-all duration-300"
+                >
+                  <div className="w-12 h-12 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-xl flex items-center justify-center mx-auto mb-4">
+                    <option.icon className="w-6 h-6 text-black" />
+                  </div>
+                  <h3 className="text-lg font-bold text-white mb-2">{option.title}</h3>
+                  <p className="text-sm text-gray-400 mb-4">{option.description}</p>
+                  <button
+                    className={`w-full py-2 px-4 rounded-lg font-semibold transition-all duration-200 ${
+                      option.comingSoon
+                        ? 'bg-gray-700 text-gray-400 cursor-not-allowed'
+                        : 'bg-gradient-to-r from-yellow-400 to-orange-500 text-black hover:shadow-lg hover:shadow-yellow-400/25'
+                    }`}
+                    disabled={option.comingSoon}
+                  >
+                    {option.comingSoon ? 'Coming Soon' : 'Download'}
+                  </button>
+                </motion.div>
+              ))}
+            </div>
+            <p className="text-gray-400 mt-6 text-sm">
+              Desktop apps will be available via OTA updates. Web version available now.
+            </p>
+          </motion.div>
         </div>
       </section>
 
-      {/* Features Section */}
-      <section className="py-20 bg-gray-800">
+      {/* Privacy by Design Section */}
+      <section className="py-20 bg-black">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
+            transition={{ duration: 0.8 }}
+            viewport={{ once: true }}
             className="text-center mb-16"
           >
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">
-              Why Choose TauCloud?
+            <h2 className="text-4xl md:text-5xl font-bold mb-6">
+              <Shield className="w-12 h-12 text-yellow-400 mx-auto mb-4" />
+              <span className="bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">
+                Privacy by Design
+              </span>
             </h2>
-            <p className="text-gray-400 text-lg max-w-2xl mx-auto">
-              Built with privacy-first principles and modern security standards
+            <p className="text-xl text-gray-300 max-w-3xl mx-auto">
+              Every feature is built with your <span className="text-yellow-400 font-semibold">privacy and security as the foundation</span>.
             </p>
           </motion.div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {features.map((feature, index) => (
+            {[
+              {
+                icon: Lock,
+                title: "Client-Side Encryption",
+                description: "Your files are encrypted on your device before upload. We can't see your data even if we wanted to."
+              },
+              {
+                icon: Eye,
+                title: "Zero-Knowledge Storage",
+                description: "End-to-end encryption ensures your files remain private. Only you have the keys to decrypt them."
+              },
+              {
+                icon: Shield,
+                title: "No Data Mining",
+                description: "We don't scan, analyze, or monetize your files. Your privacy is absolute and uncompromised."
+              },
+              {
+                icon: Globe,
+                title: "Open Standards",
+                description: "Built on WebDAV and S3 standards. Access your files from any compatible client or app."
+              }
+            ].map((feature, index) => (
               <motion.div
                 key={index}
-                initial={{ opacity: 0, y: 20 }}
+                initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: index * 0.1 }}
-                className="bg-gray-700 rounded-lg p-6 text-center"
+                transition={{ duration: 0.8, delay: index * 0.1 }}
+                viewport={{ once: true }}
+                className="p-6 bg-gray-900/30 backdrop-blur-sm border border-gray-800 rounded-2xl hover:border-yellow-400/30 transition-all duration-300"
               >
-                <div className="flex justify-center mb-4">
-                  {feature.icon}
-                </div>
-                <h3 className="text-lg font-semibold mb-2">{feature.title}</h3>
-                <p className="text-gray-400 text-sm">{feature.description}</p>
+                <feature.icon className="w-12 h-12 text-yellow-400 mb-4" />
+                <h3 className="text-xl font-bold text-white mb-3">{feature.title}</h3>
+                <p className="text-gray-300">{feature.description}</p>
               </motion.div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Screenshot Section */}
-      <section className="py-20">
+      {/* How It Works Section */}
+      <section className="py-20 bg-gradient-to-b from-black to-gray-900">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
+            transition={{ duration: 0.8 }}
+            viewport={{ once: true }}
             className="text-center mb-16"
           >
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">
-              See TauCloud in Action
+            <h2 className="text-4xl md:text-5xl font-bold mb-6">
+              <Cloud className="w-12 h-12 text-yellow-400 mx-auto mb-4" />
+              <span className="bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">
+                How It Works
+              </span>
             </h2>
-            <p className="text-gray-400 text-lg max-w-2xl mx-auto">
-              Experience the privacy-first cloud storage interface designed for complete control
+            <p className="text-xl text-gray-300 max-w-3xl mx-auto">
+              Simple, secure, and private file storage in three easy steps.
             </p>
           </motion.div>
 
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            {[
+              {
+                step: "1",
+                title: "Upload",
+                description: "Upload your files through our secure web interface or compatible apps with automatic encryption.",
+                icon: Upload
+              },
+              {
+                step: "2",
+                title: "Encrypt",
+                description: "Files are encrypted on your device before being stored on our servers. We never see your data.",
+                icon: Lock
+              },
+              {
+                step: "3",
+                title: "Access",
+                description: "Access your files anywhere, anytime, with complete privacy and security protection.",
+                icon: Download
+              }
+            ].map((step, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, delay: index * 0.1 }}
+                viewport={{ once: true }}
+                className="p-8 bg-gray-900/30 backdrop-blur-sm border border-gray-800 rounded-2xl hover:border-yellow-400/30 transition-all duration-300 text-center"
+              >
+                <div className="w-16 h-16 bg-yellow-400 text-black rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-6">
+                  {step.step}
+                </div>
+                <step.icon className="w-12 h-12 text-yellow-400 mx-auto mb-4" />
+                <h3 className="text-2xl font-bold text-white mb-4">{step.title}</h3>
+                <p className="text-gray-300 leading-relaxed">{step.description}</p>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Features Section */}
+      <section className="py-20 bg-black">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            whileInView={{ opacity: 1, scale: 1 }}
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
-            className="relative"
+            viewport={{ once: true }}
+            className="text-center mb-16"
           >
-            {/* TauCloud Interface Screenshot */}
-            <div className="bg-white rounded-lg overflow-hidden shadow-2xl">
-              {/* Header */}
-              <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white p-4">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-3">
-                    <Cloud className="w-5 h-5" />
-                    <span className="font-bold text-lg">TauCloud</span>
-                  </div>
-                  <div className="flex items-center space-x-4">
-                    <div className="flex items-center space-x-2">
-                      <Shield className="w-4 h-4" />
-                      <span className="text-sm">Encrypted</span>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <span className="text-sm">2.1 GB / 5 GB</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Main Interface */}
-              <div className="flex">
-                {/* Sidebar */}
-                <div className="w-64 bg-gray-50 border-r border-gray-200">
-                  <div className="p-4">
-                    <button className="w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium mb-4">
-                      Upload Files
-                    </button>
-                    <nav className="space-y-2">
-                      <a href="#" className="flex items-center space-x-3 p-2 rounded-lg bg-blue-50 text-blue-700">
-                        <Folder className="w-4 h-4" />
-                        <span>Files</span>
-                      </a>
-                      <a href="#" className="flex items-center space-x-3 p-2 rounded-lg text-gray-600 hover:bg-gray-100">
-                        <Image className="w-4 h-4" />
-                        <span>Photos</span>
-                      </a>
-                      <a href="#" className="flex items-center space-x-3 p-2 rounded-lg text-gray-600 hover:bg-gray-100">
-                        <Music className="w-4 h-4" />
-                        <span>Music</span>
-                      </a>
-                      <a href="#" className="flex items-center space-x-3 p-2 rounded-lg text-gray-600 hover:bg-gray-100">
-                        <Video className="w-4 h-4" />
-                        <span>Videos</span>
-                      </a>
-                    </nav>
-                  </div>
-                </div>
-
-                {/* File Grid */}
-                <div className="flex-1">
-                  <div className="border-b border-gray-200">
-                    <div className="p-4">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center space-x-4">
-                          <button className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-sm">
-                            Upload
-                          </button>
-                          <button className="text-gray-600 hover:text-gray-800 px-3 py-1 rounded text-sm">
-                            New Folder
-                          </button>
-                        </div>
-                        <div className="text-sm text-gray-500">
-                          2.1 GB of 5 GB used
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <div className="p-6">
-                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                      <div className="p-4 rounded-lg border-2 border-gray-200 hover:bg-gray-50 cursor-pointer">
-                        <div className="text-center">
-                          <div className="flex justify-center mb-3">
-                            <FileText className="w-8 h-8 text-blue-500" />
-                          </div>
-                          <div className="flex items-center justify-center mb-2">
-                            <span className="text-sm font-medium text-gray-900 truncate max-w-full">
-                              TauOS Documentation.pdf
-                            </span>
-                            <Shield className="w-4 h-4 text-green-500 ml-1" />
-                          </div>
-                          <p className="text-xs text-gray-500">2.3 MB</p>
-                          <p className="text-xs text-gray-400">2 hours ago</p>
-                        </div>
-                      </div>
-                      
-                      <div className="p-4 rounded-lg border-2 border-gray-200 hover:bg-gray-50 cursor-pointer">
-                        <div className="text-center">
-                          <div className="flex justify-center mb-3">
-                            <Folder className="w-8 h-8 text-blue-500" />
-                          </div>
-                          <div className="flex items-center justify-center mb-2">
-                            <span className="text-sm font-medium text-gray-900 truncate max-w-full">
-                              Project Screenshots
-                            </span>
-                            <Shield className="w-4 h-4 text-green-500 ml-1" />
-                          </div>
-                          <p className="text-xs text-gray-500">15 items</p>
-                          <p className="text-xs text-gray-400">1 day ago</p>
-                        </div>
-                      </div>
-                      
-                      <div className="p-4 rounded-lg border-2 border-gray-200 hover:bg-gray-50 cursor-pointer">
-                        <div className="text-center">
-                          <div className="flex justify-center mb-3">
-                            <Image className="w-8 h-8 text-green-500" />
-                          </div>
-                          <div className="flex items-center justify-center mb-2">
-                            <span className="text-sm font-medium text-gray-900 truncate max-w-full">
-                              vacation-photos.jpg
-                            </span>
-                            <Shield className="w-4 h-4 text-green-500 ml-1" />
-                          </div>
-                          <p className="text-xs text-gray-500">4.1 MB</p>
-                          <p className="text-xs text-gray-400">3 days ago</p>
-                        </div>
-                      </div>
-                      
-                      <div className="p-4 rounded-lg border-2 border-gray-200 hover:bg-gray-50 cursor-pointer">
-                        <div className="text-center">
-                          <div className="flex justify-center mb-3">
-                            <FileText className="w-8 h-8 text-blue-500" />
-                          </div>
-                          <div className="flex items-center justify-center mb-2">
-                            <span className="text-sm font-medium text-gray-900 truncate max-w-full">
-                              presentation.pptx
-                            </span>
-                            <Shield className="w-4 h-4 text-green-500 ml-1" />
-                          </div>
-                          <p className="text-xs text-gray-500">8.7 MB</p>
-                          <p className="text-xs text-gray-400">1 week ago</p>
-                        </div>
-                      </div>
-                      
-                      <div className="p-4 rounded-lg border-2 border-gray-200 hover:bg-gray-50 cursor-pointer">
-                        <div className="text-center">
-                          <div className="flex justify-center mb-3">
-                            <Music className="w-8 h-8 text-purple-500" />
-                          </div>
-                          <div className="flex items-center justify-center mb-2">
-                            <span className="text-sm font-medium text-gray-900 truncate max-w-full">
-                              Music Collection
-                            </span>
-                            <Shield className="w-4 h-4 text-green-500 ml-1" />
-                          </div>
-                          <p className="text-xs text-gray-500">127 items</p>
-                          <p className="text-xs text-gray-400">2 weeks ago</p>
-                        </div>
-                      </div>
-                      
-                      <div className="p-4 rounded-lg border-2 border-gray-200 hover:bg-gray-50 cursor-pointer">
-                        <div className="text-center">
-                          <div className="flex justify-center mb-3">
-                            <Archive className="w-8 h-8 text-orange-500" />
-                          </div>
-                          <div className="flex items-center justify-center mb-2">
-                            <span className="text-sm font-medium text-gray-900 truncate max-w-full">
-                              backup-2025.zip
-                            </span>
-                            <Shield className="w-4 h-4 text-green-500 ml-1" />
-                          </div>
-                          <p className="text-xs text-gray-500">156 MB</p>
-                          <p className="text-xs text-gray-400">1 month ago</p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Privacy Indicators */}
-            <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div className="bg-gray-800 rounded-lg p-6 text-center">
-                <Shield className="w-8 h-8 text-green-400 mx-auto mb-3" />
-                <h3 className="text-lg font-semibold mb-2">Client-Side Encryption</h3>
-                <p className="text-gray-400 text-sm">Files encrypted before upload</p>
-              </div>
-              <div className="bg-gray-800 rounded-lg p-6 text-center">
-                <EyeOff className="w-8 h-8 text-green-400 mx-auto mb-3" />
-                <h3 className="text-lg font-semibold mb-2">Zero-Knowledge</h3>
-                <p className="text-gray-400 text-sm">We can't see your files</p>
-              </div>
-              <div className="bg-gray-800 rounded-lg p-6 text-center">
-                <Lock className="w-8 h-8 text-green-400 mx-auto mb-3" />
-                <h3 className="text-lg font-semibold mb-2">Complete Control</h3>
-                <p className="text-gray-400 text-sm">Your data, your rules</p>
-              </div>
-            </div>
+            <h2 className="text-4xl md:text-5xl font-bold mb-6">
+              <Database className="w-12 h-12 text-yellow-400 mx-auto mb-4" />
+              <span className="bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">
+                Powerful Features
+              </span>
+            </h2>
+            <p className="text-xl text-gray-300 max-w-3xl mx-auto">
+              Everything you need for secure, private cloud storage.
+            </p>
           </motion.div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {[
+              {
+                icon: Upload,
+                title: "Easy File Upload",
+                description: "Drag and drop files or use our secure web interface. Support for all file types and sizes."
+              },
+              {
+                icon: Download,
+                title: "Instant Sync",
+                description: "Your files sync instantly across all your devices. Access your data anywhere, anytime."
+              },
+              {
+                icon: Shield,
+                title: "End-to-End Encryption",
+                description: "Military-grade encryption protects your files. Only you have the keys to decrypt them."
+              },
+              {
+                icon: Globe,
+                title: "Cross-Platform Access",
+                description: "Access your files from any device with our web interface or compatible mobile apps."
+              },
+              {
+                icon: Users,
+                title: "Secure Sharing",
+                description: "Share files securely with end-to-end encryption. Control who can access your shared content."
+              },
+              {
+                icon: Database,
+                title: "Version History",
+                description: "Keep track of file changes with automatic versioning. Restore previous versions anytime."
+              }
+            ].map((feature, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, delay: index * 0.1 }}
+                viewport={{ once: true }}
+                className="p-6 bg-gray-900/30 backdrop-blur-sm border border-gray-800 rounded-2xl hover:border-yellow-400/30 transition-all duration-300"
+              >
+                <feature.icon className="w-12 h-12 text-yellow-400 mb-4" />
+                <h3 className="text-xl font-bold text-white mb-3">{feature.title}</h3>
+                <p className="text-gray-300">{feature.description}</p>
+              </motion.div>
+            ))}
+          </div>
         </div>
       </section>
 
       {/* Storage Plans Section */}
-      <section className="py-20">
+      <section className="py-20 bg-gradient-to-b from-gray-900 to-black">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
+            transition={{ duration: 0.8 }}
+            viewport={{ once: true }}
             className="text-center mb-16"
           >
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">
-              Choose Your Plan
+            <h2 className="text-4xl md:text-5xl font-bold mb-6">
+              <Star className="w-12 h-12 text-yellow-400 mx-auto mb-4" />
+              <span className="bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">
+                Storage Plans
+              </span>
             </h2>
-            <p className="text-gray-400 text-lg max-w-2xl mx-auto">
-              Start free and upgrade as you grow
+            <p className="text-xl text-gray-300 max-w-3xl mx-auto">
+              Choose the perfect plan for your privacy-first cloud storage needs.
             </p>
           </motion.div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {storagePlans.map((plan, index) => (
+            {[
+              {
+                name: "Free",
+                storage: "1TB",
+                price: "$0",
+                period: "forever",
+                features: [
+                  "1TB encrypted storage",
+                  "End-to-end encryption",
+                  "Cross-platform sync",
+                  "Basic sharing",
+                  "Version history"
+                ],
+                recommended: false
+              },
+              {
+                name: "Pro",
+                storage: "10TB",
+                price: "$9",
+                period: "month",
+                features: [
+                  "10TB encrypted storage",
+                  "Advanced sharing controls",
+                  "Priority support",
+                  "Extended version history",
+                  "API access"
+                ],
+                recommended: true
+              },
+              {
+                name: "Enterprise",
+                storage: "Unlimited",
+                price: "Custom",
+                period: "contact us",
+                features: [
+                  "Unlimited storage",
+                  "Custom integrations",
+                  "Dedicated support",
+                  "Advanced security",
+                  "SLA guarantee"
+                ],
+                recommended: false
+              }
+            ].map((plan, index) => (
               <motion.div
                 key={index}
-                initial={{ opacity: 0, y: 20 }}
+                initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: index * 0.1 }}
-                className={`bg-gray-800 rounded-lg p-8 ${
-                  plan.name === "Pro" ? "ring-2 ring-purple-500" : ""
+                transition={{ duration: 0.8, delay: index * 0.1 }}
+                viewport={{ once: true }}
+                className={`p-8 bg-gray-900/30 backdrop-blur-sm border rounded-2xl hover:border-yellow-400/30 transition-all duration-300 ${
+                  plan.recommended ? 'border-yellow-400/50 ring-2 ring-yellow-400/20' : 'border-gray-800'
                 }`}
               >
+                {plan.recommended && (
+                  <div className="text-center mb-4">
+                    <span className="px-3 py-1 bg-yellow-400 text-black text-sm font-semibold rounded-full">Recommended</span>
+                  </div>
+                )}
+                
                 <div className="text-center mb-6">
-                  <h3 className="text-2xl font-bold mb-2">{plan.name}</h3>
-                  <div className="text-4xl font-bold text-purple-400 mb-2">{plan.price}</div>
-                  <div className="text-gray-400">{plan.storage} storage</div>
+                  <h3 className="text-2xl font-bold text-white mb-2">{plan.name}</h3>
+                  <div className="text-4xl font-bold text-yellow-400 mb-2">{plan.storage}</div>
+                  <div className="text-gray-300">
+                    <span className="text-3xl font-bold">{plan.price}</span>
+                    <span className="text-lg">/{plan.period}</span>
+                  </div>
                 </div>
+                
                 <ul className="space-y-3 mb-8">
                   {plan.features.map((feature, featureIndex) => (
                     <li key={featureIndex} className="flex items-center space-x-3">
-                      <CheckCircle className="w-5 h-5 text-green-400 flex-shrink-0" />
+                      <CheckCircle className="w-5 h-5 text-yellow-400 flex-shrink-0" />
                       <span className="text-gray-300">{feature}</span>
                     </li>
                   ))}
                 </ul>
-                <button className={`w-full py-3 rounded-lg font-medium transition-colors ${
-                  plan.name === "Pro" 
-                    ? "bg-purple-600 hover:bg-purple-700 text-white" 
-                    : "bg-gray-700 hover:bg-gray-600 text-white border border-gray-600"
+                
+                <button className={`w-full py-3 rounded-lg font-semibold transition-all duration-300 ${
+                  plan.recommended
+                    ? 'bg-gradient-to-r from-yellow-400 to-orange-500 text-black hover:shadow-lg hover:shadow-yellow-400/25'
+                    : 'border-2 border-gray-600 text-gray-300 hover:border-yellow-400/50 hover:text-yellow-400'
                 }`}>
-                  {plan.name === "Free" ? "Get Started" : "Choose Plan"}
+                  {plan.name === 'Enterprise' ? 'Contact Sales' : 'Get Started'}
                 </button>
               </motion.div>
             ))}
@@ -453,124 +430,50 @@ export default function TauCloudPage() {
         </div>
       </section>
 
-      {/* File Types Preview */}
-      <section className="py-20 bg-gray-800">
+      {/* CTA Section */}
+      <section className="py-20 bg-black">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            className="text-center mb-16"
+            transition={{ duration: 0.8 }}
+            viewport={{ once: true }}
+            className="text-center"
           >
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">
-              Store Everything Securely
+            <h2 className="text-4xl md:text-5xl font-bold mb-6">
+              <Cloud className="w-12 h-12 text-yellow-400 mx-auto mb-4" />
+              <span className="bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">
+                Start Your Private Cloud
+              </span>
             </h2>
-            <p className="text-gray-400 text-lg max-w-2xl mx-auto">
-              All your files, encrypted and synced across devices
+            <p className="text-xl text-gray-300 max-w-3xl mx-auto mb-8">
+              Take control of your data with the most secure and private cloud storage available.
             </p>
-          </motion.div>
-
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-            {[
-              { icon: <Folder className="w-12 h-12 text-blue-400" />, name: "Documents", desc: "PDFs, Word docs, spreadsheets" },
-              { icon: <Image className="w-12 h-12 text-green-400" />, name: "Photos", desc: "High-resolution images and albums" },
-              { icon: <Music className="w-12 h-12 text-purple-400" />, name: "Music", desc: "Your music library, anywhere" },
-              { icon: <Video className="w-12 h-12 text-red-400" />, name: "Videos", desc: "HD videos and movies" }
-            ].map((type, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: index * 0.1 }}
-                className="text-center"
-              >
-                <div className="flex justify-center mb-4">
-                  {type.icon}
-                </div>
-                <h3 className="text-lg font-semibold mb-2">{type.name}</h3>
-                <p className="text-gray-400 text-sm">{type.desc}</p>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Sign Up Section */}
-      <section className="py-20">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            className="bg-gray-800 rounded-2xl p-8 md:p-12"
-          >
-            <div className="text-center mb-8">
-              <h2 className="text-3xl font-bold mb-4">Ready to Get Started?</h2>
-              <p className="text-gray-400">Join thousands of users who have taken control of their data privacy</p>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="space-y-4">
-                <label className="block text-sm font-medium text-gray-300">Email Address</label>
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="your@email.com"
-                  className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-white placeholder-gray-400"
-                />
-                <button className="w-full bg-purple-600 hover:bg-purple-700 text-white py-3 rounded-lg font-medium transition-colors">
-                  Create Free Account
-                </button>
-              </div>
-
-              <div className="space-y-4">
-                <label className="block text-sm font-medium text-gray-300">Custom Domain</label>
-                <input
-                  type="text"
-                  value={domain}
-                  onChange={(e) => setDomain(e.target.value)}
-                  placeholder="yourdomain.com"
-                  className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-white placeholder-gray-400"
-                />
-                <button className="w-full bg-gray-700 hover:bg-gray-600 text-white py-3 rounded-lg font-medium border border-gray-600 transition-colors">
-                  Configure Domain
-                </button>
-              </div>
-            </div>
-
-            <div className="mt-8 text-center">
-              <p className="text-sm text-gray-400">
-                By signing up, you agree to our{' '}
-                <a href="#" className="text-purple-400 hover:text-purple-300">Terms of Service</a>
-                {' '}and{' '}
-                <a href="#" className="text-purple-400 hover:text-purple-300">Privacy Policy</a>
-              </p>
+            
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <button className="px-8 py-4 bg-gradient-to-r from-yellow-400 to-orange-500 text-black rounded-xl font-semibold hover:shadow-lg hover:shadow-yellow-400/25 transition-all duration-300">
+                Get Started Free
+              </button>
+              <button className="px-8 py-4 border-2 border-gray-600 text-gray-300 rounded-xl font-semibold hover:border-yellow-400/50 hover:text-yellow-400 transition-all duration-300">
+                Learn More
+              </button>
             </div>
           </motion.div>
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="bg-gray-800 border-t border-gray-700 py-8">
+      <footer className="bg-gray-900/50 border-t border-gray-800 py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col md:flex-row justify-between items-center">
-            <div className="flex items-center space-x-3 mb-4 md:mb-0">
-              <div className="w-6 h-6 bg-purple-600 rounded flex items-center justify-center">
-                <Cloud className="w-4 h-4 text-white" />
-              </div>
-              <span className="text-lg font-semibold">TauCloud</span>
+          <div className="text-center">
+            <div className="flex items-center justify-center space-x-4 mb-4">
+              <img src="/brand/tauos-logo.svg" alt="TauOS" className="h-8 w-auto" />
+              <span className="text-xl font-bold text-white">Tau OS</span>
             </div>
-            
-            <div className="flex space-x-6 text-sm text-gray-400">
-              <a href="#" className="hover:text-white transition-colors">Documentation</a>
-              <a href="#" className="hover:text-white transition-colors">Privacy Policy</a>
-              <a href="#" className="hover:text-white transition-colors">Terms of Service</a>
-              <a href="/" className="hover:text-white transition-colors">Back to TauOS</a>
-            </div>
+            <p className="text-gray-400">© 2025 Tau Foundation & Tau LLC. All rights reserved.</p>
           </div>
         </div>
       </footer>
     </div>
   );
-} 
+}

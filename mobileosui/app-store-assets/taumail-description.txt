@@ -1,0 +1,28 @@
+📧 TauMail - Privacy-First Email
+
+The most secure email app for privacy-conscious users. Built with end-to-end encryption, zero telemetry, and complete user sovereignty.
+
+🔒 PRIVACY FEATURES:
+• End-to-end encryption for all emails
+• Zero telemetry and data collection
+• Biometric authentication
+• Privacy scoring for contacts
+• Secure attachment handling
+
+📱 KEY FEATURES:
+• Gmail-style interface with privacy focus
+• Real-time encryption status
+• Offline email composition
+• Smart spam filtering
+• Custom domain support
+
+🛡️ SECURITY:
+• Military-grade encryption
+• Local key storage
+• No cloud dependencies
+• GDPR compliant
+• Open source
+
+Perfect for journalists, activists, businesses, and anyone who values privacy.
+
+Download TauMail today and take control of your digital communications.

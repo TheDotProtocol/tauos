@@ -1,0 +1,32 @@
+{
+  "name": "tauos-id",
+  "version": "1.0.0",
+  "description": "TauOS Identity Management System",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "dev": "nodemon app.js"
+  },
+  "dependencies": {
+    "bcrypt": "^5.1.0",
+    "cors": "^2.8.5",
+    "express": "^4.18.2",
+    "express-rate-limit": "^8.1.0",
+    "express-validator": "^7.2.1",
+    "helmet": "^8.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "pg": "^8.11.3",
+    "uuid": "^9.0.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  },
+  "keywords": [
+    "tauos",
+    "identity",
+    "authentication",
+    "privacy"
+  ],
+  "author": "TauOS Team",
+  "license": "MIT"
+}
