@@ -11,12 +11,19 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Database connection
+// Database connection - Force IPv4 to avoid connectivity issues
 const pool = new Pool({
-    connectionString: process.env.DATABASE_URL || 'postgresql://postgres:Ak1233%40%405@db.tviqcormikopltejomkc.supabase.co:5432/postgres',
+    connectionString: process.env.DATABASE_URL || 'postgresql://postgres:Ak1233%40%405@db.tviqcormikopltejomkc.supabase.co:5432/postgres?sslmode=require',
+    host: 'db.tviqcormikopltejomkc.supabase.co',
+    port: 5432,
+    database: 'postgres',
+    user: 'postgres',
+    password: 'Ak1233@@5',
     ssl: {
         rejectUnauthorized: false
-    }
+    },
+    // Force IPv4 connection
+    family: 4
 });
 
 // Initialize SendGrid
