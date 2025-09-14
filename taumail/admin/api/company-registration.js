@@ -267,7 +267,7 @@ class CompanyRegistrationAPI {
 
       // Send email using local SMTP
       const nodemailer = require('nodemailer');
-      const transporter = nodemailer.createTransporter({
+      const transporter = nodemailer.createTransport({
         host: 'localhost',
         port: 25,
         secure: false
@@ -302,7 +302,7 @@ class CompanyRegistrationAPI {
       `;
 
       const nodemailer = require('nodemailer');
-      const transporter = nodemailer.createTransporter({
+      const transporter = nodemailer.createTransport({
         host: 'localhost',
         port: 25,
         secure: false
