@@ -7,7 +7,7 @@ import {
   Mail, Inbox, Send, Archive, Trash2, Star, Search, Plus, 
   Filter, Download, Reply, Forward, MoreVertical, Users, 
   Shield, Lock, Eye, CheckCircle, AlertCircle, BarChart3, 
-  Activity, Settings, Calendar, Clock, LogOut, User, X
+  Activity, Settings, Calendar, Clock, LogOut, User, X, AlertTriangle
 } from 'lucide-react';
 import Link from 'next/link';
 
@@ -363,6 +363,7 @@ export default function TauMailDashboard() {
         <div className="flex space-x-1 bg-gray-900/30 backdrop-blur-sm border border-gray-800 rounded-xl p-1 mb-8">
           {[
             { id: 'inbox', label: 'Inbox', icon: Inbox, href: '/taumail/inbox' },
+            { id: 'spam', label: 'Spam', icon: AlertTriangle, href: '/taumail/spam' },
             { id: 'sent', label: 'Sent', icon: Send, href: '/taumail/sent' },
             { id: 'drafts', label: 'Drafts', icon: Archive, href: '/taumail/drafts' },
             { id: 'trash', label: 'Trash', icon: Trash2, href: '/taumail/trash' }

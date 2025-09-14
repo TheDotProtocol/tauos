@@ -60,6 +60,8 @@ const initializeDatabase = async () => {
                 message_id VARCHAR(255),
                 received_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 is_read BOOLEAN DEFAULT FALSE,
+                folder VARCHAR(50) DEFAULT 'inbox',
+                is_spam BOOLEAN DEFAULT FALSE,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )
         `);
@@ -314,8 +316,8 @@ app.get('/api/emails/inbox', async (req, res) => {
         const userId = decoded.userId;
 
         const result = await pool.query(
-            'SELECT * FROM incoming_emails WHERE user_id = $1 ORDER BY received_at DESC',
-            [userId]
+            'SELECT * FROM incoming_emails WHERE user_id = $1 AND folder = $2 ORDER BY received_at DESC',
+            [userId, 'inbox']
         );
 
         const inboxEmails = result.rows.map(email => ({
@@ -333,6 +335,41 @@ app.get('/api/emails/inbox', async (req, res) => {
     } catch (error) {
         console.error('Get inbox emails error:', error);
         res.status(500).json({ error: 'Failed to fetch inbox emails', details: error.message });
+    }
+});
+
+// Get spam emails endpoint
+app.get('/api/emails/spam', async (req, res) => {
+    try {
+        const token = req.headers.authorization?.replace('Bearer ', '');
+        
+        if (!token) {
+            return res.status(401).json({ error: 'Authentication required' });
+        }
+
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        const userId = decoded.userId;
+
+        const result = await pool.query(
+            'SELECT * FROM incoming_emails WHERE user_id = $1 AND (folder = $2 OR is_spam = true) ORDER BY received_at DESC',
+            [userId, 'spam']
+        );
+
+        const spamEmails = result.rows.map(email => ({
+            id: email.id,
+            from: email.from_email,
+            subject: email.subject,
+            preview: email.body.substring(0, 100) + '...',
+            time: new Date(email.received_at).toLocaleString(),
+            unread: !email.is_read,
+            starred: false
+        }));
+
+        res.json({ emails: spamEmails });
+
+    } catch (error) {
+        console.error('Get spam emails error:', error);
+        res.status(500).json({ error: 'Failed to fetch spam emails', details: error.message });
     }
 });
 
