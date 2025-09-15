@@ -21,6 +21,17 @@
         }
       ],
       "permanent": false
+    },
+    {
+      "source": "/",
+      "destination": "https://tauos.org/tauid",
+      "has": [
+        {
+          "type": "host",
+          "value": "id.tauos.org"
+        }
+      ],
+      "permanent": false
     }
   ]
 }
