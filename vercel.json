@@ -23,7 +23,7 @@
       "permanent": false
     },
     {
-      "source": "/(.*)",
+      "source": "/",
       "destination": "https://www.tauos.org/tauid",
       "has": [
         {
