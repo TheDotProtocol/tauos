@@ -18,30 +18,15 @@ const path = require('path');
 const fs = require('fs');
 const crypto = require('crypto');
 const { v4: uuidv4 } = require('uuid');
-const winston = require('winston');
 const mime = require('mime-types');
 
-// Initialize logger - serverless compatible
-const logger = winston.createLogger({
-    level: process.env.LOG_LEVEL || 'info',
-    format: winston.format.combine(
-        winston.format.timestamp(),
-        winston.format.errors({ stack: true }),
-        winston.format.json()
-    ),
-    transports: [
-        new winston.transports.Console()
-    ]
-});
-
-// Only create logs directory in non-serverless environments
-if (process.env.NODE_ENV !== 'production' && !process.env.VERCEL) {
-    if (!fs.existsSync('logs')) {
-        fs.mkdirSync('logs');
-    }
-    logger.add(new winston.transports.File({ filename: 'logs/error.log', level: 'error' }));
-    logger.add(new winston.transports.File({ filename: 'logs/combined.log' }));
-}
+// Simple logger - serverless compatible
+const logger = {
+    info: (message, ...args) => console.log(`[INFO] ${new Date().toISOString()} - ${message}`, ...args),
+    error: (message, ...args) => console.error(`[ERROR] ${new Date().toISOString()} - ${message}`, ...args),
+    warn: (message, ...args) => console.warn(`[WARN] ${new Date().toISOString()} - ${message}`, ...args),
+    debug: (message, ...args) => console.log(`[DEBUG] ${new Date().toISOString()} - ${message}`, ...args)
+};
 
 const app = express();
 const PORT = process.env.PORT || 3002;
@@ -352,30 +337,38 @@ app.post('/api/auth/register', validateRegister, async (req, res) => {
 // File routes
 app.get('/api/files', authenticateToken, async (req, res) => {
     try {
-        const { page = 1, limit = 20, search = '', sortBy = 'created_at', sortOrder = 'desc' } = req.query;
+        const { page = 1, limit = 20, search = '', sortBy = 'created_at', sortOrder = 'desc', folder_id } = req.query;
         const offset = (page - 1) * limit;
 
         let query = `
-            SELECT id, original_name, filename, file_size, mime_type, is_public, download_count, created_at
-            FROM files
-            WHERE user_id = $1
+            SELECT f.id, f.original_name, f.filename, f.file_size, f.mime_type, f.is_public, 
+                   f.download_count, f.created_at, f.updated_at, f.parent_folder_id,
+                   fo.name as folder_name
+            FROM files f
+            LEFT JOIN folders fo ON f.parent_folder_id = fo.id
+            WHERE f.user_id = $1 AND f.deleted_at IS NULL
         `;
 
         const params = [req.user.userId];
 
+        if (folder_id) {
+            query += ' AND f.parent_folder_id = $' + (params.length + 1);
+            params.push(folder_id);
+        }
+
         if (search) {
-            query += ' AND original_name ILIKE $2';
+            query += ' AND (f.original_name ILIKE $' + (params.length + 1) + ' OR f.mime_type ILIKE $' + (params.length + 1) + ')';
             params.push(`%${search}%`);
         }
 
         // Validate sortBy and sortOrder
-        const allowedSortFields = ['created_at', 'original_name', 'file_size', 'download_count'];
+        const allowedSortFields = ['created_at', 'original_name', 'file_size', 'download_count', 'updated_at'];
         const allowedSortOrders = ['asc', 'desc'];
         
         if (allowedSortFields.includes(sortBy) && allowedSortOrders.includes(sortOrder)) {
-            query += ` ORDER BY ${sortBy} ${sortOrder.toUpperCase()}`;
+            query += ` ORDER BY f.${sortBy} ${sortOrder.toUpperCase()}`;
         } else {
-            query += ' ORDER BY created_at DESC';
+            query += ' ORDER BY f.created_at DESC';
         }
 
         query += ` LIMIT $${params.length + 1} OFFSET $${params.length + 2}`;
@@ -384,11 +377,16 @@ app.get('/api/files', authenticateToken, async (req, res) => {
         const result = await pool.query(query, params);
 
         // Get total count for pagination
-        let countQuery = 'SELECT COUNT(*) FROM files WHERE user_id = $1';
+        let countQuery = 'SELECT COUNT(*) FROM files f WHERE f.user_id = $1 AND f.deleted_at IS NULL';
         const countParams = [req.user.userId];
         
+        if (folder_id) {
+            countQuery += ' AND f.parent_folder_id = $' + (countParams.length + 1);
+            countParams.push(folder_id);
+        }
+        
         if (search) {
-            countQuery += ' AND original_name ILIKE $2';
+            countQuery += ' AND (f.original_name ILIKE $' + (countParams.length + 1) + ' OR f.mime_type ILIKE $' + (countParams.length + 1) + ')';
             countParams.push(`%${search}%`);
         }
 
@@ -686,6 +684,312 @@ app.get('/api/profile', authenticateToken, async (req, res) => {
 
     } catch (error) {
         logger.error('Error fetching profile:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+// Folders API
+app.get('/api/folders', authenticateToken, async (req, res) => {
+    try {
+        const { parent_folder_id = null } = req.query;
+        
+        let query = `
+            SELECT id, name, description, is_public, color, icon, 
+                   parent_folder_id, created_at, updated_at
+            FROM folders
+            WHERE user_id = $1 AND deleted_at IS NULL
+        `;
+        
+        const params = [req.user.userId];
+        
+        if (parent_folder_id) {
+            query += ' AND parent_folder_id = $2';
+            params.push(parent_folder_id);
+        } else {
+            query += ' AND parent_folder_id IS NULL';
+        }
+        
+        query += ' ORDER BY name ASC';
+        
+        const result = await pool.query(query, params);
+        res.json({ folders: result.rows });
+
+    } catch (error) {
+        logger.error('Error fetching folders:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+app.post('/api/folders', authenticateToken, async (req, res) => {
+    try {
+        const { name, description, parent_folder_id, color, icon } = req.body;
+        
+        if (!name || name.trim() === '') {
+            return res.status(400).json({ error: 'Folder name is required' });
+        }
+
+        const result = await pool.query(
+            `INSERT INTO folders (user_id, organization_id, name, description, 
+                                parent_folder_id, color, icon)
+             VALUES ($1, $2, $3, $4, $5, $6, $7)
+             RETURNING id, name, description, is_public, color, icon, 
+                       parent_folder_id, created_at, updated_at`,
+            [
+                req.user.userId,
+                '00000000-0000-0000-0000-000000000001', // Default organization
+                name.trim(),
+                description || '',
+                parent_folder_id || null,
+                color || '#3B82F6',
+                icon || 'folder'
+            ]
+        );
+
+        // Log activity
+        await pool.query(
+            `INSERT INTO activity_log (user_id, organization_id, action, resource_type, 
+                                     resource_id, resource_name)
+             VALUES ($1, $2, $3, $4, $5, $6)`,
+            [
+                req.user.userId,
+                '00000000-0000-0000-0000-000000000001',
+                'created',
+                'folder',
+                result.rows[0].id,
+                name
+            ]
+        );
+
+        res.status(201).json({
+            message: 'Folder created successfully',
+            folder: result.rows[0]
+        });
+
+    } catch (error) {
+        if (error.code === '23505') { // Unique constraint violation
+            res.status(409).json({ error: 'A folder with this name already exists in this location' });
+        } else {
+            logger.error('Error creating folder:', error);
+            res.status(500).json({ error: 'Internal server error' });
+        }
+    }
+});
+
+// File sharing API
+app.post('/api/files/:id/share', authenticateToken, async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { shared_with_email, permission = 'view', expires_at, password } = req.body;
+
+        // Check if file exists and belongs to user
+        const fileResult = await pool.query(
+            'SELECT * FROM files WHERE id = $1 AND user_id = $2 AND deleted_at IS NULL',
+            [id, req.user.userId]
+        );
+
+        if (fileResult.rows.length === 0) {
+            return res.status(404).json({ error: 'File not found' });
+        }
+
+        const file = fileResult.rows[0];
+        
+        // Generate share token
+        const shareToken = crypto.randomBytes(32).toString('hex');
+        
+        // If sharing with specific email, find the user
+        let sharedWithUserId = null;
+        if (shared_with_email) {
+            const userResult = await pool.query(
+                'SELECT id FROM users WHERE email = $1',
+                [shared_with_email]
+            );
+            if (userResult.rows.length > 0) {
+                sharedWithUserId = userResult.rows[0].id;
+            }
+        }
+
+        // Create share record
+        const shareResult = await pool.query(
+            `INSERT INTO file_shares (file_id, shared_by_user_id, shared_with_user_id, 
+                                    share_token, permission, expires_at, password_hash)
+             VALUES ($1, $2, $3, $4, $5, $6, $7)
+             RETURNING id, share_token, permission, expires_at, created_at`,
+            [
+                id,
+                req.user.userId,
+                sharedWithUserId,
+                shareToken,
+                permission,
+                expires_at ? new Date(expires_at) : null,
+                password ? await bcrypt.hash(password, 12) : null
+            ]
+        );
+
+        // Log activity
+        await pool.query(
+            `INSERT INTO activity_log (user_id, organization_id, action, resource_type, 
+                                     resource_id, resource_name, details)
+             VALUES ($1, $2, $3, $4, $5, $6, $7)`,
+            [
+                req.user.userId,
+                '00000000-0000-0000-0000-000000000001',
+                'shared',
+                'file',
+                id,
+                file.original_name,
+                JSON.stringify({ 
+                    permission, 
+                    shared_with_email: shared_with_email || 'public',
+                    expires_at 
+                })
+            ]
+        );
+
+        res.status(201).json({
+            message: 'File shared successfully',
+            share: shareResult.rows[0],
+            share_url: `${process.env.FRONTEND_URL || 'http://localhost:3000'}/shared/${shareToken}`
+        });
+
+    } catch (error) {
+        logger.error('Error sharing file:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+// Get shared files
+app.get('/api/shares', authenticateToken, async (req, res) => {
+    try {
+        const result = await pool.query(
+            `SELECT fs.id, fs.permission, fs.expires_at, fs.download_count, fs.created_at,
+                    f.original_name, f.file_size, f.mime_type, f.is_public,
+                    u.username as shared_by_username, u.email as shared_by_email
+             FROM file_shares fs
+             JOIN files f ON fs.file_id = f.id
+             JOIN users u ON fs.shared_by_user_id = u.id
+             WHERE fs.shared_with_user_id = $1 AND fs.is_active = true
+             ORDER BY fs.created_at DESC`,
+            [req.user.userId]
+        );
+
+        res.json({ shares: result.rows });
+
+    } catch (error) {
+        logger.error('Error fetching shared files:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+// Download shared file
+app.get('/api/shared/:token', async (req, res) => {
+    try {
+        const { token } = req.params;
+        
+        const result = await pool.query(
+            `SELECT fs.*, f.*, u.username as shared_by_username
+             FROM file_shares fs
+             JOIN files f ON fs.file_id = f.id
+             JOIN users u ON fs.shared_by_user_id = u.id
+             WHERE fs.share_token = $1 AND fs.is_active = true
+             AND (fs.expires_at IS NULL OR fs.expires_at > NOW())`,
+            [token]
+        );
+
+        if (result.rows.length === 0) {
+            return res.status(404).json({ error: 'Shared file not found or expired' });
+        }
+
+        const share = result.rows[0];
+        
+        // Update download count
+        await pool.query(
+            'UPDATE file_shares SET download_count = download_count + 1 WHERE id = $1',
+            [share.id]
+        );
+
+        res.json({
+            file: {
+                id: share.file_id,
+                originalName: share.original_name,
+                filename: share.filename,
+                fileSize: share.file_size,
+                mimeType: share.mime_type,
+                createdAt: share.created_at,
+                sharedBy: share.shared_by_username
+            },
+            share: {
+                permission: share.permission,
+                expiresAt: share.expires_at,
+                downloadCount: share.download_count + 1
+            }
+        });
+
+    } catch (error) {
+        logger.error('Error fetching shared file:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+// Search files
+app.get('/api/search', authenticateToken, async (req, res) => {
+    try {
+        const { q, type, folder_id } = req.query;
+        
+        if (!q || q.trim() === '') {
+            return res.status(400).json({ error: 'Search query is required' });
+        }
+
+        let query = `
+            SELECT f.id, f.original_name, f.filename, f.file_size, f.mime_type, 
+                   f.is_public, f.download_count, f.created_at, f.updated_at,
+                   fo.name as folder_name
+            FROM files f
+            LEFT JOIN folders fo ON f.parent_folder_id = fo.id
+            WHERE f.user_id = $1 AND f.deleted_at IS NULL
+            AND (f.original_name ILIKE $2 OR f.mime_type ILIKE $2)
+        `;
+        
+        const params = [req.user.userId, `%${q.trim()}%`];
+        
+        if (type) {
+            query += ' AND f.mime_type LIKE $3';
+            params.push(`${type}%`);
+        }
+        
+        if (folder_id) {
+            query += ' AND f.parent_folder_id = $' + (params.length + 1);
+            params.push(folder_id);
+        }
+        
+        query += ' ORDER BY f.created_at DESC LIMIT 50';
+        
+        const result = await pool.query(query, params);
+        res.json({ files: result.rows });
+
+    } catch (error) {
+        logger.error('Error searching files:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+// Get recent activity
+app.get('/api/activity', authenticateToken, async (req, res) => {
+    try {
+        const { limit = 20 } = req.query;
+        
+        const result = await pool.query(
+            `SELECT action, resource_type, resource_name, details, created_at
+             FROM activity_log
+             WHERE user_id = $1
+             ORDER BY created_at DESC
+             LIMIT $2`,
+            [req.user.userId, parseInt(limit)]
+        );
+
+        res.json({ activity: result.rows });
+
+    } catch (error) {
+        logger.error('Error fetching activity:', error);
         res.status(500).json({ error: 'Internal server error' });
     }
 });
