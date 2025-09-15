@@ -175,7 +175,7 @@ export default function TauIDPage() {
       </section>
 
       {/* Security Features Section */}
-      <section className="py-20 bg-black">
+      <section id="features" className="py-20 bg-black">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -327,10 +327,22 @@ export default function TauIDPage() {
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <button className="px-8 py-4 bg-gradient-to-r from-yellow-400 to-orange-500 text-black rounded-xl font-semibold hover:shadow-lg hover:shadow-yellow-400/25 transition-all duration-300">
+              <button 
+                onClick={() => {
+                  // Redirect to registration page or show registration modal
+                  window.location.href = 'https://tauos-zbtm.vercel.app/api/register';
+                }}
+                className="px-8 py-4 bg-gradient-to-r from-yellow-400 to-orange-500 text-black rounded-xl font-semibold hover:shadow-lg hover:shadow-yellow-400/25 transition-all duration-300"
+              >
                 Create Identity
               </button>
-              <button className="px-8 py-4 border-2 border-gray-600 text-gray-300 rounded-xl font-semibold hover:border-yellow-400/50 hover:text-yellow-400 transition-all duration-300">
+              <button 
+                onClick={() => {
+                  // Scroll to features section or show more info
+                  document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' });
+                }}
+                className="px-8 py-4 border-2 border-gray-600 text-gray-300 rounded-xl font-semibold hover:border-yellow-400/50 hover:text-yellow-400 transition-all duration-300"
+              >
                 Learn More
               </button>
             </div>

@@ -23,8 +23,8 @@
       "permanent": false
     },
     {
-      "source": "/",
-      "destination": "https://tauos.org/tauid",
+      "source": "/(.*)",
+      "destination": "https://www.tauos.org/tauid",
       "has": [
         {
           "type": "host",
