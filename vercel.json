@@ -31,8 +31,18 @@
           "value": "id.tauos.org"
         }
       ],
-      "permanent": false,
-      "statusCode": 302
+      "permanent": false
+    },
+    {
+      "source": "/",
+      "destination": "https://tauos-store-backend.vercel.app",
+      "has": [
+        {
+          "type": "host",
+          "value": "store.tauos.org"
+        }
+      ],
+      "permanent": false
     }
   ]
 }
