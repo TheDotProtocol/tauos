@@ -23,7 +23,7 @@
       "permanent": false
     },
     {
-      "source": "/(.*)",
+      "source": "/",
       "destination": "https://www.tauos.org/tauid",
       "has": [
         {
@@ -31,7 +31,8 @@
           "value": "id.tauos.org"
         }
       ],
-      "permanent": false
+      "permanent": false,
+      "statusCode": 302
     }
   ]
 }
