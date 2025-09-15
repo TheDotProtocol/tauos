@@ -76,7 +76,7 @@ export default function TauCloudDashboard() {
   const loadFiles = async () => {
     try {
       const token = localStorage.getItem('tauos_token');
-      const response = await fetch('https://tauos-47am.vercel.app/api/files', {
+      const response = await fetch('https://tauos-6skj.vercel.app/api/files', {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       
@@ -170,7 +170,7 @@ export default function TauCloudDashboard() {
       
       try {
         const token = localStorage.getItem('tauos_token');
-        const response = await fetch('https://tauos-47am.vercel.app/api/upload', {
+        const response = await fetch('https://tauos-6skj.vercel.app/api/upload', {
           method: 'POST',
           headers: { 'Authorization': `Bearer ${token}` },
           body: formData
