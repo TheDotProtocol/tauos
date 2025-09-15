@@ -3,719 +3,290 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TauStore - App Marketplace Dashboard</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <title>TauStore - App Marketplace</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+        
         * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
         }
-
-        body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            background: #0f0f0f;
-            color: #ffffff;
-            min-height: 100vh;
+        
+        .gradient-bg {
+            background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%);
         }
-
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 0 20px;
-        }
-
-        /* Header */
-        .header {
-            background: rgba(15, 15, 15, 0.95);
+        
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.05);
             backdrop-filter: blur(20px);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            padding: 16px 0;
-            position: sticky;
-            top: 0;
-            z-index: 100;
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
-
-        .header-content {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+        
+        .card-hover {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
-
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            text-decoration: none;
-            color: inherit;
+        
+        .card-hover:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
         }
-
-        .logo img {
-            width: 32px;
-            height: 32px;
-        }
-
-        .logo-text {
-            font-size: 20px;
-            font-weight: 700;
-            background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+        
+        .text-gradient {
+            background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 50%, #d97706 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
-        }
-
-        .search-bar {
-            flex: 1;
-            max-width: 400px;
-            margin: 0 32px;
-            position: relative;
-        }
-
-        .search-input {
-            width: 100%;
-            background: rgba(31, 41, 55, 0.5);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 12px;
-            padding: 12px 16px 12px 44px;
-            color: #ffffff;
-            font-size: 14px;
-            outline: none;
-            transition: all 0.3s ease;
-        }
-
-        .search-input:focus {
-            border-color: rgba(251, 191, 36, 0.5);
-            box-shadow: 0 0 0 3px rgba(251, 191, 36, 0.1);
-        }
-
-        .search-icon {
-            position: absolute;
-            left: 16px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: #9ca3af;
-            font-size: 16px;
-        }
-
-        .user-menu {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-        }
-
-        .user-avatar {
-            width: 36px;
-            height: 36px;
-            background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 600;
-            color: #fbbf24;
-            font-size: 14px;
-        }
-
-        .logout-btn {
-            background: rgba(239, 68, 68, 0.1);
-            color: #ef4444;
-            border: 1px solid rgba(239, 68, 68, 0.3);
-            padding: 8px 16px;
-            border-radius: 8px;
-            font-size: 14px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .logout-btn:hover {
-            background: rgba(239, 68, 68, 0.2);
-            border-color: rgba(239, 68, 68, 0.5);
-        }
-
-        /* Main Content */
-        .main-content {
-            padding: 32px 0;
-        }
-
-        .dashboard-header {
-            margin-bottom: 32px;
-        }
-
-        .dashboard-title {
-            font-size: 32px;
-            font-weight: 700;
-            margin-bottom: 8px;
-            background: linear-gradient(135deg, #ffffff 0%, #f3f4f6 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .dashboard-subtitle {
-            color: #9ca3af;
-            font-size: 16px;
-        }
-
-        /* Categories */
-        .categories {
-            display: flex;
-            gap: 12px;
-            margin-bottom: 32px;
-            overflow-x: auto;
-            padding-bottom: 8px;
-        }
-
-        .category-btn {
-            background: rgba(31, 41, 55, 0.5);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 12px;
-            padding: 12px 20px;
-            color: #9ca3af;
-            font-size: 14px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            white-space: nowrap;
-        }
-
-        .category-btn.active,
-        .category-btn:hover {
-            background: rgba(251, 191, 36, 0.1);
-            border-color: rgba(251, 191, 36, 0.3);
-            color: #fbbf24;
-        }
-
-        /* Featured Section */
-        .featured-section {
-            margin-bottom: 40px;
-        }
-
-        .section-title {
-            font-size: 24px;
-            font-weight: 600;
-            margin-bottom: 24px;
-            color: #ffffff;
-        }
-
-        .featured-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 24px;
-        }
-
-        .app-card {
-            background: rgba(31, 41, 55, 0.5);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 16px;
-            padding: 24px;
-            transition: all 0.3s ease;
-            cursor: pointer;
-        }
-
-        .app-card:hover {
-            transform: translateY(-4px);
-            border-color: rgba(251, 191, 36, 0.3);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-        }
-
-        .app-header {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-            margin-bottom: 16px;
-        }
-
-        .app-icon {
-            width: 64px;
-            height: 64px;
-            background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
-        }
-
-        .app-info {
-            flex: 1;
-        }
-
-        .app-name {
-            font-size: 18px;
-            font-weight: 600;
-            color: #ffffff;
-            margin-bottom: 4px;
-        }
-
-        .app-developer {
-            font-size: 14px;
-            color: #9ca3af;
-            margin-bottom: 8px;
-        }
-
-        .app-rating {
-            display: flex;
-            align-items: center;
-            gap: 4px;
-        }
-
-        .stars {
-            color: #fbbf24;
-            font-size: 14px;
-        }
-
-        .rating-text {
-            font-size: 12px;
-            color: #9ca3af;
-        }
-
-        .app-description {
-            font-size: 14px;
-            color: #d1d5db;
-            line-height: 1.5;
-            margin-bottom: 16px;
-        }
-
-        .app-footer {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .app-price {
-            font-size: 18px;
-            font-weight: 600;
-            color: #10b981;
-        }
-
-        .app-price.free {
-            color: #fbbf24;
-        }
-
-        .install-btn {
-            background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
-            color: #fbbf24;
-            border: 1px solid rgba(251, 191, 36, 0.3);
-            padding: 8px 16px;
-            border-radius: 8px;
-            font-size: 14px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .install-btn:hover {
-            background: rgba(251, 191, 36, 0.1);
-            border-color: rgba(251, 191, 36, 0.5);
-        }
-
-        /* Top Apps Grid */
-        .top-apps-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-        }
-
-        .top-app-card {
-            background: rgba(31, 41, 55, 0.5);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 12px;
-            padding: 16px;
-            transition: all 0.3s ease;
-            cursor: pointer;
-        }
-
-        .top-app-card:hover {
-            transform: translateY(-2px);
-            border-color: rgba(251, 191, 36, 0.3);
-        }
-
-        .top-app-header {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin-bottom: 12px;
-        }
-
-        .top-app-icon {
-            width: 48px;
-            height: 48px;
-            background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 18px;
-        }
-
-        .top-app-info {
-            flex: 1;
-        }
-
-        .top-app-name {
-            font-size: 16px;
-            font-weight: 600;
-            color: #ffffff;
-            margin-bottom: 2px;
-        }
-
-        .top-app-developer {
-            font-size: 12px;
-            color: #9ca3af;
-        }
-
-        .top-app-footer {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .top-app-price {
-            font-size: 14px;
-            font-weight: 600;
-            color: #10b981;
-        }
-
-        .top-app-price.free {
-            color: #fbbf24;
-        }
-
-        .top-app-rank {
-            background: rgba(251, 191, 36, 0.1);
-            color: #fbbf24;
-            border: 1px solid rgba(251, 191, 36, 0.3);
-            padding: 4px 8px;
-            border-radius: 6px;
-            font-size: 12px;
-            font-weight: 600;
-        }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-            .header-content {
-                flex-direction: column;
-                gap: 16px;
-            }
-            
-            .search-bar {
-                margin: 0;
-                max-width: 100%;
-            }
-            
-            .featured-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .top-apps-grid {
-                grid-template-columns: 1fr;
-            }
         }
     </style>
 </head>
-<body>
-    <!-- Header -->
-    <header class="header">
-        <div class="container">
-            <div class="header-content">
-                <a href="/" class="logo">
-                    <img src="/brand/tauos-logo.svg" alt="TauOS">
-                    <span class="logo-text">TauStore</span>
-                </a>
-                <div class="search-bar">
-                    <div class="search-icon">🔍</div>
-                    <input type="text" class="search-input" placeholder="Search apps..." id="searchInput">
+<body class="gradient-bg min-h-screen text-white">
+    <!-- Navigation -->
+    <nav class="glass-effect border-b border-gray-800 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center space-x-4">
+                    <img src="/brand/tauos-logo.svg" alt="TauOS" class="w-10 h-10">
+                    <div>
+                        <h1 class="text-2xl font-bold text-gradient">TauStore</h1>
+                        <p class="text-sm text-gray-400">App Marketplace</p>
+                    </div>
                 </div>
-                <div class="user-menu">
-                    <div class="user-avatar">JD</div>
-                    <button class="logout-btn" onclick="logout()">Logout</button>
+                
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="#home" class="text-gray-300 hover:text-white transition-colors">Home</a>
+                    <a href="#categories" class="text-gray-300 hover:text-white transition-colors">Categories</a>
+                    <a href="#featured" class="text-gray-300 hover:text-white transition-colors">Featured</a>
+                    <a href="#rewards" class="text-gray-300 hover:text-white transition-colors">Rewards</a>
+                </div>
+                
+                <div class="flex items-center space-x-4">
+                    <button id="searchBtn" class="p-2 text-gray-400 hover:text-white transition-colors">
+                        <i data-lucide="search" class="w-5 h-5"></i>
+                    </button>
+                    <button id="profileBtn" class="p-2 text-gray-400 hover:text-white transition-colors">
+                        <i data-lucide="user" class="w-5 h-5"></i>
+                    </button>
+                    <button id="wishlistBtn" class="p-2 text-gray-400 hover:text-white transition-colors relative">
+                        <i data-lucide="heart" class="w-5 h-5"></i>
+                        <span id="wishlistCount" class="absolute -top-1 -right-1 bg-yellow-400 text-black text-xs rounded-full w-5 h-5 flex items-center justify-center hidden">0</span>
+                    </button>
                 </div>
             </div>
         </div>
-    </header>
+    </nav>
 
-    <!-- Main Content -->
-    <main class="main-content">
-        <div class="container">
-            <!-- Dashboard Header -->
-            <div class="dashboard-header">
-                <h1 class="dashboard-title">App Marketplace</h1>
-                <p class="dashboard-subtitle">Discover and install privacy-first applications</p>
-            </div>
-
-            <!-- Categories -->
-            <div class="categories">
-                <button class="category-btn active" onclick="filterCategory('all')">All Apps</button>
-                <button class="category-btn" onclick="filterCategory('productivity')">Productivity</button>
-                <button class="category-btn" onclick="filterCategory('communication')">Communication</button>
-                <button class="category-btn" onclick="filterCategory('security')">Security</button>
-                <button class="category-btn" onclick="filterCategory('entertainment')">Entertainment</button>
-                <button class="category-btn" onclick="filterCategory('development')">Development</button>
-                <button class="category-btn" onclick="filterCategory('utilities')">Utilities</button>
-            </div>
-
-            <!-- Featured Apps -->
-            <div class="featured-section">
-                <h2 class="section-title">Featured Apps</h2>
-                <div class="featured-grid">
-                    <div class="app-card" onclick="showAppDetails('taumail')">
-                        <div class="app-header">
-                            <div class="app-icon">📧</div>
-                            <div class="app-info">
-                                <div class="app-name">TauMail</div>
-                                <div class="app-developer">TauOS Foundation</div>
-                                <div class="app-rating">
-                                    <span class="stars">★★★★★</span>
-                                    <span class="rating-text">4.9 (2.1k)</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="app-description">
-                            Sovereign privacy-first email platform with zero-knowledge encryption and advanced security features.
-                        </div>
-                        <div class="app-footer">
-                            <div class="app-price free">Free</div>
-                            <button class="install-btn">Install</button>
-                        </div>
-                    </div>
-
-                    <div class="app-card" onclick="showAppDetails('taucloud')">
-                        <div class="app-header">
-                            <div class="app-icon">☁️</div>
-                            <div class="app-info">
-                                <div class="app-name">TauCloud</div>
-                                <div class="app-developer">TauOS Foundation</div>
-                                <div class="app-rating">
-                                    <span class="stars">★★★★★</span>
-                                    <span class="rating-text">4.8 (1.8k)</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="app-description">
-                            Secure cloud storage with end-to-end encryption, file sharing, and collaborative features.
-                        </div>
-                        <div class="app-footer">
-                            <div class="app-price">$9.99/month</div>
-                            <button class="install-btn">Install</button>
-                        </div>
-                    </div>
-
-                    <div class="app-card" onclick="showAppDetails('tauid')">
-                        <div class="app-header">
-                            <div class="app-icon">🆔</div>
-                            <div class="app-info">
-                                <div class="app-name">TauID</div>
-                                <div class="app-developer">TauOS Foundation</div>
-                                <div class="app-rating">
-                                    <span class="stars">★★★★★</span>
-                                    <span class="rating-text">4.9 (3.2k)</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="app-description">
-                            Digital identity management with biometric authentication and privacy controls.
-                        </div>
-                        <div class="app-footer">
-                            <div class="app-price free">Free</div>
-                            <button class="install-btn">Install</button>
-                        </div>
+    <!-- Hero Section -->
+    <section id="home" class="relative py-20 overflow-hidden">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center">
+                <h1 class="text-6xl md:text-8xl font-black mb-6">
+                    <span class="text-gradient">Discover</span><br>
+                    <span class="text-white">Amazing Apps</span>
+                </h1>
+                <p class="text-xl text-gray-300 mb-8 max-w-3xl mx-auto">
+                    The ultimate app marketplace for TauOS. Find productivity tools, games, 
+                    entertainment, and more with our privacy-first approach.
+                </p>
+                
+                <!-- Search Bar -->
+                <div class="max-w-2xl mx-auto mb-12">
+                    <div class="relative">
+                        <input 
+                            type="text" 
+                            id="searchInput"
+                            placeholder="Search for apps, games, tools..."
+                            class="w-full px-6 py-4 pl-14 bg-gray-900/50 border border-gray-700 rounded-2xl text-white placeholder-gray-400 focus:ring-2 focus:ring-yellow-400 focus:border-transparent text-lg"
+                        >
+                        <i data-lucide="search" class="absolute left-5 top-1/2 transform -translate-y-1/2 text-gray-400 w-6 h-6"></i>
                     </div>
                 </div>
-            </div>
-
-            <!-- Top Free Apps -->
-            <div class="featured-section">
-                <h2 class="section-title">Top Free Apps</h2>
-                <div class="top-apps-grid">
-                    <div class="top-app-card" onclick="showAppDetails('signal')">
-                        <div class="top-app-header">
-                            <div class="top-app-icon">📱</div>
-                            <div class="top-app-info">
-                                <div class="top-app-name">Signal</div>
-                                <div class="top-app-developer">Signal Foundation</div>
-                            </div>
-                        </div>
-                        <div class="top-app-footer">
-                            <div class="top-app-price free">Free</div>
-                            <div class="top-app-rank">#1</div>
-                        </div>
+                
+                <!-- Stats -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto">
+                    <div class="glass-effect rounded-2xl p-6">
+                        <div class="text-3xl font-bold text-yellow-400 mb-2">500+</div>
+                        <div class="text-gray-300">Apps Available</div>
                     </div>
-
-                    <div class="top-app-card" onclick="showAppDetails('protonmail')">
-                        <div class="top-app-header">
-                            <div class="top-app-icon">📧</div>
-                            <div class="top-app-info">
-                                <div class="top-app-name">ProtonMail</div>
-                                <div class="top-app-developer">Proton Technologies</div>
-                            </div>
-                        </div>
-                        <div class="top-app-footer">
-                            <div class="top-app-price free">Free</div>
-                            <div class="top-app-rank">#2</div>
-                        </div>
+                    <div class="glass-effect rounded-2xl p-6">
+                        <div class="text-3xl font-bold text-yellow-400 mb-2">1M+</div>
+                        <div class="text-gray-300">Downloads</div>
                     </div>
-
-                    <div class="top-app-card" onclick="showAppDetails('firefox')">
-                        <div class="top-app-header">
-                            <div class="top-app-icon">🌐</div>
-                            <div class="top-app-info">
-                                <div class="top-app-name">Firefox</div>
-                                <div class="top-app-developer">Mozilla</div>
-                            </div>
-                        </div>
-                        <div class="top-app-footer">
-                            <div class="top-app-price free">Free</div>
-                            <div class="top-app-rank">#3</div>
-                        </div>
-                    </div>
-
-                    <div class="top-app-card" onclick="showAppDetails('bitwarden')">
-                        <div class="top-app-header">
-                            <div class="top-app-icon">🔐</div>
-                            <div class="top-app-info">
-                                <div class="top-app-name">Bitwarden</div>
-                                <div class="top-app-developer">Bitwarden Inc.</div>
-                            </div>
-                        </div>
-                        <div class="top-app-footer">
-                            <div class="top-app-price free">Free</div>
-                            <div class="top-app-rank">#4</div>
-                        </div>
-                    </div>
-
-                    <div class="top-app-card" onclick="showAppDetails('joplin')">
-                        <div class="top-app-header">
-                            <div class="top-app-icon">📝</div>
-                            <div class="top-app-info">
-                                <div class="top-app-name">Joplin</div>
-                                <div class="top-app-developer">Laurent Cozic</div>
-                            </div>
-                        </div>
-                        <div class="top-app-footer">
-                            <div class="top-app-price free">Free</div>
-                            <div class="top-app-rank">#5</div>
-                        </div>
-                    </div>
-
-                    <div class="top-app-card" onclick="showAppDetails('element')">
-                        <div class="top-app-header">
-                            <div class="top-app-icon">💬</div>
-                            <div class="top-app-info">
-                                <div class="top-app-name">Element</div>
-                                <div class="top-app-developer">Element</div>
-                            </div>
-                        </div>
-                        <div class="top-app-footer">
-                            <div class="top-app-price free">Free</div>
-                            <div class="top-app-rank">#6</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Top Paid Apps -->
-            <div class="featured-section">
-                <h2 class="section-title">Top Paid Apps</h2>
-                <div class="top-apps-grid">
-                    <div class="top-app-card" onclick="showAppDetails('1password')">
-                        <div class="top-app-header">
-                            <div class="top-app-icon">🔑</div>
-                            <div class="top-app-info">
-                                <div class="top-app-name">1Password</div>
-                                <div class="top-app-developer">1Password</div>
-                            </div>
-                        </div>
-                        <div class="top-app-footer">
-                            <div class="top-app-price">$2.99/month</div>
-                            <div class="top-app-rank">#1</div>
-                        </div>
-                    </div>
-
-                    <div class="top-app-card" onclick="showAppDetails('notion')">
-                        <div class="top-app-header">
-                            <div class="top-app-icon">📋</div>
-                            <div class="top-app-info">
-                                <div class="top-app-name">Notion</div>
-                                <div class="top-app-developer">Notion Labs</div>
-                            </div>
-                        </div>
-                        <div class="top-app-footer">
-                            <div class="top-app-price">$4.99/month</div>
-                            <div class="top-app-rank">#2</div>
-                        </div>
-                    </div>
-
-                    <div class="top-app-card" onclick="showAppDetails('obsidian')">
-                        <div class="top-app-header">
-                            <div class="top-app-icon">💎</div>
-                            <div class="top-app-info">
-                                <div class="top-app-name">Obsidian</div>
-                                <div class="top-app-developer">Obsidian</div>
-                            </div>
-                        </div>
-                        <div class="top-app-footer">
-                            <div class="top-app-price">$8.00/month</div>
-                            <div class="top-app-rank">#3</div>
-                        </div>
-                    </div>
-
-                    <div class="top-app-card" onclick="showAppDetails('raycast')">
-                        <div class="top-app-header">
-                            <div class="top-app-icon">⚡</div>
-                            <div class="top-app-info">
-                                <div class="top-app-name">Raycast</div>
-                                <div class="top-app-developer">Raycast</div>
-                            </div>
-                        </div>
-                        <div class="top-app-footer">
-                            <div class="top-app-price">$9.99/month</div>
-                            <div class="top-app-rank">#4</div>
-                        </div>
+                    <div class="glass-effect rounded-2xl p-6">
+                        <div class="text-3xl font-bold text-yellow-400 mb-2">4.8★</div>
+                        <div class="text-gray-300">Average Rating</div>
                     </div>
                 </div>
             </div>
         </div>
-    </main>
+    </section>
 
-    <script>
-        function logout() {
-            localStorage.removeItem('taustore_user');
-            window.location.href = '/welcome.html';
-        }
-
-        function filterCategory(category) {
-            // Remove active class from all buttons
-            document.querySelectorAll('.category-btn').forEach(btn => {
-                btn.classList.remove('active');
-            });
+    <!-- Categories Section -->
+    <section id="categories" class="py-20">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl font-bold mb-4">Browse Categories</h2>
+                <p class="text-gray-300 text-lg">Find exactly what you're looking for</p>
+            </div>
             
-            // Add active class to clicked button
-            event.target.classList.add('active');
+            <div id="categoriesGrid" class="grid grid-cols-2 md:grid-cols-5 gap-6">
+                <!-- Categories will be loaded here -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Featured Apps Section -->
+    <section id="featured" class="py-20 bg-gray-900/30">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center mb-12">
+                <div>
+                    <h2 class="text-4xl font-bold mb-4">Featured Apps</h2>
+                    <p class="text-gray-300 text-lg">Handpicked by our team</p>
+                </div>
+                <button class="text-yellow-400 hover:text-yellow-300 transition-colors">
+                    View All <i data-lucide="arrow-right" class="w-4 h-4 inline ml-1"></i>
+                </button>
+            </div>
             
-            // Filter logic would go here
-            console.log('Filtering by category:', category);
-        }
+            <div id="featuredApps" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                <!-- Featured apps will be loaded here -->
+            </div>
+        </div>
+    </section>
 
-        function showAppDetails(appId) {
-            // App details modal would go here
-            console.log('Showing details for app:', appId);
-        }
+    <!-- Top Free Apps -->
+    <section class="py-20">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center mb-12">
+                <div>
+                    <h2 class="text-4xl font-bold mb-4">Top Free Apps</h2>
+                    <p class="text-gray-300 text-lg">Most downloaded free apps</p>
+                </div>
+                <button class="text-yellow-400 hover:text-yellow-300 transition-colors">
+                    View All <i data-lucide="arrow-right" class="w-4 h-4 inline ml-1"></i>
+                </button>
+            </div>
+            
+            <div id="topFreeApps" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                <!-- Top free apps will be loaded here -->
+            </div>
+        </div>
+    </section>
 
-        // Search functionality
-        document.getElementById('searchInput').addEventListener('input', function(e) {
-            const searchTerm = e.target.value.toLowerCase();
-            console.log('Searching for:', searchTerm);
-        });
+    <!-- Top Paid Apps -->
+    <section class="py-20 bg-gray-900/30">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center mb-12">
+                <div>
+                    <h2 class="text-4xl font-bold mb-4">Top Paid Apps</h2>
+                    <p class="text-gray-300 text-lg">Premium apps worth every penny</p>
+                </div>
+                <button class="text-yellow-400 hover:text-yellow-300 transition-colors">
+                    View All <i data-lucide="arrow-right" class="w-4 h-4 inline ml-1"></i>
+                </button>
+            </div>
+            
+            <div id="topPaidApps" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                <!-- Top paid apps will be loaded here -->
+            </div>
+        </div>
+    </section>
 
-        // Check authentication
-        document.addEventListener('DOMContentLoaded', function() {
-            const user = localStorage.getItem('taustore_user');
-            if (!user) {
-                window.location.href = '/welcome.html';
-            }
-        });
-    </script>
+    <!-- Rewards Section -->
+    <section id="rewards" class="py-20">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl font-bold mb-4">Earn Rewards</h2>
+                <p class="text-gray-300 text-lg">Get points for downloads, reviews, and purchases</p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="glass-effect rounded-2xl p-8 text-center">
+                    <div class="w-16 h-16 bg-yellow-400/20 rounded-full flex items-center justify-center mx-auto mb-6">
+                        <i data-lucide="download" class="w-8 h-8 text-yellow-400"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-4">Download Apps</h3>
+                    <p class="text-gray-300 mb-4">Get 10 points for every app you download</p>
+                    <div class="text-2xl font-bold text-yellow-400">+10 pts</div>
+                </div>
+                
+                <div class="glass-effect rounded-2xl p-8 text-center">
+                    <div class="w-16 h-16 bg-yellow-400/20 rounded-full flex items-center justify-center mx-auto mb-6">
+                        <i data-lucide="star" class="w-8 h-8 text-yellow-400"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-4">Write Reviews</h3>
+                    <p class="text-gray-300 mb-4">Earn 25 points for each helpful review</p>
+                    <div class="text-2xl font-bold text-yellow-400">+25 pts</div>
+                </div>
+                
+                <div class="glass-effect rounded-2xl p-8 text-center">
+                    <div class="w-16 h-16 bg-yellow-400/20 rounded-full flex items-center justify-center mx-auto mb-6">
+                        <i data-lucide="credit-card" class="w-8 h-8 text-yellow-400"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-4">Make Purchases</h3>
+                    <p class="text-gray-300 mb-4">Get 1 point for every dollar spent</p>
+                    <div class="text-2xl font-bold text-yellow-400">+1 pt/$</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900/50 border-t border-gray-800 py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div>
+                    <div class="flex items-center space-x-2 mb-4">
+                        <img src="/brand/tauos-logo.svg" alt="TauOS" class="w-8 h-8">
+                        <span class="text-xl font-bold text-gradient">TauStore</span>
+                    </div>
+                    <p class="text-gray-400 text-sm">
+                        The ultimate app marketplace for TauOS ecosystem.
+                    </p>
+                </div>
+                
+                <div>
+                    <h3 class="font-semibold mb-4">Categories</h3>
+                    <ul class="space-y-2 text-sm text-gray-400">
+                        <li><a href="#" class="hover:text-white transition-colors">Productivity</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Games</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Social</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Business</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h3 class="font-semibold mb-4">Support</h3>
+                    <ul class="space-y-2 text-sm text-gray-400">
+                        <li><a href="#" class="hover:text-white transition-colors">Help Center</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Contact Us</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Privacy Policy</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Terms of Service</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h3 class="font-semibold mb-4">Connect</h3>
+                    <div class="flex space-x-4">
+                        <a href="#" class="text-gray-400 hover:text-white transition-colors">
+                            <i data-lucide="twitter" class="w-5 h-5"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-white transition-colors">
+                            <i data-lucide="github" class="w-5 h-5"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-white transition-colors">
+                            <i data-lucide="discord" class="w-5 h-5"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="border-t border-gray-800 mt-8 pt-8 text-center text-sm text-gray-400">
+                <p>&copy; 2024 TauOS. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="app.js"></script>
 </body>
 </html>
