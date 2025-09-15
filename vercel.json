@@ -2,7 +2,7 @@
   "redirects": [
     {
       "source": "/",
-      "destination": "https://tauos-mail-f307q44qr-the-dot-protocol-co-ltds-projects.vercel.app",
+      "destination": "https://tauos.org/taumail",
       "has": [
         {
           "type": "host",
@@ -13,7 +13,7 @@
     },
     {
       "source": "/",
-      "destination": "https://vercel-tauos-cloud-5z2nci0ys-the-dot-protocol-co-ltds-projects.vercel.app",
+      "destination": "https://tauos.org/taucloud",
       "has": [
         {
           "type": "host",
@@ -23,4 +23,4 @@
       "permanent": false
     }
   ]
-} 
+}
