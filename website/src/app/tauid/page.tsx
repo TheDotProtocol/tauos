@@ -6,6 +6,7 @@ import {
   ArrowRight, ExternalLink, CheckCircle, Star, Zap, Code, Building,
   Target, Mail, Award, Heart, Scale, Monitor, Smartphone
 } from 'lucide-react';
+import Link from 'next/link';
 
 export default function TauIDPage() {
   return (
@@ -327,15 +328,18 @@ export default function TauIDPage() {
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <button 
-                onClick={() => {
-                  // Redirect to registration page or show registration modal
-                  window.location.href = 'https://tauos-zbtm.vercel.app/api/register';
-                }}
-                className="px-8 py-4 bg-gradient-to-r from-yellow-400 to-orange-500 text-black rounded-xl font-semibold hover:shadow-lg hover:shadow-yellow-400/25 transition-all duration-300"
+              <Link 
+                href="/tauid/register"
+                className="px-8 py-4 bg-gradient-to-r from-yellow-400 to-orange-500 text-black rounded-xl font-semibold hover:shadow-lg hover:shadow-yellow-400/25 transition-all duration-300 text-center"
               >
                 Create Identity
-              </button>
+              </Link>
+              <Link 
+                href="/tauid/login"
+                className="px-8 py-4 border-2 border-yellow-400 text-yellow-400 rounded-xl font-semibold hover:bg-yellow-400 hover:text-black transition-all duration-300 text-center"
+              >
+                Sign In
+              </Link>
               <button 
                 onClick={() => {
                   // Scroll to features section or show more info

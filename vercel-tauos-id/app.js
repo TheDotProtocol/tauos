@@ -185,7 +185,7 @@ app.post('/api/login', validateLogin, async (req, res) => {
     // Generate JWT token
     const token = jwt.sign(
       { userId: userData.id, email: userData.email },
-      process.env.JWT_SECRET || 'tauos-secret-key',
+      process.env.JWT_SECRET || '143d8c3e98e6b97a969d4c2ffd7b99ad547043c370e34cf3a9062a51c25d9f0f728742117635598c75e701ee98f44c0c62bb6f503c34cbc370bd77e6b34080c0',
       { expiresIn: '24h' }
     );
     

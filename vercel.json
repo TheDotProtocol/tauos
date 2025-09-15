@@ -31,8 +31,7 @@
           "value": "id.tauos.org"
         }
       ],
-      "permanent": false,
-      "statusCode": 302
+      "permanent": false
     }
   ]
 }
