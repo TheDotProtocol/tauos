@@ -267,6 +267,45 @@ class TauOSDesktop {
             return;
         }
 
+        // Handle real TauOS apps with iframe integration
+        const realApps = {
+            'taumail': {
+                name: 'TauMail',
+                url: 'https://tauos-47am.vercel.app',
+                icon: 'envelope',
+                description: 'Secure email system'
+            },
+            'taucloud': {
+                name: 'TauCloud',
+                url: 'https://tauos-cloud-backend.vercel.app',
+                icon: 'cloud',
+                description: 'File storage and sharing'
+            },
+            'tauid': {
+                name: 'TauID',
+                url: 'https://tauos-zbtm.vercel.app',
+                icon: 'user',
+                description: 'Identity management system'
+            },
+            'taustore': {
+                name: 'TauStore',
+                url: 'https://tauos-mqo99.vercel.app',
+                icon: 'store',
+                description: 'App marketplace'
+            },
+            'taubrowser': {
+                name: 'TauBrowser',
+                url: 'https://tauos-browser-backend.vercel.app',
+                icon: 'globe',
+                description: 'Privacy-first web browser'
+            }
+        };
+
+        if (realApps[appId]) {
+            this.openRealApp(realApps[appId], appId);
+            return;
+        }
+
         // Handle special apps
         if (appId === 'terminal') {
             this.openTerminal();
@@ -298,6 +337,61 @@ class TauOSDesktop {
 
         const window = this.createWindow(app);
         this.windows.set(window.id, window);
+        this.runningApps.set(appId, window);
+        
+        this.addToTaskbar(appId, window);
+        this.bringWindowToFront(window);
+    }
+
+    openRealApp(app, appId) {
+        this.windowCounter++;
+        const windowId = `window-${this.windowCounter}`;
+        
+        const window = document.createElement('div');
+        window.className = 'window real-app-window';
+        window.id = windowId;
+        window.style.left = `${100 + (this.windowCounter * 30)}px`;
+        window.style.top = `${100 + (this.windowCounter * 30)}px`;
+        window.style.zIndex = 1000 + this.windowCounter;
+        window.style.width = '1200px';
+        window.style.height = '800px';
+
+        window.innerHTML = `
+            <div class="window-header">
+                <div class="window-title">
+                    <img src="icons/${appId}-icon.svg" alt="${app.name}" class="window-icon-svg">
+                    <span>${app.name}</span>
+                </div>
+                <div class="window-controls">
+                    <div class="window-control minimize" data-action="minimize"></div>
+                    <div class="window-control maximize" data-action="maximize"></div>
+                    <div class="window-control close" data-action="close"></div>
+                </div>
+            </div>
+            <div class="window-content real-app-content">
+                <iframe src="${app.url}" 
+                        frameborder="0" 
+                        style="width: 100%; height: 100%; border: none; border-radius: 0 0 12px 12px;"
+                        allow="camera; microphone; geolocation; clipboard-read; clipboard-write">
+                </iframe>
+            </div>
+        `;
+
+        // Add window controls
+        window.querySelectorAll('.window-control').forEach(control => {
+            control.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const action = e.target.dataset.action;
+                this.handleWindowAction(window, action);
+            });
+        });
+
+        // Make window draggable
+        this.makeDraggable(window);
+
+        document.getElementById('windows-container').appendChild(window);
+        
+        this.windows.set(windowId, window);
         this.runningApps.set(appId, window);
         
         this.addToTaskbar(appId, window);

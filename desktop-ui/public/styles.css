@@ -364,6 +364,38 @@ body {
     color: #ffffff;
 }
 
+/* Professional SVG Icons */
+.app-icon-svg {
+    width: 48px;
+    height: 48px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
+}
+
+.app-item:hover .app-icon-svg {
+    transform: scale(1.1);
+    filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.4));
+}
+
+/* Real App Windows */
+.real-app-window {
+    border: 2px solid rgba(251, 191, 36, 0.3);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(251, 191, 36, 0.1);
+}
+
+.real-app-content {
+    padding: 0;
+    overflow: hidden;
+    background: #ffffff;
+}
+
+.window-icon-svg {
+    width: 20px;
+    height: 20px;
+    margin-right: 8px;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+}
+
 .app-name {
     font-size: 1rem;
     font-weight: 500;

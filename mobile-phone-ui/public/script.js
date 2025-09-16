@@ -201,8 +201,22 @@ class MobilePhoneUI {
             case 'gallery':
                 this.showScreen('gallery-screen');
                 break;
+            case 'terminal':
+                this.openTerminal();
+                break;
             default:
                 console.log(`Opening ${appId} app`);
+        }
+    }
+
+    openTerminal() {
+        // Open terminal in fullscreen iframe
+        const terminalWindow = window.open('terminal.html', '_blank', 'fullscreen=yes');
+        if (terminalWindow) {
+            terminalWindow.focus();
+        } else {
+            // Fallback: show terminal in current window
+            this.showScreen('terminal-screen');
         }
     }
 
