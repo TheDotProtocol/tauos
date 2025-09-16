@@ -43,6 +43,17 @@
         }
       ],
       "permanent": false
+    },
+    {
+      "source": "/",
+      "destination": "https://tauos-browser-backend.vercel.app",
+      "has": [
+        {
+          "type": "host",
+          "value": "browser.tauos.org"
+        }
+      ],
+      "permanent": false
     }
   ]
 }
