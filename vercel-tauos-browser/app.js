@@ -9,6 +9,9 @@ const { v4: uuidv4 } = require('uuid');
 const app = express();
 const PORT = process.env.PORT || 3005;
 
+// JWT Secret
+const JWT_SECRET = process.env.JWT_SECRET || '143d8c3e98e6b97a969d4c2ffd7b99ad547043c370e34cf3a9062a51c25d9f0f728742117635598c75e701ee98f44c0c62bb6f503c34cbc370bd77e6b34080c0';
+
 // Middleware
 app.use(cors());
 app.use(express.json());
@@ -47,7 +50,7 @@ app.post('/api/register', async (req, res) => {
             username: username, 
             email: email 
         };
-        const token = jwt.sign({ userId: user.id }, 'your-secret-key', { expiresIn: '24h' });
+        const token = jwt.sign({ userId: user.id }, JWT_SECRET, { expiresIn: '24h' });
 
         res.json({ 
             success: true, 
@@ -75,7 +78,7 @@ app.post('/api/login', async (req, res) => {
                 username: 'john', 
                 email: 'john@tauos.org' 
             };
-            const token = jwt.sign({ userId: user.id }, 'your-secret-key', { expiresIn: '24h' });
+            const token = jwt.sign({ userId: user.id }, JWT_SECRET, { expiresIn: '24h' });
 
             res.json({ 
                 success: true, 
@@ -98,7 +101,7 @@ app.get('/api/user/profile', async (req, res) => {
             return res.status(401).json({ error: 'No token provided' });
         }
 
-        const decoded = jwt.verify(token, 'your-secret-key');
+        const decoded = jwt.verify(token, JWT_SECRET);
         
         // Mock user profile
         const user = {
@@ -122,7 +125,7 @@ app.get('/api/browsing/history', async (req, res) => {
             return res.status(401).json({ error: 'No token provided' });
         }
 
-        const decoded = jwt.verify(token, 'your-secret-key');
+        const decoded = jwt.verify(token, JWT_SECRET);
         
         // Mock browsing history
         const history = [
@@ -156,7 +159,7 @@ app.post('/api/browsing/history', async (req, res) => {
             return res.status(401).json({ error: 'No token provided' });
         }
 
-        const decoded = jwt.verify(token, 'your-secret-key');
+        const decoded = jwt.verify(token, JWT_SECRET);
         const { url, title, favicon } = req.body;
 
         // Mock save - just return success
@@ -174,7 +177,7 @@ app.get('/api/bookmarks', async (req, res) => {
             return res.status(401).json({ error: 'No token provided' });
         }
 
-        const decoded = jwt.verify(token, 'your-secret-key');
+        const decoded = jwt.verify(token, JWT_SECRET);
         
         // Mock bookmarks
         const bookmarks = [
@@ -201,7 +204,7 @@ app.post('/api/bookmarks', async (req, res) => {
             return res.status(401).json({ error: 'No token provided' });
         }
 
-        const decoded = jwt.verify(token, 'your-secret-key');
+        const decoded = jwt.verify(token, JWT_SECRET);
         const { url, title, favicon } = req.body;
 
         // Mock save - just return success
