@@ -56,8 +56,10 @@ app.use('/api/auth/register', authLimiter);
 
 // Database connection
 const pool = new Pool({
-  connectionString: process.env.DATABASE_URL || 'postgresql://postgres.tviqcormikopltejomkc:Ak1233%40%405@aws-0-ap-southeast-1.pooler.supabase.com:6543/postgres?sslmode=disable',
-  ssl: false
+  connectionString: process.env.DATABASE_URL || 'postgresql://postgres.tviqcormikopltejomkc:Ak1233%40%405@aws-0-ap-southeast-1.pooler.supabase.com:6543/postgres?sslmode=require',
+  ssl: {
+    rejectUnauthorized: false
+  }
 });
 
 // Test database connection

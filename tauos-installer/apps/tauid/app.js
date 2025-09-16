@@ -11,7 +11,10 @@ const PORT = process.env.PORT || 3003;
 
 // Database connection
 const pool = new Pool({
-  connectionString: process.env.DATABASE_URL || 'postgresql://postgres:Ak1233%40%405@db.tviqcormikopltejomkc.supabase.co:5432/postgres'
+  connectionString: process.env.DATABASE_URL || 'postgresql://postgres:Ak1233%40%405@db.tviqcormikopltejomkc.supabase.co:5432/postgres?sslmode=require',
+  ssl: {
+    rejectUnauthorized: false
+  }
 });
 
 // Middleware
