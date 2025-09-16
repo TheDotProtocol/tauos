@@ -3,337 +3,371 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TauOS Mobile Phone</title>
+    <title>TauOS Mobile - Privacy-First Mobile Operating System</title>
     <link rel="stylesheet" href="styles.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 </head>
 <body>
-    <!-- Phone Frame -->
-    <div class="phone-frame">
-        <!-- Status Bar -->
-        <div class="status-bar">
-            <div class="status-left">
-                <span class="time" id="current-time">9:41</span>
-            </div>
-            <div class="status-right">
-                <i class="fas fa-signal"></i>
-                <i class="fas fa-wifi"></i>
-                <span class="battery">85%</span>
-                <i class="fas fa-battery-three-quarters"></i>
-            </div>
-        </div>
-
-        <!-- Dynamic Content Area -->
-        <div class="content-area" id="content-area">
-            <!-- Home Screen -->
-            <div class="screen home-screen active" id="home-screen">
-                <div class="wallpaper">
-                    <div class="wallpaper-overlay"></div>
-                </div>
-                
-                <!-- App Grid -->
-                <div class="app-grid">
-                    <div class="app-icon" data-app="camera">
-                        <div class="app-icon-bg">
-                            <img src="icons/camera-icon.svg" alt="Camera" class="app-icon-svg">
-                        </div>
-                        <span class="app-name">Camera</span>
-                    </div>
-                    <div class="app-icon" data-app="messages">
-                        <div class="app-icon-bg">
-                            <img src="icons/messages-icon.svg" alt="Messages" class="app-icon-svg">
-                        </div>
-                        <span class="app-name">Messages</span>
-                    </div>
-                    <div class="app-icon" data-app="phone">
-                        <div class="app-icon-bg">
-                            <img src="icons/phone-icon.svg" alt="Phone" class="app-icon-svg">
-                        </div>
-                        <span class="app-name">Phone</span>
-                    </div>
-                    <div class="app-icon" data-app="tautalk">
-                        <div class="app-icon-bg">📹</div>
-                        <span class="app-name">TauTalk</span>
-                    </div>
-                    <div class="app-icon" data-app="whatsapp">
-                        <div class="app-icon-bg">💚</div>
-                        <span class="app-name">WhatsApp</span>
-                    </div>
-                    <div class="app-icon" data-app="contacts">
-                        <div class="app-icon-bg">👥</div>
-                        <span class="app-name">Contacts</span>
-                    </div>
-                    <div class="app-icon" data-app="gallery">
-                        <div class="app-icon-bg">🖼️</div>
-                        <span class="app-name">Gallery</span>
-                    </div>
-                    <div class="app-icon" data-app="music">
-                        <div class="app-icon-bg">🎵</div>
-                        <span class="app-name">Music</span>
-                    </div>
-                    <div class="app-icon" data-app="maps">
-                        <div class="app-icon-bg">🗺️</div>
-                        <span class="app-name">Maps</span>
-                    </div>
-                    <div class="app-icon" data-app="weather">
-                        <div class="app-icon-bg">🌤️</div>
-                        <span class="app-name">Weather</span>
-                    </div>
-                    <div class="app-icon" data-app="notes">
-                        <div class="app-icon-bg">📝</div>
-                        <span class="app-name">Notes</span>
-                    </div>
-                    <div class="app-icon" data-app="terminal">
-                        <div class="app-icon-bg">
-                            <img src="icons/terminal-icon.svg" alt="Terminal" class="app-icon-svg">
-                        </div>
-                        <span class="app-name">Terminal</span>
-                    </div>
-                    <div class="app-icon" data-app="settings">
-                        <div class="app-icon-bg">⚙️</div>
-                        <span class="app-name">Settings</span>
-                    </div>
-                </div>
-
-                <!-- Dock -->
-                <div class="dock">
-                    <div class="dock-app" data-app="phone">
-                        <div class="dock-icon">📞</div>
-                    </div>
-                    <div class="dock-app" data-app="messages">
-                        <div class="dock-icon">💬</div>
-                    </div>
-                    <div class="dock-app" data-app="camera">
-                        <div class="dock-icon">📷</div>
-                    </div>
-                    <div class="dock-app" data-app="tautalk">
-                        <div class="dock-icon">📹</div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Camera App -->
-            <div class="screen camera-screen" id="camera-screen">
-                <div class="camera-header">
-                    <button class="back-btn" onclick="showScreen('home-screen')">
-                        <i class="fas fa-arrow-left"></i>
+    <!-- Hero Section -->
+    <div class="hero-section">
+        <div class="hero-content">
+            <div class="hero-text">
+                <h1 class="hero-title">
+                    <span class="text-gradient">TauOS Mobile</span>
+                </h1>
+                <p class="hero-subtitle">Privacy-First Mobile Operating System</p>
+                <p class="hero-description">
+                    Experience the future of mobile computing with TauOS Mobile. 
+                    Built for privacy, security, and performance. 
+                    Your data stays yours.
+                </p>
+                <div class="hero-buttons">
+                    <button class="btn-primary" onclick="scrollToPhone()">
+                        <i class="fas fa-mobile-alt"></i>
+                        Try Mobile OS
                     </button>
-                    <div class="camera-controls">
-                        <button class="camera-btn" id="flash-btn">
-                            <i class="fas fa-bolt"></i>
+                    <button class="btn-secondary" onclick="scrollToFeatures()">
+                        <i class="fas fa-star"></i>
+                        View Features
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Phone Showcase -->
+            <div class="phone-showcase">
+                <div class="phone-frame">
+                    <!-- Status Bar -->
+                    <div class="status-bar">
+                        <div class="status-left">
+                            <span class="time" id="current-time">9:41</span>
+                        </div>
+                        <div class="status-right">
+                            <i class="fas fa-signal"></i>
+                            <i class="fas fa-wifi"></i>
+                            <span class="battery">85%</span>
+                            <i class="fas fa-battery-three-quarters"></i>
+                        </div>
+                    </div>
+
+                    <!-- Dynamic Content Area -->
+                    <div class="content-area" id="content-area">
+                        <!-- Home Screen -->
+                        <div class="screen home-screen active" id="home-screen">
+                            <div class="wallpaper">
+                                <div class="wallpaper-overlay"></div>
+                            </div>
+                            
+                            <!-- App Grid -->
+                            <div class="app-grid">
+                                <div class="app-icon" data-app="camera">
+                                    <div class="app-icon-bg">
+                                        <img src="icons/camera-icon.svg" alt="Camera" class="app-icon-svg">
+                                    </div>
+                                    <span class="app-name">Camera</span>
+                                </div>
+                                <div class="app-icon" data-app="messages">
+                                    <div class="app-icon-bg">
+                                        <img src="icons/messages-icon.svg" alt="Messages" class="app-icon-svg">
+                                    </div>
+                                    <span class="app-name">Messages</span>
+                                </div>
+                                <div class="app-icon" data-app="phone">
+                                    <div class="app-icon-bg">
+                                        <img src="icons/phone-icon.svg" alt="Phone" class="app-icon-svg">
+                                    </div>
+                                    <span class="app-name">Phone</span>
+                                </div>
+                                <div class="app-icon" data-app="tautalk">
+                                    <div class="app-icon-bg">📹</div>
+                                    <span class="app-name">TauTalk</span>
+                                </div>
+                                <div class="app-icon" data-app="whatsapp">
+                                    <div class="app-icon-bg">💚</div>
+                                    <span class="app-name">WhatsApp</span>
+                                </div>
+                                <div class="app-icon" data-app="contacts">
+                                    <div class="app-icon-bg">👥</div>
+                                    <span class="app-name">Contacts</span>
+                                </div>
+                                <div class="app-icon" data-app="gallery">
+                                    <div class="app-icon-bg">🖼️</div>
+                                    <span class="app-name">Gallery</span>
+                                </div>
+                                <div class="app-icon" data-app="music">
+                                    <div class="app-icon-bg">🎵</div>
+                                    <span class="app-name">Music</span>
+                                </div>
+                                <div class="app-icon" data-app="maps">
+                                    <div class="app-icon-bg">🗺️</div>
+                                    <span class="app-name">Maps</span>
+                                </div>
+                                <div class="app-icon" data-app="weather">
+                                    <div class="app-icon-bg">🌤️</div>
+                                    <span class="app-name">Weather</span>
+                                </div>
+                                <div class="app-icon" data-app="notes">
+                                    <div class="app-icon-bg">📝</div>
+                                    <span class="app-name">Notes</span>
+                                </div>
+                                <div class="app-icon" data-app="terminal">
+                                    <div class="app-icon-bg">
+                                        <img src="icons/terminal-icon.svg" alt="Terminal" class="app-icon-svg">
+                                    </div>
+                                    <span class="app-name">Terminal</span>
+                                </div>
+                                <div class="app-icon" data-app="settings">
+                                    <div class="app-icon-bg">⚙️</div>
+                                    <span class="app-name">Settings</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Phone App Screen -->
+                        <div class="screen phone-screen" id="phone-screen">
+                            <div class="phone-header">
+                                <button class="back-btn" onclick="showScreen('home-screen')">
+                                    <i class="fas fa-arrow-left"></i>
+                                </button>
+                                <h2>Phone</h2>
+                                <button class="more-btn">
+                                    <i class="fas fa-ellipsis-h"></i>
+                                </button>
+                            </div>
+                            
+                            <!-- Phone Tabs -->
+                            <div class="phone-tabs">
+                                <button class="tab-btn active" data-tab="keypad">Keypad</button>
+                                <button class="tab-btn" data-tab="contacts">Contacts</button>
+                                <button class="tab-btn" data-tab="voicemail">Voicemail</button>
+                                <button class="tab-btn" data-tab="recent">Recent</button>
+                            </div>
+
+                            <!-- Keypad Tab -->
+                            <div class="tab-content active" id="keypad-tab">
+                                <div class="phone-display">
+                                    <div class="phone-number" id="phone-number">+1 (555) 123-4567</div>
+                                </div>
+                                
+                                <div class="keypad">
+                                    <div class="keypad-row">
+                                        <button class="keypad-btn" data-number="1">
+                                            <span class="number">1</span>
+                                            <span class="letters"></span>
+                                        </button>
+                                        <button class="keypad-btn" data-number="2">
+                                            <span class="number">2</span>
+                                            <span class="letters">ABC</span>
+                                        </button>
+                                        <button class="keypad-btn" data-number="3">
+                                            <span class="number">3</span>
+                                            <span class="letters">DEF</span>
+                                        </button>
+                                    </div>
+                                    <div class="keypad-row">
+                                        <button class="keypad-btn" data-number="4">
+                                            <span class="number">4</span>
+                                            <span class="letters">GHI</span>
+                                        </button>
+                                        <button class="keypad-btn" data-number="5">
+                                            <span class="number">5</span>
+                                            <span class="letters">JKL</span>
+                                        </button>
+                                        <button class="keypad-btn" data-number="6">
+                                            <span class="number">6</span>
+                                            <span class="letters">MNO</span>
+                                        </button>
+                                    </div>
+                                    <div class="keypad-row">
+                                        <button class="keypad-btn" data-number="7">
+                                            <span class="number">7</span>
+                                            <span class="letters">PQRS</span>
+                                        </button>
+                                        <button class="keypad-btn" data-number="8">
+                                            <span class="number">8</span>
+                                            <span class="letters">TUV</span>
+                                        </button>
+                                        <button class="keypad-btn" data-number="9">
+                                            <span class="number">9</span>
+                                            <span class="letters">WXYZ</span>
+                                        </button>
+                                    </div>
+                                    <div class="keypad-row">
+                                        <button class="keypad-btn special" data-action="star">
+                                            <span class="number">*</span>
+                                        </button>
+                                        <button class="keypad-btn" data-number="0">
+                                            <span class="number">0</span>
+                                            <span class="letters">+</span>
+                                        </button>
+                                        <button class="keypad-btn special" data-action="hash">
+                                            <span class="number">#</span>
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <div class="call-controls">
+                                    <button class="call-btn" id="call-btn">
+                                        <i class="fas fa-phone"></i>
+                                    </button>
+                                    <button class="delete-btn" id="delete-btn">
+                                        <i class="fas fa-backspace"></i>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Contacts Tab -->
+                            <div class="tab-content" id="contacts-tab">
+                                <div class="contacts-list">
+                                    <div class="contact-item">
+                                        <div class="contact-avatar">JD</div>
+                                        <div class="contact-info">
+                                            <div class="contact-name">John Doe</div>
+                                            <div class="contact-number">+1 (555) 123-4567</div>
+                                        </div>
+                                        <button class="contact-call">
+                                            <i class="fas fa-phone"></i>
+                                        </button>
+                                    </div>
+                                    <div class="contact-item">
+                                        <div class="contact-avatar">JS</div>
+                                        <div class="contact-info">
+                                            <div class="contact-name">Jane Smith</div>
+                                            <div class="contact-number">+1 (555) 987-6543</div>
+                                        </div>
+                                        <button class="contact-call">
+                                            <i class="fas fa-phone"></i>
+                                        </button>
+                                    </div>
+                                    <div class="contact-item">
+                                        <div class="contact-avatar">MJ</div>
+                                        <div class="contact-info">
+                                            <div class="contact-name">Mike Johnson</div>
+                                            <div class="contact-number">+1 (555) 456-7890</div>
+                                        </div>
+                                        <button class="contact-call">
+                                            <i class="fas fa-phone"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Voicemail Tab -->
+                            <div class="tab-content" id="voicemail-tab">
+                                <div class="voicemail-list">
+                                    <div class="voicemail-item">
+                                        <div class="voicemail-avatar">JD</div>
+                                        <div class="voicemail-info">
+                                            <div class="voicemail-name">John Doe</div>
+                                            <div class="voicemail-time">2 minutes ago</div>
+                                            <div class="voicemail-duration">1:23</div>
+                                        </div>
+                                        <button class="voicemail-play">
+                                            <i class="fas fa-play"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Recent Tab -->
+                            <div class="tab-content" id="recent-tab">
+                                <div class="recent-list">
+                                    <div class="recent-item">
+                                        <div class="recent-avatar">JD</div>
+                                        <div class="recent-info">
+                                            <div class="recent-name">John Doe</div>
+                                            <div class="recent-time">2 minutes ago</div>
+                                        </div>
+                                        <div class="recent-type">
+                                            <i class="fas fa-phone"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Other app screens would go here -->
+                    </div>
+
+                    <!-- Bottom Navigation -->
+                    <div class="bottom-nav">
+                        <button class="nav-btn active" data-screen="home-screen">
+                            <i class="fas fa-home"></i>
+                            <span>Home</span>
                         </button>
-                        <button class="camera-btn" id="timer-btn">
-                            <i class="fas fa-clock"></i>
-                        </button>
-                        <button class="camera-btn" id="effects-btn">
-                            <i class="fas fa-magic"></i>
-                        </button>
-                    </div>
-                </div>
-
-                <div class="camera-viewfinder">
-                    <video id="camera-video" autoplay muted></video>
-                    <canvas id="camera-canvas"></canvas>
-                    
-                    <!-- Camera Effects Overlay -->
-                    <div class="effects-overlay" id="effects-overlay">
-                        <div class="effect-filter" id="effect-filter"></div>
-                    </div>
-                </div>
-
-                <div class="camera-controls-bottom">
-                    <button class="gallery-btn" onclick="showScreen('gallery-screen')">
-                        <i class="fas fa-images"></i>
-                    </button>
-                    <button class="capture-btn" id="capture-btn">
-                        <div class="capture-inner"></div>
-                    </button>
-                    <button class="switch-camera-btn" id="switch-camera-btn">
-                        <i class="fas fa-sync-alt"></i>
-                    </button>
-                </div>
-
-                <!-- Camera Mode Selector -->
-                <div class="camera-modes">
-                    <button class="mode-btn active" data-mode="photo">Photo</button>
-                    <button class="mode-btn" data-mode="video">Video</button>
-                    <button class="mode-btn" data-mode="portrait">Portrait</button>
-                    <button class="mode-btn" data-mode="panorama">Panorama</button>
-                </div>
-            </div>
-
-            <!-- Messages App -->
-            <div class="screen messages-screen" id="messages-screen">
-                <div class="messages-header">
-                    <button class="back-btn" onclick="showScreen('home-screen')">
-                        <i class="fas fa-arrow-left"></i>
-                    </button>
-                    <h1>Messages</h1>
-                    <button class="compose-btn">
-                        <i class="fas fa-edit"></i>
-                    </button>
-                </div>
-
-                <div class="messages-list" id="messages-list">
-                    <!-- Messages will be loaded here -->
-                </div>
-            </div>
-
-            <!-- Individual Chat Screen -->
-            <div class="screen chat-screen" id="chat-screen">
-                <div class="chat-header">
-                    <button class="back-btn" onclick="showScreen('messages-screen')">
-                        <i class="fas fa-arrow-left"></i>
-                    </button>
-                    <div class="contact-info">
-                        <div class="contact-avatar" id="chat-avatar">👨‍💼</div>
-                        <div class="contact-details">
-                            <h3 id="chat-name">John Doe</h3>
-                            <span id="chat-status">Online</span>
-                        </div>
-                    </div>
-                    <div class="chat-actions">
-                        <button class="call-btn" onclick="startCall()">
+                        <button class="nav-btn" data-screen="phone-screen">
                             <i class="fas fa-phone"></i>
+                            <span>Phone</span>
                         </button>
-                        <button class="video-call-btn" onclick="startVideoCall()">
-                            <i class="fas fa-video"></i>
+                        <button class="nav-btn" data-screen="messages-screen">
+                            <i class="fas fa-comment"></i>
+                            <span>Messages</span>
                         </button>
-                    </div>
-                </div>
-
-                <div class="chat-messages" id="chat-messages">
-                    <!-- Chat messages will be loaded here -->
-                </div>
-
-                <div class="chat-input-area">
-                    <button class="attachment-btn">
-                        <i class="fas fa-plus"></i>
-                    </button>
-                    <div class="message-input-container">
-                        <input type="text" class="message-input" id="message-input" placeholder="Message">
-                        <button class="emoji-btn">
-                            <i class="fas fa-smile"></i>
+                        <button class="nav-btn" data-screen="camera-screen">
+                            <i class="fas fa-camera"></i>
+                            <span>Camera</span>
                         </button>
-                    </div>
-                    <button class="send-btn" id="send-btn">
-                        <i class="fas fa-paper-plane"></i>
-                    </button>
-                </div>
-            </div>
-
-            <!-- TauTalk Video Call Screen -->
-            <div class="screen tautalk-screen" id="tautalk-screen">
-                <div class="tautalk-header">
-                    <button class="back-btn" onclick="showScreen('home-screen')">
-                        <i class="fas fa-arrow-left"></i>
-                    </button>
-                    <h1>TauTalk</h1>
-                    <button class="contacts-btn" onclick="showScreen('contacts-screen')">
-                        <i class="fas fa-address-book"></i>
-                    </button>
-                </div>
-
-                <div class="tautalk-content">
-                    <div class="recent-calls" id="recent-calls">
-                        <h3>Recent Calls</h3>
-                        <!-- Recent calls will be loaded here -->
-                    </div>
-
-                    <div class="tautalk-actions">
-                        <button class="audio-call-btn" onclick="startAudioCall()">
-                            <i class="fas fa-phone"></i>
-                            <span>Audio Call</span>
-                        </button>
-                        <button class="video-call-btn" onclick="startVideoCall()">
-                            <i class="fas fa-video"></i>
-                            <span>Video Call</span>
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Video Call Interface -->
-            <div class="screen video-call-screen" id="video-call-screen">
-                <div class="video-call-container">
-                    <div class="remote-video">
-                        <video id="remote-video" autoplay></video>
-                        <div class="call-info">
-                            <h3 id="call-contact-name">John Doe</h3>
-                            <span id="call-status">Connecting...</span>
-                        </div>
-                    </div>
-                    
-                    <div class="local-video">
-                        <video id="local-video" autoplay muted></video>
-                    </div>
-
-                    <div class="call-controls">
-                        <button class="call-control-btn mute-btn" id="mute-btn">
-                            <i class="fas fa-microphone"></i>
-                        </button>
-                        <button class="call-control-btn video-btn" id="video-btn">
-                            <i class="fas fa-video"></i>
-                        </button>
-                        <button class="call-control-btn speaker-btn" id="speaker-btn">
-                            <i class="fas fa-volume-up"></i>
-                        </button>
-                        <button class="call-control-btn end-call-btn" onclick="endCall()">
-                            <i class="fas fa-phone-slash"></i>
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Gallery App -->
-            <div class="screen gallery-screen" id="gallery-screen">
-                <div class="gallery-header">
-                    <button class="back-btn" onclick="showScreen('home-screen')">
-                        <i class="fas fa-arrow-left"></i>
-                    </button>
-                    <h1>Gallery</h1>
-                    <button class="select-btn">
-                        <i class="fas fa-check-square"></i>
-                    </button>
-                </div>
-
-                <div class="gallery-content">
-                    <div class="gallery-grid" id="gallery-grid">
-                        <!-- Photos will be loaded here -->
-                    </div>
-                </div>
-            </div>
-
-            <!-- Contacts App -->
-            <div class="screen contacts-screen" id="contacts-screen">
-                <div class="contacts-header">
-                    <button class="back-btn" onclick="showScreen('home-screen')">
-                        <i class="fas fa-arrow-left"></i>
-                    </button>
-                    <h1>Contacts</h1>
-                    <button class="add-contact-btn" onclick="addContact()">
-                        <i class="fas fa-plus"></i>
-                    </button>
-                </div>
-
-                <div class="contacts-content">
-                    <div class="search-bar">
-                        <input type="text" placeholder="Search contacts" id="contact-search">
-                        <i class="fas fa-search"></i>
-                    </div>
-                    <div class="contacts-list" id="contacts-list">
-                        <!-- Contacts will be loaded here -->
                     </div>
                 </div>
             </div>
         </div>
-
-        <!-- Home Indicator -->
-        <div class="home-indicator"></div>
     </div>
 
-    <!-- Scripts -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.2/socket.io.js"></script>
+    <!-- Features Section -->
+    <div class="features-section" id="features">
+        <div class="container">
+            <h2 class="section-title">Mobile OS Features</h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <h3>Privacy First</h3>
+                    <p>Your data stays on your device. No tracking, no data collection, complete privacy.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-terminal"></i>
+                    </div>
+                    <h3>Developer Terminal</h3>
+                    <p>Full terminal access on mobile. Run commands, debug apps, and control your device.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-video"></i>
+                    </div>
+                    <h3>Video Calling</h3>
+                    <p>Secure video calls with end-to-end encryption. TauTalk for private conversations.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-mobile-alt"></i>
+                    </div>
+                    <h3>Smartphone Features</h3>
+                    <p>Complete smartphone experience with camera, messaging, contacts, and more.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- CTA Section -->
+    <div class="cta-section">
+        <div class="container">
+            <h2>Ready to Experience TauOS Mobile?</h2>
+            <p>Try the interactive demo above or explore our desktop version.</p>
+            <div class="cta-buttons">
+                <button class="btn-primary" onclick="scrollToPhone()">
+                    <i class="fas fa-mobile-alt"></i>
+                    Try Mobile Demo
+                </button>
+                <a href="/desktop-ui" class="btn-secondary">
+                    <i class="fas fa-desktop"></i>
+                    Desktop Version
+                </a>
+            </div>
+        </div>
+    </div>
+
     <script src="script.js"></script>
 </body>
 </html>
