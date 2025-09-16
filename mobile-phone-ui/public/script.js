@@ -627,7 +627,109 @@ function openNote(noteId) {
 // Initialize when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
     window.tauOSMobile = new TauOSMobileLanding();
+    
+    // Initialize forms
+    initializePrebookingForm();
+    initializeInvestorForm();
 });
+
+// Pre-booking form functionality
+function initializePrebookingForm() {
+    const form = document.getElementById('prebooking-form');
+    if (form) {
+        form.addEventListener('submit', handlePrebookingSubmit);
+    }
+}
+
+function handlePrebookingSubmit(e) {
+    e.preventDefault();
+    
+    const formData = new FormData(e.target);
+    const data = Object.fromEntries(formData.entries());
+    
+    // Save to localStorage for demo purposes
+    const prebookings = JSON.parse(localStorage.getItem('tauosPrebookings') || '[]');
+    const prebooking = {
+        id: Date.now(),
+        ...data,
+        timestamp: new Date().toISOString(),
+        status: 'pending'
+    };
+    
+    prebookings.push(prebooking);
+    localStorage.setItem('tauosPrebookings', JSON.stringify(prebookings));
+    
+    // Show success message
+    showSuccessMessage('Pre-booking submitted successfully! You will receive a confirmation email shortly.');
+    
+    // Reset form
+    e.target.reset();
+}
+
+// Investor form functionality
+function initializeInvestorForm() {
+    const form = document.getElementById('investor-form');
+    if (form) {
+        form.addEventListener('submit', handleInvestorSubmit);
+    }
+}
+
+function handleInvestorSubmit(e) {
+    e.preventDefault();
+    
+    const formData = new FormData(e.target);
+    const data = Object.fromEntries(formData.entries());
+    
+    // Save to localStorage for demo purposes
+    const investors = JSON.parse(localStorage.getItem('tauosInvestors') || '[]');
+    const investor = {
+        id: Date.now(),
+        ...data,
+        timestamp: new Date().toISOString(),
+        status: 'pending'
+    };
+    
+    investors.push(investor);
+    localStorage.setItem('tauosInvestors', JSON.stringify(investors));
+    
+    // Show success message
+    showSuccessMessage('Thank you for your interest! Our investor relations team will contact you within 24 hours.');
+    
+    // Reset form
+    e.target.reset();
+}
+
+function showSuccessMessage(message) {
+    const modal = document.createElement('div');
+    modal.style.cssText = `
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+        background: rgba(0,0,0,0.8); z-index: 10000; display: flex;
+        align-items: center; justify-content: center;
+    `;
+    modal.innerHTML = `
+        <div style="background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); 
+                    padding: 2rem; border-radius: 20px; text-align: center; 
+                    border: 1px solid rgba(255, 255, 255, 0.1); max-width: 400px; margin: 0 1rem;">
+            <div style="color: #10B981; font-size: 3rem; margin-bottom: 1rem;">✓</div>
+            <h3 style="color: #fbbf24; margin-bottom: 1rem;">Success!</h3>
+            <p style="color: #cccccc; margin-bottom: 2rem;">${message}</p>
+            <button onclick="this.closest('.modal').remove()" 
+                    style="background: #fbbf24; border: none; padding: 0.75rem 2rem; 
+                           border-radius: 8px; color: #000; font-weight: 600; cursor: pointer;">
+                Close
+            </button>
+        </div>
+    `;
+    modal.className = 'modal';
+    document.body.appendChild(modal);
+    
+    // Auto-close after 5 seconds
+    setTimeout(() => {
+        if (modal.parentNode) {
+            modal.remove();
+        }
+    }, 5000);
+}
 
 // Smooth scrolling for anchor links
 document.querySelectorAll('a[href^="#"]').forEach(anchor => {
