@@ -119,6 +119,7 @@ class TauOSMobileLanding {
         switch (appId) {
             case 'camera':
                 this.showScreen('camera-screen');
+                this.initCamera();
                 break;
             case 'messages':
                 this.showScreen('messages-screen');
@@ -137,6 +138,19 @@ class TauOSMobileLanding {
                 break;
             case 'gallery':
                 this.showScreen('gallery-screen');
+                this.loadGallery();
+                break;
+            case 'maps':
+                this.showScreen('maps-screen');
+                break;
+            case 'weather':
+                this.showScreen('weather-screen');
+                break;
+            case 'notes':
+                this.showScreen('notes-screen');
+                break;
+            case 'settings':
+                this.showScreen('settings-screen');
                 break;
             case 'terminal':
                 this.openTerminal();
@@ -259,6 +273,248 @@ class TauOSMobileLanding {
             this.showScreen('terminal-screen');
         }
     }
+
+    // Camera functionality
+    initCamera() {
+        const video = document.getElementById('camera-video');
+        if (video && navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+            navigator.mediaDevices.getUserMedia({ video: true })
+                .then(stream => {
+                    video.srcObject = stream;
+                    this.cameraStream = stream;
+                })
+                .catch(err => {
+                    console.log('Camera access denied:', err);
+                    // Show placeholder for demo
+                    video.style.background = 'linear-gradient(45deg, #333, #666)';
+                    video.innerHTML = '<div style="display: flex; align-items: center; justify-content: center; height: 100%; color: white; font-size: 18px;">📷 Camera Demo</div>';
+                });
+        }
+    }
+
+    switchCamera() {
+        // Toggle between front and back camera
+        if (this.cameraStream) {
+            this.cameraStream.getTracks().forEach(track => track.stop());
+        }
+        this.initCamera();
+    }
+
+    capturePhoto() {
+        const video = document.getElementById('camera-video');
+        const canvas = document.getElementById('camera-canvas');
+        const galleryGrid = document.getElementById('gallery-grid');
+        
+        if (video && canvas) {
+            const context = canvas.getContext('2d');
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            context.drawImage(video, 0, 0);
+            
+            // Convert to data URL
+            const dataURL = canvas.toDataURL('image/png');
+            
+            // Save to gallery
+            this.savePhotoToGallery(dataURL);
+            
+            // Show success animation
+            this.showCaptureAnimation();
+        }
+    }
+
+    savePhotoToGallery(dataURL) {
+        const gallery = JSON.parse(localStorage.getItem('tauosGallery') || '[]');
+        const photo = {
+            id: Date.now(),
+            dataURL: dataURL,
+            timestamp: new Date().toISOString(),
+            likes: 0,
+            shares: 0
+        };
+        
+        gallery.unshift(photo);
+        localStorage.setItem('tauosGallery', JSON.stringify(gallery));
+        
+        // Update gallery display
+        this.loadGallery();
+    }
+
+    loadGallery() {
+        const galleryGrid = document.getElementById('gallery-grid');
+        const galleryGridLarge = document.getElementById('gallery-grid-large');
+        const gallery = JSON.parse(localStorage.getItem('tauosGallery') || '[]');
+        
+        if (galleryGrid) {
+            galleryGrid.innerHTML = '';
+            gallery.forEach(photo => {
+                const item = document.createElement('div');
+                item.className = 'gallery-item';
+                item.innerHTML = `<img src="${photo.dataURL}" alt="Photo ${photo.id}">`;
+                item.onclick = () => this.viewPhoto(photo);
+                galleryGrid.appendChild(item);
+            });
+        }
+        
+        if (galleryGridLarge) {
+            galleryGridLarge.innerHTML = '';
+            gallery.slice(0, 12).forEach(photo => {
+                const item = document.createElement('div');
+                item.className = 'gallery-item-large';
+                item.innerHTML = `<img src="${photo.dataURL}" alt="Photo ${photo.id}">`;
+                item.onclick = () => this.viewPhoto(photo);
+                galleryGridLarge.appendChild(item);
+            });
+        }
+    }
+
+    viewPhoto(photo) {
+        // Open photo in fullscreen modal
+        const modal = document.createElement('div');
+        modal.style.cssText = `
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.9); z-index: 10000; display: flex;
+            align-items: center; justify-content: center; cursor: pointer;
+        `;
+        modal.innerHTML = `
+            <div style="max-width: 90%; max-height: 90%; position: relative;">
+                <img src="${photo.dataURL}" style="max-width: 100%; max-height: 100%; border-radius: 12px;">
+                <div style="position: absolute; top: 20px; right: 20px; background: rgba(0,0,0,0.7); padding: 10px; border-radius: 8px;">
+                    <button onclick="sharePhoto(${photo.id})" style="background: #fbbf24; border: none; padding: 8px 16px; border-radius: 6px; margin-right: 10px; cursor: pointer;">Share</button>
+                    <button onclick="this.closest('.modal').remove()" style="background: #666; border: none; padding: 8px 16px; border-radius: 6px; color: white; cursor: pointer;">Close</button>
+                </div>
+            </div>
+        `;
+        modal.className = 'modal';
+        modal.onclick = (e) => {
+            if (e.target === modal) modal.remove();
+        };
+        document.body.appendChild(modal);
+    }
+
+    showCaptureAnimation() {
+        // Show capture flash animation
+        const flash = document.createElement('div');
+        flash.style.cssText = `
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: white; z-index: 9999; opacity: 0.8;
+            pointer-events: none;
+        `;
+        document.body.appendChild(flash);
+        
+        setTimeout(() => {
+            flash.style.transition = 'opacity 0.3s ease';
+            flash.style.opacity = '0';
+            setTimeout(() => flash.remove(), 300);
+        }, 100);
+    }
+
+    // Social media sharing functions
+    shareToTwitter() {
+        const text = "Just tried TauOS Mobile! The privacy-first mobile OS is incredible! 📱✨ #TauOSMobile @TauOS";
+        const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`;
+        window.open(url, '_blank');
+    }
+
+    shareToFacebook() {
+        const text = "Just tried TauOS Mobile! The privacy-first mobile OS is incredible!";
+        const url = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.href)}&quote=${encodeURIComponent(text)}`;
+        window.open(url, '_blank');
+    }
+
+    shareToInstagram() {
+        alert('Share your TauOS Mobile photo on Instagram and tag @TauOS with #TauOSMobile to enter our weekly contest!');
+    }
+
+    shareGallery() {
+        const gallery = JSON.parse(localStorage.getItem('tauosGallery') || '[]');
+        if (gallery.length === 0) {
+            alert('No photos to share! Take some photos first.');
+            return;
+        }
+        
+        const latestPhoto = gallery[0];
+        this.viewPhoto(latestPhoto);
+    }
+
+    // Other app functions
+    newMessage() {
+        alert('New message feature coming soon!');
+    }
+
+    openChat(contactName) {
+        alert(`Opening chat with ${contactName}...`);
+    }
+
+    searchLocation() {
+        const search = document.getElementById('maps-search').value;
+        if (search) {
+            alert(`Searching for "${search}" on maps...`);
+        }
+    }
+
+    getCurrentLocation() {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                position => {
+                    alert(`Location: ${position.coords.latitude}, ${position.coords.longitude}`);
+                },
+                error => {
+                    alert('Location access denied or unavailable');
+                }
+            );
+        } else {
+            alert('Geolocation not supported');
+        }
+    }
+
+    refreshWeather() {
+        alert('Refreshing weather data...');
+    }
+
+    newNote() {
+        const title = prompt('Note title:');
+        if (title) {
+            const content = prompt('Note content:');
+            if (content) {
+                const notes = JSON.parse(localStorage.getItem('tauosNotes') || '[]');
+                notes.unshift({
+                    id: Date.now(),
+                    title: title,
+                    content: content,
+                    timestamp: new Date().toISOString()
+                });
+                localStorage.setItem('tauosNotes', JSON.stringify(notes));
+                this.loadNotes();
+            }
+        }
+    }
+
+    openNote(noteId) {
+        const notes = JSON.parse(localStorage.getItem('tauosNotes') || '[]');
+        const note = notes.find(n => n.id === noteId);
+        if (note) {
+            alert(`Note: ${note.title}\n\n${note.content}`);
+        }
+    }
+
+    loadNotes() {
+        const notesList = document.getElementById('notes-list');
+        if (notesList) {
+            const notes = JSON.parse(localStorage.getItem('tauosNotes') || '[]');
+            notesList.innerHTML = '';
+            notes.forEach(note => {
+                const item = document.createElement('div');
+                item.className = 'note-item';
+                item.onclick = () => this.openNote(note.id);
+                item.innerHTML = `
+                    <div class="note-title">${note.title}</div>
+                    <div class="note-preview">${note.content.substring(0, 50)}...</div>
+                    <div class="note-date">${new Date(note.timestamp).toLocaleDateString()}</div>
+                `;
+                notesList.appendChild(item);
+            });
+        }
+    }
 }
 
 // Landing page specific functions
@@ -276,9 +532,101 @@ function scrollToFeatures() {
     }
 }
 
+// Global functions for social media sharing
+function shareToTwitter() {
+    const text = "Just tried TauOS Mobile! The privacy-first mobile OS is incredible! 📱✨ #TauOSMobile @TauOS";
+    const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`;
+    window.open(url, '_blank');
+}
+
+function shareToFacebook() {
+    const text = "Just tried TauOS Mobile! The privacy-first mobile OS is incredible!";
+    const url = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.href)}&quote=${encodeURIComponent(text)}`;
+    window.open(url, '_blank');
+}
+
+function shareToInstagram() {
+    alert('Share your TauOS Mobile photo on Instagram and tag @TauOS with #TauOSMobile to enter our weekly contest!');
+}
+
+function sharePhoto(photoId) {
+    const gallery = JSON.parse(localStorage.getItem('tauosGallery') || '[]');
+    const photo = gallery.find(p => p.id === photoId);
+    if (photo) {
+        const text = "Check out this photo I took with TauOS Mobile! 📱✨ #TauOSMobile @TauOS";
+        const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`;
+        window.open(url, '_blank');
+    }
+}
+
+// Global functions for app functionality
+function switchCamera() {
+    if (window.tauOSMobile) {
+        window.tauOSMobile.switchCamera();
+    }
+}
+
+function capturePhoto() {
+    if (window.tauOSMobile) {
+        window.tauOSMobile.capturePhoto();
+    }
+}
+
+function toggleVideo() {
+    alert('Video recording feature coming soon!');
+}
+
+function shareGallery() {
+    if (window.tauOSMobile) {
+        window.tauOSMobile.shareGallery();
+    }
+}
+
+function newMessage() {
+    if (window.tauOSMobile) {
+        window.tauOSMobile.newMessage();
+    }
+}
+
+function openChat(contactName) {
+    if (window.tauOSMobile) {
+        window.tauOSMobile.openChat(contactName);
+    }
+}
+
+function searchLocation() {
+    if (window.tauOSMobile) {
+        window.tauOSMobile.searchLocation();
+    }
+}
+
+function getCurrentLocation() {
+    if (window.tauOSMobile) {
+        window.tauOSMobile.getCurrentLocation();
+    }
+}
+
+function refreshWeather() {
+    if (window.tauOSMobile) {
+        window.tauOSMobile.refreshWeather();
+    }
+}
+
+function newNote() {
+    if (window.tauOSMobile) {
+        window.tauOSMobile.newNote();
+    }
+}
+
+function openNote(noteId) {
+    if (window.tauOSMobile) {
+        window.tauOSMobile.openNote(noteId);
+    }
+}
+
 // Initialize when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
-    new TauOSMobileLanding();
+    window.tauOSMobile = new TauOSMobileLanding();
 });
 
 // Smooth scrolling for anchor links

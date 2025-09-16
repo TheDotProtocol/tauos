@@ -9,6 +9,24 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 </head>
 <body>
+    <!-- Header Navigation -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <img src="brand/tauos-logo.svg" alt="TauOS" class="logo-img">
+                    <span class="logo-text">TauOS</span>
+                </div>
+                <nav class="nav">
+                    <a href="#features" class="nav-link">Features</a>
+                    <a href="#phone" class="nav-link">Try Mobile</a>
+                    <a href="#gallery" class="nav-link">Gallery</a>
+                    <a href="#social" class="nav-link">Social</a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
     <!-- Hero Section -->
     <div class="hero-section">
         <div class="hero-content">
@@ -35,7 +53,7 @@
             </div>
             
             <!-- Phone Showcase -->
-            <div class="phone-showcase">
+            <div class="phone-showcase" id="phone">
                 <div class="phone-frame">
                     <!-- Status Bar -->
                     <div class="status-bar">
@@ -286,7 +304,55 @@
                             </div>
                         </div>
 
-                        <!-- Other app screens would go here -->
+                        <!-- Camera Screen -->
+                        <div class="screen camera-screen" id="camera-screen">
+                            <div class="camera-header">
+                                <button class="back-btn" onclick="showScreen('home-screen')">
+                                    <i class="fas fa-arrow-left"></i>
+                                </button>
+                                <h2>Camera</h2>
+                                <button class="switch-camera-btn" onclick="switchCamera()">
+                                    <i class="fas fa-sync-alt"></i>
+                                </button>
+                            </div>
+                            
+                            <div class="camera-viewfinder">
+                                <video id="camera-video" autoplay muted></video>
+                                <canvas id="camera-canvas" style="display: none;"></canvas>
+                                <div class="camera-overlay">
+                                    <div class="camera-grid"></div>
+                                </div>
+                            </div>
+                            
+                            <div class="camera-controls">
+                                <button class="camera-btn gallery-btn" onclick="showScreen('gallery-screen')">
+                                    <i class="fas fa-images"></i>
+                                </button>
+                                <button class="camera-btn capture-btn" onclick="capturePhoto()">
+                                    <i class="fas fa-camera"></i>
+                                </button>
+                                <button class="camera-btn video-btn" onclick="toggleVideo()">
+                                    <i class="fas fa-video"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Gallery Screen -->
+                        <div class="screen gallery-screen" id="gallery-screen">
+                            <div class="gallery-header">
+                                <button class="back-btn" onclick="showScreen('home-screen')">
+                                    <i class="fas fa-arrow-left"></i>
+                                </button>
+                                <h2>Gallery</h2>
+                                <button class="share-btn" onclick="shareGallery()">
+                                    <i class="fas fa-share"></i>
+                                </button>
+                            </div>
+                            
+                            <div class="gallery-grid" id="gallery-grid">
+                                <!-- Photos will be dynamically added here -->
+                            </div>
+                        </div>
                     </div>
 
                     <!-- Bottom Navigation -->
@@ -346,6 +412,55 @@
                     <h3>Smartphone Features</h3>
                     <p>Complete smartphone experience with camera, messaging, contacts, and more.</p>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Social Media Campaign Section -->
+    <div class="social-campaign-section" id="social">
+        <div class="container">
+            <h2 class="section-title">🎉 Weekly Social Media Contest!</h2>
+            <div class="campaign-content">
+                <div class="campaign-info">
+                    <h3>Win 100GB Free Storage for 1 Year!</h3>
+                    <p>Share your TauOS Mobile experience and enter our weekly contest</p>
+                </div>
+                
+                <div class="social-actions">
+                    <button class="social-btn twitter" onclick="shareToTwitter()">
+                        <i class="fab fa-twitter"></i>
+                        Share on Twitter
+                    </button>
+                    <button class="social-btn facebook" onclick="shareToFacebook()">
+                        <i class="fab fa-facebook"></i>
+                        Share on Facebook
+                    </button>
+                    <button class="social-btn instagram" onclick="shareToInstagram()">
+                        <i class="fab fa-instagram"></i>
+                        Share on Instagram
+                    </button>
+                </div>
+                
+                <div class="contest-rules">
+                    <h4>How to Enter:</h4>
+                    <ol>
+                        <li>Take a photo with TauOS Mobile Camera</li>
+                        <li>Share it on social media</li>
+                        <li>Tag @TauOS and use #TauOSMobile</li>
+                        <li>Winner announced every Friday!</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Gallery Section -->
+    <div class="gallery-section" id="gallery">
+        <div class="container">
+            <h2 class="section-title">Community Gallery</h2>
+            <p class="section-subtitle">Photos shared by TauOS Mobile users</p>
+            <div class="gallery-grid-large" id="gallery-grid-large">
+                <!-- Community photos will be loaded here -->
             </div>
         </div>
     </div>
