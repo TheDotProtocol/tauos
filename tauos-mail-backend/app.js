@@ -108,7 +108,18 @@ app.use(helmet({
 }));
 
 app.use(cors({
-    origin: ['http://localhost:3000', 'http://localhost:3006', 'http://localhost:3007'],
+    origin: [
+        'http://localhost:3000', 
+        'http://localhost:3006', 
+        'http://localhost:3007',
+        'https://www.tauos.org',
+        'https://tauos.org',
+        'https://cloud.tauos.org',
+        'https://mail.tauos.org',
+        'https://id.tauos.org',
+        'https://store.tauos.org',
+        'https://browser.tauos.org'
+    ],
     credentials: true
 }));
 
