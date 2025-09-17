@@ -28,6 +28,7 @@ import {
   Network,
   HardDrive,
   Cpu,
+  Play,
   Battery,
   Wifi,
   Signal,

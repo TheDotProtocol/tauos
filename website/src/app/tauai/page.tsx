@@ -9,7 +9,7 @@ import {
   Mic,
   Eye,
   Brain,
-  Sync,
+  RefreshCw,
   Shield,
   ArrowRight,
   Check,
@@ -84,7 +84,7 @@ export default function TauAIPage() {
       id: 'tausync',
       name: 'TauSync',
       description: 'Intelligent data synchronization',
-      icon: Sync,
+      icon: RefreshCw,
       color: 'text-green-400',
       bg: 'bg-green-500/20',
       features: ['Smart Sync', 'Conflict Resolution', 'Data Integrity', 'Cross-Platform']

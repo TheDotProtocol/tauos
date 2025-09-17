@@ -31,7 +31,6 @@ import {
   Music,
   Video,
   Archive,
-  Sparkles,
   ArrowRight,
   Terminal,
   Cpu,

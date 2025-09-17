@@ -28,6 +28,7 @@ import {
   User,
   ChevronRight,
   ChevronDown,
+  Play,
   MoreHorizontal,
   X,
   Check,
