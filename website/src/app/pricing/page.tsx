@@ -86,25 +86,49 @@ export default function PricingPage() {
     {
       name: 'Extra Storage',
       description: 'Additional storage for your team',
-      price: { monthly: 10, yearly: 100 },
+      price: { monthly: 2, yearly: 20 },
       unit: 'per 100GB/month'
     },
     {
       name: 'Dedicated Relay',
       description: 'Private email infrastructure',
-      price: { monthly: 25, yearly: 250 },
+      price: { monthly: 15, yearly: 150 },
       unit: 'per month'
     },
     {
       name: 'Compliance Pack',
       description: 'GDPR, SOC 2, ISO 27001 compliance',
-      price: { monthly: 50, yearly: 500 },
+      price: { monthly: 25, yearly: 250 },
       unit: 'per month'
     },
     {
       name: 'Premium Support',
       description: 'Priority support with SLA guarantees',
-      price: { monthly: 30, yearly: 300 },
+      price: { monthly: 20, yearly: 200 },
+      unit: 'per month'
+    },
+    {
+      name: 'TauAI Pro',
+      description: 'Advanced AI features and voice commands',
+      price: { monthly: 10, yearly: 100 },
+      unit: 'per user/month'
+    },
+    {
+      name: 'Custom Branding',
+      description: 'White-label customization and branding',
+      price: { monthly: 50, yearly: 500 },
+      unit: 'one-time setup'
+    },
+    {
+      name: 'API Access',
+      description: 'Advanced API access and webhooks',
+      price: { monthly: 5, yearly: 50 },
+      unit: 'per month'
+    },
+    {
+      name: 'Backup & Recovery',
+      description: 'Automated backups and disaster recovery',
+      price: { monthly: 8, yearly: 80 },
       unit: 'per month'
     }
   ];

@@ -91,7 +91,7 @@ import {
 } from 'lucide-react';
 
 export default function MDMDashboard() {
-  const [activeTab, setActiveTab] = useState('devices');
+  const [activeTab, setActiveTab] = useState('overview');
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedDevices, setSelectedDevices] = useState<string[]>([]);
 
@@ -336,6 +336,7 @@ export default function MDMDashboard() {
         {/* Navigation Tabs */}
         <div className="flex space-x-1 bg-gray-900/30 backdrop-blur-sm border border-gray-800 rounded-xl p-1 mb-8">
           {[
+            { id: 'overview', label: 'Overview', icon: Globe },
             { id: 'devices', label: 'Devices', icon: Smartphone },
             { id: 'policies', label: 'Policies', icon: Shield },
             { id: 'security', label: 'Security', icon: Lock },
@@ -358,6 +359,99 @@ export default function MDMDashboard() {
 
         {/* Content Area */}
         <div className="space-y-8">
+          {activeTab === 'overview' && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+            >
+              {/* Hero Section */}
+              <div className="text-center mb-12">
+                <h1 className="text-4xl font-bold mb-4 bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">
+                  TauOS Mobile Device Management
+                </h1>
+                <p className="text-xl text-gray-300 mb-8 max-w-3xl mx-auto">
+                  Comprehensive device management and security for enterprise environments. 
+                  Deploy, monitor, and secure all your TauOS devices from a single dashboard.
+                </p>
+                <div className="flex flex-wrap justify-center gap-4">
+                  <button className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-yellow-400 to-orange-500 text-black rounded-lg font-semibold hover:shadow-lg hover:shadow-yellow-400/25 transition-all duration-200">
+                    <Download className="w-4 h-4" />
+                    Start Free Trial
+                  </button>
+                  <button className="flex items-center gap-2 px-6 py-3 border border-yellow-400 text-yellow-400 rounded-lg font-semibold hover:bg-yellow-400 hover:text-black transition-all duration-200">
+                    <Play className="w-4 h-4" />
+                    Watch Demo
+                  </button>
+                </div>
+              </div>
+
+              {/* Features Grid */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
+                <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-6">
+                  <Shield className="w-12 h-12 text-green-400 mb-4" />
+                  <h3 className="text-xl font-bold mb-3 text-white">Device Security</h3>
+                  <p className="text-gray-400">
+                    End-to-end encryption, remote wipe, and compliance monitoring to keep your devices secure.
+                  </p>
+                </div>
+                <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-6">
+                  <Settings className="w-12 h-12 text-blue-400 mb-4" />
+                  <h3 className="text-xl font-bold mb-3 text-white">Policy Management</h3>
+                  <p className="text-gray-400">
+                    Create and deploy security policies across all devices with granular control and automation.
+                  </p>
+                </div>
+                <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-6">
+                  <BarChart3 className="w-12 h-12 text-purple-400 mb-4" />
+                  <h3 className="text-xl font-bold mb-3 text-white">Analytics & Reporting</h3>
+                  <p className="text-gray-400">
+                    Real-time insights and compliance reports to track device health and security posture.
+                  </p>
+                </div>
+                <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-6">
+                  <Users className="w-12 h-12 text-yellow-400 mb-4" />
+                  <h3 className="text-xl font-bold mb-3 text-white">User Management</h3>
+                  <p className="text-gray-400">
+                    Role-based access control and user provisioning for seamless team management.
+                  </p>
+                </div>
+                <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-6">
+                  <Lock className="w-12 h-12 text-red-400 mb-4" />
+                  <h3 className="text-xl font-bold mb-3 text-white">Compliance</h3>
+                  <p className="text-gray-400">
+                    GDPR, HIPAA, and SOC 2 compliance tools to meet enterprise security requirements.
+                  </p>
+                </div>
+                <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-6">
+                  <Zap className="w-12 h-12 text-orange-400 mb-4" />
+                  <h3 className="text-xl font-bold mb-3 text-white">Automation</h3>
+                  <p className="text-gray-400">
+                    Automated device provisioning, updates, and security responses for efficient operations.
+                  </p>
+                </div>
+              </div>
+
+              {/* CTA Section */}
+              <div className="text-center bg-gradient-to-r from-yellow-400/10 to-orange-500/10 border border-yellow-400/20 rounded-xl p-8">
+                <h2 className="text-3xl font-bold mb-4 text-white">Ready to Secure Your Devices?</h2>
+                <p className="text-lg text-gray-300 mb-8 max-w-2xl mx-auto">
+                  Get started with TauOS MDM and experience enterprise-grade device management with privacy-first design.
+                </p>
+                <div className="flex flex-wrap justify-center gap-4">
+                  <button className="flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-yellow-400 to-orange-500 text-black rounded-lg font-semibold text-lg hover:shadow-lg hover:shadow-yellow-400/25 transition-all duration-200">
+                    <Download className="w-5 h-5" />
+                    Start Free Trial
+                  </button>
+                  <button className="flex items-center gap-2 px-8 py-4 border border-yellow-400 text-yellow-400 rounded-lg font-semibold text-lg hover:bg-yellow-400 hover:text-black transition-all duration-200">
+                    <Play className="w-5 h-5" />
+                    Schedule Demo
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          )}
+
           {activeTab === 'devices' && (
             <motion.div
               initial={{ opacity: 0, y: 20 }}

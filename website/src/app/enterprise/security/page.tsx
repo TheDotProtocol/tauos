@@ -406,6 +406,73 @@ export default function SecurityDashboard() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5 }}
             >
+              {/* Hero Section */}
+              <div className="text-center mb-12">
+                <h1 className="text-4xl font-bold mb-4 bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">
+                  TauOS Enterprise Security
+                </h1>
+                <p className="text-xl text-gray-300 mb-8 max-w-3xl mx-auto">
+                  Advanced security monitoring and threat protection for enterprise environments. 
+                  Comprehensive compliance and audit tools to keep your organization secure.
+                </p>
+                <div className="flex flex-wrap justify-center gap-4">
+                  <button className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-yellow-400 to-orange-500 text-black rounded-lg font-semibold hover:shadow-lg hover:shadow-yellow-400/25 transition-all duration-200">
+                    <Download className="w-4 h-4" />
+                    Start Free Trial
+                  </button>
+                  <button className="flex items-center gap-2 px-6 py-3 border border-yellow-400 text-yellow-400 rounded-lg font-semibold hover:bg-yellow-400 hover:text-black transition-all duration-200">
+                    <Play className="w-4 h-4" />
+                    Watch Demo
+                  </button>
+                </div>
+              </div>
+
+              {/* Features Grid */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
+                <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-6">
+                  <Shield className="w-12 h-12 text-green-400 mb-4" />
+                  <h3 className="text-xl font-bold mb-3 text-white">Threat Detection</h3>
+                  <p className="text-gray-400">
+                    Real-time threat monitoring and AI-powered security analysis to detect and prevent attacks.
+                  </p>
+                </div>
+                <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-6">
+                  <CheckCircle className="w-12 h-12 text-blue-400 mb-4" />
+                  <h3 className="text-xl font-bold mb-3 text-white">Compliance Management</h3>
+                  <p className="text-gray-400">
+                    Automated compliance monitoring for GDPR, HIPAA, SOC 2, and other regulatory requirements.
+                  </p>
+                </div>
+                <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-6">
+                  <FileText className="w-12 h-12 text-purple-400 mb-4" />
+                  <h3 className="text-xl font-bold mb-3 text-white">Audit Trail</h3>
+                  <p className="text-gray-400">
+                    Comprehensive logging and audit trails for complete security event tracking and analysis.
+                  </p>
+                </div>
+                <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-6">
+                  <Lock className="w-12 h-12 text-red-400 mb-4" />
+                  <h3 className="text-xl font-bold mb-3 text-white">Access Control</h3>
+                  <p className="text-gray-400">
+                    Role-based access control and identity management for secure user authentication.
+                  </p>
+                </div>
+                <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-6">
+                  <Activity className="w-12 h-12 text-yellow-400 mb-4" />
+                  <h3 className="text-xl font-bold mb-3 text-white">Security Analytics</h3>
+                  <p className="text-gray-400">
+                    Advanced analytics and reporting to track security metrics and identify trends.
+                  </p>
+                </div>
+                <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-6">
+                  <Zap className="w-12 h-12 text-orange-400 mb-4" />
+                  <h3 className="text-xl font-bold mb-3 text-white">Incident Response</h3>
+                  <p className="text-gray-400">
+                    Automated incident response and security workflow automation for rapid threat mitigation.
+                  </p>
+                </div>
+              </div>
+
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 {/* Recent Security Events */}
                 <div className="p-6 bg-gray-900/30 backdrop-blur-sm border border-gray-800 rounded-2xl">
