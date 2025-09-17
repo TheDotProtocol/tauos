@@ -332,7 +332,16 @@
     
     <div class="container">
         <div class="header">
-            <div class="logo">τ</div>
+            <div class="logo">
+            <svg width="80" height="80" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="50" cy="50" r="45" fill="#6366f1" opacity="0.1"/>
+                <path d="M30 30h40v10H30V30z" fill="#6366f1"/>
+                <path d="M35 45h30v10H35V45z" fill="#6366f1"/>
+                <path d="M40 60h20v10H40V60z" fill="#6366f1"/>
+                <circle cx="50" cy="50" r="8" fill="#6366f1"/>
+                <text x="50" y="55" text-anchor="middle" fill="white" font-family="Arial" font-size="12" font-weight="bold">τ</text>
+            </svg>
+        </div>
             <div class="wake-word">"Tau"</div>
             <div class="subtitle">Privacy-Native AI Operating System</div>
             <div class="tagline">
@@ -638,10 +647,8 @@
             alert('TauFlow - Workflow Automation\n\nComing soon! This will include:\n• Smart routine automation\n• Context-aware task switching\n• Intelligent prioritization\n• Energy management');
         }
 
-        // Initialize TauAI System when page loads
-        document.addEventListener('DOMContentLoaded', () => {
-            window.tauAI = new TauAISystem();
-        });
+        // Redirect to the new landing page
+        window.location.href = 'tauai-landing.html';
     </script>
 </body>
 </html>
