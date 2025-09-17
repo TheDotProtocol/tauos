@@ -44,6 +44,7 @@ export default function TauAIPage() {
   const [isListening, setIsListening] = useState(false);
   const [transcript, setTranscript] = useState('');
   const [response, setResponse] = useState('');
+  const [showDemo, setShowDemo] = useState(false);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -206,6 +207,13 @@ export default function TauAIPage() {
                 <Play className="w-5 h-5" />
                 Watch Demo
               </button>
+              <button
+                onClick={() => setShowDemo(!showDemo)}
+                className="flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-purple-400 to-purple-600 text-white rounded-lg font-semibold text-lg hover:shadow-lg hover:shadow-purple-400/25 transition-all duration-200"
+              >
+                <Terminal className="w-5 h-5" />
+                {showDemo ? 'Hide AI Interface' : 'Try AI Interface'}
+              </button>
             </div>
 
             {/* Voice Demo Section */}
@@ -239,6 +247,30 @@ export default function TauAIPage() {
           </motion.div>
         </div>
       </div>
+
+      {/* AI Interface Demo */}
+      {showDemo && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16"
+        >
+          <div className="bg-gray-900/50 border border-gray-800 rounded-xl overflow-hidden">
+            <div className="h-8 bg-gray-800 flex items-center px-4 space-x-2">
+              <div className="w-3 h-3 bg-red-500 rounded-full"></div>
+              <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
+              <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+            </div>
+            <div className="h-[600px]">
+              <iframe
+                src="/tauai/tauai-landing.html"
+                className="w-full h-full border-0"
+                title="TauAI Interface Demo"
+              />
+            </div>
+          </div>
+        </motion.div>
+      )}
 
       {/* AI Modules Grid */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
