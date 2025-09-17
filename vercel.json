@@ -46,11 +46,33 @@
     },
     {
       "source": "/",
-      "destination": "https://tauos-browser-backend.vercel.app",
+      "destination": "https://tauos-nmlq.vercel.app",
       "has": [
         {
           "type": "host",
           "value": "browser.tauos.org"
+        }
+      ],
+      "permanent": false
+    },
+    {
+      "source": "/",
+      "destination": "https://tauos-desktop-demo.vercel.app",
+      "has": [
+        {
+          "type": "host",
+          "value": "desktop.tauos.org"
+        }
+      ],
+      "permanent": false
+    },
+    {
+      "source": "/",
+      "destination": "https://tauos-mobile-demo.vercel.app",
+      "has": [
+        {
+          "type": "host",
+          "value": "mobile.tauos.org"
         }
       ],
       "permanent": false
