@@ -265,6 +265,10 @@ export default function TauOSLandingPage() {
                       <div className="font-medium text-white">Governance</div>
                       <div className="text-sm text-gray-400">Foundation & structure</div>
                     </a>
+                    <a href="/investors" className="p-3 rounded-lg hover:bg-gray-800/50 transition-colors">
+                      <div className="font-medium text-white">Investors</div>
+                      <div className="text-sm text-gray-400">Financials & growth</div>
+                    </a>
                   </div>
                 </div>
               </div>
