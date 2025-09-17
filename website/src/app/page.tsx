@@ -18,6 +18,7 @@ import {
   Monitor,
   Eye,
   Zap,
+  Sparkles,
   Palette,
   Users,
   Lock,
@@ -213,6 +214,13 @@ export default function TauOSLandingPage() {
                         <div>
                           <div className="font-medium text-white">TauBrowser</div>
                           <div className="text-sm text-gray-400">🔄 In Development - Privacy browser</div>
+                        </div>
+                      </a>
+                      <a href="/tauai" className="flex items-center space-x-3 p-2 rounded-lg hover:bg-gray-800/50 transition-colors">
+                        <Sparkles className="w-5 h-5 text-yellow-400" />
+                        <div>
+                          <div className="font-medium text-white">TauAI</div>
+                          <div className="text-sm text-gray-400">✅ Working - Privacy-native AI</div>
                         </div>
                       </a>
                     </div>
@@ -414,6 +422,11 @@ export default function TauOSLandingPage() {
               <a href="/taucloud" className="flex items-center space-x-3 border-2 border-green-400/30 text-green-400 px-8 py-4 rounded-xl font-bold text-lg hover:bg-green-400/10 transition-all duration-300">
                 <Cloud className="w-6 h-6" />
                 <span>Open TauCloud</span>
+              </a>
+
+              <a href="/tauai" className="flex items-center space-x-3 border-2 border-yellow-400/30 text-yellow-400 px-8 py-4 rounded-xl font-bold text-lg hover:bg-yellow-400/10 transition-all duration-300">
+                <Sparkles className="w-6 h-6" />
+                <span>Try TauAI</span>
               </a>
             </motion.div>
 

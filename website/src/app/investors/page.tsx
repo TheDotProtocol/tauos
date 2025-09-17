@@ -725,21 +725,46 @@ export default function InvestorsPage() {
           <div className="text-center">
             <h3 className="text-2xl font-bold mb-4 text-yellow-400">Download Financial Reports</h3>
             <p className="text-gray-300 mb-6">
-              Access detailed financial models, projections, and investor materials
+              Access detailed financial models, projections, and investor materials with TauOS branding
             </p>
-            <div className="flex flex-wrap justify-center gap-4">
-              <button className="flex items-center gap-2 px-6 py-3 bg-yellow-400 text-black rounded-lg font-semibold hover:bg-yellow-500 transition-colors">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 max-w-6xl mx-auto">
+              <a href="/output/TauOS_Financials_Base.xlsx" download className="flex items-center gap-2 px-6 py-3 bg-yellow-400 text-black rounded-lg font-semibold hover:bg-yellow-500 transition-colors">
                 <Download className="w-4 h-4" />
-                Financial Model (Excel)
-              </button>
-              <button className="flex items-center gap-2 px-6 py-3 bg-gray-800 text-white rounded-lg font-semibold hover:bg-gray-700 transition-colors">
+                Base Case Financials (Excel)
+              </a>
+              <a href="/output/TauOS_Devices_Detail.xlsx" download className="flex items-center gap-2 px-6 py-3 bg-gray-800 text-white rounded-lg font-semibold hover:bg-gray-700 transition-colors">
                 <Download className="w-4 h-4" />
-                Investor Deck (PDF)
-              </button>
-              <button className="flex items-center gap-2 px-6 py-3 bg-gray-800 text-white rounded-lg font-semibold hover:bg-gray-700 transition-colors">
+                Device Sales Forecast (Excel)
+              </a>
+              <a href="/output/TauOS_Scenarios.xlsx" download className="flex items-center gap-2 px-6 py-3 bg-gray-800 text-white rounded-lg font-semibold hover:bg-gray-700 transition-colors">
                 <Download className="w-4 h-4" />
-                Business Plan (PDF)
-              </button>
+                Bear/Base/Bull Scenarios (Excel)
+              </a>
+              <a href="/output/TauOS_Valuation_Multiples.xlsx" download className="flex items-center gap-2 px-6 py-3 bg-gray-800 text-white rounded-lg font-semibold hover:bg-gray-700 transition-colors">
+                <Download className="w-4 h-4" />
+                Valuation Multiples (Excel)
+              </a>
+              <a href="/output/TauOS_Valuation_Sensitivity.xlsx" download className="flex items-center gap-2 px-6 py-3 bg-gray-800 text-white rounded-lg font-semibold hover:bg-gray-700 transition-colors">
+                <Download className="w-4 h-4" />
+                Valuation Sensitivity (Excel)
+              </a>
+              <a href="/output/TauOS_DCF.xlsx" download className="flex items-center gap-2 px-6 py-3 bg-gray-800 text-white rounded-lg font-semibold hover:bg-gray-700 transition-colors">
+                <Download className="w-4 h-4" />
+                DCF Analysis (Excel)
+              </a>
+            </div>
+            <div className="mt-6">
+              <h4 className="text-lg font-semibold mb-3 text-white">Financial Charts & Visuals</h4>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                <a href="/output/device_revenue_gp.png" download className="text-sm text-yellow-400 hover:text-yellow-300">Device Revenue & GP</a>
+                <a href="/output/revenue_vs_ebitda_base.png" download className="text-sm text-yellow-400 hover:text-yellow-300">Revenue vs EBITDA</a>
+                <a href="/output/revenue_mix_device_software.png" download className="text-sm text-yellow-400 hover:text-yellow-300">Revenue Mix</a>
+                <a href="/output/opex_split_pie.png" download className="text-sm text-yellow-400 hover:text-yellow-300">OPEX Breakdown</a>
+                <a href="/output/revenue_scenarios.png" download className="text-sm text-yellow-400 hover:text-yellow-300">Revenue Scenarios</a>
+                <a href="/output/ebitda_scenarios.png" download className="text-sm text-yellow-400 hover:text-yellow-300">EBITDA Scenarios</a>
+                <a href="/output/valuation_sensitivity.png" download className="text-sm text-yellow-400 hover:text-yellow-300">Valuation Sensitivity</a>
+                <a href="/output/TauOS_Investor_Summary.md" download className="text-sm text-yellow-400 hover:text-yellow-300">Investor Summary</a>
+              </div>
             </div>
           </div>
         </div>
