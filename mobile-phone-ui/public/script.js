@@ -155,6 +155,9 @@ class TauOSMobileLanding {
             case 'terminal':
                 this.openTerminal();
                 break;
+            case 'tauai':
+                this.openTauAI();
+                break;
             default:
                 console.log(`Opening ${appId} app`);
         }
@@ -271,6 +274,17 @@ class TauOSMobileLanding {
         } else {
             // Fallback: show terminal in current window
             this.showScreen('terminal-screen');
+        }
+    }
+
+    openTauAI() {
+        // Open TauAI in fullscreen iframe
+        const tauaiWindow = window.open('http://localhost:3013', '_blank', 'fullscreen=yes');
+        if (tauaiWindow) {
+            tauaiWindow.focus();
+        } else {
+            // Fallback: show TauAI in current window
+            alert('TauAI - Privacy-Native AI Assistant\n\nJust say "Tau" to activate your AI assistant.\n\nFeatures:\n• Voice commands\n• Local processing\n• Privacy-first design\n• Real-time responses');
         }
     }
 

@@ -298,6 +298,12 @@ class TauOSDesktop {
                 url: 'https://tauos-browser-backend.vercel.app',
                 icon: 'globe',
                 description: 'Privacy-first web browser'
+            },
+            'tauai': {
+                name: 'TauAI',
+                url: 'http://localhost:3013',
+                icon: 'robot',
+                description: 'Privacy-native AI assistant'
             }
         };
 
