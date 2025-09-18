@@ -198,7 +198,7 @@ export default function InvestorsPage() {
             {/* CTA Buttons */}
             <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
               <a
-                href="/output/updated_investor/TauOS_Investor_Deck.pdf"
+                href="/TauOS_Financial_Model.xlsx"
                 className="inline-flex items-center gap-2 bg-gradient-to-r from-yellow-400 to-orange-500 text-black px-8 py-4 rounded-lg font-semibold hover:from-yellow-500 hover:to-orange-600 transition-all duration-200"
               >
                 <Download className="w-5 h-5" />
@@ -472,7 +472,7 @@ export default function InvestorsPage() {
           <p className="text-gray-300 mb-6">Join us in building the world's first Privacy-Native AI Operating System</p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <a
-              href="/output/updated_investor/TauOS_Investor_Deck.pdf"
+              href="/TauOS_Financial_Model.xlsx"
               className="inline-flex items-center gap-2 bg-gradient-to-r from-yellow-400 to-orange-500 text-black px-8 py-4 rounded-lg font-semibold hover:from-yellow-500 hover:to-orange-600 transition-all duration-200"
             >
               <Download className="w-5 h-5" />
