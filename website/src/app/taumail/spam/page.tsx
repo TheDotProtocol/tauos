@@ -38,7 +38,7 @@ export default function TauMailSpam() {
     setLoading(true);
     try {
       const token = localStorage.getItem('tauos_token');
-      const response = await fetch('https://tauos-47am.vercel.app/api/emails/spam', {
+      const response = await fetch('/api/taumail/emails/spam', {
         headers: {
           'Authorization': `Bearer ${token}`
         }

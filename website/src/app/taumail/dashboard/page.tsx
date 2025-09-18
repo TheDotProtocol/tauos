@@ -52,7 +52,7 @@ export default function TauMailDashboard() {
         return;
       }
       
-      const response = await fetch('https://tauos-47am.vercel.app/api/emails/inbox', {
+      const response = await fetch('/api/taumail/emails/inbox', {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -115,7 +115,7 @@ export default function TauMailDashboard() {
         return;
       }
       
-      const response = await fetch('https://tauos-47am.vercel.app/api/emails/sent', {
+      const response = await fetch('/api/taumail/emails/sent', {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -140,7 +140,7 @@ export default function TauMailDashboard() {
     
     try {
       const token = localStorage.getItem('tauos_token');
-      const response = await fetch('https://tauos-47am.vercel.app/api/emails/send', {
+      const response = await fetch('/api/taumail/emails/send', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
