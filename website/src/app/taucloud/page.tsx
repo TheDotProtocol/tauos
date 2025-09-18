@@ -39,7 +39,7 @@ export default function TauCloudLanding() {
     setLoading(true);
     
     try {
-      const response = await fetch('https://tauos-6skj.vercel.app/api/auth/login', {
+      const response = await fetch('/api/taucloud/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(loginData)
@@ -69,7 +69,7 @@ export default function TauCloudLanding() {
     setLoading(true);
     
     try {
-      const response = await fetch('https://tauos-6skj.vercel.app/api/auth/register', {
+      const response = await fetch('/api/taucloud/auth/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(registerData)
