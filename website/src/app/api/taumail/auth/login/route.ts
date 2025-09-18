@@ -21,7 +21,7 @@ export async function POST(request: NextRequest) {
 
     // Query user from database
     const result = await pool.query(
-      'SELECT id, username, email, password_hash, full_name, is_active FROM users WHERE email = $1',
+      'SELECT id, username, email, password_hash, is_active FROM users WHERE email = $1',
       [email]
     );
 
@@ -61,7 +61,7 @@ export async function POST(request: NextRequest) {
         id: user.id,
         username: user.username,
         email: user.email,
-        fullName: user.full_name
+        fullName: user.username // Use username as fullName if full_name doesn't exist
       }
     });
 
