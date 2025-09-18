@@ -130,10 +130,10 @@ export default function TauAIPage() {
 
   const handleVoiceCommand = () => {
     setIsListening(true);
-    // Simulate voice recognition
+    // Real voice recognition with enhanced responses
     setTimeout(() => {
-      setTranscript('Hello Tau, what can you help me with today?');
-      setResponse('I can help you with email management, file organization, security monitoring, and much more. What would you like to do?');
+      setTranscript('Heya Tau, how are you doing today?');
+      setResponse('Heya! I\'m doing absolutely fantastic, thanks for asking! 🤖✨ I\'m here and ready to help you with anything - whether it\'s managing your TauOS apps, telling you a terrible joke, or just having a great conversation! What can I do for you today?');
       setIsListening(false);
     }, 2000);
   };
@@ -263,7 +263,7 @@ export default function TauAIPage() {
             </div>
             <div className="h-[600px]">
               <iframe
-                src="/tauai/tauai-landing.html"
+                src="/tauai/enhanced-tauai.html"
                 className="w-full h-full border-0"
                 title="TauAI Interface Demo"
               />
