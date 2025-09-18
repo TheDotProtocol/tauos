@@ -191,28 +191,28 @@ export default function TauOSLandingPage() {
                         <Cloud className="w-5 h-5 text-green-400" />
                         <div>
                           <div className="font-medium text-white">TauCloud</div>
-                          <div className="text-sm text-gray-400">🔄 In Development - Encrypted storage</div>
+                          <div className="text-sm text-gray-400">✅ Complete - Encrypted storage</div>
                         </div>
                       </a>
                       <a href="/tauid" className="flex items-center space-x-3 p-2 rounded-lg hover:bg-gray-800/50 transition-colors">
                         <Shield className="w-5 h-5 text-purple-400" />
                         <div>
                           <div className="font-medium text-white">TauID</div>
-                          <div className="text-sm text-gray-400">🔄 In Development - Decentralized identity</div>
+                          <div className="text-sm text-gray-400">✅ Complete - Decentralized identity</div>
                         </div>
                       </a>
                       <a href="/taustore" className="flex items-center space-x-3 p-2 rounded-lg hover:bg-gray-800/50 transition-colors">
                         <Folder className="w-5 h-5 text-orange-400" />
                         <div>
                           <div className="font-medium text-white">TauStore</div>
-                          <div className="text-sm text-gray-400">🔄 In Development - Privacy-scored apps</div>
+                          <div className="text-sm text-gray-400">✅ Complete - Privacy-scored apps</div>
                         </div>
                       </a>
                       <a href="/taubrowser" className="flex items-center space-x-3 p-2 rounded-lg hover:bg-gray-800/50 transition-colors">
                         <Globe className="w-5 h-5 text-cyan-400" />
                         <div>
                           <div className="font-medium text-white">TauBrowser</div>
-                          <div className="text-sm text-gray-400">🔄 In Development - Privacy browser</div>
+                          <div className="text-sm text-gray-400">✅ Complete - Privacy browser</div>
                         </div>
                       </a>
                       <a href="/tauai" className="flex items-center space-x-3 p-2 rounded-lg hover:bg-gray-800/50 transition-colors">

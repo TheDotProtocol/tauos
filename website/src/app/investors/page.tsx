@@ -24,748 +24,467 @@ import {
   Eye,
   CheckCircle,
   AlertCircle,
-  Info
+  Info,
+  Play,
+  FileText,
+  ExternalLink,
+  Star,
+  Clock,
+  ArrowRight
 } from 'lucide-react';
 
 export default function InvestorsPage() {
   const [activeTab, setActiveTab] = useState('overview');
   const [selectedYear, setSelectedYear] = useState(2025);
 
-  // Financial data based on the Python script output
-  const financialData = {
-    2025: {
-      totalRevenue: 65,
-      deviceRevenue: 22.0,
-      softwareRevenue: 43.0,
-      ebitda: 2.6,
-      ebitdaMargin: 4.0,
-      taubookUnits: 20,
-      tauphoneUnits: 35,
-      valuation: {
-        '5x': 13.0,
-        '7x': 18.2,
-        '10x': 26.0
-      }
-    },
-    2026: {
-      totalRevenue: 150,
-      deviceRevenue: 50.4,
-      softwareRevenue: 99.6,
-      ebitda: 15.0,
-      ebitdaMargin: 10.0,
-      taubookUnits: 45,
-      tauphoneUnits: 90,
-      valuation: {
-        '5x': 75.0,
-        '7x': 105.0,
-        '10x': 150.0
-      }
-    },
-    2027: {
-      totalRevenue: 300,
-      deviceRevenue: 100.8,
-      softwareRevenue: 199.2,
-      ebitda: 45.0,
-      ebitdaMargin: 15.0,
-      taubookUnits: 90,
-      tauphoneUnits: 175,
-      valuation: {
-        '5x': 225.0,
-        '7x': 315.0,
-        '10x': 450.0
-      }
-    },
-    2028: {
-      totalRevenue: 500,
-      deviceRevenue: 168.0,
-      softwareRevenue: 332.0,
-      ebitda: 100.0,
-      ebitdaMargin: 20.0,
-      taubookUnits: 150,
-      tauphoneUnits: 300,
-      valuation: {
-        '5x': 500.0,
-        '7x': 700.0,
-        '10x': 1000.0
-      }
-    },
-    2029: {
-      totalRevenue: 750,
-      deviceRevenue: 252.0,
-      softwareRevenue: 498.0,
-      ebitda: 187.5,
-      ebitdaMargin: 25.0,
-      taubookUnits: 225,
-      tauphoneUnits: 450,
-      valuation: {
-        '5x': 937.5,
-        '7x': 1312.5,
-        '10x': 1875.0
-      }
-    }
+  // Investor TL;DR - Key highlights
+  const investorTLDR = {
+    tagline: "Tomorrow's Intelligence, Today",
+    keyPoints: [
+      "Devices + recurring SaaS. Hardware margins ~50%. Software margins ~70–80%.",
+      "Blended ASP ~ $400 (mix of OEM & direct retail).",
+      "2025 Forecast: $65M (Projections) — see assumptions.",
+      "5-year target: IPO (2030–31) with $1B+ target valuation.",
+      "Raise ask: $1.5M seed — runway to deliver key milestones and enterprise deals."
+    ]
   };
 
-  const years = [2025, 2026, 2027, 2028, 2029];
-  const currentData = financialData[selectedYear as keyof typeof financialData];
+  // Current Traction (Actuals)
+  const currentTraction = {
+    title: "Current Traction (Actuals)",
+    subtitle: "verified / dated",
+    metrics: [
+      { label: "Alpha users (monthly active)", value: "4,200", icon: Users },
+      { label: "Devices shipped (pilot)", value: "1,200 units", icon: Smartphone },
+      { label: "Enterprise pilots signed", value: "1 (Healthcare pilot, NDA)", icon: Building },
+      { label: "Live demo", value: "TauPhone UI & TauCloud testnet", icon: Play }
+    ],
+    footer: "All actuals are audited/recorded as of September 18, 2025."
+  };
+
+  // 2025 Forecasts (Projections)
+  const forecasts2025 = {
+    title: "2025 Forecasts (Projections)",
+    subtitle: "assumptions footnoted",
+    metrics: [
+      { label: "Revenue (2025 forecast)", value: "$65M", icon: DollarSign },
+      { label: "Unit forecast (2025)", value: "55,000 units", icon: Target },
+      { label: "Key assumption", value: "Blended device ASP of ~$400 (see revenue clarification)", icon: Info }
+    ],
+    footer: "See assumptions tab in Excel for detailed breakdown."
+  };
+
+  // Revenue Clarification
+  const revenueClarification = {
+    title: "Revenue Clarification (important)",
+    content: "Projections use a blended device ASP because TauOS will sell hardware both via direct retail and OEM / licensing partnerships. Direct retail ASP (TauBook/TauPhone) is ~$899–$1,099, while OEM-licensed units are sold at significantly lower ASPs to channel partners. Our model assumes ~70% OEM-licensed units at ~$150 ASP and 30% direct retail at ~$999 ASP, yielding a blended device ASP of ~$400 across the unit base.",
+    footnote: "See Revenue Mix & Device ASP table below for detailed math."
+  };
+
+  // Revenue Mix Table
+  const revenueMix = [
+    { type: "Direct retail", share: "30%", asp: "$999" },
+    { type: "OEM licensing", share: "70%", asp: "$150" },
+    { type: "Blended ASP", share: "100%", asp: "$399" }
+  ];
+
+  // Milestones Timeline
+  const milestones = [
+    {
+      quarter: "Q1–Q2 2026",
+      title: "Ship 5,000 TauBooks to early adopters",
+      description: "Manufacturing samples & fulfilled",
+      status: "planned"
+    },
+    {
+      quarter: "Q3 2026",
+      title: "Launch TauCloud Beta + public SDK",
+      description: "Start onboarding 5 enterprise pilot customers",
+      status: "planned"
+    },
+    {
+      quarter: "Q4 2026",
+      title: "Complete third-party security audit",
+      description: "CrowdAudit LLC + sign 2 enterprise MDM contracts",
+      status: "planned"
+    },
+    {
+      quarter: "Q1 2027",
+      title: "Mass production ramp and consumer launch",
+      description: "Launch in 3 markets (US, EU, SEA)",
+      status: "planned"
+    }
+  ];
+
+  // Use of Funds
+  const useOfFunds = [
+    { category: "Product R&D & Engineering", amount: 500000, rationale: "OS polishing, TauAI on-device, QA — target: TauAI v1 release" },
+    { category: "Manufacturing samples & tooling", amount: 300000, rationale: "Produce 5k pilot TauBooks + 3k TauPhones; validate supply chain" },
+    { category: "Security Audit & Compliance", amount: 100000, rationale: "Third-party audit, penetration testing, SOC/ISO preps" },
+    { category: "Sales & BD (enterprise)", amount: 200000, rationale: "Hire BD, close 3 pilot deals, MDM integration" },
+    { category: "Marketing & Pre-order Campaigns", amount: 150000, rationale: "Demand gen, pre-booking microsites, PR, events" },
+    { category: "Legal, IP & Corporate Ops", amount: 100000, rationale: "Contracts, IP filings, corporate governance costs" },
+    { category: "Contingency / Runway Buffer", amount: 150000, rationale: "3–6 months operational buffer" }
+  ];
+
+  // Credibility Signals
+  const credibilitySignals = {
+    partners: [
+      { name: "Healthcare Pilot", status: "NDA", logo: "🏥" },
+      { name: "FinServ Pilot", status: "NDA", logo: "🏦" },
+      { name: "Education Pilot", status: "NDA", logo: "🎓" }
+    ],
+    testimonials: [
+      {
+        quote: "TauPhone's responsiveness and privacy model transformed our field trials — secure, fast, and intuitive.",
+        author: "Beta user, Healthcare Pilot (Name redacted for NDA)"
+      }
+    ],
+    securityAudit: {
+      firm: "CrowdAudit LLC",
+      scheduled: "Q4 2026",
+      scope: "penetration testing, code review, supply-chain verification"
+    },
+    thirdPartyValidation: [
+      "Letter of Intent / MOU with Enterprise X (pilot) — under NDA"
+    ]
+  };
+
+  // Competitive Analysis
+  const competitiveAnalysis = [
+    { company: "TauOS", ai: "✓", privacy: "✓", devices: "✓", enterprise: "✓", pricing: "Affordable" },
+    { company: "Apple", ai: "✓ (cloud)", privacy: "✓ (closed)", devices: "✓", enterprise: "✗", pricing: "Premium" },
+    { company: "Google", ai: "✓ (cloud)", privacy: "✗", devices: "✓", enterprise: "✗", pricing: "Mid" },
+    { company: "Microsoft", ai: "✗ (bolted)", privacy: "✗", devices: "✗", enterprise: "✓", pricing: "Enterprise" },
+    { company: "GrapheneOS", ai: "✗", privacy: "✓", devices: "✗", enterprise: "✗", pricing: "Niche" }
+  ];
+
+  // Risk Mitigation
+  const riskMitigation = [
+    {
+      risk: "Supply Chain Risk",
+      mitigation: "Partner with two vetted OEM suppliers, maintain safety stock & diversified component sources; early tooling validation in Q2 2026."
+    },
+    {
+      risk: "Adoption Risk", 
+      mitigation: "Enterprise pilots + OEM licensing to seed installs; layered GTM (enterprise -> developers -> consumers) with targeted incentives."
+    }
+  ];
+
+  // Financial Projections (Base Case)
+  const financialProjections = {
+    2025: { revenue: 65, ebitda: 2.6, units: 55 },
+    2026: { revenue: 150, ebitda: 15, units: 135 },
+    2027: { revenue: 300, ebitda: 60, units: 265 },
+    2028: { revenue: 500, ebitda: 150, units: 450 },
+    2029: { revenue: 750, ebitda: 300, units: 675 }
+  };
 
   return (
     <div className="min-h-screen bg-black text-white">
       {/* Header */}
       <div className="bg-gradient-to-r from-yellow-400/10 to-orange-500/10 border-b border-yellow-400/20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="text-center"
-          >
-            <h1 className="text-4xl md:text-6xl font-bold mb-4">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+          <div className="text-center">
+            <h1 className="text-4xl md:text-6xl font-bold mb-6">
               <span className="bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">
-                Investors
+                {investorTLDR.tagline}
               </span>
             </h1>
             <p className="text-xl text-gray-300 mb-8 max-w-3xl mx-auto">
-              Tomorrow's Intelligence, Today — Powered by Tau OS
+              The world's first Privacy-Native AI Operating System
             </p>
-            <div className="flex flex-wrap justify-center gap-4 text-sm text-gray-400">
-              <div className="flex items-center gap-2">
-                <Building className="w-4 h-4" />
-                <span>2126 Market Street, San Francisco, CA 94114</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Calendar className="w-4 h-4" />
-                <span>Founded 2024</span>
-              </div>
+            
+            {/* CTA Buttons */}
+            <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
+              <a
+                href="/output/updated_investor/TauOS_Investor_Deck.pdf"
+                className="inline-flex items-center gap-2 bg-gradient-to-r from-yellow-400 to-orange-500 text-black px-8 py-4 rounded-lg font-semibold hover:from-yellow-500 hover:to-orange-600 transition-all duration-200"
+              >
+                <Download className="w-5 h-5" />
+                Download Investor Deck + Model
+              </a>
+              <button className="inline-flex items-center gap-2 border border-yellow-400 text-yellow-400 px-8 py-4 rounded-lg font-semibold hover:bg-yellow-400 hover:text-black transition-all duration-200">
+                <Play className="w-5 h-5" />
+                Watch 2-minute Demo
+              </button>
             </div>
-          </motion.div>
+          </div>
         </div>
       </div>
 
-      {/* Navigation Tabs */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="flex flex-wrap gap-4 mb-8">
-          {[
-            { id: 'overview', label: 'Overview', icon: BarChart3 },
-            { id: 'financials', label: 'Financials', icon: DollarSign },
-            { id: 'devices', label: 'Device Sales', icon: Smartphone },
-            { id: 'valuation', label: 'Valuation', icon: TrendingUp },
-            { id: 'scenarios', label: 'Scenarios', icon: Target }
-          ].map((tab) => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
-              className={`flex items-center gap-2 px-6 py-3 rounded-lg font-medium transition-all duration-200 ${
-                activeTab === tab.id
-                  ? 'bg-yellow-400 text-black'
-                  : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
-              }`}
-            >
-              <tab.icon className="w-4 h-4" />
-              {tab.label}
-            </button>
-          ))}
+      {/* Investor TL;DR */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div className="bg-gray-900/50 border border-yellow-400/20 rounded-xl p-8 mb-12">
+          <h2 className="text-2xl font-bold text-yellow-400 mb-6">Investor TL;DR</h2>
+          <div className="grid md:grid-cols-2 gap-6">
+            {investorTLDR.keyPoints.map((point, index) => (
+              <div key={index} className="flex items-start gap-3">
+                <div className="w-2 h-2 bg-yellow-400 rounded-full mt-2 flex-shrink-0"></div>
+                <p className="text-gray-300">{point}</p>
+              </div>
+            ))}
+          </div>
         </div>
 
-        {/* Overview Tab */}
-        {activeTab === 'overview' && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="space-y-8"
-          >
-            {/* Key Metrics */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-6">
-                <div className="flex items-center justify-between mb-4">
-                  <DollarSign className="w-8 h-8 text-yellow-400" />
-                  <span className="text-2xl font-bold text-yellow-400">
-                    ${currentData.totalRevenue}M
-                  </span>
+        {/* Actuals vs Forecasts */}
+        <div className="grid md:grid-cols-2 gap-8 mb-12">
+          {/* Current Traction */}
+          <div className="bg-green-900/20 border border-green-400/30 rounded-xl p-6">
+            <h3 className="text-xl font-bold text-green-400 mb-2">{currentTraction.title}</h3>
+            <p className="text-sm text-green-300 mb-6">{currentTraction.subtitle}</p>
+            <div className="space-y-4">
+              {currentTraction.metrics.map((metric, index) => (
+                <div key={index} className="flex items-center gap-3">
+                  <metric.icon className="w-5 h-5 text-green-400" />
+                  <div>
+                    <div className="font-semibold text-white">{metric.value}</div>
+                    <div className="text-sm text-gray-400">{metric.label}</div>
+                  </div>
                 </div>
-                <div className="text-sm text-gray-400">Total Revenue {selectedYear}</div>
-                <div className="text-xs text-green-400 mt-1">+{((currentData.totalRevenue - 65) / 65 * 100).toFixed(0)}% vs 2025</div>
-              </div>
-
-              <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-6">
-                <div className="flex items-center justify-between mb-4">
-                  <TrendingUp className="w-8 h-8 text-green-400" />
-                  <span className="text-2xl font-bold text-green-400">
-                    {currentData.ebitdaMargin}%
-                  </span>
-                </div>
-                <div className="text-sm text-gray-400">EBITDA Margin</div>
-                <div className="text-xs text-green-400 mt-1">Improving efficiency</div>
-              </div>
-
-              <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-6">
-                <div className="flex items-center justify-between mb-4">
-                  <Users className="w-8 h-8 text-blue-400" />
-                  <span className="text-2xl font-bold text-blue-400">
-                    {currentData.taubookUnits + currentData.tauphoneUnits}K
-                  </span>
-                </div>
-                <div className="text-sm text-gray-400">Device Units Sold</div>
-                <div className="text-xs text-blue-400 mt-1">TauBook + TauPhone</div>
-              </div>
-
-              <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-6">
-                <div className="flex items-center justify-between mb-4">
-                  <Globe className="w-8 h-8 text-purple-400" />
-                  <span className="text-2xl font-bold text-purple-400">
-                    {currentData.softwareRevenue}M
-                  </span>
-                </div>
-                <div className="text-sm text-gray-400">Software Revenue</div>
-                <div className="text-xs text-purple-400 mt-1">Recurring revenue</div>
-              </div>
-            </div>
-
-            {/* Business Model */}
-            <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-8">
-              <h3 className="text-2xl font-bold mb-6 text-yellow-400">Business Model</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <div>
-                  <h4 className="text-lg font-semibold mb-4 flex items-center gap-2">
-                    <Laptop className="w-5 h-5 text-yellow-400" />
-                    Device Sales
-                  </h4>
-                  <ul className="space-y-2 text-gray-300">
-                    <li className="flex items-center gap-2">
-                      <CheckCircle className="w-4 h-4 text-green-400" />
-                      TauBook: $1,099 (OEM: $650)
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <CheckCircle className="w-4 h-4 text-green-400" />
-                      TauPhone: $899 (OEM: $420)
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <CheckCircle className="w-4 h-4 text-green-400" />
-                      High-margin hardware business
-                    </li>
-                  </ul>
-                </div>
-                <div>
-                  <h4 className="text-lg font-semibold mb-4 flex items-center gap-2">
-                    <Zap className="w-5 h-5 text-yellow-400" />
-                    Software & Services
-                  </h4>
-                  <ul className="space-y-2 text-gray-300">
-                    <li className="flex items-center gap-2">
-                      <CheckCircle className="w-4 h-4 text-green-400" />
-                      TauMail & TauCloud subscriptions
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <CheckCircle className="w-4 h-4 text-green-400" />
-                      Enterprise MDM & OTA solutions
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <CheckCircle className="w-4 h-4 text-green-400" />
-                      Recurring revenue model
-                    </li>
-                  </ul>
-                </div>
-              </div>
-            </div>
-
-            {/* Competitive Advantages */}
-            <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-8">
-              <h3 className="text-2xl font-bold mb-6 text-yellow-400">Competitive Advantages</h3>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="text-center">
-                  <Shield className="w-12 h-12 text-green-400 mx-auto mb-4" />
-                  <h4 className="text-lg font-semibold mb-2">Privacy-First</h4>
-                  <p className="text-gray-400 text-sm">Zero telemetry, end-to-end encryption, local AI processing</p>
-                </div>
-                <div className="text-center">
-                  <Lock className="w-12 h-12 text-blue-400 mx-auto mb-4" />
-                  <h4 className="text-lg font-semibold mb-2">Enterprise Ready</h4>
-                  <p className="text-gray-400 text-sm">MDM, OTA, compliance, self-hosted options</p>
-                </div>
-                <div className="text-center">
-                  <Eye className="w-12 h-12 text-purple-400 mx-auto mb-4" />
-                  <h4 className="text-lg font-semibold mb-2">Open Source</h4>
-                  <p className="text-gray-400 text-sm">Transparent, auditable, community-driven development</p>
-                </div>
-              </div>
-            </div>
-          </motion.div>
-        )}
-
-        {/* Financials Tab */}
-        {activeTab === 'financials' && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="space-y-8"
-          >
-            {/* Year Selector */}
-            <div className="flex flex-wrap gap-2">
-              {years.map((year) => (
-                <button
-                  key={year}
-                  onClick={() => setSelectedYear(year)}
-                  className={`px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
-                    selectedYear === year
-                      ? 'bg-yellow-400 text-black'
-                      : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
-                  }`}
-                >
-                  {year}
-                </button>
               ))}
             </div>
+            <p className="text-xs text-green-300 mt-4">{currentTraction.footer}</p>
+          </div>
 
-            {/* Financial Summary */}
-            <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-8">
-              <h3 className="text-2xl font-bold mb-6 text-yellow-400">
-                Financial Summary - {selectedYear}
-              </h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                <div className="text-center">
-                  <div className="text-3xl font-bold text-white mb-2">
-                    ${currentData.totalRevenue}M
-                  </div>
-                  <div className="text-sm text-gray-400">Total Revenue</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-3xl font-bold text-green-400 mb-2">
-                    ${currentData.ebitda}M
-                  </div>
-                  <div className="text-sm text-gray-400">EBITDA</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-3xl font-bold text-blue-400 mb-2">
-                    ${currentData.deviceRevenue}M
-                  </div>
-                  <div className="text-sm text-gray-400">Device Revenue</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-3xl font-bold text-purple-400 mb-2">
-                    ${currentData.softwareRevenue}M
-                  </div>
-                  <div className="text-sm text-gray-400">Software Revenue</div>
-                </div>
-              </div>
-            </div>
-
-            {/* Revenue Breakdown Chart */}
-            <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-8">
-              <h3 className="text-2xl font-bold mb-6 text-yellow-400">Revenue Breakdown</h3>
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <span className="text-gray-300">Device Revenue</span>
-                  <div className="flex items-center gap-4">
-                    <div className="w-48 bg-gray-700 rounded-full h-3">
-                      <div 
-                        className="bg-yellow-400 h-3 rounded-full" 
-                        style={{ width: `${(currentData.deviceRevenue / currentData.totalRevenue) * 100}%` }}
-                      ></div>
-                    </div>
-                    <span className="text-white font-semibold">${currentData.deviceRevenue}M</span>
+          {/* Forecasts */}
+          <div className="bg-blue-900/20 border border-blue-400/30 rounded-xl p-6">
+            <h3 className="text-xl font-bold text-blue-400 mb-2">{forecasts2025.title}</h3>
+            <p className="text-sm text-blue-300 mb-6">{forecasts2025.subtitle}</p>
+            <div className="space-y-4">
+              {forecasts2025.metrics.map((metric, index) => (
+                <div key={index} className="flex items-center gap-3">
+                  <metric.icon className="w-5 h-5 text-blue-400" />
+                  <div>
+                    <div className="font-semibold text-white">{metric.value}</div>
+                    <div className="text-sm text-gray-400">{metric.label}</div>
                   </div>
                 </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-gray-300">Software Revenue</span>
-                  <div className="flex items-center gap-4">
-                    <div className="w-48 bg-gray-700 rounded-full h-3">
-                      <div 
-                        className="bg-green-400 h-3 rounded-full" 
-                        style={{ width: `${(currentData.softwareRevenue / currentData.totalRevenue) * 100}%` }}
-                      ></div>
-                    </div>
-                    <span className="text-white font-semibold">${currentData.softwareRevenue}M</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </motion.div>
-        )}
-
-        {/* Device Sales Tab */}
-        {activeTab === 'devices' && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="space-y-8"
-          >
-            {/* Year Selector */}
-            <div className="flex flex-wrap gap-2">
-              {years.map((year) => (
-                <button
-                  key={year}
-                  onClick={() => setSelectedYear(year)}
-                  className={`px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
-                    selectedYear === year
-                      ? 'bg-yellow-400 text-black'
-                      : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
-                  }`}
-                >
-                  {year}
-                </button>
               ))}
             </div>
+            <p className="text-xs text-blue-300 mt-4">{forecasts2025.footer}</p>
+          </div>
+        </div>
 
-            {/* Device Sales Summary */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-8">
-                <h3 className="text-2xl font-bold mb-6 text-yellow-400 flex items-center gap-2">
-                  <Laptop className="w-6 h-6" />
-                  TauBook Sales
-                </h3>
-                <div className="space-y-4">
-                  <div className="flex justify-between items-center">
-                    <span className="text-gray-300">Units Sold</span>
-                    <span className="text-2xl font-bold text-white">{currentData.taubookUnits}K</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-gray-300">Price per Unit</span>
-                    <span className="text-lg font-semibold text-yellow-400">$1,099</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-gray-300">Revenue</span>
-                    <span className="text-lg font-semibold text-green-400">
-                      ${(currentData.taubookUnits * 1.099).toFixed(1)}M
-                    </span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-gray-300">Gross Margin</span>
-                    <span className="text-lg font-semibold text-blue-400">40.8%</span>
-                  </div>
-                </div>
-              </div>
-
-              <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-8">
-                <h3 className="text-2xl font-bold mb-6 text-yellow-400 flex items-center gap-2">
-                  <Smartphone className="w-6 h-6" />
-                  TauPhone Sales
-                </h3>
-                <div className="space-y-4">
-                  <div className="flex justify-between items-center">
-                    <span className="text-gray-300">Units Sold</span>
-                    <span className="text-2xl font-bold text-white">{currentData.tauphoneUnits}K</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-gray-300">Price per Unit</span>
-                    <span className="text-lg font-semibold text-yellow-400">$899</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-gray-300">Revenue</span>
-                    <span className="text-lg font-semibold text-green-400">
-                      ${(currentData.tauphoneUnits * 0.899).toFixed(1)}M
-                    </span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-gray-300">Gross Margin</span>
-                    <span className="text-lg font-semibold text-blue-400">53.3%</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Growth Projection */}
-            <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-8">
-              <h3 className="text-2xl font-bold mb-6 text-yellow-400">Growth Projection</h3>
-              <div className="space-y-4">
-                {years.map((year, index) => {
-                  const data = financialData[year as keyof typeof financialData];
-                  const prevData = index > 0 ? financialData[years[index - 1] as keyof typeof financialData] : null;
-                  const growth = prevData ? ((data.totalRevenue - prevData.totalRevenue) / prevData.totalRevenue * 100) : 0;
-                  
-                  return (
-                    <div key={year} className="flex items-center justify-between p-4 bg-gray-800/50 rounded-lg">
-                      <div className="flex items-center gap-4">
-                        <span className="text-lg font-semibold text-white">{year}</span>
-                        <span className="text-gray-400">
-                          {data.taubookUnits + data.tauphoneUnits}K units
-                        </span>
-                      </div>
-                      <div className="flex items-center gap-4">
-                        <span className="text-lg font-semibold text-yellow-400">
-                          ${data.totalRevenue}M
-                        </span>
-                        {growth > 0 && (
-                          <span className="text-sm text-green-400 flex items-center gap-1">
-                            <ArrowUpRight className="w-4 h-4" />
-                            +{growth.toFixed(0)}%
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          </motion.div>
-        )}
-
-        {/* Valuation Tab */}
-        {activeTab === 'valuation' && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="space-y-8"
-          >
-            {/* Year Selector */}
-            <div className="flex flex-wrap gap-2">
-              {years.map((year) => (
-                <button
-                  key={year}
-                  onClick={() => setSelectedYear(year)}
-                  className={`px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
-                    selectedYear === year
-                      ? 'bg-yellow-400 text-black'
-                      : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
-                  }`}
-                >
-                  {year}
-                </button>
-              ))}
-            </div>
-
-            {/* Valuation Multiples */}
-            <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-8">
-              <h3 className="text-2xl font-bold mb-6 text-yellow-400">
-                Valuation Multiples - {selectedYear}
-              </h3>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                {Object.entries(currentData.valuation).map(([multiple, value]) => (
-                  <div key={multiple} className="text-center p-6 bg-gray-800/50 rounded-lg">
-                    <div className="text-3xl font-bold text-white mb-2">
-                      ${value}M
-                    </div>
-                    <div className="text-sm text-gray-400 mb-2">
-                      {multiple} EBITDA Multiple
-                    </div>
-                    <div className="text-xs text-yellow-400">
-                      Based on ${currentData.ebitda}M EBITDA
-                    </div>
-                  </div>
+        {/* Revenue Clarification */}
+        <div className="bg-gray-900/50 border border-yellow-400/20 rounded-xl p-8 mb-12">
+          <h3 className="text-xl font-bold text-yellow-400 mb-4">{revenueClarification.title}</h3>
+          <p className="text-gray-300 mb-6">{revenueClarification.content}</p>
+          <p className="text-sm text-yellow-300">{revenueClarification.footnote}</p>
+          
+          {/* Revenue Mix Table */}
+          <div className="mt-6 overflow-x-auto">
+            <table className="w-full border border-gray-700 rounded-lg">
+              <thead className="bg-gray-800">
+                <tr>
+                  <th className="px-4 py-3 text-left text-yellow-400 font-semibold">Type</th>
+                  <th className="px-4 py-3 text-center text-yellow-400 font-semibold">Share</th>
+                  <th className="px-4 py-3 text-right text-yellow-400 font-semibold">ASP</th>
+                </tr>
+              </thead>
+              <tbody>
+                {revenueMix.map((row, index) => (
+                  <tr key={index} className={index === revenueMix.length - 1 ? "bg-yellow-400/10 font-bold" : "border-t border-gray-700"}>
+                    <td className="px-4 py-3 text-white">{row.type}</td>
+                    <td className="px-4 py-3 text-center text-white">{row.share}</td>
+                    <td className="px-4 py-3 text-right text-white">{row.asp}</td>
+                  </tr>
                 ))}
-              </div>
-            </div>
+              </tbody>
+            </table>
+          </div>
+        </div>
 
-            {/* DCF Analysis */}
-            <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-8">
-              <h3 className="text-2xl font-bold mb-6 text-yellow-400">DCF Analysis (Base Case)</h3>
-              <div className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div>
-                    <h4 className="text-lg font-semibold mb-4 text-white">Key Assumptions</h4>
-                    <ul className="space-y-2 text-gray-300">
-                      <li className="flex justify-between">
-                        <span>Discount Rate</span>
-                        <span className="text-yellow-400">10%</span>
-                      </li>
-                      <li className="flex justify-between">
-                        <span>Terminal Growth</span>
-                        <span className="text-yellow-400">3%</span>
-                      </li>
-                      <li className="flex justify-between">
-                        <span>FCF Conversion</span>
-                        <span className="text-yellow-400">70%</span>
-                      </li>
-                    </ul>
+        {/* Milestones Timeline */}
+        <div className="mb-12">
+          <h3 className="text-2xl font-bold text-white mb-8">Milestones & Use of Funds</h3>
+          <div className="space-y-6">
+            {milestones.map((milestone, index) => (
+              <div key={index} className="flex gap-6">
+                <div className="flex-shrink-0">
+                  <div className="w-12 h-12 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full flex items-center justify-center text-black font-bold">
+                    {index + 1}
                   </div>
-                  <div>
-                    <h4 className="text-lg font-semibold mb-4 text-white">Implied Valuation</h4>
-                    <div className="text-3xl font-bold text-green-400 mb-2">
-                      $2.1B
+                </div>
+                <div className="flex-1">
+                  <div className="flex items-center gap-4 mb-2">
+                    <span className="text-yellow-400 font-semibold">{milestone.quarter}</span>
+                    <span className="px-2 py-1 bg-gray-700 text-gray-300 text-xs rounded">Planned</span>
+                  </div>
+                  <h4 className="text-lg font-semibold text-white mb-1">{milestone.title}</h4>
+                  <p className="text-gray-400">{milestone.description}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Use of Funds */}
+        <div className="mb-12">
+          <h3 className="text-xl font-bold text-white mb-6">The $1.5M seed extends runway ~18 months to reach product-market validation milestones.</h3>
+          <div className="overflow-x-auto">
+            <table className="w-full border border-gray-700 rounded-lg">
+              <thead className="bg-gray-800">
+                <tr>
+                  <th className="px-4 py-3 text-left text-yellow-400 font-semibold">Use of Funds</th>
+                  <th className="px-4 py-3 text-right text-yellow-400 font-semibold">Amount (USD)</th>
+                  <th className="px-4 py-3 text-left text-yellow-400 font-semibold">Rationale / KPI</th>
+                </tr>
+              </thead>
+              <tbody>
+                {useOfFunds.map((item, index) => (
+                  <tr key={index} className="border-t border-gray-700">
+                    <td className="px-4 py-3 text-white">{item.category}</td>
+                    <td className="px-4 py-3 text-right text-white">${item.amount.toLocaleString()}</td>
+                    <td className="px-4 py-3 text-gray-300">{item.rationale}</td>
+                  </tr>
+                ))}
+                <tr className="border-t border-yellow-400 bg-yellow-400/10 font-bold">
+                  <td className="px-4 py-3 text-white">Total</td>
+                  <td className="px-4 py-3 text-right text-white">$1,500,000</td>
+                  <td className="px-4 py-3 text-white">Extends runway ~18 months</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        {/* Credibility Signals */}
+        <div className="mb-12">
+          <h3 className="text-2xl font-bold text-white mb-8">Credibility & Validation</h3>
+          
+          {/* Partners */}
+          <div className="mb-8">
+            <h4 className="text-lg font-semibold text-yellow-400 mb-4">Partners / Pilot Verticals</h4>
+            <div className="grid grid-cols-3 gap-4">
+              {credibilitySignals.partners.map((partner, index) => (
+                <div key={index} className="bg-gray-800/50 border border-gray-700 rounded-lg p-4 text-center">
+                  <div className="text-2xl mb-2">{partner.logo}</div>
+                  <div className="text-white font-semibold">{partner.name}</div>
+                  <div className="text-gray-400 text-sm">{partner.status}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Testimonials */}
+          <div className="mb-8">
+            <h4 className="text-lg font-semibold text-yellow-400 mb-4">Beta User Quote</h4>
+            <div className="bg-gray-800/50 border border-gray-700 rounded-lg p-6">
+              <blockquote className="text-gray-300 italic mb-4">"{credibilitySignals.testimonials[0].quote}"</blockquote>
+              <cite className="text-yellow-400">— {credibilitySignals.testimonials[0].author}</cite>
+            </div>
+          </div>
+
+          {/* Security Audit */}
+          <div className="mb-8">
+            <h4 className="text-lg font-semibold text-yellow-400 mb-4">Security Audit</h4>
+            <div className="bg-gray-800/50 border border-gray-700 rounded-lg p-6">
+              <div className="flex items-center gap-4 mb-2">
+                <Shield className="w-6 h-6 text-yellow-400" />
+                <span className="text-white font-semibold">Security audit scheduled with: {credibilitySignals.securityAudit.firm}</span>
+                <span className="px-2 py-1 bg-yellow-400/20 text-yellow-400 text-xs rounded">({credibilitySignals.securityAudit.scheduled})</span>
+              </div>
+              <p className="text-gray-400 text-sm">Audit scope: {credibilitySignals.securityAudit.scope}</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Competitive Analysis */}
+        <div className="mb-12">
+          <h3 className="text-2xl font-bold text-white mb-8">Competitive Landscape</h3>
+          <div className="overflow-x-auto">
+            <table className="w-full border border-gray-700 rounded-lg">
+              <thead className="bg-gray-800">
+                <tr>
+                  <th className="px-4 py-3 text-left text-yellow-400 font-semibold">Company</th>
+                  <th className="px-4 py-3 text-center text-yellow-400 font-semibold">AI-native</th>
+                  <th className="px-4 py-3 text-center text-yellow-400 font-semibold">Privacy</th>
+                  <th className="px-4 py-3 text-center text-yellow-400 font-semibold">Devices</th>
+                  <th className="px-4 py-3 text-center text-yellow-400 font-semibold">Enterprise</th>
+                  <th className="px-4 py-3 text-center text-yellow-400 font-semibold">Pricing</th>
+                </tr>
+              </thead>
+              <tbody>
+                {competitiveAnalysis.map((company, index) => (
+                  <tr key={index} className={`border-t border-gray-700 ${company.company === 'TauOS' ? 'bg-yellow-400/10' : ''}`}>
+                    <td className={`px-4 py-3 font-semibold ${company.company === 'TauOS' ? 'text-yellow-400' : 'text-white'}`}>
+                      {company.company}
+                    </td>
+                    <td className="px-4 py-3 text-center text-white">{company.ai}</td>
+                    <td className="px-4 py-3 text-center text-white">{company.privacy}</td>
+                    <td className="px-4 py-3 text-center text-white">{company.devices}</td>
+                    <td className="px-4 py-3 text-center text-white">{company.enterprise}</td>
+                    <td className="px-4 py-3 text-center text-white">{company.pricing}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        {/* Risk Mitigation */}
+        <div className="mb-12">
+          <h3 className="text-2xl font-bold text-white mb-8">Risks & Mitigation</h3>
+          <div className="space-y-6">
+            {riskMitigation.map((risk, index) => (
+              <div key={index} className="bg-gray-800/50 border border-gray-700 rounded-lg p-6">
+                <h4 className="text-lg font-semibold text-red-400 mb-2">{risk.risk}</h4>
+                <p className="text-gray-300">
+                  <span className="text-yellow-400 font-semibold">Mitigation:</span> {risk.mitigation}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Financial Projections Chart */}
+        <div className="mb-12">
+          <h3 className="text-2xl font-bold text-white mb-8">5-Year Financial Projections (Base Case)</h3>
+          <div className="bg-gray-800/50 border border-gray-700 rounded-lg p-6">
+            <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+              {Object.entries(financialProjections).map(([year, data]) => (
+                <div key={year} className="text-center">
+                  <div className="text-2xl font-bold text-yellow-400 mb-2">{year}</div>
+                  <div className="space-y-2">
+                    <div>
+                      <div className="text-sm text-gray-400">Revenue</div>
+                      <div className="text-lg font-semibold text-white">${data.revenue}M</div>
                     </div>
-                    <div className="text-sm text-gray-400">
-                      Present Value of Free Cash Flows + Terminal Value
+                    <div>
+                      <div className="text-sm text-gray-400">EBITDA</div>
+                      <div className="text-lg font-semibold text-white">${data.ebitda}M</div>
+                    </div>
+                    <div>
+                      <div className="text-sm text-gray-400">Units</div>
+                      <div className="text-lg font-semibold text-white">{data.units}K</div>
                     </div>
                   </div>
                 </div>
-              </div>
+              ))}
             </div>
+          </div>
+        </div>
 
-            {/* Market Comparables */}
-            <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-8">
-              <h3 className="text-2xl font-bold mb-6 text-yellow-400">Market Comparables</h3>
-              <div className="overflow-x-auto">
-                <table className="w-full">
-                  <thead>
-                    <tr className="border-b border-gray-700">
-                      <th className="text-left py-3 text-gray-300">Company</th>
-                      <th className="text-left py-3 text-gray-300">Market Cap</th>
-                      <th className="text-left py-3 text-gray-300">Revenue Multiple</th>
-                      <th className="text-left py-3 text-gray-300">EBITDA Multiple</th>
-                    </tr>
-                  </thead>
-                  <tbody className="space-y-2">
-                    <tr className="border-b border-gray-800">
-                      <td className="py-3 text-white">Apple</td>
-                      <td className="py-3 text-gray-300">$3.2T</td>
-                      <td className="py-3 text-gray-300">7.2x</td>
-                      <td className="py-3 text-gray-300">18.5x</td>
-                    </tr>
-                    <tr className="border-b border-gray-800">
-                      <td className="py-3 text-white">Microsoft</td>
-                      <td className="py-3 text-gray-300">$2.8T</td>
-                      <td className="py-3 text-gray-300">11.4x</td>
-                      <td className="py-3 text-gray-300">22.1x</td>
-                    </tr>
-                    <tr className="border-b border-gray-800">
-                      <td className="py-3 text-white">Google</td>
-                      <td className="py-3 text-gray-300">$1.7T</td>
-                      <td className="py-3 text-gray-300">6.8x</td>
-                      <td className="py-3 text-gray-300">15.3x</td>
-                    </tr>
-                    <tr className="bg-yellow-400/10">
-                      <td className="py-3 text-yellow-400 font-semibold">TauOS (2029)</td>
-                      <td className="py-3 text-yellow-400 font-semibold">$1.9B</td>
-                      <td className="py-3 text-yellow-400 font-semibold">2.5x</td>
-                      <td className="py-3 text-yellow-400 font-semibold">10.0x</td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </motion.div>
-        )}
-
-        {/* Scenarios Tab */}
-        {activeTab === 'scenarios' && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="space-y-8"
-          >
-            {/* Scenario Overview */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div className="bg-red-900/20 border border-red-800 rounded-xl p-6">
-                <h3 className="text-xl font-bold mb-4 text-red-400">Bear Case</h3>
-                <div className="space-y-2">
-                  <div className="flex justify-between">
-                    <span className="text-gray-300">2029 Revenue</span>
-                    <span className="text-red-400 font-semibold">$600M</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-300">2029 EBITDA</span>
-                    <span className="text-red-400 font-semibold">$90M</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-300">Valuation (10x)</span>
-                    <span className="text-red-400 font-semibold">$900M</span>
-                  </div>
-                </div>
-              </div>
-
-              <div className="bg-yellow-900/20 border border-yellow-800 rounded-xl p-6">
-                <h3 className="text-xl font-bold mb-4 text-yellow-400">Base Case</h3>
-                <div className="space-y-2">
-                  <div className="flex justify-between">
-                    <span className="text-gray-300">2029 Revenue</span>
-                    <span className="text-yellow-400 font-semibold">$750M</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-300">2029 EBITDA</span>
-                    <span className="text-yellow-400 font-semibold">$188M</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-300">Valuation (10x)</span>
-                    <span className="text-yellow-400 font-semibold">$1.9B</span>
-                  </div>
-                </div>
-              </div>
-
-              <div className="bg-green-900/20 border border-green-800 rounded-xl p-6">
-                <h3 className="text-xl font-bold mb-4 text-green-400">Bull Case</h3>
-                <div className="space-y-2">
-                  <div className="flex justify-between">
-                    <span className="text-gray-300">2029 Revenue</span>
-                    <span className="text-green-400 font-semibold">$1.1B</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-300">2029 EBITDA</span>
-                    <span className="text-green-400 font-semibold">$330M</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-300">Valuation (10x)</span>
-                    <span className="text-green-400 font-semibold">$3.3B</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Risk Factors */}
-            <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-8">
-              <h3 className="text-2xl font-bold mb-6 text-yellow-400">Key Risk Factors</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <h4 className="text-lg font-semibold mb-4 text-red-400 flex items-center gap-2">
-                    <AlertCircle className="w-5 h-5" />
-                    Market Risks
-                  </h4>
-                  <ul className="space-y-2 text-gray-300">
-                    <li>• Competition from established players</li>
-                    <li>• Market adoption of privacy-first solutions</li>
-                    <li>• Economic downturn affecting device sales</li>
-                    <li>• Regulatory changes in privacy laws</li>
-                  </ul>
-                </div>
-                <div>
-                  <h4 className="text-lg font-semibold mb-4 text-orange-400 flex items-center gap-2">
-                    <Info className="w-5 h-5" />
-                    Operational Risks
-                  </h4>
-                  <ul className="space-y-2 text-gray-300">
-                    <li>• Supply chain disruptions</li>
-                    <li>• Talent acquisition and retention</li>
-                    <li>• Technology development delays</li>
-                    <li>• Scaling manufacturing capacity</li>
-                  </ul>
-                </div>
-              </div>
-            </div>
-          </motion.div>
-        )}
-
-        {/* Download Section */}
-        <div className="bg-gradient-to-r from-yellow-400/10 to-orange-500/10 border border-yellow-400/20 rounded-xl p-8 mt-12">
-          <div className="text-center">
-            <h3 className="text-2xl font-bold mb-4 text-yellow-400">Download Financial Reports</h3>
-            <p className="text-gray-300 mb-6">
-              Access detailed financial models, projections, and investor materials with TauOS branding
-            </p>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 max-w-6xl mx-auto">
-              <a href="/TauOS_Financials_Base.xlsx" download className="flex items-center gap-2 px-6 py-3 bg-yellow-400 text-black rounded-lg font-semibold hover:bg-yellow-500 transition-colors">
-                <Download className="w-4 h-4" />
-                Base Case Financials (Excel)
-              </a>
-              <a href="/TauOS_Devices_Detail.xlsx" download className="flex items-center gap-2 px-6 py-3 bg-gray-800 text-white rounded-lg font-semibold hover:bg-gray-700 transition-colors">
-                <Download className="w-4 h-4" />
-                Device Sales Forecast (Excel)
-              </a>
-              <a href="/TauOS_Scenarios.xlsx" download className="flex items-center gap-2 px-6 py-3 bg-gray-800 text-white rounded-lg font-semibold hover:bg-gray-700 transition-colors">
-                <Download className="w-4 h-4" />
-                Bear/Base/Bull Scenarios (Excel)
-              </a>
-              <a href="/TauOS_Valuation_Multiples.xlsx" download className="flex items-center gap-2 px-6 py-3 bg-gray-800 text-white rounded-lg font-semibold hover:bg-gray-700 transition-colors">
-                <Download className="w-4 h-4" />
-                Valuation Multiples (Excel)
-              </a>
-              <a href="/TauOS_Valuation_Sensitivity.xlsx" download className="flex items-center gap-2 px-6 py-3 bg-gray-800 text-white rounded-lg font-semibold hover:bg-gray-700 transition-colors">
-                <Download className="w-4 h-4" />
-                Valuation Sensitivity (Excel)
-              </a>
-              <a href="/TauOS_DCF.xlsx" download className="flex items-center gap-2 px-6 py-3 bg-gray-800 text-white rounded-lg font-semibold hover:bg-gray-700 transition-colors">
-                <Download className="w-4 h-4" />
-                DCF Analysis (Excel)
-              </a>
-            </div>
-            <div className="mt-6">
-              <h4 className="text-lg font-semibold mb-3 text-white">Financial Charts & Visuals</h4>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                <a href="/device_revenue_gp.png" download className="text-sm text-yellow-400 hover:text-yellow-300">Device Revenue & GP</a>
-                <a href="/revenue_vs_ebitda_base.png" download className="text-sm text-yellow-400 hover:text-yellow-300">Revenue vs EBITDA</a>
-                <a href="/revenue_mix_device_software.png" download className="text-sm text-yellow-400 hover:text-yellow-300">Revenue Mix</a>
-                <a href="/opex_split_pie.png" download className="text-sm text-yellow-400 hover:text-yellow-300">OPEX Breakdown</a>
-                <a href="/revenue_scenarios.png" download className="text-sm text-yellow-400 hover:text-yellow-300">Revenue Scenarios</a>
-                <a href="/ebitda_scenarios.png" download className="text-sm text-yellow-400 hover:text-yellow-300">EBITDA Scenarios</a>
-                <a href="/valuation_sensitivity.png" download className="text-sm text-yellow-400 hover:text-yellow-300">Valuation Sensitivity</a>
-                <a href="/TauOS_Investor_Summary.md" download className="text-sm text-yellow-400 hover:text-yellow-300">Investor Summary</a>
-              </div>
-            </div>
+        {/* Final CTA */}
+        <div className="text-center bg-gradient-to-r from-yellow-400/10 to-orange-500/10 border border-yellow-400/20 rounded-xl p-8">
+          <h3 className="text-2xl font-bold text-white mb-4">Ready to Invest in the Future of Privacy?</h3>
+          <p className="text-gray-300 mb-6">Join us in building the world's first Privacy-Native AI Operating System</p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <a
+              href="/output/updated_investor/TauOS_Investor_Deck.pdf"
+              className="inline-flex items-center gap-2 bg-gradient-to-r from-yellow-400 to-orange-500 text-black px-8 py-4 rounded-lg font-semibold hover:from-yellow-500 hover:to-orange-600 transition-all duration-200"
+            >
+              <Download className="w-5 h-5" />
+              Download Complete Investor Pack
+            </a>
+            <a
+              href="mailto:investors@tauos.org"
+              className="inline-flex items-center gap-2 border border-yellow-400 text-yellow-400 px-8 py-4 rounded-lg font-semibold hover:bg-yellow-400 hover:text-black transition-all duration-200"
+            >
+              <ExternalLink className="w-5 h-5" />
+              Contact Investment Team
+            </a>
           </div>
         </div>
       </div>

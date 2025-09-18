@@ -27,7 +27,7 @@ export default function TauIDLogin() {
     setMessage('');
 
     try {
-      const response = await fetch('https://tauos-zbtm.vercel.app/api/login', {
+      const response = await fetch('/api/tauid/auth/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
