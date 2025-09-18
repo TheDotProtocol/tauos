@@ -35,8 +35,8 @@ export async function POST(request: NextRequest) {
 
     // Create user
     const result = await pool.query(
-      'INSERT INTO users (username, email, password_hash, is_active, created_at) VALUES ($1, $2, $3, $4, CURRENT_TIMESTAMP) RETURNING id, username, email',
-      [username, email, passwordHash, true]
+      'INSERT INTO users (username, email, password_hash, full_name, is_active, created_at) VALUES ($1, $2, $3, $4, $5, CURRENT_TIMESTAMP) RETURNING id, username, email, full_name',
+      [username, email, passwordHash, fullName, true]
     );
 
     const user = result.rows[0];
@@ -55,7 +55,7 @@ export async function POST(request: NextRequest) {
         id: user.id,
         username: user.username,
         email: user.email,
-        fullName: user.username // Use username as fullName if full_name doesn't exist
+        fullName: user.full_name
       }
     });
 
