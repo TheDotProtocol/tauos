@@ -228,7 +228,7 @@ export default function TauMailInbox() {
                     <div className="flex-shrink-0">
                       <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full flex items-center justify-center">
                         <span className="text-white font-semibold text-sm">
-                          {email.from.charAt(0).toUpperCase()}
+                          {(email.from || 'U').charAt(0).toUpperCase()}
                         </span>
                       </div>
                     </div>
@@ -236,17 +236,17 @@ export default function TauMailInbox() {
                       <div className="flex items-center justify-between">
                         <div className="flex items-center space-x-2">
                           <p className={`font-medium ${email.unread ? 'text-white' : 'text-gray-300'}`}>
-                            {email.from}
+                            {email.from || 'Unknown'}
                           </p>
                           {email.starred && <Star className="w-4 h-4 text-yellow-400 fill-current" />}
                         </div>
                         <p className="text-sm text-gray-400">{email.time}</p>
                       </div>
                       <p className={`text-sm mt-1 ${email.unread ? 'text-white font-medium' : 'text-gray-400'}`}>
-                        {email.subject}
+                        {email.subject || 'No Subject'}
                       </p>
                       <p className="text-sm text-gray-500 mt-1 truncate">
-                        {email.preview}
+                        {email.preview || 'No preview'}
                       </p>
                     </div>
                     <div className="flex items-center space-x-2">
@@ -291,11 +291,11 @@ export default function TauMailInbox() {
               <div className="flex items-center space-x-4">
                 <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full flex items-center justify-center">
                   <span className="text-white font-semibold text-lg">
-                    {selectedEmail.from.charAt(0).toUpperCase()}
+                    {(selectedEmail.from || 'U').charAt(0).toUpperCase()}
                   </span>
                 </div>
                 <div>
-                  <p className="text-white font-semibold">{selectedEmail.from}</p>
+                  <p className="text-white font-semibold">{selectedEmail.from || 'Unknown'}</p>
                   <p className="text-gray-400 text-sm">{selectedEmail.time}</p>
                 </div>
               </div>
