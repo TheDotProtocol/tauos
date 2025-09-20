@@ -3,9 +3,9 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { Pool } from 'pg';
 
-// Database connection - using IPv4 compatible URL
+// Database connection - production ready
 const pool = new Pool({
-  connectionString: process.env.DATABASE_URL || 'postgresql://postgres.tviqcormikopltejomkc:Ak1233%40%405@aws-0-ap-southeast-1.pooler.supabase.com:5432/postgres?sslmode=disable',
+  connectionString: process.env.DATABASE_URL || 'postgresql://postgres.tviqcormikopltejomkc:Ak1233%40%405@aws-0-ap-southeast-1.pooler.supabase.com:5432/postgres?sslmode=require',
   ssl: {
     rejectUnauthorized: false
   }
@@ -42,9 +42,12 @@ export async function POST(request: NextRequest) {
     const user = result.rows[0];
 
     // Generate JWT token
+    if (!process.env.JWT_SECRET) {
+      return NextResponse.json({ error: 'JWT secret not configured' }, { status: 500 });
+    }
     const token = jwt.sign(
       { userId: user.id, email: user.email, username: user.username },
-      process.env.JWT_SECRET || 'tauos-secret-key-change-in-production',
+      process.env.JWT_SECRET,
       { expiresIn: '24h' }
     );
 

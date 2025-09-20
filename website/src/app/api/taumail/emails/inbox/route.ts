@@ -2,9 +2,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import { Pool } from 'pg';
 import jwt from 'jsonwebtoken';
 
-// Database connection - using IPv4 compatible URL
+// Database connection - production ready
 const pool = new Pool({
-  connectionString: process.env.DATABASE_URL || 'postgresql://postgres.tviqcormikopltejomkc:Ak1233%40%405@aws-0-ap-southeast-1.pooler.supabase.com:5432/postgres?sslmode=disable',
+  connectionString: process.env.DATABASE_URL || 'postgresql://postgres.tviqcormikopltejomkc:Ak1233%40%405@aws-0-ap-southeast-1.pooler.supabase.com:5432/postgres?sslmode=require',
   ssl: {
     rejectUnauthorized: false
   }
@@ -21,13 +21,16 @@ export async function GET(request: NextRequest) {
     const token = authHeader.substring(7);
     
     // Verify token
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'tauos-secret-key-change-in-production') as any;
+    if (!process.env.JWT_SECRET) {
+      return NextResponse.json({ error: 'JWT secret not configured' }, { status: 500 });
+    }
+    const decoded = jwt.verify(token, process.env.JWT_SECRET) as any;
     
     // Get user's incoming emails
     const result = await pool.query(
       `SELECT ie.*, u.username as sender_username 
        FROM incoming_emails ie 
-       LEFT JOIN users u ON ie.sender_email = u.email 
+       LEFT JOIN users u ON ie.from_email = u.email 
        WHERE ie.user_id = $1 
        ORDER BY ie.received_at DESC`,
       [decoded.userId]

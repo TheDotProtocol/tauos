@@ -27,7 +27,7 @@ export async function GET(request: NextRequest) {
     const result = await pool.query(
       `SELECT ie.*, u.username as sender_username 
        FROM incoming_emails ie 
-       LEFT JOIN users u ON ie.sender_email = u.email 
+       LEFT JOIN users u ON ie.from_email = u.email 
        WHERE ie.user_id = $1 AND ie.is_spam = true 
        ORDER BY ie.received_at DESC`,
       [decoded.userId]

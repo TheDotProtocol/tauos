@@ -1,38 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { Pool } from 'pg';
 import jwt from 'jsonwebtoken';
-import * as nodemailer from 'nodemailer';
+import sgMail from '@sendgrid/mail';
 
-// Database connection - using IPv4 compatible URL
+// Database connection - production ready
 const pool = new Pool({
-  connectionString: process.env.DATABASE_URL || 'postgresql://postgres.tviqcormikopltejomkc:Ak1233%40%405@aws-0-ap-southeast-1.pooler.supabase.com:5432/postgres?sslmode=disable',
+  connectionString: process.env.DATABASE_URL || 'postgresql://postgres.tviqcormikopltejomkc:Ak1233%40%405@aws-0-ap-southeast-1.pooler.supabase.com:5432/postgres?sslmode=require',
   ssl: {
     rejectUnauthorized: false
   }
 });
 
-// Create SMTP transporter
-const createTransporter = () => {
-  // For development/testing, use a mock transporter that logs emails
-  if (process.env.NODE_ENV === 'development' || !process.env.SMTP_USER) {
-    return nodemailer.createTransport({
-      streamTransport: true,
-      newline: 'unix',
-      buffer: true
-    });
-  }
-  
-  // Production SMTP configuration
-  return nodemailer.createTransport({
-    host: process.env.SMTP_HOST || 'smtp.gmail.com',
-    port: parseInt(process.env.SMTP_PORT || '587'),
-    secure: false, // true for 465, false for other ports
-    auth: {
-      user: process.env.SMTP_USER,
-      pass: process.env.SMTP_PASS
-    }
-  });
-};
+// Initialize SendGrid
+if (process.env.SENDGRID_API_KEY) {
+  sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+}
 
 export async function POST(request: NextRequest) {
   try {
@@ -45,7 +27,10 @@ export async function POST(request: NextRequest) {
     const token = authHeader.substring(7);
     
     // Verify token
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'tauos-secret-key-change-in-production') as any;
+    if (!process.env.JWT_SECRET) {
+      return NextResponse.json({ error: 'JWT secret not configured' }, { status: 500 });
+    }
+    const decoded = jwt.verify(token, process.env.JWT_SECRET) as any;
     
     const { to, subject, body, cc, bcc } = await request.json();
     
@@ -66,12 +51,13 @@ export async function POST(request: NextRequest) {
     const user = userResult.rows[0];
     const fromEmail = user.email || `${user.username}@tauos.org`;
 
-    // Create email options
-    const mailOptions = {
-      from: `"${user.username}" <${fromEmail}>`,
+    // Prepare SendGrid email message
+    const msg = {
       to: to,
-      cc: cc || undefined,
-      bcc: bcc || undefined,
+      from: {
+        email: fromEmail,
+        name: user.username
+      },
       subject: subject,
       text: body,
       html: `<div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
@@ -84,22 +70,21 @@ export async function POST(request: NextRequest) {
              </div>`
     };
 
-    // Send email via SMTP
-    const transporter = createTransporter();
-    const info = await (transporter as any).sendMail(mailOptions);
+    // Add CC and BCC if provided
+    if (cc) (msg as any).cc = cc;
+    if (bcc) (msg as any).bcc = bcc;
 
-    // Generate a message ID for tracking
-    const messageId = info.messageId || `tauos-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    // Send email via SendGrid
+    const response = await sgMail.send(msg);
+    const messageId = response[0].headers['x-message-id'];
 
-    // Log email details for development
-    if (process.env.NODE_ENV === 'development' || !process.env.SMTP_USER) {
-      console.log('📧 Email Sent (Mock Mode):');
-      console.log('From:', mailOptions.from);
-      console.log('To:', mailOptions.to);
-      console.log('Subject:', mailOptions.subject);
-      console.log('Message ID:', messageId);
-      console.log('---');
-    }
+    // Log email details for debugging
+    console.log('📧 Email Sent via SendGrid:');
+    console.log('From:', msg.from);
+    console.log('To:', msg.to);
+    console.log('Subject:', msg.subject);
+    console.log('Message ID:', messageId);
+    console.log('---');
 
     // Save email to sent_emails table
     const result = await pool.query(
@@ -113,7 +98,7 @@ export async function POST(request: NextRequest) {
       success: true,
       message: 'Email sent successfully',
       email: result.rows[0],
-      messageId: info.messageId,
+      messageId: messageId,
       from: fromEmail,
       fromName: user.username
     });
