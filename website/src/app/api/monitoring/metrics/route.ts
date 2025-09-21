@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import { Pool } from 'pg';
 import { getMetrics, calculateAverageResponseTime } from '../../middleware/metrics';
 
+// Force dynamic rendering
+export const dynamic = 'force-dynamic';
+
 // Database connection for health checks
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL || 'postgresql://postgres.tviqcormikopltejomkc:Ak1233%40%405@aws-0-ap-southeast-1.pooler.supabase.com:5432/postgres?sslmode=disable',
