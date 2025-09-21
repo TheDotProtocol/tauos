@@ -25,7 +25,7 @@ export default function SharedFileViewer({ params }) {
 
   const loadSharedFile = async () => {
     try {
-      const response = await fetch(`https://tauos-47am.vercel.app/api/shared/${params.token}`);
+      const response = await fetch(`/api/taucloud/shared/${params.token}`);
       
       if (response.ok) {
         const data = await response.json();
@@ -52,7 +52,7 @@ export default function SharedFileViewer({ params }) {
     setPasswordError('');
     
     try {
-      const response = await fetch(`https://tauos-47am.vercel.app/api/shared/${params.token}/verify`, {
+      const response = await fetch(`/api/taucloud/shared/${params.token}/verify`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ password })

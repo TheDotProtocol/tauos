@@ -81,7 +81,7 @@ export default function TauBrowserLanding() {
   const handleRegistration = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch('https://tauos-cbh3.vercel.app/api/auth/register', {
+      const response = await fetch('/api/taubrowser/auth/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -111,7 +111,7 @@ export default function TauBrowserLanding() {
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch('https://tauos-cbh3.vercel.app/api/auth/login', {
+      const response = await fetch('/api/taubrowser/auth/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

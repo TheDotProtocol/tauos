@@ -46,7 +46,7 @@ export default function TauCloudSearch() {
         ...(filters.folder !== 'all' && { folder_id: filters.folder })
       });
 
-      const response = await fetch(`https://tauos-47am.vercel.app/api/search?${params}`, {
+      const response = await fetch(`/api/taucloud/search?${params}`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
 

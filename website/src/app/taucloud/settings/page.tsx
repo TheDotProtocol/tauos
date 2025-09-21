@@ -41,7 +41,7 @@ export default function TauCloudSettings() {
   const loadProfile = async () => {
     try {
       const token = localStorage.getItem('tauos_token');
-      const response = await fetch('https://tauos-47am.vercel.app/api/profile', {
+      const response = await fetch('/api/taucloud/profile', {
         headers: { 'Authorization': `Bearer ${token}` }
       });
 
@@ -69,7 +69,7 @@ export default function TauCloudSettings() {
     setSaving(true);
     try {
       const token = localStorage.getItem('tauos_token');
-      const response = await fetch('https://tauos-47am.vercel.app/api/profile', {
+      const response = await fetch('/api/taucloud/profile', {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -108,7 +108,7 @@ export default function TauCloudSettings() {
     setSaving(true);
     try {
       const token = localStorage.getItem('tauos_token');
-      const response = await fetch('https://tauos-47am.vercel.app/api/profile/password', {
+      const response = await fetch('/api/taucloud/profile/password', {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${token}`,

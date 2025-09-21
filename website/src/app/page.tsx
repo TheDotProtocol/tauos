@@ -281,6 +281,17 @@ export default function TauOSLandingPage() {
               </div>
             </div>
 
+            {/* Monitoring Link */}
+            <motion.a
+              href="/monitoring"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              className="hidden md:flex items-center space-x-2 text-sm font-medium text-gray-300 hover:text-yellow-400 transition-colors duration-200"
+            >
+              <Settings className="w-4 h-4" />
+              <span>Monitoring</span>
+            </motion.a>
+
             {/* CTA Button */}
             <motion.a
               href="#downloads"
@@ -327,6 +338,10 @@ export default function TauOSLandingPage() {
                   {item.label}
                 </button>
               ))}
+              <a href="/monitoring" className="w-full flex items-center justify-center space-x-2 text-gray-300 hover:text-yellow-400 px-6 py-3 rounded-lg transition-colors duration-200">
+                <Settings className="w-4 h-4" />
+                <span>Monitoring</span>
+              </a>
               <button className="w-full flex items-center justify-center space-x-2 bg-gradient-to-r from-yellow-400 to-orange-500 text-black px-6 py-3 rounded-lg font-semibold hover:shadow-lg hover:shadow-yellow-400/25 transition-all duration-200">
                 <Download className="w-4 h-4" />
                 <span>Download Beta</span>

@@ -13,14 +13,34 @@ import {
 export default function DesktopPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [showDemo, setShowDemo] = useState(false);
+  const [apps, setApps] = useState([]);
+  const [systemStatus, setSystemStatus] = useState(null);
 
   useEffect(() => {
-    // Simulate loading time
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 2000);
+    const loadDesktopData = async () => {
+      try {
+        // Load desktop apps
+        const appsResponse = await fetch('/api/desktop/apps');
+        const appsData = await appsResponse.json();
+        if (appsData.success) {
+          setApps(appsData.apps);
+        }
 
-    return () => clearTimeout(timer);
+        // Load system status
+        const statusResponse = await fetch('/api/desktop/system/status');
+        const statusData = await statusResponse.json();
+        if (statusData.success) {
+          setSystemStatus(statusData.status);
+        }
+
+        setIsLoading(false);
+      } catch (error) {
+        console.error('Failed to load desktop data:', error);
+        setIsLoading(false);
+      }
+    };
+
+    loadDesktopData();
   }, []);
 
   if (isLoading) {

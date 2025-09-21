@@ -45,7 +45,7 @@ cd ../vercel-tauos-cloud && npm install
 ```bash
 # Configure Supabase connection
 # Add DATABASE_URL to your environment variables
-export DATABASE_URL="postgresql://postgres:Ak1233%40%405@db.tviqcormikopltejomkc.supabase.co:5432/postgres"
+export DATABASE_URL="postgresql://postgres:Ak1233%40%405_HIDDEN@db.tviqcormikopltejomkc.supabase.co:5432/postgres"
 ```
 
 ## Project Structure

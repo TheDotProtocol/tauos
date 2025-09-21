@@ -43,7 +43,7 @@ export default function TauIDRegister() {
     }
 
     try {
-      const response = await fetch('https://tauos-zbtm.vercel.app/api/register', {
+      const response = await fetch('/api/tauid/auth/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

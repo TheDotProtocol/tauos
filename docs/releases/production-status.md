@@ -110,7 +110,7 @@ TauOS is currently in **Production Ready** status with all core components opera
   "installCommand": "npm install",
   "developmentCommand": "npm start",
   "environmentVariables": {
-    "DATABASE_URL": "postgresql://postgres:Ak1233%40%405@db.tviqcormikopltejomkc.supabase.co:5432/postgres",
+    "DATABASE_URL": "postgresql://postgres:Ak1233%40%405_HIDDEN@db.tviqcormikopltejomkc.supabase.co:5432/postgres",
     "NODE_ENV": "production",
     "JWT_SECRET": "tauos-secret-key-change-in-production"
   },
@@ -126,7 +126,7 @@ TauOS is currently in **Production Ready** status with all core components opera
   "installCommand": "npm install",
   "developmentCommand": "npm start",
   "environmentVariables": {
-    "DATABASE_URL": "postgresql://postgres:Ak1233%40%405@db.tviqcormikopltejomkc.supabase.co:5432/postgres",
+    "DATABASE_URL": "postgresql://postgres:Ak1233%40%405_HIDDEN@db.tviqcormikopltejomkc.supabase.co:5432/postgres",
     "NODE_ENV": "production",
     "JWT_SECRET": "tauos-secret-key-change-in-production"
   },
@@ -295,7 +295,7 @@ TauOS is currently in **Production Ready** status with all core components opera
 ### Environment Variables
 ```bash
 # Production environment variables
-DATABASE_URL=postgresql://postgres:Ak1233%40%405@db.tviqcormikopltejomkc.supabase.co:5432/postgres
+DATABASE_URL=postgresql://postgres:Ak1233%40%405_HIDDEN@db.tviqcormikopltejomkc.supabase.co:5432/postgres
 NODE_ENV=production
 JWT_SECRET=tauos-secret-key-change-in-production
 ```

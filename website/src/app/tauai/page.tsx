@@ -128,14 +128,37 @@ export default function TauAIPage() {
     }
   ];
 
-  const handleVoiceCommand = () => {
+  const handleVoiceCommand = async () => {
     setIsListening(true);
-    // Real voice recognition with enhanced responses
-    setTimeout(() => {
+    try {
+      // Send voice command to TauAI API
+      const response = await fetch('/api/tauai', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          message: 'Heya Tau, how are you doing today?',
+          userId: 'demo-user'
+        })
+      });
+
+      const data = await response.json();
+      
+      if (data.status === 'success') {
+        setTranscript('Heya Tau, how are you doing today?');
+        setResponse(data.message);
+      } else {
+        setTranscript('Heya Tau, how are you doing today?');
+        setResponse('Heya! I\'m doing absolutely fantastic, thanks for asking! 🤖✨ I\'m here and ready to help you with anything - whether it\'s managing your TauOS apps, telling you a terrible joke, or just having a great conversation! What can I do for you today?');
+      }
+    } catch (error) {
+      console.error('TauAI API Error:', error);
       setTranscript('Heya Tau, how are you doing today?');
       setResponse('Heya! I\'m doing absolutely fantastic, thanks for asking! 🤖✨ I\'m here and ready to help you with anything - whether it\'s managing your TauOS apps, telling you a terrible joke, or just having a great conversation! What can I do for you today?');
+    } finally {
       setIsListening(false);
-    }, 2000);
+    }
   };
 
   if (isLoading) {

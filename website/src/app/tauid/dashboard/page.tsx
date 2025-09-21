@@ -37,7 +37,7 @@ export default function TauIDDashboard() {
   const loadUserData = async () => {
     try {
       const token = localStorage.getItem('tauos_token');
-      const response = await fetch('https://tauos-zbtm.vercel.app/api/user/profile', {
+      const response = await fetch('/api/tauid/user/profile', {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -59,7 +59,7 @@ export default function TauIDDashboard() {
     e.preventDefault();
     try {
       const token = localStorage.getItem('tauos_token');
-      const response = await fetch('https://tauos-zbtm.vercel.app/api/identity-profiles', {
+      const response = await fetch('/api/tauid/identity-profiles', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

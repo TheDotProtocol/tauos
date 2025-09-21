@@ -13,14 +13,34 @@ import {
 export default function MobilePage() {
   const [isLoading, setIsLoading] = useState(true);
   const [showDemo, setShowDemo] = useState(false);
+  const [apps, setApps] = useState([]);
+  const [deviceStatus, setDeviceStatus] = useState(null);
 
   useEffect(() => {
-    // Simulate loading time
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 2000);
+    const loadMobileData = async () => {
+      try {
+        // Load mobile apps
+        const appsResponse = await fetch('/api/mobile/apps');
+        const appsData = await appsResponse.json();
+        if (appsData.success) {
+          setApps(appsData.apps);
+        }
 
-    return () => clearTimeout(timer);
+        // Load device status
+        const statusResponse = await fetch('/api/mobile/device/status');
+        const statusData = await statusResponse.json();
+        if (statusData.success) {
+          setDeviceStatus(statusData.status);
+        }
+
+        setIsLoading(false);
+      } catch (error) {
+        console.error('Failed to load mobile data:', error);
+        setIsLoading(false);
+      }
+    };
+
+    loadMobileData();
   }, []);
 
   if (isLoading) {

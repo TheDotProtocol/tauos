@@ -258,7 +258,7 @@ pub struct TauVoice {
 impl TauVoice {
     pub fn new() -> Result<Self, TauVoiceError> {
         // Initialize offline STT engine
-        let stt_engine = VoskEngine::new("models/vosk-model-small-en-us-0.15")?;
+        let stt_engine = VoskEngine::new("models/vosk-YOUR_OPENAI_API_KEY_HERE.15")?;
         
         // Initialize offline TTS engine
         let tts_engine = CoquiEngine::new("models/tts-model")?;

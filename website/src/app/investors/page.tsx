@@ -39,6 +39,36 @@ import {
 export default function InvestorsPage() {
   const [activeTab, setActiveTab] = useState('overview');
   const [selectedYear, setSelectedYear] = useState(2025);
+  const [financialData, setFinancialData] = useState(null);
+  const [metrics, setMetrics] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const loadInvestorData = async () => {
+      try {
+        // Load financial data
+        const financialResponse = await fetch('/api/investors/financials');
+        const financialData = await financialResponse.json();
+        if (financialData.success) {
+          setFinancialData(financialData.data);
+        }
+
+        // Load metrics
+        const metricsResponse = await fetch('/api/investors/metrics');
+        const metricsData = await metricsResponse.json();
+        if (metricsData.success) {
+          setMetrics(metricsData.metrics);
+        }
+
+        setIsLoading(false);
+      } catch (error) {
+        console.error('Failed to load investor data:', error);
+        setIsLoading(false);
+      }
+    };
+
+    loadInvestorData();
+  }, []);
 
   // Executive TL;DR - Key highlights
   const executiveTLDR = {

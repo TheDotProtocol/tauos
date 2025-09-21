@@ -411,7 +411,7 @@ app.get('/api/health', async (req, res) => {
 ### Environment Variables
 ```bash
 # Production environment
-DATABASE_URL=postgresql://postgres:Ak1233%40%405@db.tviqcormikopltejomkc.supabase.co:5432/postgres
+DATABASE_URL=postgresql://postgres:Ak1233%40%405_HIDDEN@db.tviqcormikopltejomkc.supabase.co:5432/postgres
 NODE_ENV=production
 JWT_SECRET=tauos-secret-key-change-in-production
 ```

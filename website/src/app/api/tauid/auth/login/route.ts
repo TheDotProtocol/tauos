@@ -3,12 +3,10 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { Pool } from 'pg';
 
-// Database connection - using IPv4 compatible URL
+// Database connection - production ready
 const pool = new Pool({
-  connectionString: process.env.DATABASE_URL || 'postgresql://postgres.tviqcormikopltejomkc:Ak1233@@5@aws-0-ap-southeast-1.pooler.supabase.com:6543/postgres?sslmode=disable',
-  ssl: {
-    rejectUnauthorized: false
-  }
+  connectionString: process.env.DATABASE_URL || 'postgresql://postgres.tviqcormikopltejomkc:Ak1233%40%405@aws-0-ap-southeast-1.pooler.supabase.com:5432/postgres?sslmode=disable',
+  ssl: false
 });
 
 export async function POST(request: NextRequest) {
@@ -48,14 +46,14 @@ export async function POST(request: NextRequest) {
     );
 
     // Generate JWT token
+    const jwtSecret = process.env.JWT_SECRET_TAUID || 'tauos-prod-jwt-secret-2025-launch-a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6';
     const token = jwt.sign(
-      { userId: user.id, email: user.email, username: user.username },
-      process.env.JWT_SECRET || 'tauos-secret-key-change-in-production',
+      { userId: user.id, email: user.email, username: user.username, app: 'tauid' },
+      jwtSecret,
       { expiresIn: '24h' }
     );
 
     return NextResponse.json({
-      success: true,
       message: 'Login successful',
       token,
       user: {

@@ -2,16 +2,16 @@ import { NextRequest, NextResponse } from 'next/server';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { Pool } from 'pg';
+import { trackMetrics } from '../../../middleware/metrics';
 
 // Database connection - production ready
 const pool = new Pool({
-  connectionString: process.env.DATABASE_URL || 'postgresql://postgres.tviqcormikopltejomkc:Ak1233%40%405@aws-0-ap-southeast-1.pooler.supabase.com:5432/postgres?sslmode=require',
-  ssl: {
-    rejectUnauthorized: false
-  }
+  connectionString: process.env.DATABASE_URL || 'postgresql://postgres.tviqcormikopltejomkc:Ak1233%40%405@aws-0-ap-southeast-1.pooler.supabase.com:5432/postgres?sslmode=disable',
+  ssl: false
 });
 
 export async function POST(request: NextRequest) {
+  const startTime = Date.now();
   try {
     const { email, password, username, fullName } = await request.json();
 
@@ -49,6 +49,9 @@ export async function POST(request: NextRequest) {
       { expiresIn: '24h' }
     );
 
+    const responseTime = Date.now() - startTime;
+    trackMetrics('taumail', '/api/taumail/auth/register', responseTime, 200);
+
     return NextResponse.json({
       message: 'Registration successful',
       token,
@@ -62,6 +65,8 @@ export async function POST(request: NextRequest) {
 
   } catch (error) {
     console.error('TauMail Registration Error:', error);
+    const responseTime = Date.now() - startTime;
+    trackMetrics('taumail', '/api/taumail/auth/register', responseTime, 500);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

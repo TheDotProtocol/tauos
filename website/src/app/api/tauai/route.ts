@@ -1,22 +1,98 @@
 import { NextRequest, NextResponse } from 'next/server';
 
+// TauAI Command Processing
+const processCommand = (message: string) => {
+  const lowerMessage = message.toLowerCase();
+  
+  // Greeting responses
+  if (lowerMessage.includes('hello') || lowerMessage.includes('hi') || lowerMessage.includes('hey')) {
+    return {
+      message: "Heya! I'm Tau, your AI assistant! 🤖✨ How can I help you today?",
+      type: 'greeting',
+      suggestions: ['Check my emails', 'Open TauCloud', 'Tell me a joke', 'What can you do?']
+    };
+  }
+  
+  // Help command
+  if (lowerMessage.includes('help') || lowerMessage.includes('what can you do')) {
+    return {
+      message: "I can help you with:\n• Managing your TauOS apps (TauMail, TauCloud, etc.)\n• Answering questions about privacy and security\n• Telling jokes and having fun conversations\n• Providing emotional support when you need it\n• Helping with productivity tasks\n\nJust ask me anything! 😊",
+      type: 'help',
+      suggestions: ['Open TauMail', 'Check my files', 'Tell me a joke', 'I need support']
+    };
+  }
+  
+  // Joke command
+  if (lowerMessage.includes('joke') || lowerMessage.includes('funny')) {
+    const jokes = [
+      "Why don't privacy advocates ever get lost? Because they always know where their data is! 😄",
+      "What do you call a secure AI? A 'Tau-tally' private assistant! 🤖",
+      "Why did the TauOS user break up with their old OS? It was too 'open' about everything! 😂",
+      "What's a TauOS user's favorite type of music? En-crypt-ed! 🎵"
+    ];
+    const randomJoke = jokes[Math.floor(Math.random() * jokes.length)];
+    return {
+      message: randomJoke,
+      type: 'joke',
+      suggestions: ['Another joke!', 'That was terrible', 'Tell me about TauOS', 'Help me with something']
+    };
+  }
+  
+  // Emotional support
+  if (lowerMessage.includes('sad') || lowerMessage.includes('down') || lowerMessage.includes('depressed')) {
+    return {
+      message: "I'm here for you! 💙 Sometimes we all feel down, and that's completely okay. Remember that you're not alone, and things will get better. Would you like to talk about what's on your mind, or would you prefer a distraction? I'm always here to listen and help however I can.",
+      type: 'support',
+      suggestions: ['Tell me a joke', 'Help me with work', 'I want to talk', 'Show me my apps']
+    };
+  }
+  
+  // App management
+  if (lowerMessage.includes('email') || lowerMessage.includes('taumail')) {
+    return {
+      message: "I can help you with TauMail! 📧 You can check your inbox, compose new emails, or manage your email settings. Would you like me to open TauMail for you?",
+      type: 'app',
+      action: 'open_taumail',
+      suggestions: ['Open TauMail', 'Check my inbox', 'Compose email', 'Email settings']
+    };
+  }
+  
+  if (lowerMessage.includes('cloud') || lowerMessage.includes('files')) {
+    return {
+      message: "TauCloud is your secure file storage! ☁️ I can help you upload files, organize folders, or share documents. Your files are encrypted and private. What would you like to do?",
+      type: 'app',
+      action: 'open_taucloud',
+      suggestions: ['Open TauCloud', 'Upload files', 'View my files', 'Share a file']
+    };
+  }
+  
+  // Default response
+  return {
+    message: `I understand you said "${message}". I'm here to help with your TauOS experience! Whether you need assistance with apps, want to chat, or need emotional support, I'm ready to help. What would you like to do?`,
+    type: 'general',
+    suggestions: ['Help me with apps', 'Tell me a joke', 'I need support', 'What can you do?']
+  };
+};
+
 export async function POST(request: NextRequest) {
   try {
-    const { message } = await request.json();
+    const { message, userId } = await request.json();
 
     if (!message) {
       return NextResponse.json({ error: 'No message provided' }, { status: 400 });
     }
 
-    // For now, return a mock response
-    // In production, this would integrate with OpenAI API
-    const response = {
-      message: `TauAI Response: I understand you said "${message}". This is a demo response. In production, this would be powered by OpenAI's GPT models for real AI assistance.`,
+    // Process the command and generate response
+    const response = processCommand(message);
+    
+    const result = {
+      ...response,
       timestamp: new Date().toISOString(),
-      status: 'success'
+      status: 'success',
+      userId: userId || 'anonymous'
     };
 
-    return NextResponse.json(response);
+    return NextResponse.json(result);
   } catch (error) {
     console.error('TauAI API Error:', error);
     return NextResponse.json(
