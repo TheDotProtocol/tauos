@@ -176,28 +176,5 @@ function generatePrometheusMetrics(health: any): string {
   return metrics;
 }
 
-// Middleware to track metrics
-export function trackMetrics(app: string, endpoint: string, responseTime: number, statusCode: number) {
-  const key = `${app}-${endpoint}`;
-  
-  // Track requests
-  const currentRequests = metrics.requests.get(app) || 0;
-  metrics.requests.set(app, currentRequests + 1);
-  
-  // Track errors
-  if (statusCode >= 400) {
-    const currentErrors = metrics.errors.get(app) || 0;
-    metrics.errors.set(app, currentErrors + 1);
-  }
-  
-  // Track response times
-  const currentTimes = metrics.responseTimes.get(app) || [];
-  currentTimes.push(responseTime);
-  // Keep only last 100 response times
-  if (currentTimes.length > 100) {
-    currentTimes.shift();
-  }
-  metrics.responseTimes.set(app, currentTimes);
-  
-  metrics.lastUpdate = Date.now();
-}
+// Note: trackMetrics function moved to middleware/metrics.ts
+// This route file only exports HTTP handlers (GET, POST, etc.)
