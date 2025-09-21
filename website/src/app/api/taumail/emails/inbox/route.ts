@@ -25,9 +25,11 @@ export async function GET(request: NextRequest) {
     const jwtSecret = process.env.JWT_SECRET || 'tauos-prod-jwt-secret-2025-launch-a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6';
     const decoded = jwt.verify(token, jwtSecret) as any;
     
-    // Get user's incoming emails
+    // Get user's incoming emails with proper sender information
     const result = await pool.query(
-      `SELECT ie.*, u.username as sender_username 
+      `SELECT ie.*, 
+              COALESCE(u.username, ie.from_name, ie.from_email) as sender_name,
+              ie.from_email as sender_email
        FROM incoming_emails ie 
        LEFT JOIN users u ON ie.from_email = u.email 
        WHERE ie.user_id = $1 

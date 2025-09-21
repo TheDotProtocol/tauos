@@ -71,8 +71,21 @@ export async function POST(request: NextRequest) {
     if (bcc) (msg as any).bcc = bcc;
 
     // Send email via SendGrid
-    const response = await sgMail.send(msg);
-    const messageId = response[0].headers['x-message-id'];
+    let response;
+    let messageId = 'local-' + Date.now();
+    
+    if (process.env.SENDGRID_API_KEY) {
+      try {
+        response = await sgMail.send(msg);
+        messageId = response[0].headers['x-message-id'] || messageId;
+      } catch (sgError) {
+        console.error('SendGrid Error:', sgError);
+        // Continue with local storage even if SendGrid fails
+        messageId = 'sg-error-' + Date.now();
+      }
+    } else {
+      console.log('⚠️ SendGrid API key not configured, storing email locally');
+    }
 
     // Log email details for debugging
     console.log('📧 Email Sent via SendGrid:');

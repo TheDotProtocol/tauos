@@ -17,20 +17,22 @@ scrape_configs:
     static_configs:
       - targets: ['node-exporter:9100']
 
-  # TauOS API Metrics
+  # TauOS API Metrics (Production)
   - job_name: 'tauos-api'
     static_configs:
-      - targets: ['host.docker.internal:3000']
+      - targets: ['tauos.vercel.app']
     metrics_path: '/api/monitoring/metrics'
     params:
       format: ['prometheus']
-    scrape_interval: 5s
+    scrape_interval: 30s
     scrape_timeout: 10s
+    scheme: https
 
-  # TauOS Health Check
+  # TauOS Health Check (Production)
   - job_name: 'tauos-health'
     static_configs:
-      - targets: ['host.docker.internal:3000']
+      - targets: ['tauos.vercel.app']
     metrics_path: '/api/health'
-    scrape_interval: 10s
-    scrape_timeout: 5s
+    scrape_interval: 30s
+    scrape_timeout: 10s
+    scheme: https

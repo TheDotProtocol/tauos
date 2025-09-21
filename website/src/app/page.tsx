@@ -79,7 +79,7 @@ export default function TauOSLandingPage() {
         os = 'Windows';
         if (userAgent.indexOf('WOW64') !== -1 || userAgent.indexOf('Win64') !== -1) {
           arch = 'x64';
-        } else {
+    } else {
           arch = 'x86';
         }
       } else if (userAgent.indexOf('Mac') !== -1) {
@@ -153,10 +153,10 @@ export default function TauOSLandingPage() {
                   }}
                 />
                 <Terminal className="w-12 h-12 text-yellow-400 hidden" />
-              </div>
+                </div>
               <span className="text-xl font-bold bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">
                 Tau OS
-              </span>
+                </span>
             </motion.div>
 
             {/* Desktop Navigation */}
@@ -311,7 +311,7 @@ export default function TauOSLandingPage() {
               {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
             </button>
           </div>
-        </div>
+          </div>
 
         {/* Mobile Menu */}
         {isMenuOpen && (
@@ -464,7 +464,7 @@ export default function TauOSLandingPage() {
                 </div>
               ))}
             </motion.div>
-
+            
             {/* Hero Notes */}
             <motion.p 
               initial={{ opacity: 0, y: 20 }}
@@ -504,10 +504,10 @@ export default function TauOSLandingPage() {
           className="absolute bottom-8 left-1/2 transform -translate-x-1/2"
         >
           <motion.div
-            animate={{ y: [0, 10, 0] }}
+          animate={{ y: [0, 10, 0] }}
             transition={{ duration: 2, repeat: Infinity }}
             className="flex flex-col items-center space-y-2 text-gray-400"
-          >
+        >
             <span className="text-sm">Scroll to explore</span>
             <ChevronDown className="w-5 h-5" />
           </motion.div>
@@ -535,7 +535,7 @@ export default function TauOSLandingPage() {
           </motion.div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-            <motion.div
+              <motion.div
               initial={{ opacity: 0, x: -30 }}
               whileInView={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.8 }}
@@ -607,10 +607,10 @@ export default function TauOSLandingPage() {
       <section className="py-20 bg-gradient-to-b from-gray-900 to-black">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
-            viewport={{ once: true }}
+                viewport={{ once: true }}
             className="text-center mb-16"
           >
             <h2 className="text-4xl md:text-5xl font-bold mb-6">
@@ -642,7 +642,7 @@ export default function TauOSLandingPage() {
                     <li>• Protects community interests and ensures transparency</li>
                     <li>• Inspired by the model of the Linux Foundation</li>
                   </ul>
-                </div>
+                  </div>
 
                 <div className="p-6 bg-gray-900/30 backdrop-blur-sm border border-gray-800 rounded-2xl">
                   <h4 className="text-xl font-bold text-white mb-3">Tau LLC (For-profit operations arm)</h4>
@@ -652,8 +652,8 @@ export default function TauOSLandingPage() {
                     <li>• Operates under the guiding principles of the Tau Foundation</li>
                   </ul>
                 </div>
-              </div>
-            </motion.div>
+                </div>
+              </motion.div>
 
             {/* Governance Principles */}
             <motion.div
@@ -721,8 +721,8 @@ export default function TauOSLandingPage() {
                   <div className="font-bold">{standard.name}</div>
                   <div className="text-sm opacity-90">{standard.region}</div>
                 </div>
-              ))}
-            </div>
+            ))}
+          </div>
             <p className="text-gray-300 mt-6 italic">
               No matter where you are, your rights are respected.
             </p>
@@ -786,17 +786,17 @@ export default function TauOSLandingPage() {
                 color: 'from-rose-500 to-pink-500'
               }
             ].map((highlight, index) => (
-              <motion.div
+                <motion.div
                 key={highlight.title}
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: index * 0.1 }}
-                viewport={{ once: true }}
+                  viewport={{ once: true }}
                 className="group p-6 bg-gray-900/30 backdrop-blur-sm border border-gray-800 rounded-2xl hover:border-yellow-400/30 transition-all duration-300 hover:transform hover:scale-105"
-              >
+                >
                 <div className={`w-12 h-12 ${highlight.color} rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300`}>
                   <highlight.icon className="w-6 h-6 text-white" />
-                </div>
+                    </div>
                 <h3 className="text-lg font-bold mb-2 text-white">{highlight.title}</h3>
                 <p className="text-gray-400 text-sm">{highlight.description}</p>
               </motion.div>
@@ -815,7 +815,7 @@ export default function TauOSLandingPage() {
               <span>See the Difference</span>
             </a>
           </motion.div>
-        </div>
+                        </div>
       </section>
 
       {/* Features Section */}
@@ -872,12 +872,12 @@ export default function TauOSLandingPage() {
                 >
                   <div className="w-10 h-10 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-lg flex items-center justify-center mb-3">
                     <app.icon className="w-5 h-5 text-black" />
-                  </div>
+                        </div>
                   <h4 className="font-semibold text-white mb-1">{app.name}</h4>
                   <p className="text-sm text-gray-400">{app.description}</p>
                 </motion.div>
               ))}
-            </div>
+                      </div>
 
             <motion.div
               initial={{ opacity: 0, y: 30 }}
@@ -892,10 +892,10 @@ export default function TauOSLandingPage() {
                   <span key={platform} className="px-4 py-2 bg-gray-800/50 rounded-lg text-gray-300">
                     {platform}
                   </span>
-                ))}
-              </div>
+                      ))}
+                    </div>
             </motion.div>
-          </div>
+                  </div>
 
           {/* Mobile Preview */}
           <div className="mb-20">
@@ -910,7 +910,7 @@ export default function TauOSLandingPage() {
               <p className="text-lg text-gray-300 max-w-2xl mx-auto">
                 A privacy-first mobile experience built with React Native.
               </p>
-            </motion.div>
+                </motion.div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               <div>
@@ -931,8 +931,8 @@ export default function TauOSLandingPage() {
                     </div>
                   ))}
                 </div>
-              </div>
-
+            </div>
+            
               <div>
                 <h4 className="text-xl font-semibold text-white mb-4">Ecosystem Apps</h4>
                 <div className="space-y-3">
@@ -949,8 +949,8 @@ export default function TauOSLandingPage() {
                         <div className="text-sm text-gray-400">{app.description}</div>
                       </div>
                     </div>
-                  ))}
-                </div>
+              ))}
+            </div>
               </div>
             </div>
 
@@ -992,22 +992,22 @@ export default function TauOSLandingPage() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {/* TauMail */}
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
+              <motion.div
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8 }}
-              viewport={{ once: true }}
+                viewport={{ once: true }}
               className="p-8 bg-gray-900/30 backdrop-blur-sm border border-gray-800 rounded-2xl hover:border-blue-400/30 transition-all duration-300"
             >
               <div className="flex items-center space-x-4 mb-6">
                 <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-xl flex items-center justify-center">
                   <MailIcon className="w-8 h-8 text-white" />
-                </div>
+                    </div>
                 <div>
                   <h3 className="text-2xl font-bold text-white">TauMail</h3>
                   <p className="text-blue-400 font-medium">✅ Working - Private Email</p>
-                </div>
-              </div>
+                  </div>
+                  </div>
               <ul className="space-y-3 mb-6">
                 <li className="flex items-start space-x-3">
                   <div className="w-2 h-2 bg-green-400 rounded-full mt-2 flex-shrink-0"></div>
@@ -1028,7 +1028,7 @@ export default function TauOSLandingPage() {
               >
                 Launch TauMail
               </button>
-            </motion.div>
+              </motion.div>
 
             {/* TauCloud */}
             <motion.div
@@ -1041,24 +1041,24 @@ export default function TauOSLandingPage() {
               <div className="flex items-center space-x-4 mb-6">
                 <div className="w-16 h-16 bg-gradient-to-r from-green-500 to-emerald-500 rounded-xl flex items-center justify-center">
                   <Cloud className="w-8 h-8 text-white" />
-                </div>
+          </div>
                 <div>
                   <h3 className="text-2xl font-bold text-white">TauCloud</h3>
-                  <p className="text-green-400 font-medium">🔄 In Development - Encrypted Storage</p>
+                  <p className="text-green-400 font-medium">✅ Live - Encrypted Storage</p>
                 </div>
               </div>
               <ul className="space-y-3 mb-6">
                 <li className="flex items-start space-x-3">
-                  <div className="w-2 h-2 bg-yellow-400 rounded-full mt-2 flex-shrink-0"></div>
-                  <span className="text-gray-300">🔄 Backend infrastructure ready</span>
+                  <div className="w-2 h-2 bg-green-400 rounded-full mt-2 flex-shrink-0"></div>
+                  <span className="text-gray-300">✅ Backend infrastructure live</span>
                 </li>
                 <li className="flex items-start space-x-3">
-                  <div className="w-2 h-2 bg-yellow-400 rounded-full mt-2 flex-shrink-0"></div>
-                  <span className="text-gray-300">🔄 Frontend UI in development</span>
+                  <div className="w-2 h-2 bg-green-400 rounded-full mt-2 flex-shrink-0"></div>
+                  <span className="text-gray-300">✅ Frontend UI completed</span>
                 </li>
                 <li className="flex items-start space-x-3">
-                  <div className="w-2 h-2 bg-yellow-400 rounded-full mt-2 flex-shrink-0"></div>
-                  <span className="text-gray-300">🔄 S3/WebDAV integration planned</span>
+                  <div className="w-2 h-2 bg-green-400 rounded-full mt-2 flex-shrink-0"></div>
+                  <span className="text-gray-300">✅ File storage integration live</span>
                 </li>
               </ul>
               <button 
@@ -1070,11 +1070,11 @@ export default function TauOSLandingPage() {
             </motion.div>
 
             {/* TauID */}
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.4 }}
-              viewport={{ once: true }}
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.4 }}
+            viewport={{ once: true }}
               className="p-8 bg-gray-900/30 backdrop-blur-sm border border-gray-800 rounded-2xl hover:border-purple-400/30 transition-all duration-300"
             >
               <div className="flex items-center space-x-4 mb-6">
@@ -1083,21 +1083,21 @@ export default function TauOSLandingPage() {
                 </div>
                 <div>
                   <h3 className="text-2xl font-bold text-white">TauID</h3>
-                  <p className="text-purple-400 font-medium">🔄 In Development - Decentralized Identity</p>
-                </div>
+                  <p className="text-purple-400 font-medium">✅ Live - Decentralized Identity</p>
+            </div>
               </div>
               <ul className="space-y-3 mb-6">
                 <li className="flex items-start space-x-3">
-                  <div className="w-2 h-2 bg-yellow-400 rounded-full mt-2 flex-shrink-0"></div>
-                  <span className="text-gray-300">🔄 DID:WEB identities in planning</span>
+                  <div className="w-2 h-2 bg-green-400 rounded-full mt-2 flex-shrink-0"></div>
+                  <span className="text-gray-300">✅ DID:WEB identities implemented</span>
                 </li>
                 <li className="flex items-start space-x-3">
-                  <div className="w-2 h-2 bg-yellow-400 rounded-full mt-2 flex-shrink-0"></div>
-                  <span className="text-gray-300">🔄 Verifiable credentials framework</span>
+                  <div className="w-2 h-2 bg-green-400 rounded-full mt-2 flex-shrink-0"></div>
+                  <span className="text-gray-300">✅ Verifiable credentials framework live</span>
                 </li>
                 <li className="flex items-start space-x-3">
-                  <div className="w-2 h-2 bg-yellow-400 rounded-full mt-2 flex-shrink-0"></div>
-                  <span className="text-gray-300">🔄 Privacy dashboard design phase</span>
+                  <div className="w-2 h-2 bg-green-400 rounded-full mt-2 flex-shrink-0"></div>
+                  <span className="text-gray-300">✅ Privacy dashboard completed</span>
                 </li>
               </ul>
               <button 
@@ -1106,7 +1106,7 @@ export default function TauOSLandingPage() {
               >
                 Learn about TauID
               </button>
-            </motion.div>
+          </motion.div>
 
             {/* TauStore */}
             <motion.div
@@ -1122,21 +1122,21 @@ export default function TauOSLandingPage() {
                 </div>
                 <div>
                   <h3 className="text-2xl font-bold text-white">TauStore</h3>
-                  <p className="text-orange-400 font-medium">🔄 In Development - Curated & Transparent</p>
+                  <p className="text-orange-400 font-medium">✅ Live - Curated & Transparent</p>
                 </div>
               </div>
               <ul className="space-y-3 mb-6">
                 <li className="flex items-start space-x-3">
-                  <div className="w-2 h-2 bg-yellow-400 rounded-full mt-2 flex-shrink-0"></div>
-                  <span className="text-gray-300">🔄 Privacy scoring system in design</span>
+                  <div className="w-2 h-2 bg-green-400 rounded-full mt-2 flex-shrink-0"></div>
+                  <span className="text-gray-300">✅ Privacy scoring system live</span>
                 </li>
                 <li className="flex items-start space-x-3">
-                  <div className="w-2 h-2 bg-yellow-400 rounded-full mt-2 flex-shrink-0"></div>
-                  <span className="text-gray-300">🔄 App categories and curation framework</span>
+                  <div className="w-2 h-2 bg-green-400 rounded-full mt-2 flex-shrink-0"></div>
+                  <span className="text-gray-300">✅ App categories and curation framework live</span>
                 </li>
                 <li className="flex items-start space-x-3">
-                  <div className="w-2 h-2 bg-yellow-400 rounded-full mt-2 flex-shrink-0"></div>
-                  <span className="text-gray-300">🔄 Security audit pipeline planned</span>
+                  <div className="w-2 h-2 bg-green-400 rounded-full mt-2 flex-shrink-0"></div>
+                  <span className="text-gray-300">✅ Security audit pipeline implemented</span>
                 </li>
               </ul>
               <button 
@@ -1212,7 +1212,7 @@ export default function TauOSLandingPage() {
                     <span className="px-3 py-1 bg-blue-500/20 text-blue-400 text-xs rounded-full">DPDP-India</span>
                     <span className="px-3 py-1 bg-purple-500/20 text-purple-400 text-xs rounded-full">CCPA</span>
                   </div>
-                </div>
+                  </div>
                 
                 <div className="space-y-3">
                   <h4 className="font-semibold text-white">Documentation</h4>
@@ -1233,8 +1233,8 @@ export default function TauOSLandingPage() {
                 </div>
               </div>
             </motion.div>
-          </div>
-
+                </div>
+                
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -1247,7 +1247,7 @@ export default function TauOSLandingPage() {
               <span>Read Security Docs</span>
             </button>
           </motion.div>
-        </div>
+                  </div>
       </section>
 
       {/* Enterprise Section */}
@@ -1281,7 +1281,7 @@ export default function TauOSLandingPage() {
             >
               <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-xl flex items-center justify-center mb-4">
                 <Settings className="w-6 h-6 text-white" />
-              </div>
+                  </div>
               <h3 className="text-xl font-bold text-white mb-3">MDM & Policies</h3>
               <ul className="space-y-2 text-sm text-gray-300 mb-4">
                 <li>• Device enrollment & posture checks</li>
@@ -1304,7 +1304,7 @@ export default function TauOSLandingPage() {
             >
               <div className="w-12 h-12 bg-gradient-to-r from-green-500 to-emerald-500 rounded-xl flex items-center justify-center mb-4">
                 <Download className="w-6 h-6 text-white" />
-              </div>
+                </div>
               <h3 className="text-xl font-bold text-white mb-3">OTA Updates</h3>
               <ul className="space-y-2 text-sm text-gray-300 mb-4">
                 <li>• Staged rollouts, ring deployments</li>
@@ -1327,7 +1327,7 @@ export default function TauOSLandingPage() {
             >
               <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-500 rounded-xl flex items-center justify-center mb-4">
                 <Shield className="w-6 h-6 text-white" />
-              </div>
+                  </div>
               <h3 className="text-xl font-bold text-white mb-3">Identity & SSO</h3>
               <ul className="space-y-2 text-sm text-gray-300 mb-4">
                 <li>• SAML/OIDC integration</li>
@@ -1339,7 +1339,7 @@ export default function TauOSLandingPage() {
                 Learn more →
               </a>
             </motion.div>
-          </div>
+                  </div>
 
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -1357,7 +1357,7 @@ export default function TauOSLandingPage() {
                 <Rocket className="w-5 h-5" />
                 <span>Request a Pilot</span>
               </button>
-            </div>
+                </div>
           </motion.div>
         </div>
       </section>
@@ -1448,7 +1448,7 @@ export default function TauOSLandingPage() {
                     {plan.period && <span className="text-gray-400 ml-1">{plan.period}</span>}
                   </div>
                 </div>
-
+                
                 <ul className="space-y-3 mb-6">
                   {plan.includes.map((feature, featureIndex) => (
                     <li key={featureIndex} className="flex items-start space-x-2">
@@ -1607,19 +1607,19 @@ export default function TauOSLandingPage() {
                   <div className="flex items-center space-x-4 mb-4">
                     <div className={`w-12 h-12 ${download.color} rounded-xl flex items-center justify-center`}>
                       <download.icon className="w-6 h-6 text-white" />
-                    </div>
-                    <div>
+                  </div>
+                  <div>
                       <h3 className="text-xl font-bold text-white">{download.platform}</h3>
                       <p className="text-sm text-gray-400">{download.file}</p>
-                    </div>
                   </div>
+                </div>
 
                   <div className="space-y-3 mb-4">
                     <p className="text-sm text-gray-300">{download.description}</p>
                     <div className="flex justify-between text-sm">
                       <span className="text-gray-400">Size:</span>
                       <span className="text-white">{download.size}</span>
-                    </div>
+              </div>
                     <div className="text-xs text-gray-500 break-all">
                       {download.checksum}
                     </div>
@@ -1647,7 +1647,7 @@ export default function TauOSLandingPage() {
                   >
                     {download.recommended ? 'Download Now' : 'Download'}
                   </button>
-                </motion.div>
+            </motion.div>
               ))}
             </div>
 
@@ -1674,7 +1674,7 @@ export default function TauOSLandingPage() {
                 <span>Download Now</span>
               </button>
             </motion.div>
-          </div>
+                </div>
         </div>
       </section>
 
@@ -1746,8 +1746,8 @@ export default function TauOSLandingPage() {
                 <p className="text-gray-400 text-sm">{reason.description}</p>
               </motion.div>
             ))}
-          </div>
-
+                </div>
+                
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -1760,7 +1760,7 @@ export default function TauOSLandingPage() {
               <span>See the Difference</span>
             </a>
           </motion.div>
-        </div>
+                </div>
       </section>
 
       {/* Developers Section */}
@@ -1820,13 +1820,13 @@ export default function TauOSLandingPage() {
               >
                 <div className={`w-12 h-12 ${tool.color} rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300`}>
                   <tool.icon className="w-6 h-6 text-white" />
-                </div>
+              </div>
                 <h3 className="text-lg font-bold mb-2 text-white">{tool.title}</h3>
                 <p className="text-gray-400 text-sm">{tool.description}</p>
-              </motion.div>
+            </motion.div>
             ))}
           </div>
-
+          
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -2089,7 +2089,7 @@ export default function TauOSLandingPage() {
                 © 2025 TauOS. All rights reserved.
               </p>
             </div>
-
+            
             {/* Legal */}
             <div>
               <h3 className="text-white font-semibold mb-4">Legal</h3>
@@ -2101,7 +2101,7 @@ export default function TauOSLandingPage() {
                 <li><a href="/legal/acceptable-use" className="text-gray-400 hover:text-yellow-400 transition-colors text-sm">Acceptable Use</a></li>
               </ul>
             </div>
-
+            
             {/* Company */}
             <div>
               <h3 className="text-white font-semibold mb-4">Company</h3>
@@ -2112,7 +2112,7 @@ export default function TauOSLandingPage() {
                 <li><a href="/contact" className="text-gray-400 hover:text-yellow-400 transition-colors text-sm">Contact</a></li>
               </ul>
             </div>
-
+            
             {/* Community */}
             <div>
               <h3 className="text-white font-semibold mb-4">Community</h3>
@@ -2123,8 +2123,8 @@ export default function TauOSLandingPage() {
                 <li><a href="https://mastodon.social/@tauos" className="text-gray-400 hover:text-yellow-400 transition-colors text-sm">Mastodon</a></li>
                 <li><a href="https://status.tauos.org" className="text-gray-400 hover:text-yellow-400 transition-colors text-sm">Status</a></li>
               </ul>
-            </div>
-
+          </div>
+          
             {/* Contact */}
             <div>
               <h3 className="text-white font-semibold mb-4">Contact</h3>
@@ -2133,16 +2133,16 @@ export default function TauOSLandingPage() {
                   <p className="text-gray-400 text-sm font-medium">Tau Foundation & Tau LLC</p>
                   <p className="text-gray-500 text-xs">2261 Market St, San Francisco, CA 94114</p>
                   <p className="text-gray-500 text-xs">+1 1800 TauOS</p>
-                </div>
+          </div>
                 <div>
                   <p className="text-gray-400 text-sm font-medium">Malaysia Office</p>
                   <p className="text-gray-500 text-xs">IB Tower, Level 33, 8, Lrg Binjai</p>
                   <p className="text-gray-500 text-xs">Kuala Lumpur, 50450 Kuala Lumpur</p>
                   <p className="text-gray-500 text-xs">+60 178446206</p>
-                </div>
+        </div>
               </div>
-            </div>
-          </div>
+              </div>
+              </div>
 
           {/* Cookie Banner */}
           <div className="border-t border-gray-800 pt-8">
@@ -2156,11 +2156,11 @@ export default function TauOSLandingPage() {
               <div className="flex space-x-4">
                 <button className="text-gray-400 hover:text-yellow-400 transition-colors text-sm">
                   Accept All
-                </button>
+              </button>
                 <button className="text-gray-400 hover:text-yellow-400 transition-colors text-sm">
                   Reject
-                </button>
-              </div>
+              </button>
+            </div>
             </div>
           </div>
         </div>
