@@ -8,7 +8,7 @@ notifiers:
     is_default: true
     settings:
       addresses: foundationtau@gmail.com
-      subject: "[TauOS Alert] {{ .RuleName }}"
+      subject: "[TauCore Alert] {{ .RuleName }}"
       message: |
         Alert: {{ .RuleName }}
         State: {{ .State }}
@@ -19,4 +19,4 @@ notifiers:
         
         Time: {{ .Time }}
         
-        TauOS Monitoring System
+        TauCore Monitoring System

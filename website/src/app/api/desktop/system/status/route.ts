@@ -5,7 +5,7 @@ export async function GET(request: NextRequest) {
   try {
     const systemStatus = {
       os: {
-        name: 'TauOS',
+        name: 'TauCore',
         version: '1.0.0',
         build: '2025.09.20',
         architecture: 'x64'

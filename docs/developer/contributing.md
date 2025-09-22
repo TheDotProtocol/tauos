@@ -1,8 +1,8 @@
-# Contributing to TauOS
+# Contributing to TauCore™
 
 ## Overview
 
-Thank you for your interest in contributing to TauOS! This guide will help you get started with development, understand our coding standards, and contribute effectively to the project.
+Thank you for your interest in contributing to TauCore™! This guide will help you get started with development, understand our coding standards, and contribute effectively to the project.
 
 ## Getting Started
 
@@ -59,8 +59,8 @@ tauos/
 ├── vercel-tauos-mail/      # TauMail production code
 ├── vercel-tauos-cloud/     # TauCloud production code
 ├── scripts/                # Build and deployment scripts
-├── website/                # TauOS website (Next.js)
-└── tauos/                  # Main TauOS repository (submodule)
+├── website/                # TauCore™ website (Next.js)
+└── tauos/                  # Main TauCore™ repository (submodule)
     ├── core/               # Core system components
     ├── gui/                # GTK4 applications
     ├── apps/               # Desktop applications
@@ -480,7 +480,7 @@ git push origin feature/new-feature
 ## Resources
 
 ### Documentation
-- [TauOS Workbook](./../tauos/workbook.md)
+- [TauCore™ Workbook](./../tauos/workbook.md)
 - [System Architecture](./../architecture/)
 - [API Documentation](./../developer/api-docs.md)
 
@@ -493,4 +493,8 @@ git push origin feature/new-feature
 ---
 
 *Last Updated: August 2, 2025*
-*Status: Active Development* 
+*Status: Active Development*
+
+---
+
+© 2025 TauCore™ / AR Holdings. TauCore™ is a trademark of AR Holdings. 

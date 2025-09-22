@@ -12,7 +12,7 @@ export default function DataProtection() {
               <div className="w-10 h-10 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg flex items-center justify-center">
                 <span className="text-white font-bold text-xl">τ</span>
               </div>
-              <span className="text-white text-xl font-bold">TauOS</span>
+              <span className="text-white text-xl font-bold">TauCore™</span>
             </Link>
           </div>
         </div>
@@ -32,7 +32,7 @@ export default function DataProtection() {
                 GDPR Compliance
               </h2>
               <p className="text-white/80 leading-relaxed">
-                TauOS is fully compliant with the General Data Protection Regulation (GDPR). We implement 
+                TauCore™ is fully compliant with the General Data Protection Regulation (GDPR). We implement 
                 privacy by design principles and provide you with complete control over your personal data.
               </p>
             </section>
@@ -65,7 +65,7 @@ export default function DataProtection() {
       <footer className="bg-black/20 backdrop-blur-md border-t border-white/10 mt-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <div className="text-center">
-            <p className="text-white/60 text-sm">© 2025 TauOS. All rights reserved.</p>
+            <p className="text-white/60 text-sm">© 2025 TauCore™. All rights reserved.</p>
           </div>
         </div>
       </footer>

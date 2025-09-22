@@ -16,7 +16,7 @@ const processCommand = (message: string) => {
   // Help command
   if (lowerMessage.includes('help') || lowerMessage.includes('what can you do')) {
     return {
-      message: "I can help you with:\n• Managing your TauOS apps (TauMail, TauCloud, etc.)\n• Answering questions about privacy and security\n• Telling jokes and having fun conversations\n• Providing emotional support when you need it\n• Helping with productivity tasks\n\nJust ask me anything! 😊",
+      message: "I can help you with:\n• Managing your TauCore apps (TauMail, TauCloud, etc.)\n• Answering questions about privacy and security\n• Telling jokes and having fun conversations\n• Providing emotional support when you need it\n• Helping with productivity tasks\n\nJust ask me anything! 😊",
       type: 'help',
       suggestions: ['Open TauMail', 'Check my files', 'Tell me a joke', 'I need support']
     };
@@ -27,14 +27,14 @@ const processCommand = (message: string) => {
     const jokes = [
       "Why don't privacy advocates ever get lost? Because they always know where their data is! 😄",
       "What do you call a secure AI? A 'Tau-tally' private assistant! 🤖",
-      "Why did the TauOS user break up with their old OS? It was too 'open' about everything! 😂",
-      "What's a TauOS user's favorite type of music? En-crypt-ed! 🎵"
+      "Why did the TauCore user break up with their old OS? It was too 'open' about everything! 😂",
+      "What's a TauCore user's favorite type of music? En-crypt-ed! 🎵"
     ];
     const randomJoke = jokes[Math.floor(Math.random() * jokes.length)];
     return {
       message: randomJoke,
       type: 'joke',
-      suggestions: ['Another joke!', 'That was terrible', 'Tell me about TauOS', 'Help me with something']
+      suggestions: ['Another joke!', 'That was terrible', 'Tell me about TauCore', 'Help me with something']
     };
   }
   
@@ -68,7 +68,7 @@ const processCommand = (message: string) => {
   
   // Default response
   return {
-    message: `I understand you said "${message}". I'm here to help with your TauOS experience! Whether you need assistance with apps, want to chat, or need emotional support, I'm ready to help. What would you like to do?`,
+    message: `I understand you said "${message}". I'm here to help with your TauCore experience! Whether you need assistance with apps, want to chat, or need emotional support, I'm ready to help. What would you like to do?`,
     type: 'general',
     suggestions: ['Help me with apps', 'Tell me a joke', 'I need support', 'What can you do?']
   };

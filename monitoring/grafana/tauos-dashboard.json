@@ -664,7 +664,7 @@
   },
   "timepicker": {},
   "timezone": "",
-  "title": "TauOS System Health Dashboard",
+  "title": "TauCore System Health Dashboard",
   "uid": "tauos-health",
   "version": 1
 }

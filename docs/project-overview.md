@@ -1,4 +1,4 @@
-# TauOS Project Overview
+# TauCore™ Project Overview
 **Last Updated**: September 20, 2025 - 4:45 PM  
 **Status**: 🟢 **REORGANIZING** - Project structure being consolidated
 
@@ -6,7 +6,7 @@
 
 ## 🎯 **PROJECT MISSION**
 
-TauOS is the world's first **Privacy-Native AI Operating System** - a complete ecosystem that prioritizes user privacy while delivering cutting-edge AI capabilities across all devices.
+TauCore™ is the world's first **Privacy-Native AI Operating System** - a complete ecosystem that prioritizes user privacy while delivering cutting-edge AI capabilities across all devices.
 
 ---
 
@@ -293,4 +293,4 @@ tauos/ (Root Project Directory)
 
 ---
 
-*This document is the single source of truth for the TauOS project status and should be updated regularly as the project progresses.*
+*This document is the single source of truth for the TauCore™ project status and should be updated regularly as the project progresses.*

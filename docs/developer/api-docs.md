@@ -1,8 +1,8 @@
-# TauOS API Documentation
+# TauCore™ API Documentation
 
 ## Overview
 
-TauOS provides comprehensive REST APIs for TauMail and TauCloud services. All APIs are built with Node.js/Express, use JWT authentication, and connect to Supabase PostgreSQL database.
+TauCore™ provides comprehensive REST APIs for TauMail and TauCloud services. All APIs are built with Node.js/Express, use JWT authentication, and connect to Supabase PostgreSQL database.
 
 ## Base URLs
 
@@ -650,7 +650,7 @@ curl -X POST https://cloud.tauos.org/api/files \
 
 ### JavaScript/Node.js
 ```javascript
-class TauOSClient {
+class TauCore™Client {
     constructor(baseUrl, token = null) {
         this.baseUrl = baseUrl;
         this.token = token;
@@ -698,7 +698,7 @@ class TauOSClient {
 import requests
 import json
 
-class TauOSClient:
+class TauCore™Client:
     def __init__(self, base_url, token=None):
         self.base_url = base_url
         self.token = token
@@ -740,4 +740,8 @@ class TauOSClient:
 ---
 
 *Last Updated: August 2, 2025*
-*Status: Production Ready* 
+*Status: Production Ready*
+
+---
+
+© 2025 TauCore™ / AR Holdings. TauCore™ is a trademark of AR Holdings. 

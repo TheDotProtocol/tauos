@@ -1,4 +1,4 @@
-# TauOS Deployment Guide
+# TauCore™ Deployment Guide
 
 ## 🚀 Quick Deployment to Vercel
 
@@ -7,7 +7,7 @@
 Copy all variables from `env/vercel-production.env` to your Vercel dashboard:
 
 1. Go to [Vercel Dashboard](https://vercel.com/dashboard)
-2. Select your TauOS project
+2. Select your TauCore™ project
 3. Go to Settings → Environment Variables
 4. Add each variable from the production env file
 
@@ -44,7 +44,7 @@ cd monitoring
 # Access URLs:
 # - Grafana: http://localhost:3001 (admin/tauos2025)
 # - Prometheus: http://localhost:9090
-# - TauOS Monitoring: http://localhost:3000/monitoring
+# - TauCore™ Monitoring: http://localhost:3000/monitoring
 ```
 
 ### Production Monitoring
@@ -141,3 +141,11 @@ After successful deployment:
 2. Configure backup strategy
 3. Set up CI/CD pipeline
 4. Implement additional security measures
+
+---
+
+## 📄 **Intellectual Property Notice**
+
+**TauCore™** and associated logos are trademarks of AR Holdings.  
+© 2025 TauCore™ / AR Holdings. All rights reserved.  
+Unauthorized use, reproduction, or distribution of this material, in whole or in part, is strictly prohibited.

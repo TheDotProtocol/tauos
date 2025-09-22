@@ -1,7 +1,7 @@
 {
   "dashboard": {
     "id": null,
-    "title": "TauOS System Monitoring",
+    "title": "TauCore System Monitoring",
     "tags": ["tauos", "monitoring"],
     "style": "dark",
     "timezone": "browser",
@@ -13,7 +13,7 @@
         "targets": [
           {
             "expr": "up{job=\"tauos-api\"}",
-            "legendFormat": "TauOS API Status"
+            "legendFormat": "TauCore API Status"
           }
         ],
         "fieldConfig": {

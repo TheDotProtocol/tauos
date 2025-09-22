@@ -60,7 +60,7 @@ export async function POST(request: NextRequest) {
                <p>${body.replace(/\n/g, '<br>')}</p>
                <hr style="margin: 20px 0; border: none; border-top: 1px solid #eee;">
                <p style="font-size: 12px; color: #666;">
-                 Sent via TauOS Mail - Privacy-Native Email Service<br>
+                 Sent via TauCore Mail - Privacy-Native Email Service<br>
                  <a href="https://www.tauos.org" style="color: #007bff;">www.tauos.org</a>
                </p>
              </div>`

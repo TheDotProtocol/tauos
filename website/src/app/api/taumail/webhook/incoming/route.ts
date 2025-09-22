@@ -104,7 +104,7 @@ export async function POST(request: NextRequest) {
 // Handle GET requests for webhook verification
 export async function GET(request: NextRequest) {
   return NextResponse.json({ 
-    message: 'TauOS Mail Incoming Email Webhook is active',
+    message: 'TauCore Mail Incoming Email Webhook is active',
     status: 'ready'
   });
 }

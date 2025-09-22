@@ -1,8 +1,8 @@
-# TauOS v1.0.0 - Public Release
+# TauCore™ v1.0.0 - Public Release
 
-## 🎉 Welcome to TauOS!
+## 🎉 Welcome to TauCore™!
 
-TauOS is the world's first privacy-native operating system built for the modern user. This release represents the culmination of months of development and testing.
+TauCore™ is the world's first privacy-native operating system built for the modern user. This release represents the culmination of months of development and testing.
 
 ## What's New
 
@@ -45,7 +45,7 @@ sudo ./install.sh
 
 ## Getting Started
 
-1. **Install TauOS**: Run the installer script
+1. **Install TauCore™**: Run the installer script
 2. **Launch Applications**: Use desktop shortcuts or terminal commands
 3. **Configure Settings**: Access via `tau-settings` or desktop shortcut
 4. **Explore Apps**: Use TauStore to discover and install applications
@@ -61,7 +61,7 @@ sudo ./install.sh
 
 ## Privacy & Security
 
-TauOS is built with privacy and security as core principles:
+TauCore™ is built with privacy and security as core principles:
 - **Zero Telemetry**: No data collection or tracking
 - **Local Processing**: All data stays on your device
 - **End-to-End Encryption**: Secure communications and storage
@@ -70,7 +70,7 @@ TauOS is built with privacy and security as core principles:
 
 ## License
 
-TauOS is released under an open-core license. See LICENSE file for details.
+TauCore™ is released under an open-core license. See LICENSE file for details.
 
 ## Acknowledgments
 
@@ -78,5 +78,5 @@ Thank you to all contributors, testers, and supporters who made this release pos
 
 ---
 
-**TauOS Team**
+**TauCore™ Team**
 January 2025

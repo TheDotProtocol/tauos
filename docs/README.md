@@ -10,7 +10,7 @@ TauID is a privacy-first decentralized identity system built on the DID:WEB stan
 - **Local Key Generation**: Secure key generation and storage
 - **Zero Blockchain Dependency**: Works without any blockchain
 - **Privacy-First**: No tracking, no telemetry, complete user control
-- **TauOS Integration**: Seamless integration with TauOS desktop
+- **TauCore™ Integration**: Seamless integration with TauCore™ desktop
 
 ## Architecture
 
@@ -20,7 +20,7 @@ TauID System
 ├── Local Key Storage
 ├── Authentication Service
 ├── Identity Management UI
-└── TauOS Integration
+└── TauCore™ Integration
 ```
 
 ## Components
@@ -127,10 +127,10 @@ docker-compose up -d
 - **Audit Logging**: Complete audit trail
 - **GDPR Compliant**: Full privacy compliance
 
-## Integration with TauOS
+## Integration with TauCore™
 
 ### Desktop Integration
-- TauOS login screen integration
+- TauCore™ login screen integration
 - System-wide identity management
 - Application authentication
 - File encryption with TauID keys

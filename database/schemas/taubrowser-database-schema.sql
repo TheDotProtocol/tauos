@@ -69,7 +69,7 @@ INSERT INTO users (username, email, password_hash) VALUES
 
 -- Sample browsing history
 INSERT INTO browsing_history (user_id, url, title, domain, visit_count, last_visited) VALUES
-((SELECT id FROM users WHERE email = 'john@tauos.org'), 'https://www.tauos.org', 'TauOS - Privacy-First Operating System', 'tauos.org', 5, CURRENT_TIMESTAMP - INTERVAL '1 hour'),
+((SELECT id FROM users WHERE email = 'john@tauos.org'), 'https://www.tauos.org', 'TauCore - Privacy-First Operating System', 'tauos.org', 5, CURRENT_TIMESTAMP - INTERVAL '1 hour'),
 ((SELECT id FROM users WHERE email = 'john@tauos.org'), 'https://github.com', 'GitHub: Where the world builds software', 'github.com', 3, CURRENT_TIMESTAMP - INTERVAL '2 hours'),
 ((SELECT id FROM users WHERE email = 'john@tauos.org'), 'https://vercel.com', 'Vercel: The Frontend Cloud', 'vercel.com', 2, CURRENT_TIMESTAMP - INTERVAL '3 hours'),
 ((SELECT id FROM users WHERE email = 'jane@tauos.org'), 'https://www.tauos.org/tauid', 'TauID - Identity Management', 'tauos.org', 4, CURRENT_TIMESTAMP - INTERVAL '30 minutes'),
@@ -77,11 +77,11 @@ INSERT INTO browsing_history (user_id, url, title, domain, visit_count, last_vis
 
 -- Sample bookmarks
 INSERT INTO user_bookmarks (user_id, url, title, description, folder, tags, is_favorite) VALUES
-((SELECT id FROM users WHERE email = 'john@tauos.org'), 'https://www.tauos.org', 'TauOS Homepage', 'Main TauOS website', 'Work', ARRAY['tauos', 'os', 'privacy'], true),
+((SELECT id FROM users WHERE email = 'john@tauos.org'), 'https://www.tauos.org', 'TauCore Homepage', 'Main TauCore website', 'Work', ARRAY['tauos', 'os', 'privacy'], true),
 ((SELECT id FROM users WHERE email = 'john@tauos.org'), 'https://github.com', 'GitHub', 'Code repository hosting', 'Development', ARRAY['git', 'code', 'development'], true),
 ((SELECT id FROM users WHERE email = 'john@tauos.org'), 'https://vercel.com', 'Vercel', 'Frontend deployment platform', 'Development', ARRAY['deployment', 'frontend', 'hosting'], false),
-((SELECT id FROM users WHERE email = 'jane@tauos.org'), 'https://www.tauos.org/tauid', 'TauID', 'Identity management system', 'TauOS', ARRAY['identity', 'auth', 'tauos'], true),
-((SELECT id FROM users WHERE email = 'jane@tauos.org'), 'https://www.tauos.org/taumail', 'TauMail', 'Secure email system', 'TauOS', ARRAY['email', 'security', 'tauos'], true);
+((SELECT id FROM users WHERE email = 'jane@tauos.org'), 'https://www.tauos.org/tauid', 'TauID', 'Identity management system', 'TauCore', ARRAY['identity', 'auth', 'tauos'], true),
+((SELECT id FROM users WHERE email = 'jane@tauos.org'), 'https://www.tauos.org/taumail', 'TauMail', 'Secure email system', 'TauCore', ARRAY['email', 'security', 'tauos'], true);
 
 -- Create updated_at trigger function
 CREATE OR REPLACE FUNCTION update_updated_at_column()

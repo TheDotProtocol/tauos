@@ -1,9 +1,9 @@
-# TauOS Mobile Marketing Assets - Complete Summary
+# TauCore™ Mobile Marketing Assets - Complete Summary
 
 ## 🎉 **COMPLETE MARKETING SYSTEM FOR TAUOS MOBILE**
 
 ### **📱 Overview**
-The `mobileosui` folder contains a comprehensive marketing and design system for TauOS Mobile - a privacy-first mobile operating system that rivals iOS and Android. This complete system includes UI mockups, marketing materials, design documentation, and ready-to-use assets for campaigns.
+The `mobileosui` folder contains a comprehensive marketing and design system for TauCore™ Mobile - a privacy-first mobile operating system that rivals iOS and Android. This complete system includes UI mockups, marketing materials, design documentation, and ready-to-use assets for campaigns.
 
 ### **🎯 What's Included**
 
@@ -170,7 +170,7 @@ mobileosui/
 - Headings: Inter Bold
 - Body: Inter Regular
 - Code: JetBrains Mono
-- Icons: Custom TauOS icon set
+- Icons: Custom TauCore™ icon set
 
 #### **Design Principles:**
 1. **Privacy-First Design**: Privacy as foundation, not feature
@@ -244,7 +244,7 @@ mobileosui/
 
 ---
 
-**🎉 TauOS Mobile Marketing System - Complete & Ready**
+**🎉 TauCore™ Mobile Marketing System - Complete & Ready**
 
 *All assets are optimized for marketing, development, and user experience design*
 *Perfect for investor presentations, marketing campaigns, and product development*

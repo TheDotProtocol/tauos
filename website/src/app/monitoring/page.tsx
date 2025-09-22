@@ -123,7 +123,7 @@ export default function MonitoringPage() {
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center">
               <Activity className="w-8 h-8 text-blue-500 mr-3" />
-              <h1 className="text-2xl font-bold">TauOS System Monitoring</h1>
+              <h1 className="text-2xl font-bold">TauCore™ System Monitoring</h1>
             </div>
             <div className="flex items-center space-x-4">
               <div className={`flex items-center ${getStatusColor(health.status)}`}>

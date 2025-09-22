@@ -14,7 +14,7 @@ export default function AboutPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center space-x-4">
-              <img src="/brand/tauos-logo.svg" alt="TauOS" className="h-8 w-auto" />
+              <img src="/brand/tauos-logo.svg" alt="TauCore™" className="h-8 w-auto" />
               <span className="text-xl font-bold text-white">Tau OS</span>
             </div>
             <nav className="hidden md:flex items-center space-x-8">
@@ -38,11 +38,11 @@ export default function AboutPage() {
           >
             <h1 className="text-5xl md:text-7xl font-bold mb-6">
               <span className="bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">
-                About TauOS
+                About TauCore™
               </span>
             </h1>
             <p className="text-xl md:text-2xl text-gray-300 max-w-4xl mx-auto leading-relaxed">
-              We built TauOS with one idea in mind: <span className="text-yellow-400 font-semibold">technology should belong to people</span>, not the other way around.
+              We built TauCore™ with one idea in mind: <span className="text-yellow-400 font-semibold">technology should belong to people</span>, not the other way around.
               <br />
               Our mission is to create a complete, secure, zero-telemetry operating system.
             </p>
@@ -128,7 +128,7 @@ export default function AboutPage() {
               </span>
             </h2>
             <p className="text-xl text-gray-300 max-w-3xl mx-auto">
-              The principles that guide everything we do at TauOS.
+              The principles that guide everything we do at TauCore™.
             </p>
           </motion.div>
 
@@ -245,7 +245,7 @@ export default function AboutPage() {
               </span>
             </h2>
             <p className="text-xl text-gray-300 max-w-4xl mx-auto">
-              TauOS was born from a simple observation: <span className="text-yellow-400 font-semibold">the internet was supposed to be free and open</span>, but it has become a surveillance machine controlled by a few powerful corporations.
+              TauCore™ was born from a simple observation: <span className="text-yellow-400 font-semibold">the internet was supposed to be free and open</span>, but it has become a surveillance machine controlled by a few powerful corporations.
             </p>
           </motion.div>
 
@@ -303,7 +303,7 @@ export default function AboutPage() {
               </span>
             </h2>
             <p className="text-xl text-gray-300 max-w-3xl mx-auto mb-8">
-              Want to learn more about TauOS or get involved? We'd love to hear from you.
+              Want to learn more about TauCore™ or get involved? We'd love to hear from you.
             </p>
             
             <div className="bg-gradient-to-r from-gray-900 to-black border border-gray-800 rounded-2xl p-8 max-w-4xl mx-auto mb-8">
@@ -311,7 +311,7 @@ export default function AboutPage() {
                 <div>
                   <h3 className="text-xl font-bold text-white mb-4">General Inquiries</h3>
                   <p className="text-gray-300 mb-2">Email: <a href="mailto:hello@tauos.org" className="text-yellow-400 hover:text-yellow-300">hello@tauos.org</a></p>
-                  <p className="text-gray-300 mb-2">Phone: +1 1800 TauOS</p>
+                  <p className="text-gray-300 mb-2">Phone: +1 1800 TauCore™</p>
                   <p className="text-gray-300">Address: 2261 Market St, San Francisco, CA 94114</p>
                 </div>
                 <div>
@@ -339,7 +339,7 @@ export default function AboutPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
             <div className="flex items-center justify-center space-x-4 mb-4">
-              <img src="/brand/tauos-logo.svg" alt="TauOS" className="h-8 w-auto" />
+              <img src="/brand/tauos-logo.svg" alt="TauCore™" className="h-8 w-auto" />
               <span className="text-xl font-bold text-white">Tau OS</span>
             </div>
             <p className="text-gray-400">© 2025 Tau Foundation & Tau LLC. All rights reserved.</p>

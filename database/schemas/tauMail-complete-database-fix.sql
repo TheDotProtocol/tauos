@@ -159,8 +159,8 @@ SELECT
         ELSE u.id::UUID
     END,
     'support@tauos.org',
-    'TauOS System Update',
-    'Your TauOS system has been updated with the latest security patches.',
+    'TauCore System Update',
+    'Your TauCore system has been updated with the latest security patches.',
     'msg-' || gen_random_uuid()::text,
     FALSE
 FROM users u 

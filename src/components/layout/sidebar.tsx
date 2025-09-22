@@ -1,132 +1,169 @@
-import React from "react";
-import { motion } from "framer-motion";
+'use client';
+
+import { useState } from 'react';
+import { motion } from 'framer-motion';
 import { 
-  Mail, 
-  Send, 
-  Star, 
-  Trash2, 
-  Archive, 
-  AlertCircle, 
+  Home,
+  FolderOpen,
+  Star,
+  GitBranch,
   Settings,
-  Plus,
-  Search,
-  Menu,
-  X
-} from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
+  Users,
+  BarChart3,
+  Terminal,
+  Code,
+  BookOpen,
+  Package,
+  Zap
+} from 'lucide-react';
 
 interface SidebarProps {
   isOpen: boolean;
-  onToggle: () => void;
-  activeSection: string;
-  onSectionChange: (section: string) => void;
+  onClose: () => void;
 }
 
-const sidebarItems = [
-  { id: "inbox", label: "Inbox", icon: Mail, count: 12 },
-  { id: "sent", label: "Sent", icon: Send, count: 0 },
-  { id: "starred", label: "Starred", icon: Star, count: 3 },
-  { id: "archive", label: "Archive", icon: Archive, count: 0 },
-  { id: "spam", label: "Spam", icon: AlertCircle, count: 0 },
-  { id: "trash", label: "Trash", icon: Trash2, count: 0 },
-];
+export default function Sidebar({ isOpen, onClose }: SidebarProps) {
+  const [activeItem, setActiveItem] = useState('dashboard');
 
-export function Sidebar({ isOpen, onToggle, activeSection, onSectionChange }: SidebarProps) {
+  const navigation = [
+    { id: 'dashboard', name: 'Dashboard', icon: Home, href: '/' },
+    { id: 'repositories', name: 'Repositories', icon: FolderOpen, href: '/repos', count: 12 },
+    { id: 'stars', name: 'Stars', icon: Star, href: '/stars', count: 89 },
+    { id: 'branches', name: 'Branches', icon: GitBranch, href: '/branches', count: 45 },
+    { id: 'terminal', name: 'Terminal', icon: Terminal, href: '/terminal' },
+    { id: 'packages', name: 'Packages', icon: Package, href: '/packages', count: 23 },
+  ];
+
+  const tools = [
+    { id: 'code', name: 'Code Editor', icon: Code, href: '/editor' },
+    { id: 'docs', name: 'Documentation', icon: BookOpen, href: '/docs' },
+    { id: 'analytics', name: 'Analytics', icon: BarChart3, href: '/analytics' },
+    { id: 'team', name: 'Team', icon: Users, href: '/team' },
+  ];
+
+  const settings = [
+    { id: 'settings', name: 'Settings', icon: Settings, href: '/settings' },
+  ];
+
   return (
     <>
-      {/* Mobile Overlay */}
+      {/* Overlay for mobile */}
       {isOpen && (
         <motion.div
-          className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40 lg:hidden"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          onClick={onToggle}
+          className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
+          onClick={onClose}
         />
       )}
 
       {/* Sidebar */}
       <motion.aside
-        className={cn(
-          "fixed left-0 top-0 z-50 h-full w-80 bg-tau-dark-800 border-r border-tau-dark-600 transform transition-transform duration-300 ease-in-out lg:translate-x-0",
+        initial={{ x: -300 }}
+        animate={{ x: isOpen ? 0 : -300 }}
+        transition={{ duration: 0.3, ease: 'easeInOut' }}
+        className={`fixed left-0 top-0 h-full w-64 bg-gray-900 border-r border-gray-800 z-50 lg:translate-x-0 lg:static lg:z-auto ${
           isOpen ? "translate-x-0" : "-translate-x-full"
-        )}
-        initial={{ x: -320 }}
-        animate={{ x: isOpen ? 0 : -320 }}
-        transition={{ type: "spring", stiffness: 300, damping: 30 }}
+        }`}
       >
         <div className="flex flex-col h-full">
           {/* Header */}
-          <div className="flex items-center justify-between p-6 border-b border-tau-dark-600">
+          <div className="p-6 border-b border-gray-800">
             <div className="flex items-center space-x-3">
-              <div className="w-8 h-8 bg-tau-gradient rounded-lg flex items-center justify-center">
-                <span className="text-tau-dark-900 font-bold text-lg">τ</span>
+              <div className="w-8 h-8 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg flex items-center justify-center">
+                <Zap className="w-5 h-5 text-white" />
               </div>
-              <h1 className="text-xl font-bold text-white">TauMail</h1>
+              <div>
+                <h2 className="text-lg font-bold text-white">Developer Hub</h2>
+                <p className="text-xs text-gray-400">TauOS Platform</p>
+              </div>
             </div>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={onToggle}
-              className="lg:hidden"
-            >
-              <X className="w-5 h-5" />
-            </Button>
-          </div>
-
-          {/* Compose Button */}
-          <div className="p-4">
-            <Button
-              className="w-full bg-tau-primary text-tau-dark-900 hover:bg-tau-primary/90"
-              onClick={() => onSectionChange("compose")}
-            >
-              <Plus className="w-4 h-4 mr-2" />
-              Compose
-            </Button>
           </div>
 
           {/* Navigation */}
-          <nav className="flex-1 px-4 space-y-1">
-            {sidebarItems.map((item) => (
-              <motion.button
-                key={item.id}
-                className={cn(
-                  "w-full flex items-center justify-between px-4 py-3 rounded-lg text-left transition-all duration-200 group",
-                  activeSection === item.id
-                    ? "bg-tau-primary/20 text-tau-primary border border-tau-primary/30"
-                    : "text-gray-300 hover:bg-tau-dark-700 hover:text-white"
-                )}
-                onClick={() => onSectionChange(item.id)}
-                whileHover={{ x: 4 }}
-                whileTap={{ scale: 0.98 }}
-              >
-                <div className="flex items-center space-x-3">
-                  <item.icon className="w-5 h-5" />
-                  <span className="font-medium">{item.label}</span>
-                </div>
-                {item.count > 0 && (
-                  <span className="bg-tau-primary/20 text-tau-primary px-2 py-1 rounded-full text-xs font-medium">
-                    {item.count}
-                  </span>
-                )}
-              </motion.button>
-            ))}
+          <nav className="flex-1 p-4 space-y-2">
+            <div className="space-y-1">
+              <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">
+                Main
+              </h3>
+              {navigation.map((item) => (
+                <motion.a
+                  key={item.id}
+                  href={item.href}
+                  onClick={() => setActiveItem(item.id)}
+                  className={`flex items-center justify-between px-3 py-2 rounded-lg text-sm font-medium transition-colors duration-200 ${
+                    activeItem === item.id
+                      ? "bg-purple-500/20 text-purple-400 border border-purple-500/30"
+                      : "text-gray-300 hover:text-white hover:bg-gray-800"
+                  }`}
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                >
+                  <div className="flex items-center space-x-3">
+                    <item.icon className="w-4 h-4" />
+                    <span>{item.name}</span>
+                  </div>
+                  {item.count && (
+                    <span className="px-2 py-1 text-xs bg-gray-700 text-gray-300 rounded-full">
+                      {item.count}
+                    </span>
+                  )}
+                </motion.a>
+              ))}
+            </div>
+
+            <div className="space-y-1 mt-8">
+              <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">
+                Tools
+              </h3>
+              {tools.map((item) => (
+                <motion.a
+                  key={item.id}
+                  href={item.href}
+                  className="flex items-center space-x-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-300 hover:text-white hover:bg-gray-800 transition-colors duration-200"
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                >
+                  <item.icon className="w-4 h-4" />
+                  <span>{item.name}</span>
+                </motion.a>
+              ))}
+            </div>
+
+            <div className="space-y-1 mt-8">
+              <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">
+                Settings
+              </h3>
+              {settings.map((item) => (
+                <motion.a
+                  key={item.id}
+                  href={item.href}
+                  className="flex items-center space-x-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-300 hover:text-white hover:bg-gray-800 transition-colors duration-200"
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                >
+                  <item.icon className="w-4 h-4" />
+                  <span>{item.name}</span>
+                </motion.a>
+              ))}
+            </div>
           </nav>
 
           {/* Footer */}
-          <div className="p-4 border-t border-tau-dark-600">
-            <Button
-              variant="ghost"
-              className="w-full justify-start"
-              onClick={() => onSectionChange("settings")}
-            >
-              <Settings className="w-5 h-5 mr-3" />
-              Settings
-            </Button>
+          <div className="p-4 border-t border-gray-800">
+            <div className="flex items-center space-x-3">
+              <div className="w-8 h-8 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center">
+                <span className="text-xs font-bold text-white">U</span>
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium text-white truncate">saleena@tauos.org</p>
+                <p className="text-xs text-gray-400 truncate">Developer</p>
+              </div>
+            </div>
           </div>
         </div>
       </motion.aside>
     </>
   );
-} 
+}

@@ -1,291 +1,270 @@
-"use client";
+'use client';
 
-import React, { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { Sidebar } from "@/components/layout/sidebar";
-import { Header } from "@/components/layout/header";
-import { EmailList } from "@/components/email/email-list";
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
+import { useState } from 'react';
+import { motion } from 'framer-motion';
+import Header from '@/components/layout/Header';
+import Sidebar from '@/components/layout/Sidebar';
+import StatsCard from '@/components/dashboard/StatsCard';
+import RepositoryCard from '@/components/dashboard/RepositoryCard';
 import { 
-  Mail, 
-  Send, 
+  FolderOpen, 
   Star, 
-  Trash2, 
-  Archive, 
-  AlertCircle,
+  GitFork, 
+  Users, 
+  Code,
+  Terminal,
+  BookOpen,
+  Package,
   Plus,
   Search,
-  Settings,
-  User,
-  Shield,
-  Lock
-} from "lucide-react";
+  Filter
+} from 'lucide-react';
 
-// Mock data for demonstration
-const mockEmails = [
-  {
-    id: "1",
-    from: "john.doe@company.com",
-    subject: "Project Update - Q4 Goals",
-    preview: "Hi team, I wanted to share our progress on the Q4 objectives. We've made significant strides in...",
-    timestamp: new Date(Date.now() - 1000 * 60 * 30), // 30 minutes ago
-    isRead: false,
-    isStarred: true,
-    hasAttachments: true,
-    priority: "high" as const,
-  },
-  {
-    id: "2",
-    from: "support@tauos.org",
-    subject: "Welcome to TauMail!",
-    preview: "Welcome to your new privacy-first email experience. Your account has been successfully created...",
-    timestamp: new Date(Date.now() - 1000 * 60 * 60 * 2), // 2 hours ago
-    isRead: true,
-    isStarred: false,
-    hasAttachments: false,
-    priority: "normal" as const,
-  },
-  {
-    id: "3",
-    from: "alice@startup.io",
-    subject: "Meeting Tomorrow at 10 AM",
-    preview: "Just a reminder about our meeting tomorrow. We'll be discussing the new feature roadmap...",
-    timestamp: new Date(Date.now() - 1000 * 60 * 60 * 4), // 4 hours ago
-    isRead: true,
-    isStarred: false,
-    hasAttachments: false,
-    priority: "normal" as const,
-  },
-  {
-    id: "4",
-    from: "security@tauos.org",
-    subject: "Account Security Alert",
-    preview: "We detected a new login to your account from an unrecognized device. If this was you...",
-    timestamp: new Date(Date.now() - 1000 * 60 * 60 * 6), // 6 hours ago
-    isRead: false,
-    isStarred: true,
-    hasAttachments: false,
-    priority: "high" as const,
-  },
-  {
-    id: "5",
-    from: "newsletter@tech.com",
-    subject: "Weekly Tech Digest",
-    preview: "This week's top stories: AI breakthroughs, new privacy regulations, and the future of...",
-    timestamp: new Date(Date.now() - 1000 * 60 * 60 * 24), // 1 day ago
-    isRead: true,
-    isStarred: false,
-    hasAttachments: true,
-    priority: "low" as const,
-  },
-];
+export default function Dashboard() {
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
-export default function Home() {
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [activeSection, setActiveSection] = useState("inbox");
-  const [selectedEmail, setSelectedEmail] = useState<string | null>(null);
-  const [emails, setEmails] = useState(mockEmails);
+  // Mock data for demonstration
+  const stats = [
+    {
+      title: 'Total Repositories',
+      value: '1,247',
+      change: '+12% from last month',
+      changeType: 'positive' as const,
+      icon: FolderOpen,
+      color: 'purple' as const,
+    },
+    {
+      title: 'Active Developers',
+      value: '89',
+      change: '+5 new this week',
+      changeType: 'positive' as const,
+      icon: Users,
+      color: 'blue' as const,
+    },
+    {
+      title: 'Lines of Code',
+      value: '2.3M',
+      change: '+156K this month',
+      changeType: 'positive' as const,
+      icon: Code,
+      color: 'green' as const,
+    },
+    {
+      title: 'System Uptime',
+      value: '99.9%',
+      change: 'Last 30 days',
+      changeType: 'positive' as const,
+      icon: Terminal,
+      color: 'orange' as const,
+    },
+  ];
 
-  const handleEmailStar = (emailId: string) => {
-    setEmails(emails.map(email => 
-      email.id === emailId 
-        ? { ...email, isStarred: !email.isStarred }
-        : email
-    ));
-  };
+  const repositories = [
+    {
+      name: 'TauMail',
+      description: 'Privacy-first email client with end-to-end encryption and zero tracking. Built for the modern privacy-conscious user.',
+      language: 'TypeScript',
+      stars: 1247,
+      forks: 89,
+      watchers: 234,
+      lastUpdated: new Date('2024-09-20'),
+      isPrivate: false,
+      color: 'purple',
+    },
+    {
+      name: 'TauCloud',
+      description: 'Encrypted cloud storage with zero-knowledge architecture. Your files, your keys, your privacy.',
+      language: 'Rust',
+      stars: 1189,
+      forks: 67,
+      watchers: 198,
+      lastUpdated: new Date('2024-09-19'),
+      isPrivate: false,
+      color: 'blue',
+    },
+    {
+      name: 'TauID',
+      description: 'Decentralized identity management with verifiable credentials and privacy-first authentication.',
+      language: 'Go',
+      stars: 1089,
+      forks: 45,
+      watchers: 156,
+      lastUpdated: new Date('2024-09-18'),
+      isPrivate: false,
+      color: 'green',
+    },
+    {
+      name: 'TauStore',
+      description: 'Privacy-scored app marketplace with transparent security audits and community-driven curation.',
+      language: 'JavaScript',
+      stars: 956,
+      forks: 34,
+      watchers: 123,
+      lastUpdated: new Date('2024-09-17'),
+      isPrivate: false,
+      color: 'orange',
+    },
+    {
+      name: 'TauBrowser',
+      description: 'Privacy-first web browser with built-in ad blocking, tracking protection, and secure browsing.',
+      language: 'C++',
+      stars: 1345,
+      forks: 78,
+      watchers: 267,
+      lastUpdated: new Date('2024-09-16'),
+      isPrivate: false,
+      color: 'red',
+    },
+    {
+      name: 'TauAI',
+      description: 'On-device AI assistant with privacy protection and local processing capabilities.',
+      language: 'Python',
+      stars: 1876,
+      forks: 123,
+      watchers: 345,
+      lastUpdated: new Date('2024-09-15'),
+      isPrivate: false,
+      color: 'purple',
+    },
+  ];
 
-  const handleEmailDelete = (emailId: string) => {
-    setEmails(emails.filter(email => email.id !== emailId));
-    if (selectedEmail === emailId) {
-      setSelectedEmail(null);
-    }
-  };
-
-  const handleEmailArchive = (emailId: string) => {
-    // Move to archive logic
-    console.log("Archive email:", emailId);
-  };
-
-  const filteredEmails = emails.filter(email => {
-    switch (activeSection) {
-      case "inbox":
-        return true;
-      case "sent":
-        return false; // Would be sent emails
-      case "starred":
-        return email.isStarred;
-      case "archive":
-        return false; // Would be archived emails
-      case "spam":
-        return false; // Would be spam emails
-      case "trash":
-        return false; // Would be deleted emails
-      default:
-        return true;
-    }
-  });
+  const tools = [
+    { name: 'Terminal', icon: Terminal, description: 'Integrated terminal with TauScript support' },
+    { name: 'Documentation', icon: BookOpen, description: 'Comprehensive API docs and guides' },
+    { name: 'Package Manager', icon: Package, description: 'TauScript package management' },
+  ];
 
   return (
-    <div className="h-screen bg-tau-dark-900 overflow-hidden">
-      {/* Sidebar */}
-      <Sidebar
-        isOpen={isSidebarOpen}
-        onToggle={() => setIsSidebarOpen(!isSidebarOpen)}
-        activeSection={activeSection}
-        onSectionChange={setActiveSection}
-      />
+    <div className="min-h-screen bg-gray-950">
+      <Header />
+      
+      <div className="flex">
+        <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+        
+        <main className="flex-1 lg:ml-64">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            {/* Hero Section */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+              className="text-center mb-12"
+            >
+              <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
+                Welcome to <span className="bg-gradient-to-r from-purple-500 to-pink-500 bg-clip-text text-transparent">TauOS Developer Hub</span>
+              </h1>
+              <p className="text-xl text-gray-400 mb-8 max-w-3xl mx-auto">
+                Build, deploy, and scale with privacy-first developer tools and infrastructure. 
+                Join the future of secure software development.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-8 py-3 rounded-lg font-semibold hover:shadow-lg hover:shadow-purple-500/25 transition-all duration-300 flex items-center justify-center space-x-2"
+                >
+                  <Plus className="w-5 h-5" />
+                  <span>Create Repository</span>
+                </motion.button>
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="border border-gray-700 text-white px-8 py-3 rounded-lg font-semibold hover:bg-gray-800 transition-all duration-300 flex items-center justify-center space-x-2"
+                >
+                  <BookOpen className="w-5 h-5" />
+                  <span>View Documentation</span>
+                </motion.button>
+              </div>
+            </motion.div>
 
-      {/* Main Content */}
-      <div className="lg:ml-80 h-full flex flex-col">
-        {/* Header */}
-        <Header
-          onMenuToggle={() => setIsSidebarOpen(!isSidebarOpen)}
-          isSidebarOpen={isSidebarOpen}
-        />
+            {/* Stats Grid */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.2 }}
+              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12"
+            >
+              {stats.map((stat, index) => (
+                <StatsCard
+                  key={stat.title}
+                  {...stat}
+                  delay={index * 0.1}
+                />
+              ))}
+            </motion.div>
 
-        {/* Content Area */}
-        <div className="flex-1 flex">
-          {/* Email List */}
-          <div className="w-full lg:w-1/2 border-r border-tau-dark-600">
-            <div className="h-full flex flex-col">
-              {/* Section Header */}
-              <div className="p-4 border-b border-tau-dark-600">
-                <div className="flex items-center justify-between">
-                  <h2 className="text-lg font-semibold text-white capitalize">
-                    {activeSection}
-                  </h2>
-                  <div className="flex items-center space-x-2">
-                    <span className="text-sm text-gray-400">
-                      {filteredEmails.length} messages
-                    </span>
-                    <Button variant="ghost" size="sm">
-                      <Settings className="w-4 h-4" />
-                    </Button>
+            {/* Trending Repositories */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.4 }}
+              className="mb-12"
+            >
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-2xl font-bold text-white">🔥 Trending Repositories</h2>
+                <div className="flex items-center space-x-4">
+                  <div className="relative">
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                    <input
+                      type="text"
+                      placeholder="Search repositories..."
+                      className="pl-10 pr-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                    />
                   </div>
+                  <button className="p-2 text-gray-400 hover:text-white transition-colors duration-200">
+                    <Filter className="w-5 h-5" />
+                  </button>
                 </div>
               </div>
-
-              {/* Email List */}
-              <div className="flex-1">
-                <EmailList
-                  emails={filteredEmails}
-                  selectedEmail={selectedEmail}
-                  onEmailSelect={setSelectedEmail}
-                  onEmailStar={handleEmailStar}
-                  onEmailDelete={handleEmailDelete}
-                  onEmailArchive={handleEmailArchive}
-                />
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {repositories.map((repo, index) => (
+                  <RepositoryCard
+                    key={repo.name}
+                    {...repo}
+                    delay={index * 0.1}
+                  />
+                ))}
               </div>
-            </div>
-          </div>
+            </motion.div>
 
-          {/* Email Detail */}
-          <div className="hidden lg:block lg:w-1/2">
-            <AnimatePresence mode="wait">
-              {selectedEmail ? (
-                <motion.div
-                  key={selectedEmail}
-                  className="h-full p-6"
-                  initial={{ opacity: 0, x: 20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: -20 }}
-                  transition={{ duration: 0.3 }}
-                >
-                  <Card variant="glass" className="h-full">
-                    <div className="space-y-4">
-                      {/* Email Header */}
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center space-x-3">
-                          <div className="w-10 h-10 bg-tau-gradient rounded-full flex items-center justify-center">
-                            <span className="text-tau-dark-900 font-bold">J</span>
-                          </div>
-                          <div>
-                            <h3 className="text-white font-semibold">John Doe</h3>
-                            <p className="text-gray-400 text-sm">john.doe@company.com</p>
-                          </div>
-                        </div>
-                        <div className="flex items-center space-x-2">
-                          <Button variant="ghost" size="sm">
-                            <Star className="w-4 h-4" />
-                          </Button>
-                          <Button variant="ghost" size="sm">
-                            <Archive className="w-4 h-4" />
-                          </Button>
-                          <Button variant="ghost" size="sm">
-                            <Trash2 className="w-4 h-4" />
-                          </Button>
-                        </div>
+            {/* Developer Tools */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.6 }}
+              className="mb-12"
+            >
+              <h2 className="text-2xl font-bold text-white mb-6">🛠️ Developer Tools</h2>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                {tools.map((tool, index) => (
+                  <motion.div
+                    key={tool.name}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5, delay: 0.7 + index * 0.1 }}
+                    className="bg-gray-900/50 backdrop-blur-sm border border-gray-800 rounded-xl p-6 hover:border-purple-500/30 transition-all duration-300 group cursor-pointer"
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                  >
+                    <div className="flex items-center space-x-4 mb-4">
+                      <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                        <tool.icon className="w-6 h-6 text-white" />
                       </div>
-
-                      {/* Email Subject */}
-                      <div>
-                        <h2 className="text-xl font-semibold text-white mb-2">
-                          Project Update - Q4 Goals
-                        </h2>
-                        <p className="text-gray-400 text-sm">
-                          Today at 2:30 PM
-                        </p>
-                      </div>
-
-                      {/* Email Body */}
-                      <div className="prose prose-invert max-w-none">
-                        <p className="text-gray-300 leading-relaxed">
-                          Hi team,
-                        </p>
-                        <p className="text-gray-300 leading-relaxed">
-                          I wanted to share our progress on the Q4 objectives. We've made significant strides in our key initiatives and I'm excited to see the momentum we're building.
-                        </p>
-                        <p className="text-gray-300 leading-relaxed">
-                          Key highlights from this quarter:
-                        </p>
-                        <ul className="text-gray-300 list-disc list-inside space-y-1">
-                          <li>Successfully launched the new privacy features</li>
-                          <li>Achieved 99.9% uptime across all services</li>
-                          <li>Reduced response time by 40%</li>
-                          <li>Onboarded 500+ new enterprise customers</li>
-                        </ul>
-                        <p className="text-gray-300 leading-relaxed">
-                          Let's keep this momentum going into Q1. I'll schedule a team meeting next week to discuss our roadmap for the new year.
-                        </p>
-                        <p className="text-gray-300 leading-relaxed">
-                          Best regards,<br />
-                          John
-                        </p>
-                      </div>
-
-                      {/* Security Badge */}
-                      <div className="flex items-center space-x-2 p-3 bg-tau-dark-700 rounded-lg">
-                        <Shield className="w-4 h-4 text-tau-primary" />
-                        <span className="text-sm text-gray-300">
-                          This email was encrypted and verified by TauMail
-                        </span>
-                      </div>
+                      <h3 className="text-lg font-semibold text-white group-hover:text-purple-400 transition-colors duration-200">
+                        {tool.name}
+                      </h3>
                     </div>
-                  </Card>
-                </motion.div>
-              ) : (
-                <motion.div
-                  className="h-full flex items-center justify-center"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                >
-                  <div className="text-center">
-                    <Mail className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                    <h3 className="text-lg font-semibold text-white mb-2">
-                      Select an email to read
-                    </h3>
-                    <p className="text-gray-400">
-                      Choose an email from the list to view its contents
+                    <p className="text-gray-400 text-sm">
+                      {tool.description}
                     </p>
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
+                  </motion.div>
+                ))}
+              </div>
+            </motion.div>
           </div>
-        </div>
+        </main>
       </div>
     </div>
   );
-} 
+}

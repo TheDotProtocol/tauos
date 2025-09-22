@@ -5,7 +5,7 @@ groups:
     org_id: 1
     rules:
       - uid: tauos-api-down
-        title: TauOS API Down
+        title: TauCore API Down
         condition: C
         data:
           - refId: A
@@ -24,8 +24,8 @@ groups:
         exec_err_state: Alerting
         for: 1m
         annotations:
-          summary: TauOS API is down
-          description: The TauOS API has been down for more than 1 minute
+          summary: TauCore API is down
+          description: The TauCore API has been down for more than 1 minute
         labels:
           severity: critical
         notification_uid: tauos-email
@@ -103,7 +103,7 @@ groups:
         for: 1m
         annotations:
           summary: Database is down
-          description: The TauOS database has been down for more than 1 minute
+          description: The TauCore database has been down for more than 1 minute
         labels:
           severity: critical
         notification_uid: tauos-email

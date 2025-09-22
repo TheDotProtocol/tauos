@@ -1,6 +1,6 @@
 #!/bin/bash
 
-echo "🧹 Cleaning TauOS repository for GitHub..."
+echo "🧹 Cleaning TauCore repository for GitHub..."
 
 # Remove all environment files
 echo "Removing environment files..."

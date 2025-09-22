@@ -1,6 +1,6 @@
 # TauCloud
 
-TauCloud is your encrypted file manager and cloud interface built right into TauOS.
+TauCloud is your encrypted file manager and cloud interface built right into TauCore™.
 
 ## 🗂️ File Explorer + Cloud in One
 Manage files locally or in your encrypted TauCloud account. No more switching between different apps or services — everything you need is in one beautiful, unified interface that feels natural and intuitive.
@@ -15,7 +15,7 @@ Instantly see which files are public, private, or shared. TauCloud's intelligent
 Intuitive design, no CLI needed. TauCloud makes file management as simple as it should be — drag files between folders, upload to cloud storage, or share with others, all through beautiful, responsive interfaces.
 
 ## 🧩 Works with Tau Apps
-Seamlessly syncs with TauMail, Tau Media, and more. Your files are accessible across all TauOS applications, creating a unified digital experience where everything works together harmoniously.
+Seamlessly syncs with TauMail, Tau Media, and more. Your files are accessible across all TauCore™ applications, creating a unified digital experience where everything works together harmoniously.
 
 ## 📦 Backup & Restore
 One-click backup of your entire system. TauCloud makes it easy to protect your digital life, with automated backups that respect your privacy while ensuring your data is always safe and recoverable.

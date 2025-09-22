@@ -43,7 +43,7 @@ export default function LegalPage() {
                   <span className="text-white font-bold text-xl">τ</span>
                 </div>
                 <span className="text-2xl font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
-                  TauOS
+                  TauCore™
                 </span>
               </a>
             </motion.div>
@@ -111,7 +111,7 @@ export default function LegalPage() {
           >
             <h2 className="text-4xl font-bold mb-6">Company Information</h2>
             <p className="text-xl text-gray-300 max-w-3xl mx-auto">
-              TauOS is developed and maintained by The Tau Foundation, a privacy-first technology company.
+              TauCore™ is developed and maintained by The Tau Foundation, a privacy-first technology company.
             </p>
           </motion.div>
 
@@ -203,7 +203,7 @@ export default function LegalPage() {
           >
             <h2 className="text-4xl font-bold mb-6">Licensing</h2>
             <p className="text-xl text-gray-300 max-w-3xl mx-auto">
-              TauOS uses an open-core licensing model that balances openness with sustainability.
+              TauCore™ uses an open-core licensing model that balances openness with sustainability.
             </p>
           </motion.div>
 
@@ -219,7 +219,7 @@ export default function LegalPage() {
                 icon: GitBranch,
                 title: "Applications",
                 license: "MIT License",
-                description: "Most TauOS applications are licensed under MIT for broad adoption and compatibility."
+                description: "Most TauCore™ applications are licensed under MIT for broad adoption and compatibility."
               },
               {
                 icon: Shield,
@@ -374,7 +374,7 @@ export default function LegalPage() {
               },
               {
                 title: "Limitation of Liability",
-                description: "TauOS is provided 'as is' without warranties. We are not liable for damages arising from use of our software or services.",
+                description: "TauCore™ is provided 'as is' without warranties. We are not liable for damages arising from use of our software or services.",
                 icon: AlertTriangle,
                 color: "text-yellow-400"
               },
@@ -439,7 +439,7 @@ export default function LegalPage() {
               {
                 title: "General Support",
                 email: "support@tauos.org",
-                description: "For general questions about TauOS and our services"
+                description: "For general questions about TauCore™ and our services"
               }
             ].map((contact, index) => (
               <motion.div

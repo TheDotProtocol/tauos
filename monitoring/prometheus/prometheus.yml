@@ -17,7 +17,7 @@ scrape_configs:
     static_configs:
       - targets: ['node-exporter:9100']
 
-  # TauOS API Metrics (Production)
+  # TauCore API Metrics (Production)
   - job_name: 'tauos-api'
     static_configs:
       - targets: ['tauos.vercel.app']
@@ -28,7 +28,7 @@ scrape_configs:
     scrape_timeout: 10s
     scheme: https
 
-  # TauOS Health Check (Production)
+  # TauCore Health Check (Production)
   - job_name: 'tauos-health'
     static_configs:
       - targets: ['tauos.vercel.app']

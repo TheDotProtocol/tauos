@@ -7,7 +7,7 @@ export async function GET(request: NextRequest) {
       device: {
         name: 'TauPhone Ultra',
         model: 'TPU-2025',
-        os: 'TauOS Mobile 1.0.0',
+        os: 'TauCore Mobile 1.0.0',
         build: '2025.09.20',
         serial: 'TPU-2025-001234'
       },
@@ -18,7 +18,7 @@ export async function GET(request: NextRequest) {
         temperature: '32°C'
       },
       network: {
-        carrier: 'TauOS Network',
+        carrier: 'TauCore Network',
         signal: Math.floor(Math.random() * 3) + 3, // 3-5 bars
         type: '5G',
         speed: '1.2 Gbps'

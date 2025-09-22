@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-TauOS Comprehensive Testing Suite
+TauCore Comprehensive Testing Suite
 Tests all applications, APIs, and system functionality
 """
 
@@ -14,7 +14,7 @@ from typing import Dict, List, Tuple, Any
 import hashlib
 import subprocess
 
-class TauOSTestSuite:
+class TauCoreTestSuite:
     def __init__(self, base_url="https://tauos.vercel.app"):
         self.base_url = base_url
         self.test_results = {
@@ -70,7 +70,7 @@ class TauOSTestSuite:
                 "email": "saleena@tauos.org",
                 "password": "Saleena@132",
                 "username": "saleena",
-                "fullName": "Saleena TauOS"
+                "fullName": "Saleena TauCore"
             }
             response = self.session.post(f"{self.base_url}/api/taumail/auth/register", json=reg_data)
             if response.status_code in [200, 201, 409]:  # 409 = user already exists
@@ -118,7 +118,7 @@ class TauOSTestSuite:
                 "email": "saleena@tauos.org",
                 "password": "Saleena@132",
                 "username": "saleena",
-                "fullName": "Saleena TauOS"
+                "fullName": "Saleena TauCore"
             }
             response = self.session.post(f"{self.base_url}/api/taucloud/auth/register", json=reg_data)
             if response.status_code in [200, 201, 409]:
@@ -166,7 +166,7 @@ class TauOSTestSuite:
                 "email": "saleena@tauos.org",
                 "password": "Saleena@132",
                 "username": "saleena",
-                "fullName": "Saleena TauOS"
+                "fullName": "Saleena TauCore"
             }
             response = self.session.post(f"{self.base_url}/api/tauid/auth/register", json=reg_data)
             if response.status_code in [200, 201, 409]:
@@ -236,7 +236,7 @@ class TauOSTestSuite:
                 "email": "saleena@tauos.org",
                 "password": "Saleena@132",
                 "username": "saleena",
-                "fullName": "Saleena TauOS"
+                "fullName": "Saleena TauCore"
             }
             response = self.session.post(f"{self.base_url}/api/taubrowser/auth/register", json=reg_data)
             if response.status_code in [200, 201, 409]:
@@ -441,7 +441,7 @@ class TauOSTestSuite:
     
     def run_all_tests(self) -> Dict:
         """Run complete test suite"""
-        print("🚀 Starting TauOS Comprehensive Testing Suite")
+        print("🚀 Starting TauCore Comprehensive Testing Suite")
         print("=" * 60)
         
         # Core system tests
@@ -497,10 +497,10 @@ if __name__ == "__main__":
     if len(sys.argv) > 1:
         base_url = sys.argv[1]
     
-    print(f"Testing TauOS at: {base_url}")
+    print(f"Testing TauCore at: {base_url}")
     
     # Run tests
-    test_suite = TauOSTestSuite(base_url)
+    test_suite = TauCoreTestSuite(base_url)
     results = test_suite.run_all_tests()
     
     # Exit with appropriate code

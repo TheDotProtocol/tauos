@@ -2,7 +2,7 @@
 
 Apps you need. Privacy you deserve.
 
-Tau Store is your official marketplace for apps, tools, themes, and updates — all curated to meet the TauOS standard of privacy-first and zero-bloat.
+Tau Store is your official marketplace for apps, tools, themes, and updates — all curated to meet the TauCore™ standard of privacy-first and zero-bloat.
 
 ## 🚫 No Ads. No Trackers. No Spyware.
 Every app in the Tau Store is vetted for security, usability, and respect for user data. We believe your app store shouldn't be a surveillance tool — it should be a trusted gateway to software that works for you.
@@ -11,10 +11,10 @@ Every app in the Tau Store is vetted for security, usability, and respect for us
 From productivity tools to creative suites, AI assistants to blockchain wallets — everything is organized and accessible in one click. Find what you need quickly, discover new tools easily, and explore categories that make sense for real people with real needs.
 
 ## 🎨 Themes & Customization
-Switch up your entire OS look with custom icon packs, UI themes, and animations — all drag-and-drop ready. TauOS is beautiful by default, but it's also infinitely customizable. Make it yours, without compromising on performance or security.
+Switch up your entire OS look with custom icon packs, UI themes, and animations — all drag-and-drop ready. TauCore™ is beautiful by default, but it's also infinitely customizable. Make it yours, without compromising on performance or security.
 
 ## 📦 One-Click Installs
-No sudo. No scripts. Just tap, install, and go. All apps are GUI-optimized for TauOS, ensuring that every piece of software you install feels native and integrated with your system.
+No sudo. No scripts. Just tap, install, and go. All apps are GUI-optimized for TauCore™, ensuring that every piece of software you install feels native and integrated with your system.
 
 ## 🔄 Automatic Updates, Manual Control
 You stay in control. Choose when and how to update your system or apps — nothing runs without your permission. Tau Store respects your autonomy while keeping your software secure and up-to-date.
@@ -42,7 +42,7 @@ Tau Store is more than an app marketplace — it's a trust layer between you and
 Every app in Tau Store is evaluated not just for functionality, but for its commitment to user privacy. We believe software should serve you, not spy on you.
 
 ### Quality by Design
-We don't just curate apps — we ensure they meet our standards for performance, security, and user experience. Every app in Tau Store is tested and verified to work seamlessly with TauOS.
+We don't just curate apps — we ensure they meet our standards for performance, security, and user experience. Every app in Tau Store is tested and verified to work seamlessly with TauCore™.
 
 ### Community by Choice
 Tau Store isn't just a marketplace — it's a community of developers, users, and advocates who believe in privacy-first computing. Join us in building a better digital future.

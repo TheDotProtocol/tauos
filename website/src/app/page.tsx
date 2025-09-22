@@ -55,7 +55,7 @@ import {
   Store
 } from 'lucide-react';
 
-export default function TauOSLandingPage() {
+export default function TauCoreLandingPage() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [activeSection, setActiveSection] = useState('hero');
   const [detectedOS, setDetectedOS] = useState<string>('');
@@ -142,7 +142,7 @@ export default function TauOSLandingPage() {
               <div className="w-10 h-10 bg-gray-800 rounded-xl flex items-center justify-center border border-gray-700">
                 <img 
                   src="/brand/tauos-logo.svg" 
-                  alt="TauOS Logo" 
+                  alt="TauCore Logo" 
                   className="w-12 h-12"
                   onError={(e) => {
                     // Fallback to text if image fails to load
@@ -411,7 +411,7 @@ export default function TauOSLandingPage() {
                 transition={{ duration: 0.8, delay: 0.4 }}
                 className="text-xl md:text-2xl text-gray-300 max-w-4xl mx-auto leading-relaxed"
               >
-                TauOS is a complete, secure, zero-telemetry operating system for desktop and mobile—with first-party apps, encrypted services, and enterprise controls.
+                TauCore™ is a complete, secure, zero-telemetry operating system for desktop and mobile—with first-party apps, encrypted services, and enterprise controls.
               </motion.p>
             </div>
 
@@ -424,7 +424,7 @@ export default function TauOSLandingPage() {
             >
               <a href="#downloads" className="group flex items-center space-x-3 bg-gradient-to-r from-yellow-400 to-orange-500 text-black px-8 py-4 rounded-xl font-bold text-lg hover:shadow-2xl hover:shadow-yellow-400/25 transition-all duration-300 transform hover:scale-105">
                 <Download className="w-6 h-6" />
-                <span>Download TauOS Desktop</span>
+                <span>Download TauCore™ Desktop</span>
                 <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </a>
               
@@ -530,7 +530,7 @@ export default function TauOSLandingPage() {
               </span>
             </h2>
             <p className="text-xl text-gray-300 max-w-3xl mx-auto">
-              We built TauOS with one idea in mind: technology should belong to people, not the other way around.
+              We built TauCore™ with one idea in mind: technology should belong to people, not the other way around.
             </p>
           </motion.div>
 
@@ -545,7 +545,7 @@ export default function TauOSLandingPage() {
               <div className="space-y-4">
                 <h3 className="text-2xl font-bold text-white">Your Data, Your Control</h3>
                 <p className="text-gray-300 leading-relaxed">
-                  Your data, your conversations, your photos, your work — they're yours. TauOS, TauMail, and TauCloud are here to give you the tools to use technology freely and safely, without losing control of what matters most: your privacy.
+                  Your data, your conversations, your photos, your work — they're yours. TauCore™, TauMail, and TauCloud are here to give you the tools to use technology freely and safely, without losing control of what matters most: your privacy.
                 </p>
                 <p className="text-gray-300 leading-relaxed">
                   We don't track, we don't sell data, and we don't make you the product. We simply provide the platform — <span className="text-yellow-400 font-semibold">you stay in control.</span>
@@ -555,7 +555,7 @@ export default function TauOSLandingPage() {
               <div className="space-y-4">
                 <h3 className="text-2xl font-bold text-white">Built for Everyone</h3>
                 <p className="text-gray-300 leading-relaxed">
-                  From kids discovering the internet for the first time, to grandparents staying connected, to professionals managing sensitive work — TauOS is built so that <span className="text-yellow-400 font-semibold">anyone, at any age, can use it with confidence.</span>
+                  From kids discovering the internet for the first time, to grandparents staying connected, to professionals managing sensitive work — TauCore™ is built so that <span className="text-yellow-400 font-semibold">anyone, at any age, can use it with confidence.</span>
                 </p>
               </div>
 
@@ -619,7 +619,7 @@ export default function TauOSLandingPage() {
               </span>
             </h2>
             <p className="text-xl text-gray-300 max-w-3xl mx-auto">
-              TauOS is developed and maintained under The Tau Foundation, a nonprofit organization inspired by the model of the Linux Foundation.
+              TauCore™ is developed and maintained under The Tau Foundation, a nonprofit organization inspired by the model of the Linux Foundation.
             </p>
           </motion.div>
 
@@ -708,7 +708,7 @@ export default function TauOSLandingPage() {
           >
             <h3 className="text-2xl font-bold text-white mb-6">Compliance</h3>
             <p className="text-gray-300 mb-6 max-w-3xl mx-auto">
-              TauOS and related services comply with international privacy and consumer protection standards, including:
+              TauCore™ and related services comply with international privacy and consumer protection standards, including:
             </p>
             <div className="flex flex-wrap justify-center gap-4">
               {[
@@ -742,7 +742,7 @@ export default function TauOSLandingPage() {
           >
             <h2 className="text-3xl md:text-4xl font-bold mb-6">
               <span className="bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">
-                Why Choose TauOS?
+                Why Choose TauCore™?
               </span>
             </h2>
           </motion.div>
@@ -886,7 +886,7 @@ export default function TauOSLandingPage() {
               viewport={{ once: true }}
               className="text-center"
             >
-              <p className="text-lg text-gray-300 mb-4">Download: TauOS Desktop</p>
+              <p className="text-lg text-gray-300 mb-4">Download: TauCore™ Desktop</p>
               <div className="flex flex-wrap justify-center gap-4">
                 {['Windows', 'macOS', 'Linux'].map((platform) => (
                   <span key={platform} className="px-4 py-2 bg-gray-800/50 rounded-lg text-gray-300">
@@ -1378,7 +1378,7 @@ export default function TauOSLandingPage() {
               </span>
             </h2>
             <p className="text-xl text-gray-300 max-w-3xl mx-auto">
-              TauOS Desktop is free to download. Services & enterprise tooling are licensed as below.
+              TauCore™ Desktop is free to download. Services & enterprise tooling are licensed as below.
             </p>
           </motion.div>
 
@@ -1507,7 +1507,7 @@ export default function TauOSLandingPage() {
               </span>
             </h2>
             <p className="text-xl text-gray-300 max-w-3xl mx-auto">
-              Get TauOS for your platform. All downloads include SHA256 checksums for verification.
+              Get TauCore™ for your platform. All downloads include SHA256 checksums for verification.
             </p>
           </motion.div>
 
@@ -1535,17 +1535,17 @@ export default function TauOSLandingPage() {
               {[
                 {
                   platform: 'Windows',
-                  file: 'TauOS Setup 1.0.0.exe',
+                  file: 'TauCore™ Setup 1.0.0.exe',
                   size: '81.8 MB',
                   checksum: 'sha256:b7e30f51035d5cfaf6b60f309996300f08e4e5a0aaad3bc5affcaf01b657a426',
                   icon: Monitor,
                   color: 'from-blue-500 to-cyan-500',
                   recommended: detectedOS.includes('Windows'),
-                  description: 'Full TauOS Desktop with all apps included'
+                  description: 'Full TauCore™ Desktop with all apps included'
                 },
                 {
                   platform: 'macOS',
-                  file: 'TauOS-1.0.0.dmg',
+                  file: 'TauCore™-1.0.0.dmg',
                   size: '98.9 MB',
                   checksum: 'sha256:d5ae510bf9b269c6a4d92c38e3b8f1cd794b6ad6c000396eb8c1032c11652124',
                   icon: Smartphone,
@@ -1565,17 +1565,17 @@ export default function TauOSLandingPage() {
                 },
                 {
                   platform: 'Mobile (Android)',
-                  file: 'TauOS-Mobile-v1.0.0.apk',
+                  file: 'TauCore™-Mobile-v1.0.0.apk',
                   size: '156 MB',
                   checksum: 'sha256:d4e5f6789012345678901234567890abcdef1234567890abcdef123456789',
                   icon: Phone,
                   color: 'from-purple-500 to-pink-500',
                   recommended: false,
-                  description: 'TauOS Mobile with all privacy-first apps'
+                  description: 'TauCore™ Mobile with all privacy-first apps'
                 },
                 {
                   platform: 'ISO (Live)',
-                  file: 'TauOS-Live-v1.0.0.iso',
+                  file: 'TauCore™-Live-v1.0.0.iso',
                   size: '2.3 GB',
                   checksum: 'sha256:e5f6789012345678901234567890abcdef1234567890abcdef1234567890',
                   icon: Download,
@@ -1637,7 +1637,7 @@ export default function TauOSLandingPage() {
                       document.body.removeChild(link);
                       
                       // Show success message
-                      alert(`Downloading ${download.file}...\n\nFile size: ${download.size}\nChecksum: ${download.checksum}\n\nThis will install the complete TauOS operating system with all privacy-first applications!`);
+                      alert(`Downloading ${download.file}...\n\nFile size: ${download.size}\nChecksum: ${download.checksum}\n\nThis will install the complete TauCore™ operating system with all privacy-first applications!`);
                     }}
                     className={`w-full py-3 rounded-lg font-semibold transition-all duration-300 ${
                       download.recommended
@@ -1678,7 +1678,7 @@ export default function TauOSLandingPage() {
         </div>
       </section>
 
-      {/* Why TauOS Section */}
+      {/* Why TauCore Section */}
       <section className="py-20 bg-gradient-to-b from-black to-gray-900">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
@@ -1690,7 +1690,7 @@ export default function TauOSLandingPage() {
           >
             <h2 className="text-4xl md:text-5xl font-bold mb-6">
               <span className="bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">
-                Why TauOS?
+                Why TauCore™?
               </span>
             </h2>
             <p className="text-xl text-gray-300 max-w-3xl mx-auto">
@@ -1868,7 +1868,7 @@ export default function TauOSLandingPage() {
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
               <a href="#downloads" className="inline-flex items-center space-x-2 bg-gradient-to-r from-yellow-400 to-orange-500 text-black px-8 py-4 rounded-xl font-semibold hover:shadow-lg hover:shadow-yellow-400/25 transition-all duration-300">
                 <Download className="w-6 h-6" />
-                <span>Download TauOS</span>
+                <span>Download TauCore™</span>
               </a>
               <a href="/taumail" className="inline-flex items-center space-x-2 border-2 border-blue-400/30 text-blue-400 px-8 py-4 rounded-xl font-semibold hover:bg-blue-400/10 transition-all duration-300">
                 <MailIcon className="w-6 h-6" />
@@ -2066,7 +2066,7 @@ export default function TauOSLandingPage() {
                 <div className="w-10 h-10 bg-gray-800 rounded-xl flex items-center justify-center border border-gray-700">
                   <img 
                     src="/brand/tauos-logo.svg" 
-                    alt="TauOS Logo" 
+                    alt="TauCore Logo" 
                     className="w-12 h-12"
                     onError={(e) => {
                       // Fallback to text if image fails to load
@@ -2086,7 +2086,7 @@ export default function TauOSLandingPage() {
                 Privacy-First Computing
               </p>
               <p className="text-gray-500 text-sm">
-                © 2025 TauOS. All rights reserved.
+                © 2025 TauCore / AR Holdings. All rights reserved.
               </p>
             </div>
             
@@ -2132,7 +2132,7 @@ export default function TauOSLandingPage() {
                 <div>
                   <p className="text-gray-400 text-sm font-medium">Tau Foundation & Tau LLC</p>
                   <p className="text-gray-500 text-xs">2261 Market St, San Francisco, CA 94114</p>
-                  <p className="text-gray-500 text-xs">+1 1800 TauOS</p>
+                  <p className="text-gray-500 text-xs">+1 1800 TauCore</p>
           </div>
                 <div>
                   <p className="text-gray-400 text-sm font-medium">Malaysia Office</p>
@@ -2161,6 +2161,20 @@ export default function TauOSLandingPage() {
                   Reject
               </button>
             </div>
+            </div>
+          </div>
+          
+          {/* Intellectual Property Notice */}
+          <div className="border-t border-gray-800 mt-12 pt-8">
+            <div className="text-center">
+              <p className="text-gray-400 text-sm mb-2">
+                <strong>Intellectual Property Notice</strong>
+              </p>
+              <p className="text-gray-500 text-xs leading-relaxed max-w-4xl mx-auto">
+                TauCore™ and associated logos are trademarks of AR Holdings.<br/>
+                © 2025 TauCore / AR Holdings. All rights reserved.<br/>
+                Unauthorized use, reproduction, or distribution of this material, in whole or in part, is strictly prohibited.
+              </p>
             </div>
           </div>
         </div>

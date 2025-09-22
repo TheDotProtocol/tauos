@@ -144,8 +144,8 @@ INSERT INTO incoming_emails (user_id, from_email, subject, body, message_id, is_
 SELECT 
     u.id::text,
     'support@tauos.org',
-    'TauOS System Update',
-    'Your TauOS system has been updated with the latest security patches.',
+    'TauCore System Update',
+    'Your TauCore system has been updated with the latest security patches.',
     'msg-' || gen_random_uuid()::text,
     FALSE
 FROM users u 

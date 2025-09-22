@@ -1,4 +1,4 @@
-# TauOS - Privacy-Native AI Operating System
+# TauCore™ - Privacy-Native AI Operating System
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Next.js](https://img.shields.io/badge/Next.js-14.2.32-black)](https://nextjs.org/)
@@ -16,7 +16,7 @@
 
 ## 🎯 **Mission**
 
-TauOS revolutionizes computing by providing:
+TauCore™ revolutionizes computing by providing:
 - **Zero Telemetry**: No data collection, no tracking, no surveillance
 - **AI-First Design**: Built-in AI capabilities that work locally
 - **Privacy by Default**: Every feature designed with privacy in mind
@@ -26,7 +26,7 @@ TauOS revolutionizes computing by providing:
 ## 🏗️ **Architecture**
 
 ### **Core Components**
-- **TauOS Kernel**: Custom Linux-based operating system
+- **TauCore™ Kernel**: Custom Linux-based operating system
 - **TauAI**: Local AI assistant with natural language processing
 - **TauMail**: Encrypted email client with zero-knowledge architecture
 - **TauCloud**: Secure cloud storage with end-to-end encryption
@@ -188,6 +188,14 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ---
 
-**TauOS** - *Tomorrow's Intelligence, Today* 🚀
+**TauCore™** - *Tomorrow's Intelligence, Today* 🚀
 
 *Built with ❤️ for privacy, security, and freedom.*
+
+---
+
+## 📄 **Intellectual Property Notice**
+
+**TauCore™** and associated logos are trademarks of AR Holdings.  
+© 2025 TauCore™ / AR Holdings. All rights reserved.  
+Unauthorized use, reproduction, or distribution of this material, in whole or in part, is strictly prohibited.

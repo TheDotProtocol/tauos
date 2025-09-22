@@ -15,7 +15,7 @@ export default function HelpPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center space-x-4">
-              <img src="/brand/tauos-logo.svg" alt="TauOS" className="h-8 w-auto" />
+              <img src="/brand/tauos-logo.svg" alt="TauCore™" className="h-8 w-auto" />
               <span className="text-xl font-bold text-white">Tau OS</span>
             </div>
             <nav className="hidden md:flex items-center space-x-8">
@@ -43,7 +43,7 @@ export default function HelpPage() {
               </span>
             </h1>
             <p className="text-xl md:text-2xl text-gray-300 max-w-4xl mx-auto leading-relaxed">
-              Get help with <span className="text-yellow-400 font-semibold">TauOS, TauMail, TauCloud</span> and all our privacy-first applications.
+              Get help with <span className="text-yellow-400 font-semibold">TauCore™, TauMail, TauCloud</span> and all our privacy-first applications.
               <br />
               Find answers, guides, and support resources.
             </p>
@@ -77,7 +77,7 @@ export default function HelpPage() {
               {
                 icon: Download,
                 title: "Installation",
-                description: "Download and install TauOS on your system",
+                description: "Download and install TauCore™ on your system",
                 link: "/#downloads"
               },
               {
@@ -142,24 +142,24 @@ export default function HelpPage() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             {[
               {
-                question: "How do I install TauOS?",
-                answer: "Download the installer for your platform from our downloads page. Run the installer and follow the setup wizard to install TauOS with all applications."
+                question: "How do I install TauCore™?",
+                answer: "Download the installer for your platform from our downloads page. Run the installer and follow the setup wizard to install TauCore™ with all applications."
               },
               {
-                question: "Is TauOS free to use?",
-                answer: "Yes, TauOS is completely free and open-source. We believe privacy should be accessible to everyone, not just those who can afford it."
+                question: "Is TauCore™ free to use?",
+                answer: "Yes, TauCore™ is completely free and open-source. We believe privacy should be accessible to everyone, not just those who can afford it."
               },
               {
                 question: "How do I create a @tauos.org email?",
-                answer: "Visit our TauMail page, click 'Get TauOS Email', and register with your desired username. Your @tauos.org email will be ready immediately."
+                answer: "Visit our TauMail page, click 'Get TauCore™ Email', and register with your desired username. Your @tauos.org email will be ready immediately."
               },
               {
                 question: "Is my data really private?",
                 answer: "Absolutely. We use end-to-end encryption, zero-telemetry architecture, and open-source code. Your data never leaves your control."
               },
               {
-                question: "Can I use TauOS on my existing computer?",
-                answer: "Yes! TauOS can be installed alongside Windows, macOS, or Linux. You can also run it in a virtual machine or as a live system."
+                question: "Can I use TauCore™ on my existing computer?",
+                answer: "Yes! TauCore™ can be installed alongside Windows, macOS, or Linux. You can also run it in a virtual machine or as a live system."
               },
               {
                 question: "How do I get support?",
@@ -269,7 +269,7 @@ export default function HelpPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
             {[
               "Installation Guide - Step-by-step installation instructions",
-              "User Manual - Complete guide to using TauOS applications",
+              "User Manual - Complete guide to using TauCore™ applications",
               "Security Guide - Best practices for privacy and security",
               "Troubleshooting - Common issues and solutions",
               "API Documentation - For developers and integrations",
@@ -316,7 +316,7 @@ export default function HelpPage() {
                 <div>
                   <h3 className="text-xl font-bold text-white mb-4">General Support</h3>
                   <p className="text-gray-300 mb-2">Email: <a href="mailto:support@tauos.org" className="text-yellow-400 hover:text-yellow-300">support@tauos.org</a></p>
-                  <p className="text-gray-300 mb-2">Phone: +1 1800 TauOS</p>
+                  <p className="text-gray-300 mb-2">Phone: +1 1800 TauCore™</p>
                   <p className="text-gray-300">Response time: 24 hours</p>
                 </div>
                 <div>
@@ -344,7 +344,7 @@ export default function HelpPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
             <div className="flex items-center justify-center space-x-4 mb-4">
-              <img src="/brand/tauos-logo.svg" alt="TauOS" className="h-8 w-auto" />
+              <img src="/brand/tauos-logo.svg" alt="TauCore™" className="h-8 w-auto" />
               <span className="text-xl font-bold text-white">Tau OS</span>
             </div>
             <p className="text-gray-400">© 2025 Tau Foundation & Tau LLC. All rights reserved.</p>

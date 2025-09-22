@@ -2,7 +2,7 @@
 
 Your inbox, finally private.
 
-TauMail is the official email client of TauOS — built from scratch to give you total control over your communication.
+TauMail is the official email client of TauCore™ — built from scratch to give you total control over your communication.
 
 ## 📧 Modern UI
 Clean, intuitive, and fully GUI-based. No confusing menus or hidden features. Everything you need is right where you expect it to be, with a design that feels both familiar and refreshingly new.
