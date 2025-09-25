@@ -5,8 +5,10 @@ import sgMail from '@sendgrid/mail';
 
 // Database connection - production ready
 const pool = new Pool({
-  connectionString: process.env.DATABASE_URL || 'postgresql://postgres.tviqcormikopltejomkc:Ak1233%40%405@aws-0-ap-southeast-1.pooler.supabase.com:5432/postgres?sslmode=disable',
-  ssl: false
+  connectionString: process.env.DATABASE_URL || 'postgresql://postgres.tviqcormikopltejomkc:Ak1233%40%405@aws-0-ap-southeast-1.pooler.supabase.com:5432/postgres?sslmode=require',
+  ssl: {
+    rejectUnauthorized: false
+  }
 });
 
 // Initialize SendGrid
