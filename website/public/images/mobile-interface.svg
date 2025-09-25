@@ -1,0 +1,47 @@
+<svg width="320" height="192" viewBox="0 0 320 192" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="320" height="192" rx="12" fill="url(#gradient7)"/>
+  <defs>
+    <linearGradient id="gradient7" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#831843;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#be185d;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#ec4899;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Mobile Interface -->
+  <rect x="20" y="20" width="280" height="152" rx="8" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>
+  
+  <!-- Phone Frame -->
+  <rect x="120" y="30" width="80" height="132" rx="20" fill="rgba(255,255,255,0.08)" stroke="rgba(255,255,255,0.2)" stroke-width="2"/>
+  
+  <!-- Status Bar -->
+  <rect x="125" y="35" width="70" height="15" rx="4" fill="rgba(255,255,255,0.1)"/>
+  <circle cx="135" cy="42" r="2" fill="#10b981"/>
+  <text x="155" y="45" text-anchor="middle" fill="rgba(255,255,255,0.8)" font-family="Arial" font-size="8">9:41</text>
+  <circle cx="175" cy="42" r="2" fill="rgba(255,255,255,0.6)"/>
+  
+  <!-- App Grid -->
+  <rect x="130" y="55" width="70" height="100" rx="8" fill="rgba(255,255,255,0.03)"/>
+  
+  <!-- App Icons -->
+  <rect x="135" y="60" width="15" height="15" rx="3" fill="rgba(139,92,246,0.4)"/>
+  <rect x="155" y="60" width="15" height="15" rx="3" fill="rgba(59,130,246,0.4)"/>
+  <rect x="175" y="60" width="15" height="15" rx="3" fill="rgba(16,185,129,0.4)"/>
+  
+  <rect x="135" y="80" width="15" height="15" rx="3" fill="rgba(245,158,11,0.4)"/>
+  <rect x="155" y="80" width="15" height="15" rx="3" fill="rgba(239,68,68,0.4)"/>
+  <rect x="175" y="80" width="15" height="15" rx="3" fill="rgba(168,85,247,0.4)"/>
+  
+  <rect x="135" y="100" width="15" height="15" rx="3" fill="rgba(34,197,94,0.4)"/>
+  <rect x="155" y="100" width="15" height="15" rx="3" fill="rgba(251,146,60,0.4)"/>
+  <rect x="175" y="100" width="15" height="15" rx="3" fill="rgba(139,92,246,0.4)"/>
+  
+  <rect x="135" y="120" width="15" height="15" rx="3" fill="rgba(59,130,246,0.4)"/>
+  <rect x="155" y="120" width="15" height="15" rx="3" fill="rgba(16,185,129,0.4)"/>
+  <rect x="175" y="120" width="15" height="15" rx="3" fill="rgba(245,158,11,0.4)"/>
+  
+  <!-- Home Indicator -->
+  <rect x="150" y="140" width="20" height="3" rx="2" fill="rgba(255,255,255,0.3)"/>
+  
+  <text x="160" y="180" text-anchor="middle" fill="rgba(255,255,255,0.5)" font-family="Arial" font-size="12">TauOS Mobile</text>
+</svg> 

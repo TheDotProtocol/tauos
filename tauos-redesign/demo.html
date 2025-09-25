@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TauOS Design System Demo</title>
+    
+    <!-- Inter Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 100%);
+            color: white;
+            overflow-x: hidden;
+        }
+
+        .demo-container {
+            display: flex;
+            min-height: 100vh;
+            gap: 40px;
+            padding: 40px;
+        }
+
+        .demo-section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .demo-title {
+            font-size: 2rem;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .demo-frame {
+            flex: 1;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            overflow: hidden;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+        }
+
+        .demo-frame iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        .demo-description {
+            text-align: center;
+            color: rgba(255, 255, 255, 0.8);
+            line-height: 1.6;
+        }
+
+        .demo-features {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .feature-tag {
+            background: rgba(102, 126, 234, 0.2);
+            color: #667eea;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .mobile-frame {
+            width: 375px;
+            height: 812px;
+            margin: 0 auto;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 100%);
+            border-radius: 40px;
+            border: 2px solid #333;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+        }
+
+        @media (max-width: 1200px) {
+            .demo-container {
+                flex-direction: column;
+                gap: 20px;
+            }
+            
+            .demo-frame {
+                height: 600px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .demo-container {
+                padding: 20px;
+            }
+            
+            .demo-title {
+                font-size: 1.5rem;
+            }
+            
+            .mobile-frame {
+                width: 300px;
+                height: 600px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="demo-container">
+        <!-- Landing Page Demo -->
+        <div class="demo-section">
+            <h1 class="demo-title">🌐 Landing Page</h1>
+            <div class="demo-frame">
+                <iframe src="index.html" title="TauOS Landing Page"></iframe>
+            </div>
+            <div class="demo-description">
+                Premium landing page with animated particle system, glassmorphism effects, and interactive device showcase.
+            </div>
+            <div class="demo-features">
+                <span class="feature-tag">Particle System</span>
+                <span class="feature-tag">Glassmorphism</span>
+                <span class="feature-tag">60fps Animations</span>
+                <span class="feature-tag">Responsive Design</span>
+                <span class="feature-tag">Interactive Elements</span>
+            </div>
+        </div>
+
+        <!-- Mobile UI Demo -->
+        <div class="demo-section">
+            <h1 class="demo-title">📱 Mobile UI</h1>
+            <div class="demo-frame">
+                <div class="mobile-frame">
+                    <iframe src="mobile-ui.html" title="TauOS Mobile UI"></iframe>
+                </div>
+            </div>
+            <div class="demo-description">
+                Complete mobile UI system with 8 core apps, haptic feedback, and gesture support.
+            </div>
+            <div class="demo-features">
+                <span class="feature-tag">8 Core Apps</span>
+                <span class="feature-tag">Haptic Feedback</span>
+                <span class="feature-tag">Gesture Support</span>
+                <span class="feature-tag">App Overlays</span>
+                <span class="feature-tag">Touch Optimized</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Add some interactive effects
+        document.addEventListener('DOMContentLoaded', () => {
+            const frames = document.querySelectorAll('iframe');
+            
+            frames.forEach(frame => {
+                frame.addEventListener('load', () => {
+                    frame.style.opacity = '1';
+                });
+                
+                frame.style.opacity = '0';
+                frame.style.transition = 'opacity 0.5s ease';
+            });
+            
+            // Add hover effects to feature tags
+            const featureTags = document.querySelectorAll('.feature-tag');
+            featureTags.forEach(tag => {
+                tag.addEventListener('mouseenter', () => {
+                    tag.style.transform = 'scale(1.05)';
+                    tag.style.background = 'rgba(102, 126, 234, 0.3)';
+                });
+                
+                tag.addEventListener('mouseleave', () => {
+                    tag.style.transform = 'scale(1)';
+                    tag.style.background = 'rgba(102, 126, 234, 0.2)';
+                });
+            });
+        });
+    </script>
+</body>
+</html> 

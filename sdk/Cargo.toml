@@ -1,0 +1,35 @@
+[package]
+name = "tau-sdk"
+version = "0.1.0"
+edition = "2021"
+authors = ["Tau OS Team"]
+description = "Tau OS Developer SDK - Tools for creating, building, and publishing Tau applications"
+
+[[bin]]
+name = "tau-sdk"
+path = "src/main.rs"
+
+[dependencies]
+# GTK4 dependencies removed due to system dependency issues
+# gtk4 = { workspace = true }
+# glib = { workspace = true }
+# gio = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+anyhow = { workspace = true }
+thiserror = { workspace = true }
+tokio = { workspace = true }
+reqwest = { workspace = true, features = ["multipart"] }
+clap = { workspace = true }
+indicatif = { workspace = true }
+console = { workspace = true }
+uuid = { workspace = true }
+chrono = { workspace = true }
+log = { workspace = true }
+env_logger = { workspace = true }
+sha2 = "0.10"
+rand = "0.8"
+regex = "1.0"
+tempfile = "3.0"
+toml = "0.8"
+num_cpus = "1.0" 

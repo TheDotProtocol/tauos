@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>τ Browser - Privacy First Web Browser</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #0a0a0a;
+            color: #ffffff;
+            overflow: hidden;
+        }
+
+        .browser-window {
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header-bar {
+            background: rgba(26, 26, 26, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 8px 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .browser-title {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            font-size: 18px;
+            font-weight: 600;
+            color: #ffffff;
+            background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
+            padding: 8px 16px;
+            border-radius: 8px;
+            margin: 4px;
+        }
+
+        .privacy-indicator {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            font-size: 12px;
+            font-weight: 500;
+            color: #10b981;
+            background: rgba(16, 185, 129, 0.1);
+            padding: 4px 8px;
+            border-radius: 4px;
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+
+        .toolbar {
+            background: rgba(26, 26, 26, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 8px 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .nav-button {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 6px;
+            color: white;
+            padding: 8px;
+            font-size: 14px;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+
+        .nav-button:hover {
+            background: rgba(139, 92, 246, 0.2);
+            border-color: #8b5cf6;
+            transform: translateY(-1px);
+        }
+
+        .address-bar {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            color: white;
+            padding: 8px 12px;
+            font-size: 14px;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            flex: 1;
+            margin: 0 8px;
+        }
+
+        .address-bar:focus {
+            outline: none;
+            border-color: #8b5cf6;
+            box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.2);
+        }
+
+        .address-bar::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .privacy-button {
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            border-radius: 6px;
+            color: #10b981;
+            padding: 8px 12px;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+
+        .privacy-button:hover {
+            background: rgba(16, 185, 129, 0.2);
+            border-color: #10b981;
+            transform: translateY(-1px);
+        }
+
+        .webview-container {
+            flex: 1;
+            background: #ffffff;
+            position: relative;
+        }
+
+        .webview-placeholder {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            color: #1e293b;
+        }
+
+        .webview-placeholder h1 {
+            font-size: 48px;
+            margin-bottom: 16px;
+            background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .webview-placeholder p {
+            font-size: 18px;
+            color: #64748b;
+            margin-bottom: 24px;
+        }
+
+        .privacy-stats {
+            display: flex;
+            gap: 16px;
+            margin-top: 16px;
+        }
+
+        .stat-item {
+            background: rgba(139, 92, 246, 0.1);
+            border: 1px solid rgba(139, 92, 246, 0.3);
+            border-radius: 8px;
+            padding: 12px;
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 24px;
+            font-weight: 600;
+            color: #8b5cf6;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #64748b;
+            margin-top: 4px;
+        }
+
+        .privacy-dialog {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(26, 26, 26, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 24px;
+            display: none;
+            z-index: 1000;
+            width: 400px;
+        }
+
+        .privacy-dialog.show {
+            display: block;
+            animation: fadeIn 0.3s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translate(-50%, -50%) scale(0.9); }
+            to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+        }
+
+        .dialog-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .dialog-header h3 {
+            margin: 0;
+            color: white;
+            font-size: 20px;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            padding: 5px;
+            border-radius: 50%;
+            transition: background-color 0.2s ease;
+        }
+
+        .close-btn:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .feature-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .feature-row:last-child {
+            border-bottom: none;
+        }
+
+        .switch {
+            position: relative;
+            width: 50px;
+            height: 24px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+
+        .switch.active {
+            background: #10b981;
+        }
+
+        .switch::after {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 20px;
+            height: 20px;
+            background: white;
+            border-radius: 50%;
+            transition: transform 0.2s ease;
+        }
+
+        .switch.active::after {
+            transform: translateX(26px);
+        }
+
+        .dialog-buttons {
+            display: flex;
+            gap: 8px;
+            justify-content: flex-end;
+            margin-top: 20px;
+        }
+
+        .dialog-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 6px;
+            color: white;
+            padding: 8px 16px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .dialog-btn:hover {
+            background: rgba(139, 92, 246, 0.3);
+            border-color: #8b5cf6;
+        }
+
+        .dialog-btn.primary {
+            background: rgba(139, 92, 246, 0.3);
+            border-color: #8b5cf6;
+        }
+
+        .dialog-btn.primary:hover {
+            background: rgba(139, 92, 246, 0.5);
+        }
+    </style>
+</head>
+<body>
+    <div class="browser-window">
+        <!-- Header Bar -->
+        <div class="header-bar">
+            <div class="browser-title">τ Browser</div>
+            <div class="privacy-indicator">🔒 Privacy Protected</div>
+        </div>
+
+        <!-- Toolbar -->
+        <div class="toolbar">
+            <button class="nav-button" onclick="goBack()">←</button>
+            <button class="nav-button" onclick="goForward()">→</button>
+            <button class="nav-button" onclick="refresh()">↻</button>
+            <button class="nav-button" onclick="goHome()">🏠</button>
+            
+            <input type="text" class="address-bar" placeholder="Enter URL or search..." 
+                   value="https://www.google.com" onkeypress="handleEnter(event)">
+            
+            <button class="privacy-button" onclick="showPrivacyDialog()">🔒</button>
+        </div>
+
+        <!-- WebView Container -->
+        <div class="webview-container">
+            <div class="webview-placeholder">
+                <h1>τ</h1>
+                <p>Welcome to Tau Browser - Privacy First Web Browser</p>
+                <div class="privacy-stats">
+                    <div class="stat-item">
+                        <div class="stat-number" id="blockedAds">23</div>
+                        <div class="stat-label">Ads Blocked</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number" id="blockedTrackers">8</div>
+                        <div class="stat-label">Trackers Blocked</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number" id="secureConnections">12</div>
+                        <div class="stat-label">Secure Connections</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Privacy Dialog -->
+    <div class="privacy-dialog" id="privacyDialog">
+        <div class="dialog-header">
+            <h3>Privacy Settings</h3>
+            <button class="close-btn" onclick="hidePrivacyDialog()">✕</button>
+        </div>
+        
+        <div class="feature-row">
+            <span>Ad Blocking</span>
+            <div class="switch active" onclick="toggleSwitch(this)"></div>
+        </div>
+        
+        <div class="feature-row">
+            <span>Tracking Protection</span>
+            <div class="switch active" onclick="toggleSwitch(this)"></div>
+        </div>
+        
+        <div class="feature-row">
+            <span>Fingerprinting Protection</span>
+            <div class="switch active" onclick="toggleSwitch(this)"></div>
+        </div>
+        
+        <div class="feature-row">
+            <span>HTTPS Everywhere</span>
+            <div class="switch active" onclick="toggleSwitch(this)"></div>
+        </div>
+        
+        <div class="dialog-buttons">
+            <button class="dialog-btn" onclick="hidePrivacyDialog()">Cancel</button>
+            <button class="dialog-btn primary" onclick="applyPrivacySettings()">Apply</button>
+        </div>
+    </div>
+
+    <script>
+        function goBack() {
+            console.log('Go back clicked');
+        }
+
+        function goForward() {
+            console.log('Go forward clicked');
+        }
+
+        function refresh() {
+            console.log('Refresh clicked');
+        }
+
+        function goHome() {
+            console.log('Home clicked');
+        }
+
+        function handleEnter(event) {
+            if (event.key === 'Enter') {
+                const url = event.target.value;
+                console.log('Navigating to:', url);
+            }
+        }
+
+        function showPrivacyDialog() {
+            document.getElementById('privacyDialog').classList.add('show');
+        }
+
+        function hidePrivacyDialog() {
+            document.getElementById('privacyDialog').classList.remove('show');
+        }
+
+        function toggleSwitch(element) {
+            element.classList.toggle('active');
+        }
+
+        function applyPrivacySettings() {
+            console.log('Privacy settings applied');
+            hidePrivacyDialog();
+        }
+
+        // Update privacy stats
+        function updateStats() {
+            document.getElementById('blockedAds').textContent = Math.floor(Math.random() * 50) + 10;
+            document.getElementById('blockedTrackers').textContent = Math.floor(Math.random() * 20) + 5;
+            document.getElementById('secureConnections').textContent = Math.floor(Math.random() * 30) + 10;
+        }
+
+        // Update stats every 5 seconds
+        setInterval(updateStats, 5000);
+    </script>
+</body>
+</html> 

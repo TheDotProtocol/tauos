@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TauOS Version Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);
+            color: #ffffff;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: rgba(42, 42, 42, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-icon {
+            font-size: 32px;
+            font-weight: bold;
+            background: linear-gradient(135deg, #667eea 0%, #8b5cf6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .logo-text {
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        .login-section {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .login-input {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            padding: 8px 12px;
+            color: #ffffff;
+            font-size: 14px;
+        }
+
+        .login-input::placeholder {
+            color: #a1a1aa;
+        }
+
+        .login-button {
+            background: linear-gradient(135deg, #667eea 0%, #8b5cf6 100%);
+            border: none;
+            border-radius: 8px;
+            padding: 8px 16px;
+            color: #ffffff;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .login-button:hover {
+            transform: translateY(-1px);
+        }
+
+        .dashboard {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 16px;
+            padding: 24px;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .upload-section {
+            grid-column: 1 / -1;
+        }
+
+        .upload-form {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .form-label {
+            font-size: 14px;
+            font-weight: 600;
+            color: #a1a1aa;
+        }
+
+        .form-input {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            padding: 12px;
+            color: #ffffff;
+            font-size: 14px;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .form-textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .file-input {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            padding: 12px;
+            color: #ffffff;
+            cursor: pointer;
+        }
+
+        .upload-button {
+            background: linear-gradient(135deg, #667eea 0%, #8b5cf6 100%);
+            border: none;
+            border-radius: 8px;
+            padding: 12px 24px;
+            color: #ffffff;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+            grid-column: 1 / -1;
+        }
+
+        .upload-button:hover {
+            transform: translateY(-1px);
+        }
+
+        .updates-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .update-item {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .update-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .update-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .update-version {
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .update-platform {
+            background: rgba(102, 126, 234, 0.2);
+            border: 1px solid rgba(102, 126, 234, 0.3);
+            border-radius: 6px;
+            padding: 4px 8px;
+            font-size: 12px;
+            color: #667eea;
+        }
+
+        .update-details {
+            display: flex;
+            gap: 16px;
+            font-size: 12px;
+            color: #a1a1aa;
+            margin-bottom: 8px;
+        }
+
+        .update-changelog {
+            font-size: 14px;
+            color: #ffffff;
+            line-height: 1.4;
+        }
+
+        .update-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .action-button {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 6px;
+            padding: 6px 12px;
+            color: #ffffff;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .action-button:hover {
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .action-button.danger {
+            background: rgba(248, 113, 113, 0.2);
+            border-color: rgba(248, 113, 113, 0.3);
+            color: #f87171;
+        }
+
+        .action-button.danger:hover {
+            background: rgba(248, 113, 113, 0.3);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 16px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: #667eea;
+            margin-bottom: 4px;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #a1a1aa;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .success-message {
+            background: rgba(74, 222, 128, 0.2);
+            border: 1px solid rgba(74, 222, 128, 0.3);
+            border-radius: 8px;
+            padding: 12px;
+            color: #4ade80;
+            margin-bottom: 16px;
+        }
+
+        .error-message {
+            background: rgba(248, 113, 113, 0.2);
+            border: 1px solid rgba(248, 113, 113, 0.3);
+            border-radius: 8px;
+            padding: 12px;
+            color: #f87171;
+            margin-bottom: 16px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="logo">
+                <div class="logo-icon">τ</div>
+                <div class="logo-text">TauOS Version Dashboard</div>
+            </div>
+            <div class="login-section">
+                <input type="password" class="login-input" id="adminToken" placeholder="Admin Token">
+                <button class="login-button" onclick="login()">Login</button>
+            </div>
+        </div>
+
+        <!-- Dashboard Content -->
+        <div class="dashboard" id="dashboard" style="display: none;">
+            <!-- Stats -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">Statistics</div>
+                </div>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value" id="totalUpdates">0</div>
+                        <div class="stat-label">Total Updates</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="activeUpdates">0</div>
+                        <div class="stat-label">Active Updates</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="totalDownloads">0</div>
+                        <div class="stat-label">Total Downloads</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Upload Section -->
+            <div class="card upload-section">
+                <div class="card-header">
+                    <div class="card-title">Upload New Update</div>
+                </div>
+                <form id="uploadForm" class="upload-form">
+                    <div class="form-group">
+                        <label class="form-label">Version</label>
+                        <input type="text" class="form-input" id="version" placeholder="1.0.0" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Build Number</label>
+                        <input type="number" class="form-input" id="buildNumber" placeholder="100" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Platform</label>
+                        <select class="form-input" id="platform" required>
+                            <option value="">Select Platform</option>
+                            <option value="android">Android</option>
+                            <option value="ios">iOS</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Mandatory Update</label>
+                        <select class="form-input" id="isMandatory">
+                            <option value="false">No</option>
+                            <option value="true">Yes</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Update File</label>
+                        <input type="file" class="file-input" id="updateFile" accept=".apk,.ipa,.zip" required>
+                    </div>
+                    <div class="form-group" style="grid-column: 1 / -1;">
+                        <label class="form-label">Changelog</label>
+                        <textarea class="form-input form-textarea" id="changelog" placeholder="Enter changelog..." required></textarea>
+                    </div>
+                    <button type="submit" class="upload-button">Upload Update</button>
+                </form>
+            </div>
+
+            <!-- Updates List -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">Recent Updates</div>
+                </div>
+                <div class="updates-list" id="updatesList">
+                    <!-- Updates will be loaded here -->
+                </div>
+            </div>
+
+            <!-- Links -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">Quick Links</div>
+                </div>
+                <div style="display: flex; flex-direction: column; gap: 12px;">
+                    <a href="https://updates.tauos.org" target="_blank" style="color: #667eea; text-decoration: none; padding: 12px; background: rgba(102, 126, 234, 0.1); border-radius: 8px; transition: background 0.2s;">
+                        📱 Updates Portal
+                    </a>
+                    <a href="https://api.tauos.org" target="_blank" style="color: #667eea; text-decoration: none; padding: 12px; background: rgba(102, 126, 234, 0.1); border-radius: 8px; transition: background 0.2s;">
+                        🔌 API Documentation
+                    </a>
+                    <a href="https://mdm.tauos.org" target="_blank" style="color: #667eea; text-decoration: none; padding: 12px; background: rgba(102, 126, 234, 0.1); border-radius: 8px; transition: background 0.2s;">
+                        🛡️ MDM Dashboard
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Login Message -->
+        <div id="loginMessage" style="text-align: center; padding: 60px 20px;">
+            <div style="font-size: 24px; margin-bottom: 16px;">🔐 Admin Access Required</div>
+            <div style="color: #a1a1aa; max-width: 400px; margin: 0 auto;">
+                Please enter your admin token to access the TauOS Version Dashboard.
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let adminToken = '';
+        let updates = [];
+
+        function login() {
+            const token = document.getElementById('adminToken').value;
+            if (token === 'tauos-admin-2025') {
+                adminToken = token;
+                document.getElementById('dashboard').style.display = 'grid';
+                document.getElementById('loginMessage').style.display = 'none';
+                loadUpdates();
+            } else {
+                alert('Invalid admin token');
+            }
+        }
+
+        async function loadUpdates() {
+            try {
+                const response = await fetch('/admin/updates', {
+                    headers: {
+                        'Authorization': `Bearer ${adminToken}`
+                    }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    updates = data.updates;
+                    displayUpdates();
+                    updateStats();
+                }
+            } catch (error) {
+                console.error('Error loading updates:', error);
+            }
+        }
+
+        function displayUpdates() {
+            const container = document.getElementById('updatesList');
+            container.innerHTML = '';
+
+            updates.forEach(update => {
+                const updateElement = document.createElement('div');
+                updateElement.className = 'update-item';
+                updateElement.innerHTML = `
+                    <div class="update-header">
+                        <div class="update-version">v${update.version}</div>
+                        <div class="update-platform">${update.platform}</div>
+                    </div>
+                    <div class="update-details">
+                        <span>Build: ${update.build_number}</span>
+                        <span>Size: ${formatFileSize(update.file_size)}</span>
+                        <span>${update.is_mandatory ? 'Mandatory' : 'Optional'}</span>
+                    </div>
+                    <div class="update-actions">
+                        <button class="action-button" onclick="toggleUpdate('${update.update_id}')">
+                            ${update.is_active ? 'Disable' : 'Enable'}
+                        </button>
+                        <button class="action-button danger" onclick="deleteUpdate('${update.update_id}')">
+                            Delete
+                        </button>
+                    </div>
+                `;
+                container.appendChild(updateElement);
+            });
+        }
+
+        function updateStats() {
+            document.getElementById('totalUpdates').textContent = updates.length;
+            document.getElementById('activeUpdates').textContent = updates.filter(u => u.is_active).length;
+            document.getElementById('totalDownloads').textContent = '0'; // TODO: Implement download tracking
+        }
+
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        document.getElementById('uploadForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const formData = new FormData();
+            formData.append('file', document.getElementById('updateFile').files[0]);
+            formData.append('version', document.getElementById('version').value);
+            formData.append('build_number', document.getElementById('buildNumber').value);
+            formData.append('platform', document.getElementById('platform').value);
+            formData.append('changelog', document.getElementById('changelog').value);
+            formData.append('is_mandatory', document.getElementById('isMandatory').value);
+
+            try {
+                const response = await fetch('/admin/updates/upload', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${adminToken}`
+                    },
+                    body: formData
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+                    alert('Update uploaded successfully!');
+                    document.getElementById('uploadForm').reset();
+                    loadUpdates();
+                } else {
+                    alert('Error uploading update');
+                }
+            } catch (error) {
+                console.error('Error uploading update:', error);
+                alert('Error uploading update');
+            }
+        });
+
+        async function toggleUpdate(updateId) {
+            try {
+                const response = await fetch(`/admin/updates/${updateId}/toggle`, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `Bearer ${adminToken}`
+                    }
+                });
+
+                if (response.ok) {
+                    loadUpdates();
+                }
+            } catch (error) {
+                console.error('Error toggling update:', error);
+            }
+        }
+
+        async function deleteUpdate(updateId) {
+            if (!confirm('Are you sure you want to delete this update?')) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`/admin/updates/${updateId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${adminToken}`
+                    }
+                });
+
+                if (response.ok) {
+                    loadUpdates();
+                }
+            } catch (error) {
+                console.error('Error deleting update:', error);
+            }
+        }
+
+        // Enter key to login
+        document.getElementById('adminToken').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                login();
+            }
+        });
+    </script>
+</body>
+</html> 

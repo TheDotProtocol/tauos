@@ -1,0 +1,784 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TauID - Sovereign Privacy First Identity</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #0f0f0f;
+            color: #ffffff;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .welcome-container {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header */
+        .header {
+            background: rgba(17, 24, 39, 0.5);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(75, 85, 99, 0.5);
+            padding: 16px 24px;
+        }
+
+        .header-content {
+            max-width: 1280px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .logo {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            color: #fbbf24;
+            font-size: 18px;
+        }
+
+        .header-title h1 {
+            font-size: 20px;
+            font-weight: 700;
+            color: #ffffff;
+        }
+
+        .header-title p {
+            font-size: 14px;
+            color: #9ca3af;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .header-button {
+            padding: 8px 16px;
+            background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
+            color: #fbbf24;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .header-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(31, 41, 55, 0.3);
+        }
+
+        /* Hero Section */
+        .hero-section {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 80px 24px;
+            text-align: center;
+        }
+
+        .hero-content {
+            max-width: 800px;
+        }
+
+        .hero-title {
+            font-size: 3.5rem;
+            font-weight: 800;
+            color: #ffffff;
+            margin-bottom: 24px;
+            line-height: 1.1;
+        }
+
+        .hero-subtitle {
+            font-size: 1.25rem;
+            color: #9ca3af;
+            margin-bottom: 48px;
+            line-height: 1.6;
+        }
+
+        .hero-features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 24px;
+            margin-bottom: 48px;
+        }
+
+        .feature-card {
+            background: rgba(17, 24, 39, 0.3);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(75, 85, 99, 0.5);
+            border-radius: 16px;
+            padding: 24px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .feature-card:hover {
+            border-color: rgba(251, 191, 36, 0.3);
+            transform: translateY(-4px);
+        }
+
+        .feature-icon {
+            width: 64px;
+            height: 64px;
+            background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 16px;
+            font-size: 28px;
+            color: #fbbf24;
+        }
+
+        .feature-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: #ffffff;
+            margin-bottom: 8px;
+        }
+
+        .feature-description {
+            color: #9ca3af;
+            line-height: 1.5;
+        }
+
+        .cta-buttons {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .cta-button {
+            padding: 16px 32px;
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 1.125rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .cta-primary {
+            background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
+            color: #fbbf24;
+        }
+
+        .cta-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(31, 41, 55, 0.3);
+        }
+
+        .cta-secondary {
+            background: rgba(75, 85, 99, 0.3);
+            color: #ffffff;
+            border: 1px solid rgba(75, 85, 99, 0.5);
+        }
+
+        .cta-secondary:hover {
+            background: rgba(75, 85, 99, 0.5);
+            transform: translateY(-2px);
+        }
+
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .modal {
+            background: rgba(17, 24, 39, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(75, 85, 99, 0.5);
+            border-radius: 16px;
+            padding: 32px;
+            width: 90%;
+            max-width: 480px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #ffffff;
+            margin-bottom: 8px;
+        }
+
+        .modal-subtitle {
+            color: #9ca3af;
+            font-size: 0.875rem;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            color: #9ca3af;
+            font-size: 0.875rem;
+            font-weight: 500;
+            margin-bottom: 8px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px 16px;
+            background: rgba(55, 65, 81, 0.3);
+            border: 1px solid rgba(75, 85, 99, 0.5);
+            border-radius: 8px;
+            color: #ffffff;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #fbbf24;
+            background: rgba(55, 65, 81, 0.7);
+        }
+
+        .form-input::placeholder {
+            color: #6b7280;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 32px;
+        }
+
+        .btn-secondary {
+            flex: 1;
+            padding: 12px 24px;
+            background: rgba(75, 85, 99, 0.5);
+            color: #ffffff;
+            border: 1px solid rgba(75, 85, 99, 0.5);
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(75, 85, 99, 0.7);
+        }
+
+        .btn-primary {
+            flex: 1;
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
+            color: #fbbf24;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(31, 41, 55, 0.3);
+        }
+
+        .modal-footer {
+            text-align: center;
+            margin-top: 24px;
+            padding-top: 24px;
+            border-top: 1px solid rgba(75, 85, 99, 0.3);
+        }
+
+        .modal-footer a {
+            color: #fbbf24;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .modal-footer a:hover {
+            text-decoration: underline;
+        }
+
+        /* Notification */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(34, 197, 94, 0.9);
+            color: #ffffff;
+            padding: 16px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            transform: translateX(400px);
+            transition: transform 0.3s ease;
+            z-index: 1001;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        .notification.error {
+            background: rgba(239, 68, 68, 0.9);
+        }
+
+        /* Legal Documentation Styles */
+        .legal-section {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1002;
+        }
+
+        .legal-btn {
+            padding: 12px 20px;
+            background: rgba(75, 85, 99, 0.5);
+            color: #ffffff;
+            border: 1px solid rgba(75, 85, 99, 0.5);
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .legal-btn:hover {
+            background: rgba(75, 85, 99, 0.7);
+        }
+
+        .modal-content {
+            background: rgba(17, 24, 39, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(75, 85, 99, 0.5);
+            border-radius: 16px;
+            padding: 32px;
+            width: 90%;
+            max-width: 800px;
+            max-height: 80vh;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero-title {
+                font-size: 2.5rem;
+            }
+
+            .hero-features {
+                grid-template-columns: 1fr;
+            }
+
+            .cta-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .cta-button {
+                width: 100%;
+                max-width: 300px;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="welcome-container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <div class="header-left">
+                    <div class="logo">τ</div>
+                    <div class="header-title">
+                        <h1>TauID</h1>
+                        <p>Identity & Access Management</p>
+                    </div>
+                </div>
+                <div class="header-right">
+                    <button class="header-button" onclick="openLoginModal()">Sign In</button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Hero Section -->
+        <section class="hero-section">
+            <div class="hero-content">
+                <h1 class="hero-title">Your Digital Identity,<br>Your Control</h1>
+                <p class="hero-subtitle">
+                    TauID provides sovereign, privacy-first identity management. 
+                    Own your data, control your access, and maintain complete privacy across the TauOS ecosystem.
+                </p>
+
+                <div class="hero-features">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-shield-alt"></i>
+                        </div>
+                        <h3 class="feature-title">Zero-Knowledge</h3>
+                        <p class="feature-description">Your data never leaves your device unencrypted</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-fingerprint"></i>
+                        </div>
+                        <h3 class="feature-title">Biometric Security</h3>
+                        <p class="feature-description">Advanced authentication with fingerprint and face recognition</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-lock"></i>
+                        </div>
+                        <h3 class="feature-title">End-to-End Encryption</h3>
+                        <p class="feature-description">Military-grade encryption for all your identity data</p>
+                    </div>
+                </div>
+
+                <div class="cta-buttons">
+                    <button class="cta-button cta-primary" onclick="openRegisterModal()">
+                        <i class="fas fa-user-plus"></i>
+                        Create Account
+                    </button>
+                    <button class="cta-button cta-secondary" onclick="openLoginModal()">
+                        <i class="fas fa-sign-in-alt"></i>
+                        Sign In
+                    </button>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Register Modal -->
+    <div class="modal-overlay" id="registerModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 class="modal-title">Create Your TauID</h2>
+                <p class="modal-subtitle">Join the sovereign digital future</p>
+            </div>
+            <form id="registerForm">
+                <div class="form-group">
+                    <label class="form-label">Full Name</label>
+                    <input type="text" class="form-input" id="registerFullName" placeholder="Enter your full name" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Username</label>
+                    <input type="text" class="form-input" id="registerUsername" placeholder="Choose a username" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Email</label>
+                    <input type="email" class="form-input" id="registerEmail" placeholder="Enter your email" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Password</label>
+                    <input type="password" class="form-input" id="registerPassword" placeholder="Create a strong password" required>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn-secondary" onclick="closeRegisterModal()">Cancel</button>
+                    <button type="submit" class="btn-primary">Create Account</button>
+                </div>
+            </form>
+            <div class="modal-footer">
+                Already have an account? <a href="#" onclick="switchToLogin()">Sign In</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Login Modal -->
+    <div class="modal-overlay" id="loginModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 class="modal-title">Welcome Back</h2>
+                <p class="modal-subtitle">Sign in to your TauID account</p>
+            </div>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label class="form-label">Email or Username</label>
+                    <input type="text" class="form-input" id="loginEmail" placeholder="Enter your email or username" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Password</label>
+                    <input type="password" class="form-input" id="loginPassword" placeholder="Enter your password" required>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn-secondary" onclick="closeLoginModal()">Cancel</button>
+                    <button type="submit" class="btn-primary">Sign In</button>
+                </div>
+            </form>
+            <div class="modal-footer">
+                Don't have an account? <a href="#" onclick="switchToRegister()">Create Account</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Legal Documentation Section -->
+    <div class="legal-section">
+        <button onclick="toggleLegalDocs()" class="legal-btn">
+            📜 Legal & Privacy
+        </button>
+    </div>
+
+    <!-- Legal Documentation Modal -->
+    <div id="legalModal" class="modal-overlay" style="display: none;">
+        <div class="modal-content" style="max-width: 800px; max-height: 80vh; overflow-y: auto;">
+            <div class="modal-header">
+                <h2 style="color: #fbbf24; margin-bottom: 8px;">TauID Legal & Privacy Documentation</h2>
+                <button onclick="closeLegalDocs()" style="position: absolute; top: 16px; right: 16px; background: none; border: none; color: #9ca3af; font-size: 24px; cursor: pointer;">&times;</button>
+            </div>
+            
+            <div style="color: #ffffff; line-height: 1.6; font-size: 14px;">
+                <h3 style="color: #fbbf24; margin-top: 24px; margin-bottom: 16px;">📜 TauID Terms of Service</h3>
+                <p><strong>Effective Date:</strong> December 30, 2024<br>
+                <strong>Last Updated:</strong> December 30, 2024</p>
+                
+                <h4 style="color: #d1d5db; margin-top: 20px; margin-bottom: 10px;">1. Service Description</h3>
+                <p>TauID provides sovereign digital identity management services with zero-knowledge architecture, allowing users to manage their digital identity while maintaining complete control over their personal information.</p>
+                
+                <h4 style="color: #d1d5db; margin-top: 20px; margin-bottom: 10px;">2. User Responsibilities</h3>
+                <p>Users are responsible for maintaining the security of their identity credentials, providing accurate information, and not using the service for fraudulent activities or impersonation.</p>
+                
+                <h4 style="color: #d1d5db; margin-top: 20px; margin-bottom: 10px;">3. Identity Verification</h3>
+                <p>We provide tools for identity verification but do not guarantee the accuracy of user-provided information. Users are responsible for the validity of their identity claims.</p>
+                
+                <h4 style="color: #d1d5db; margin-top: 20px; margin-bottom: 10px;">4. Service Availability</h3>
+                <p>We strive for 99.99% uptime but do not guarantee uninterrupted service. We reserve the right to perform maintenance and updates as needed.</p>
+                
+                <h4 style="color: #d1d5db; margin-top: 20px; margin-bottom: 10px;">5. Termination</h3>
+                <p>Either party may terminate service with 30 days notice. Upon termination, users must export their identity data within 90 days.</p>
+
+                <h3 style="color: #fbbf24; margin-top: 24px; margin-bottom: 16px;">🔒 TauID Privacy Policy</h3>
+                <p><strong>Effective Date:</strong> December 30, 2024<br>
+                <strong>Last Updated:</strong> December 30, 2024</p>
+                
+                <h4 style="color: #d1d5db; margin-top: 20px; margin-bottom: 10px;">1. Data Collection</h3>
+                <p>We collect minimal identity metadata (username, verification status) but never access your encrypted personal information. Your identity keys remain solely in your possession.</p>
+                
+                <h4 style="color: #d1d5db; margin-top: 20px; margin-bottom: 10px;">2. Data Processing</h3>
+                <p>All identity processing occurs client-side before encryption. We cannot decrypt, read, or analyze your stored personal information.</p>
+                
+                <h4 style="color: #d1d5db; margin-top: 20px; margin-bottom: 10px;">3. Data Sharing</h3>
+                <p>We do not sell, rent, or share your personal information with third parties, except as required by law or with your explicit consent for specific services.</p>
+                
+                <h4 style="color: #d1d5db; margin-top: 20px; margin-bottom: 10px;">4. Data Retention</h3>
+                <p>Account metadata is retained while your account is active. Deleted identity data is permanently removed within 30 days.</p>
+                
+                <h4 style="color: #d1d5db; margin-top: 20px; margin-bottom: 10px;">5. Your Rights</h3>
+                <p>You have the right to access, correct, or delete your identity information. You can export your data at any time and control sharing permissions.</p>
+
+                <h3 style="color: #fbbf24; margin-top: 24px; margin-bottom: 16px;">🛡️ TauID Privacy Principles</h3>
+                <p><strong>Our Core Commitments:</strong></p>
+                <ul style="margin-left: 20px; margin-top: 10px;">
+                    <li><strong>Zero-Knowledge:</strong> We cannot access your encrypted identity data</li>
+                    <li><strong>Client-Side Processing:</strong> All identity operations happen on your device</li>
+                    <li><strong>No Identity Mining:</strong> We do not analyze your identity or behavior patterns</li>
+                    <li><strong>Transparency:</strong> Open source protocols and regular security audits</li>
+                    <li><strong>User Control:</strong> You decide what identity information to share and with whom</li>
+                </ul>
+
+                <h3 style="color: #fbbf24; margin-top: 24px; margin-bottom: 16px;">📊 TauID Transparency Report</h3>
+                <p><strong>Q4 2024 Report:</strong></p>
+                <ul style="margin-left: 20px; margin-top: 10px;">
+                    <li><strong>Government Requests:</strong> 0 (we cannot access encrypted data)</li>
+                    <li><strong>Data Breaches:</strong> 0 (zero-knowledge architecture prevents access)</li>
+                    <li><strong>Third-Party Access:</strong> 0 (no data sharing agreements)</li>
+                    <li><strong>Audit Results:</strong> Passed all security and privacy audits</li>
+                    <li><strong>Compliance:</strong> GDPR, CCPA, eIDAS, SOC 2 Type II certified</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification -->
+    <div class="notification" id="notification"></div>
+
+    <script>
+        // Modal Functions
+        function openRegisterModal() {
+            document.getElementById('registerModal').style.display = 'flex';
+        }
+
+        function closeRegisterModal() {
+            document.getElementById('registerModal').style.display = 'none';
+        }
+
+        function openLoginModal() {
+            document.getElementById('loginModal').style.display = 'flex';
+        }
+
+        function closeLoginModal() {
+            document.getElementById('loginModal').style.display = 'none';
+        }
+
+        function switchToLogin() {
+            closeRegisterModal();
+            openLoginModal();
+        }
+
+        function switchToRegister() {
+            closeLoginModal();
+            openRegisterModal();
+        }
+
+        // Close modals when clicking outside
+        document.querySelectorAll('.modal-overlay').forEach(overlay => {
+            overlay.addEventListener('click', function(e) {
+                if (e.target === this) {
+                    this.style.display = 'none';
+                }
+            });
+        });
+
+        // Form Submissions
+        document.getElementById('registerForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const formData = {
+                fullName: document.getElementById('registerFullName').value,
+                username: document.getElementById('registerUsername').value,
+                email: document.getElementById('registerEmail').value,
+                password: document.getElementById('registerPassword').value
+            };
+
+            try {
+                const response = await fetch('/api/register', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    showNotification('Account created successfully! Please sign in.');
+                    closeRegisterModal();
+                    openLoginModal();
+                } else {
+                    showNotification(data.error || 'Registration failed', 'error');
+                }
+            } catch (error) {
+                showNotification('Registration failed. Please try again.', 'error');
+            }
+        });
+
+        document.getElementById('loginForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const formData = {
+                email: document.getElementById('loginEmail').value,
+                password: document.getElementById('loginPassword').value
+            };
+
+            try {
+                const response = await fetch('/api/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    // Store user data and token
+                    localStorage.setItem('tauIDUser', JSON.stringify(data.user));
+                    localStorage.setItem('tauIDToken', data.token);
+                    
+                    showNotification('Login successful! Redirecting to dashboard...');
+                    setTimeout(() => {
+                        window.location.href = '/dashboard';
+                    }, 1500);
+                } else {
+                    showNotification(data.error || 'Login failed', 'error');
+                }
+            } catch (error) {
+                showNotification('Login failed. Please try again.', 'error');
+            }
+        });
+
+        function showNotification(message, type = 'success') {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.className = `notification ${type}`;
+            notification.classList.add('show');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeRegisterModal();
+                closeLoginModal();
+            }
+        });
+
+        function toggleLegalDocs() {
+            const modal = document.getElementById('legalModal');
+            modal.style.display = modal.style.display === 'none' ? 'block' : 'none';
+        }
+
+        function closeLegalDocs() {
+            document.getElementById('legalModal').style.display = 'none';
+        }
+
+        // Close modals when clicking outside
+        window.onclick = function(event) {
+            if (event.target.classList.contains('modal-overlay')) {
+                event.target.style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>

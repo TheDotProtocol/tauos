@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TauOS Mobile Terminal</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            background: #000000;
+            color: #00ff00;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .terminal {
+            height: 100vh;
+            padding: 20px;
+            overflow-y: auto;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+        }
+
+        .terminal-line {
+            margin-bottom: 8px;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        .prompt {
+            color: #00ff00;
+            font-weight: bold;
+        }
+
+        .command {
+            color: #ffffff;
+        }
+
+        .output {
+            color: #cccccc;
+            margin-left: 20px;
+        }
+
+        .error {
+            color: #ff4444;
+        }
+
+        .success {
+            color: #44ff44;
+        }
+
+        .cursor {
+            background: #00ff00;
+            animation: blink 1s infinite;
+        }
+
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0; }
+        }
+
+        .input-line {
+            display: flex;
+            align-items: center;
+        }
+
+        .input {
+            background: transparent;
+            border: none;
+            color: #ffffff;
+            font-family: inherit;
+            font-size: inherit;
+            outline: none;
+            flex: 1;
+        }
+
+        .terminal-header {
+            background: #333333;
+            color: #ffffff;
+            padding: 10px 20px;
+            font-size: 14px;
+            border-bottom: 1px solid #555555;
+        }
+
+        .terminal-controls {
+            display: flex;
+            gap: 8px;
+            margin-left: auto;
+        }
+
+        .control-btn {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
+        }
+
+        .close { background: #ff5f57; }
+        .minimize { background: #ffbd2e; }
+        .maximize { background: #28ca42; }
+    </style>
+</head>
+<body>
+    <div class="terminal-header">
+        <span>TauOS Mobile Terminal</span>
+        <div class="terminal-controls">
+            <button class="control-btn close"></button>
+            <button class="control-btn minimize"></button>
+            <button class="control-btn maximize"></button>
+        </div>
+    </div>
+    <div class="terminal" id="terminal">
+        <div class="terminal-line">
+            <span class="prompt">tauos@mobile:~$</span> <span class="command">welcome</span>
+        </div>
+        <div class="output">
+            Welcome to TauOS Mobile Terminal v1.0.0
+            Type 'help' for available commands
+        </div>
+        <div class="terminal-line">
+            <span class="prompt">tauos@mobile:~$</span> <span class="command">ls</span>
+        </div>
+        <div class="output">
+            apps/    system/    config/    logs/
+        </div>
+        <div class="terminal-line">
+            <span class="prompt">tauos@mobile:~$</span> <span class="command">ps aux</span>
+        </div>
+        <div class="output">
+            PID  USER    COMMAND
+            1    root    /sbin/init
+            2    root    [kthreadd]
+            3    root    [rcu_gp]
+            4    root    [rcu_par_gp]
+            5    root    [kworker/0:0-events]
+        </div>
+        <div class="terminal-line">
+            <span class="prompt">tauos@mobile:~$</span> <span class="command">tauos --version</span>
+        </div>
+        <div class="output success">
+            TauOS Mobile v1.0.0
+            Build: 2024-09-16
+            Architecture: ARM64
+        </div>
+        <div class="terminal-line">
+            <span class="prompt">tauos@mobile:~$</span> <span class="command">system status</span>
+        </div>
+        <div class="output">
+            System Status: Online
+            CPU Usage: 15%
+            Memory: 2.1GB / 8GB
+            Storage: 45GB / 128GB
+            Network: Connected
+        </div>
+        <div class="terminal-line">
+            <span class="prompt">tauos@mobile:~$</span> <span class="command">apps list</span>
+        </div>
+        <div class="output">
+            Installed Apps:
+            - TauMail (v2.1.0)
+            - TauCloud (v1.8.2)
+            - TauID (v3.0.1)
+            - TauStore (v1.5.0)
+            - TauBrowser (v2.0.0)
+        </div>
+        <div class="terminal-line">
+            <span class="prompt">tauos@mobile:~$</span> <span class="command">security status</span>
+        </div>
+        <div class="output success">
+            Security Status: All Systems Secure
+            - Encryption: AES-256
+            - VPN: Active
+            - Firewall: Enabled
+            - Privacy Mode: On
+        </div>
+        <div class="terminal-line">
+            <span class="prompt">tauos@mobile:~$</span> <span class="command">uptime</span>
+        </div>
+        <div class="output">
+            up 2 days, 14 hours, 32 minutes
+            load average: 0.15, 0.18, 0.22
+        </div>
+        <div class="terminal-line">
+            <span class="prompt">tauos@mobile:~$</span> <span class="command">whoami</span>
+        </div>
+        <div class="output">
+            tauos
+        </div>
+        <div class="terminal-line">
+            <span class="prompt">tauos@mobile:~$</span> <span class="command">date</span>
+        </div>
+        <div class="output">
+            Mon Sep 16 14:32:15 UTC 2024
+        </div>
+        <div class="terminal-line">
+            <span class="prompt">tauos@mobile:~$</span> <span class="command">free -h</span>
+        </div>
+        <div class="output">
+            total        used        free      shared  buff/cache   available
+            Mem:           8.0G        2.1G        4.2G        1.2G        1.7G        4.5G
+            Swap:          2.0G          0B        2.0G
+        </div>
+        <div class="terminal-line">
+            <span class="prompt">tauos@mobile:~$</span> <span class="command">df -h</span>
+        </div>
+        <div class="output">
+            Filesystem      Size  Used Avail Use% Mounted on
+            /dev/root       128G   45G   78G  37% /
+            tmpfs           4.0G     0  4.0G   0% /dev/shm
+            tmpfs           4.0G  1.2G  2.8G  30% /tmp
+        </div>
+        <div class="terminal-line">
+            <span class="prompt">tauos@mobile:~$</span> <span class="command">network status</span>
+        </div>
+        <div class="output success">
+            Network Status: Connected
+            Interface: wlan0
+            IP: 192.168.1.105
+            Gateway: 192.168.1.1
+            DNS: 8.8.8.8, 1.1.1.1
+            Speed: 866.7 Mbps
+        </div>
+        <div class="terminal-line">
+            <span class="prompt">tauos@mobile:~$</span> <span class="command">battery status</span>
+        </div>
+        <div class="output">
+            Battery Status: 85% (Charging)
+            Health: Good
+            Temperature: 32°C
+            Cycle Count: 245
+        </div>
+        <div class="terminal-line">
+            <span class="prompt">tauos@mobile:~$</span> <span class="command">sensors</span>
+        </div>
+        <div class="output">
+            CPU Temperature: 45°C
+            GPU Temperature: 38°C
+            Battery Temperature: 32°C
+            Ambient Temperature: 24°C
+        </div>
+        <div class="terminal-line">
+            <span class="prompt">tauos@mobile:~$</span> <span class="command">help</span>
+        </div>
+        <div class="output">
+            Available Commands:
+            - help: Show this help message
+            - ls: List directory contents
+            - ps: Show running processes
+            - system status: Show system status
+            - apps list: List installed apps
+            - security status: Show security status
+            - uptime: Show system uptime
+            - whoami: Show current user
+            - date: Show current date/time
+            - free: Show memory usage
+            - df: Show disk usage
+            - network status: Show network info
+            - battery status: Show battery info
+            - sensors: Show sensor readings
+            - clear: Clear terminal
+            - exit: Close terminal
+        </div>
+        <div class="terminal-line">
+            <span class="prompt">tauos@mobile:~$</span> <span class="command">clear</span>
+        </div>
+        <div class="terminal-line">
+            <span class="prompt">tauos@mobile:~$</span> <span class="command">_</span>
+        </div>
+    </div>
+
+    <script>
+        // Terminal functionality
+        const terminal = document.getElementById('terminal');
+        let commandHistory = [];
+        let historyIndex = -1;
+
+        // Add some interactive functionality
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                // Simulate command execution
+                addCommandLine();
+            } else if (e.key === 'ArrowUp') {
+                e.preventDefault();
+                // Navigate command history
+                if (historyIndex < commandHistory.length - 1) {
+                    historyIndex++;
+                    // Update input with history
+                }
+            } else if (e.key === 'ArrowDown') {
+                e.preventDefault();
+                // Navigate command history
+                if (historyIndex > 0) {
+                    historyIndex--;
+                    // Update input with history
+                }
+            }
+        });
+
+        function addCommandLine() {
+            const newLine = document.createElement('div');
+            newLine.className = 'terminal-line';
+            newLine.innerHTML = '<span class="prompt">tauos@mobile:~$</span> <span class="command">_</span>';
+            terminal.appendChild(newLine);
+            terminal.scrollTop = terminal.scrollHeight;
+        }
+
+        // Auto-scroll to bottom
+        setInterval(() => {
+            terminal.scrollTop = terminal.scrollHeight;
+        }, 100);
+    </script>
+</body>
+</html>

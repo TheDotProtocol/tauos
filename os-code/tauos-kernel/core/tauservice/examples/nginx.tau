@@ -1,0 +1,36 @@
+name = "nginx"
+description = "Nginx web server"
+
+[service]
+exec_start = "/usr/sbin/nginx"
+exec_stop = "/usr/sbin/nginx -s stop"
+exec_reload = "/usr/sbin/nginx -s reload"
+restart = "always"
+user = "www-data"
+group = "www-data"
+working_directory = "/var/www"
+timeout_start_sec = 30
+timeout_stop_sec = 30
+kill_mode = "process"
+type = "forking"
+
+environment = { "NGINX_CONF" = "/etc/nginx/nginx.conf" }
+environment_file = ["/etc/nginx/nginx.env"]
+
+standard_output = "journal"
+standard_error = "journal"
+
+[sandbox]
+read_write_paths = ["/var/log/nginx", "/var/cache/nginx"]
+read_only_paths = ["/etc/nginx", "/var/www"]
+no_new_privileges = true
+private_tmp = true
+network_access = true
+
+[install]
+wanted_by = ["multi-user.target"]
+
+[unit]
+description = "Nginx web server"
+after = ["network.target"]
+wants = ["network.target"] 

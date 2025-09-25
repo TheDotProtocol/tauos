@@ -1,0 +1,262 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'TauMail Complete Email Infrastructure Stack'
+
+Parameters:
+  DomainName:
+    Type: String
+    Default: 'tauos.org'
+    Description: 'Primary domain for email service'
+  
+  MailDomain:
+    Type: String
+    Default: 'mail.tauos.org'
+    Description: 'Mail server domain'
+  
+  SMTPDomain:
+    Type: String
+    Default: 'smtp.tauos.org'
+    Description: 'SMTP server domain'
+  
+  InstanceType:
+    Type: String
+    Default: 't3.medium'
+    Description: 'EC2 instance type for mail server'
+  
+  KeyPairName:
+    Type: AWS::EC2::KeyPair::KeyName
+    Description: 'EC2 Key Pair for SSH access'
+
+Resources:
+  # VPC and Networking
+  VPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: '10.0.0.0/16'
+      EnableDnsHostnames: true
+      EnableDnsSupport: true
+      Tags:
+        - Key: Name
+          Value: !Sub '${AWS::StackName}-VPC'
+
+  PublicSubnet:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      CidrBlock: '10.0.1.0/24'
+      AvailabilityZone: !Select [0, !GetAZs '']
+      MapPublicIpOnLaunch: true
+      Tags:
+        - Key: Name
+          Value: !Sub '${AWS::StackName}-PublicSubnet'
+
+  InternetGateway:
+    Type: AWS::EC2::InternetGateway
+    Properties:
+      Tags:
+        - Key: Name
+          Value: !Sub '${AWS::StackName}-IGW'
+
+  AttachGateway:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      VpcId: !Ref VPC
+      InternetGatewayId: !Ref InternetGateway
+
+  RouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref VPC
+      Tags:
+        - Key: Name
+          Value: !Sub '${AWS::StackName}-RouteTable'
+
+  DefaultRoute:
+    Type: AWS::EC2::Route
+    DependsOn: AttachGateway
+    Properties:
+      RouteTableId: !Ref RouteTable
+      DestinationCidrBlock: '0.0.0.0/0'
+      GatewayId: !Ref InternetGateway
+
+  SubnetRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref PublicSubnet
+      RouteTableId: !Ref RouteTable
+
+  # Security Groups
+  MailServerSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: 'Security group for TauMail email server'
+      VpcId: !Ref VPC
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: 0.0.0.0/0
+          Description: 'SSH access'
+        - IpProtocol: tcp
+          FromPort: 25
+          ToPort: 25
+          CidrIp: 0.0.0.0/0
+          Description: 'SMTP'
+        - IpProtocol: tcp
+          FromPort: 587
+          ToPort: 587
+          CidrIp: 0.0.0.0/0
+          Description: 'SMTP Submission'
+        - IpProtocol: tcp
+          FromPort: 465
+          ToPort: 465
+          CidrIp: 0.0.0.0/0
+          Description: 'SMTPS'
+        - IpProtocol: tcp
+          FromPort: 143
+          ToPort: 143
+          CidrIp: 0.0.0.0/0
+          Description: 'IMAP'
+        - IpProtocol: tcp
+          FromPort: 993
+          ToPort: 993
+          CidrIp: 0.0.0.0/0
+          Description: 'IMAPS'
+        - IpProtocol: tcp
+          FromPort: 110
+          ToPort: 110
+          CidrIp: 0.0.0.0/0
+          Description: 'POP3'
+        - IpProtocol: tcp
+          FromPort: 995
+          ToPort: 995
+          CidrIp: 0.0.0.0/0
+          Description: 'POP3S'
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+          Description: 'HTTP'
+        - IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+          CidrIp: 0.0.0.0/0
+          Description: 'HTTPS'
+      SecurityGroupEgress:
+        - IpProtocol: -1
+          CidrIp: 0.0.0.0/0
+          Description: 'All outbound traffic'
+
+  # EC2 Instance for Mail Server
+  MailServerInstance:
+    Type: AWS::EC2::Instance
+    Properties:
+      ImageId: ami-0c02fb55956c7d316  # Amazon Linux 2
+      InstanceType: !Ref InstanceType
+      KeyName: !Ref KeyPairName
+      SubnetId: !Ref PublicSubnet
+      SecurityGroupIds:
+        - !Ref MailServerSecurityGroup
+      IamInstanceProfile: !Ref MailServerInstanceProfile
+      UserData:
+        Fn::Base64: !Sub |
+          #!/bin/bash -xe
+          yum update -y
+          yum install -y docker git aws-cli
+          systemctl start docker
+          systemctl enable docker
+          
+          # Install Docker Compose
+          curl -L "https://github.com/docker/compose/releases/download/v2.20.0/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+          chmod +x /usr/local/bin/docker-compose
+          
+          # Create mail server directory
+          mkdir -p /opt/taumail
+          cd /opt/taumail
+          
+          # Download mail server configuration
+          aws s3 cp s3://taumail-config/mail-server-config.tar.gz /opt/taumail/
+          tar -xzf mail-server-config.tar.gz
+          
+          # Start mail server
+          docker-compose up -d
+          
+          # Configure DNS records
+          INSTANCE_ID=$(curl -s http://169.254.169.254/latest/meta-data/instance-id)
+          PUBLIC_IP=$(curl -s http://169.254.169.254/latest/meta-data/public-ipv4)
+          
+          # Update Route53 records (if configured)
+          # aws route53 change-resource-record-sets --hosted-zone-id Z1234567890 --change-batch file://dns-update.json
+          
+          echo "TauMail server setup complete!"
+      Tags:
+        - Key: Name
+          Value: !Sub '${AWS::StackName}-MailServer'
+
+  # IAM Role for Mail Server
+  MailServerRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: ec2.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess
+        - arn:aws:iam::aws:policy/AmazonRoute53FullAccess
+
+  MailServerInstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      Roles:
+        - !Ref MailServerRole
+
+  # Elastic IP for Mail Server
+  MailServerEIP:
+    Type: AWS::EC2::EIP
+    Properties:
+      Domain: vpc
+      InstanceId: !Ref MailServerInstance
+      Tags:
+        - Key: Name
+          Value: !Sub '${AWS::StackName}-MailServerEIP'
+
+  # S3 Bucket for Mail Server Configuration
+  MailServerConfigBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub 'taumail-config-${AWS::AccountId}'
+      VersioningConfiguration:
+        Status: Enabled
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+
+Outputs:
+  MailServerPublicIP:
+    Description: 'Public IP of the mail server'
+    Value: !Ref MailServerEIP
+    Export:
+      Name: !Sub '${AWS::StackName}-MailServerIP'
+
+  MailServerInstanceId:
+    Description: 'Instance ID of the mail server'
+    Value: !Ref MailServerInstance
+    Export:
+      Name: !Sub '${AWS::StackName}-MailServerInstance'
+
+  VPCId:
+    Description: 'VPC ID'
+    Value: !Ref VPC
+    Export:
+      Name: !Sub '${AWS::StackName}-VPC'
+
+  ConfigBucketName:
+    Description: 'S3 bucket for mail server configuration'
+    Value: !Ref MailServerConfigBucket
+    Export:
+      Name: !Sub '${AWS::StackName}-ConfigBucket' 

@@ -1,0 +1,68 @@
+[package]
+name = "taustore"
+version = "1.0.0"
+edition = "2021"
+authors = ["TauOS Team <admin@tauos.org>"]
+description = "Tau Store - Application marketplace for TauOS"
+license = "MIT"
+
+[dependencies]
+# GUI Framework
+gtk = { version = "0.7", features = ["v4_8"] }
+glib = "0.18"
+gio = "0.18"
+adw = "0.5"
+
+# Database
+sqlx = { version = "0.7", features = ["runtime-tokio-rustls", "postgres", "chrono"] }
+tokio = { version = "1.0", features = ["full"] }
+
+# Web Framework
+axum = "0.7"
+tower = "0.4"
+tower-http = { version = "0.5", features = ["cors", "fs", "trace"] }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+
+# Utilities
+anyhow = "1.0"
+thiserror = "1.0"
+chrono = { version = "0.4", features = ["serde"] }
+uuid = { version = "1.0", features = ["v4", "serde"] }
+log = "0.4"
+env_logger = "0.10"
+
+# Configuration
+config = "0.13"
+toml = "0.8"
+
+# Localization
+gettext-rs = "5.0"
+gettext = "0.7"
+
+# Package Management
+reqwest = { version = "0.11", features = ["json"] }
+zip = "0.6"
+tar = "0.4"
+
+# Security
+ring = "0.17"
+base64 = "0.21"
+
+# Async
+futures = "0.3"
+async-trait = "0.1"
+
+[dev-dependencies]
+tokio-test = "0.4"
+mockall = "0.12"
+
+[[bin]]
+name = "taustore"
+path = "src/main.rs"
+
+[profile.release]
+opt-level = 3
+lto = true
+codegen-units = 1
+panic = "abort" 

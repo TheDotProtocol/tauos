@@ -1,0 +1,5 @@
+#!/bin/bash
+echo "🐢 TauOS Initrd Loading..."
+echo "This is a minimal initrd for testing"
+sleep 1
+echo "🐢 TauOS Initrd Loaded Successfully!"

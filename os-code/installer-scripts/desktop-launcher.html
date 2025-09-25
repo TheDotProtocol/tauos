@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TauOS Desktop Launcher</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            color: white;
+            overflow: hidden;
+            height: 100vh;
+        }
+
+        .launcher-container {
+            display: flex;
+            height: 100vh;
+        }
+
+        .sidebar {
+            width: 80px;
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px 0;
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .app-icon {
+            width: 50px;
+            height: 50px;
+            margin: 10px 0;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .app-icon:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.1);
+        }
+
+        .app-icon.active {
+            background: linear-gradient(45deg, #ffd700, #ffed4e);
+            color: #333;
+        }
+
+        .main-content {
+            flex: 1;
+            padding: 30px;
+            overflow-y: auto;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            background: linear-gradient(45deg, #ffd700, #ffed4e);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 16px;
+            background: rgba(0, 255, 0, 0.1);
+            border: 1px solid rgba(0, 255, 0, 0.3);
+            border-radius: 20px;
+            font-size: 0.9rem;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #00ff00;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        .apps-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .app-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .app-card:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        .app-card .icon {
+            width: 60px;
+            height: 60px;
+            margin: 0 auto 15px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+        }
+
+        .app-card h3 {
+            font-size: 1.1rem;
+            margin-bottom: 8px;
+            color: white;
+        }
+
+        .app-card p {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 10px;
+        }
+
+        .app-status {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .status-running {
+            background: rgba(0, 255, 0, 0.2);
+            color: #00ff00;
+            border: 1px solid rgba(0, 255, 0, 0.3);
+        }
+
+        .status-stopped {
+            background: rgba(255, 0, 0, 0.2);
+            color: #ff0000;
+            border: 1px solid rgba(255, 0, 0, 0.3);
+        }
+
+        .system-info {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 20px;
+            backdrop-filter: blur(10px);
+        }
+
+        .system-info h3 {
+            margin-bottom: 15px;
+            color: #ffd700;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .info-label {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .info-value {
+            color: white;
+            font-weight: 500;
+        }
+
+        .quick-actions {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .action-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, #ffd700, #ffed4e);
+            color: #333;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 215, 0, 0.3);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+    </style>
+</head>
+<body>
+    <div class="launcher-container">
+        <div class="sidebar">
+            <div class="app-icon active" data-app="desktop">
+                <span>🏠</span>
+            </div>
+            <div class="app-icon" data-app="mail">
+                <span>📧</span>
+            </div>
+            <div class="app-icon" data-app="cloud">
+                <span>☁️</span>
+            </div>
+            <div class="app-icon" data-app="id">
+                <span>🆔</span>
+            </div>
+            <div class="app-icon" data-app="store">
+                <span>🏪</span>
+            </div>
+            <div class="app-icon" data-app="browser">
+                <span>🌐</span>
+            </div>
+            <div class="app-icon" data-app="mobile">
+                <span>📱</span>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="header">
+                <div class="logo">
+                    <span style="font-size: 2rem;">τ</span>
+                    <h1>TauOS</h1>
+                </div>
+                <div class="status-indicator">
+                    <div class="status-dot"></div>
+                    <span>All Systems Running</span>
+                </div>
+            </div>
+
+            <div class="apps-grid">
+                <div class="app-card" data-app="mail">
+                    <div class="icon">📧</div>
+                    <h3>TauMail</h3>
+                    <p>Privacy-first email client</p>
+                    <span class="app-status status-running">Running</span>
+                </div>
+
+                <div class="app-card" data-app="cloud">
+                    <div class="icon">☁️</div>
+                    <h3>TauCloud</h3>
+                    <p>Encrypted file storage</p>
+                    <span class="app-status status-running">Running</span>
+                </div>
+
+                <div class="app-card" data-app="id">
+                    <div class="icon">🆔</div>
+                    <h3>TauID</h3>
+                    <p>Identity management</p>
+                    <span class="app-status status-running">Running</span>
+                </div>
+
+                <div class="app-card" data-app="store">
+                    <div class="icon">🏪</div>
+                    <h3>TauStore</h3>
+                    <p>App marketplace</p>
+                    <span class="app-status status-running">Running</span>
+                </div>
+
+                <div class="app-card" data-app="browser">
+                    <div class="icon">🌐</div>
+                    <h3>TauBrowser</h3>
+                    <p>Privacy browser</p>
+                    <span class="app-status status-running">Running</span>
+                </div>
+
+                <div class="app-card" data-app="mobile">
+                    <div class="icon">📱</div>
+                    <h3>Mobile UI</h3>
+                    <p>Mobile interface</p>
+                    <span class="app-status status-running">Running</span>
+                </div>
+            </div>
+
+            <div class="system-info">
+                <h3>System Information</h3>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <span class="info-label">Platform:</span>
+                        <span class="info-value" id="platform">Loading...</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Uptime:</span>
+                        <span class="info-value" id="uptime">Loading...</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Memory:</span>
+                        <span class="info-value" id="memory">Loading...</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Services:</span>
+                        <span class="info-value" id="services">7/7 Running</span>
+                    </div>
+                </div>
+                <div class="quick-actions">
+                    <button class="action-btn btn-primary" onclick="openAllApps()">Open All Apps</button>
+                    <button class="action-btn btn-secondary" onclick="showSettings()">Settings</button>
+                    <button class="action-btn btn-secondary" onclick="showSystemStatus()">System Status</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const { ipcRenderer } = require('electron');
+        
+        // App mapping
+        const appPorts = {
+            'mail': 3001,
+            'cloud': 3002,
+            'id': 3003,
+            'store': 3004,
+            'browser': 3005,
+            'mobile': 3007
+        };
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            updateSystemInfo();
+            setupEventListeners();
+        });
+
+        function setupEventListeners() {
+            // App card clicks
+            document.querySelectorAll('.app-card').forEach(card => {
+                card.addEventListener('click', () => {
+                    const app = card.dataset.app;
+                    openApp(app);
+                });
+            });
+
+            // Sidebar icon clicks
+            document.querySelectorAll('.app-icon').forEach(icon => {
+                icon.addEventListener('click', () => {
+                    const app = icon.dataset.app;
+                    if (app === 'desktop') {
+                        // Already on desktop
+                        return;
+                    }
+                    openApp(app);
+                });
+            });
+        }
+
+        function openApp(app) {
+            if (app === 'desktop') {
+                return; // Already on desktop
+            }
+            
+            const port = appPorts[app];
+            if (port) {
+                const url = `http://localhost:${port}`;
+                require('electron').shell.openExternal(url);
+            }
+        }
+
+        function openAllApps() {
+            Object.values(appPorts).forEach(port => {
+                const url = `http://localhost:${port}`;
+                require('electron').shell.openExternal(url);
+            });
+        }
+
+        function showSettings() {
+            // This would open a settings window
+            alert('Settings panel will be implemented in Phase 3');
+        }
+
+        function showSystemStatus() {
+            // This would show detailed system status
+            alert('System Status:\n\nAll 7 TauOS services are running\nPlatform: ' + process.platform + '\nUptime: ' + Math.round(process.uptime()) + 's');
+        }
+
+        function updateSystemInfo() {
+            document.getElementById('platform').textContent = process.platform;
+            document.getElementById('uptime').textContent = Math.round(process.uptime()) + 's';
+            document.getElementById('memory').textContent = Math.round(process.memoryUsage().heapUsed / 1024 / 1024) + ' MB';
+        }
+
+        // Update system info every 5 seconds
+        setInterval(updateSystemInfo, 5000);
+    </script>
+</body>
+</html>

@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TauOS - Loading Screen</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="design-system/tauos-design-system.css">
+    <style>
+        .loading-gradient {
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a0f3a 50%, #0a0a0a 100%);
+        }
+        
+        .loading-logo {
+            animation: loadingSpin 2s linear infinite;
+        }
+        
+        @keyframes loadingSpin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .loading-bar {
+            background: linear-gradient(90deg, transparent, #9333ea, transparent);
+            background-size: 200% 100%;
+            animation: loadingShimmer 2s infinite;
+        }
+        
+        @keyframes loadingShimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+        
+        .boot-quote {
+            animation: fadeInOut 4s ease-in-out infinite;
+        }
+        
+        @keyframes fadeInOut {
+            0%, 100% { opacity: 0; }
+            20%, 80% { opacity: 1; }
+        }
+        
+        .status-item {
+            animation: slideInRight 0.5s ease-out;
+        }
+        
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        
+        .progress-dot {
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 1; }
+        }
+    </style>
+</head>
+<body class="loading-gradient min-h-screen flex flex-col items-center justify-center p-8">
+    <!-- Main Loading Container -->
+    <div class="text-center max-w-2xl">
+        <!-- Animated Logo -->
+        <div class="mb-12">
+            <div class="loading-logo text-8xl font-bold mb-8 tau-text-gradient">τ</div>
+            <h1 class="text-4xl font-bold text-white mb-2">TauOS</h1>
+            <p class="text-gray-400">Booting secure environment...</p>
+        </div>
+
+        <!-- Loading Progress -->
+        <div class="mb-8">
+            <div class="w-full bg-gray-800 rounded-full h-2 mb-4">
+                <div class="loading-bar h-2 rounded-full" style="width: 65%"></div>
+            </div>
+            <div class="flex justify-between text-sm text-gray-400">
+                <span>Initializing system...</span>
+                <span>65%</span>
+            </div>
+        </div>
+
+        <!-- System Status -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+            <div class="status-item bg-black/30 backdrop-blur-xl rounded-xl p-4 border border-gray-700">
+                <div class="flex items-center justify-between mb-2">
+                    <span class="text-white font-medium">Kernel</span>
+                    <div class="flex space-x-1">
+                        <div class="progress-dot w-2 h-2 bg-green-400 rounded-full"></div>
+                        <div class="progress-dot w-2 h-2 bg-green-400 rounded-full" style="animation-delay: 0.2s;"></div>
+                        <div class="progress-dot w-2 h-2 bg-green-400 rounded-full" style="animation-delay: 0.4s;"></div>
+                    </div>
+                </div>
+                <p class="text-gray-400 text-sm">Linux 6.1.0-tauos</p>
+            </div>
+
+            <div class="status-item bg-black/30 backdrop-blur-xl rounded-xl p-4 border border-gray-700" style="animation-delay: 0.1s;">
+                <div class="flex items-center justify-between mb-2">
+                    <span class="text-white font-medium">Security</span>
+                    <div class="flex space-x-1">
+                        <div class="progress-dot w-2 h-2 bg-green-400 rounded-full"></div>
+                        <div class="progress-dot w-2 h-2 bg-green-400 rounded-full" style="animation-delay: 0.2s;"></div>
+                        <div class="progress-dot w-2 h-2 bg-green-400 rounded-full" style="animation-delay: 0.4s;"></div>
+                    </div>
+                </div>
+                <p class="text-gray-400 text-sm">Sandbox active</p>
+            </div>
+
+            <div class="status-item bg-black/30 backdrop-blur-xl rounded-xl p-4 border border-gray-700" style="animation-delay: 0.2s;">
+                <div class="flex items-center justify-between mb-2">
+                    <span class="text-white font-medium">Network</span>
+                    <div class="flex space-x-1">
+                        <div class="progress-dot w-2 h-2 bg-blue-400 rounded-full"></div>
+                        <div class="progress-dot w-2 h-2 bg-blue-400 rounded-full" style="animation-delay: 0.2s;"></div>
+                        <div class="progress-dot w-2 h-2 bg-blue-400 rounded-full" style="animation-delay: 0.4s;"></div>
+                    </div>
+                </div>
+                <p class="text-gray-400 text-sm">Connecting...</p>
+            </div>
+
+            <div class="status-item bg-black/30 backdrop-blur-xl rounded-xl p-4 border border-gray-700" style="animation-delay: 0.3s;">
+                <div class="flex items-center justify-between mb-2">
+                    <span class="text-white font-medium">Services</span>
+                    <div class="flex space-x-1">
+                        <div class="progress-dot w-2 h-2 bg-purple-400 rounded-full"></div>
+                        <div class="progress-dot w-2 h-2 bg-purple-400 rounded-full" style="animation-delay: 0.2s;"></div>
+                        <div class="progress-dot w-2 h-2 bg-purple-400 rounded-full" style="animation-delay: 0.4s;"></div>
+                    </div>
+                </div>
+                <p class="text-gray-400 text-sm">Starting TauMail...</p>
+            </div>
+        </div>
+
+        <!-- Boot Quote -->
+        <div class="mb-8">
+            <div class="boot-quote text-gray-300 italic">
+                "Privacy is not something that I'm merely entitled to, it's an absolute prerequisite." 
+                <span class="text-gray-500">— Marlon Brando</span>
+            </div>
+        </div>
+
+        <!-- System Info -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+            <div class="text-center">
+                <div class="text-gray-400">Version</div>
+                <div class="text-white font-medium">1.0.0</div>
+            </div>
+            <div class="text-center">
+                <div class="text-gray-400">Build</div>
+                <div class="text-white font-medium">2025.07.30</div>
+            </div>
+            <div class="text-center">
+                <div class="text-gray-400">Architecture</div>
+                <div class="text-white font-medium">x86_64</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bottom Status Bar -->
+    <div class="absolute bottom-8 left-8 right-8">
+        <div class="flex items-center justify-between text-sm text-gray-400">
+            <div class="flex items-center space-x-4">
+                <div class="flex items-center">
+                    <div class="w-2 h-2 bg-green-400 rounded-full mr-2"></div>
+                    <span>Secure Boot ✓</span>
+                </div>
+                <div class="flex items-center">
+                    <div class="w-2 h-2 bg-blue-400 rounded-full mr-2"></div>
+                    <span>TPM Active</span>
+                </div>
+                <div class="flex items-center">
+                    <div class="w-2 h-2 bg-purple-400 rounded-full mr-2"></div>
+                    <span>Encryption ✓</span>
+                </div>
+            </div>
+            <div class="flex items-center space-x-2">
+                <span>Press ESC for recovery</span>
+                <div class="w-1 h-1 bg-gray-600 rounded-full"></div>
+                <span>F12 for boot options</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Dots -->
+    <div class="absolute top-1/2 right-8 transform -translate-y-1/2">
+        <div class="flex flex-col space-y-2">
+            <div class="w-2 h-2 bg-purple-400 rounded-full progress-dot"></div>
+            <div class="w-2 h-2 bg-purple-400 rounded-full progress-dot" style="animation-delay: 0.2s;"></div>
+            <div class="w-2 h-2 bg-purple-400 rounded-full progress-dot" style="animation-delay: 0.4s;"></div>
+        </div>
+    </div>
+
+    <script>
+        // Simulate loading progress
+        let progress = 65;
+        const progressBar = document.querySelector('.loading-bar');
+        const progressText = document.querySelector('.text-gray-400 span:last-child');
+        
+        const updateProgress = () => {
+            if (progress < 100) {
+                progress += Math.random() * 5;
+                if (progress > 100) progress = 100;
+                
+                progressBar.style.width = progress + '%';
+                progressText.textContent = Math.round(progress) + '%';
+                
+                if (progress < 100) {
+                    setTimeout(updateProgress, 200 + Math.random() * 300);
+                } else {
+                    // Loading complete
+                    setTimeout(() => {
+                        document.body.style.opacity = '0';
+                        setTimeout(() => {
+                            console.log('Loading complete, transitioning to desktop...');
+                        }, 500);
+                    }, 1000);
+                }
+            }
+        };
+        
+        // Start progress after a short delay
+        setTimeout(updateProgress, 1000);
+        
+        // Rotate boot quotes
+        const quotes = [
+            '"Privacy is not something that I\'m merely entitled to, it\'s an absolute prerequisite." — Marlon Brando',
+            '"The right to privacy is the right to be left alone." — Louis Brandeis',
+            '"Security is not a product, but a process." — Bruce Schneier',
+            '"The best security is the security you don\'t notice." — Unknown',
+            '"Privacy is the foundation of freedom." — Edward Snowden'
+        ];
+        
+        let currentQuote = 0;
+        const quoteElement = document.querySelector('.boot-quote');
+        
+        setInterval(() => {
+            currentQuote = (currentQuote + 1) % quotes.length;
+            quoteElement.style.opacity = '0';
+            setTimeout(() => {
+                quoteElement.innerHTML = quotes[currentQuote];
+                quoteElement.style.opacity = '1';
+            }, 200);
+        }, 4000);
+        
+        // Update status messages
+        const statusMessages = [
+            'Initializing kernel modules...',
+            'Loading security policies...',
+            'Starting network services...',
+            'Mounting encrypted volumes...',
+            'Launching TauMail...',
+            'Starting TauCloud...',
+            'Initializing desktop environment...',
+            'Loading user preferences...',
+            'Establishing secure connections...',
+            'System ready'
+        ];
+        
+        let currentStatus = 0;
+        const statusElement = document.querySelector('.text-gray-400');
+        
+        setInterval(() => {
+            if (currentStatus < statusMessages.length - 1) {
+                currentStatus++;
+                statusElement.textContent = statusMessages[currentStatus];
+            }
+        }, 2000);
+    </script>
+</body>
+</html> 

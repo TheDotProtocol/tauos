@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TauOS Investor Hub</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f8f9fa;
+        }
+        .header {
+            text-align: center;
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+            color: white;
+            padding: 40px 20px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+        }
+        .header h1 {
+            font-size: 2.5em;
+            margin: 0 0 10px 0;
+            font-weight: 700;
+        }
+        .tagline {
+            font-size: 1.2em;
+            opacity: 0.9;
+            font-weight: 300;
+        }
+        .section {
+            background: white;
+            padding: 30px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .section h2 {
+            color: #1a1a1a;
+            border-bottom: 3px solid #007bff;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        .tldr {
+            background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+            color: white;
+        }
+        .tldr h2 {
+            color: white;
+            border-bottom-color: rgba(255,255,255,0.3);
+        }
+        .team-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .team-member {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .team-member h3 {
+            margin: 0 0 5px 0;
+            color: #1a1a1a;
+        }
+        .team-member p {
+            margin: 0;
+            color: #666;
+            font-weight: 500;
+        }
+        .financial-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        .financial-table th,
+        .financial-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        .financial-table th {
+            background: #f8f9fa;
+            font-weight: 600;
+        }
+        .financial-table tr:hover {
+            background: #f8f9fa;
+        }
+        .cta-section {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+            text-align: center;
+        }
+        .cta-section h2 {
+            color: white;
+            border-bottom-color: rgba(255,255,255,0.3);
+        }
+        .download-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin: 20px 0;
+        }
+        .download-btn {
+            background: white;
+            color: #28a745;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-block;
+            transition: transform 0.2s;
+        }
+        .download-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+        .contact-info {
+            background: #1a1a1a;
+            color: white;
+            text-align: center;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 30px;
+        }
+        .contact-info p {
+            margin: 5px 0;
+        }
+        .chart-placeholder {
+            background: #f8f9fa;
+            border: 2px dashed #ddd;
+            padding: 40px;
+            text-align: center;
+            border-radius: 8px;
+            margin: 20px 0;
+            color: #666;
+        }
+        .highlight {
+            background: #fff3cd;
+            padding: 15px;
+            border-left: 4px solid #ffc107;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+        .metrics {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+        .metric {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .metric-value {
+            font-size: 2em;
+            font-weight: 700;
+            color: #007bff;
+            margin-bottom: 5px;
+        }
+        .metric-label {
+            color: #666;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>TauOS Investor Hub</h1>
+        <p class="tagline">Tomorrow's Intelligence, Today - Powered by TauOS.</p>
+    </div>
+
+    <div class="section tldr">
+        <h2>Executive TL;DR</h2>
+        <div class="metrics">
+            <div class="metric">
+                <div class="metric-value">$1.5M</div>
+                <div class="metric-label">Seed Round</div>
+            </div>
+            <div class="metric">
+                <div class="metric-value">$1B+</div>
+                <div class="metric-label">IPO Target</div>
+            </div>
+            <div class="metric">
+                <div class="metric-value">~$400</div>
+                <div class="metric-label">Blended ASP</div>
+            </div>
+            <div class="metric">
+                <div class="metric-value">$43M</div>
+                <div class="metric-label">2026 Revenue</div>
+            </div>
+        </div>
+        <p><strong>Why Invest:</strong> Privacy-native AI + hybrid OS + hardware stack = scalable recurring SaaS + device margins.</p>
+    </div>
+
+    <div class="section">
+        <h2>The Problem</h2>
+        <p>Large incumbents monetize users' data. AI is cloud-dependent and privacy-invasive. Enterprises need compliant, AI-enabled OS that protects users and scales.</p>
+    </div>
+
+    <div class="section">
+        <h2>The Solution: TauOS</h2>
+        <p>TauOS is the world's first <strong>AI-native, privacy-first hybrid OS</strong> across devices and cloud.</p>
+        <p><strong>Key product pillars:</strong></p>
+        <ul>
+            <li><strong>TauAI</strong> — Local, privacy-preserving assistant ("Hey Tau").</li>
+            <li><strong>TauVision</strong> — On-device visual intelligence.</li>
+            <li><strong>TauMind</strong> — Predictive, private personalization.</li>
+            <li><strong>TauSync</strong> — Smart file & device sync.</li>
+            <li><strong>TauGuard</strong> — AI-first threat protection.</li>
+            <li><strong>TauFlow</strong> — Workflow automation & energy optimization.</li>
+        </ul>
+    </div>
+
+    <div class="section">
+        <h2>Product + Device Offering</h2>
+        <ul>
+            <li><strong>TauOS:</strong> OS licensing & enterprise bundles.</li>
+            <li><strong>TauDevices:</strong> TauBook (laptop), TauPhone (smartphone), TauPad (tablet) — premium specs, affordable pricing.</li>
+            <li><strong>TauCloud & Enterprise:</strong> SaaS subscriptions, BaaS, enterprise integrations.</li>
+        </ul>
+    </div>
+
+    <div class="section">
+        <h2>Leadership Team</h2>
+        <div class="team-grid">
+            <div class="team-member">
+                <h3>Saleena Thamani</h3>
+                <p>Chief Executive Officer</p>
+            </div>
+            <div class="team-member">
+                <h3>Kelsey Morgan</h3>
+                <p>Chief Technology Officer</p>
+            </div>
+            <div class="team-member">
+                <h3>Rudra Narayanan</h3>
+                <p>Head of Business & Strategy</p>
+            </div>
+            <div class="team-member">
+                <h3>Timothy Burton</h3>
+                <p>Chairman</p>
+            </div>
+        </div>
+        <p><em>(Advisors and additional hires in progress — see Assumptions sheet in the model.)</em></p>
+    </div>
+
+    <div class="section">
+        <h2>Traction & Key Milestones</h2>
+        <ul>
+            <li>Alpha OS released; working phone UI demo; TauAI wake-word functional.</li>
+            <li>Pilot: 1 healthcare enterprise pilot (under NDA).</li>
+        </ul>
+        <h3>2026 Roadmap (with $1.5M seed):</h3>
+        <ul>
+            <li>Q1–Q2 2026: Ship 5,000 TauBooks (pilot).</li>
+            <li>Q3 2026: Launch TauCloud beta + public SDK.</li>
+            <li>Q4 2026: Complete security audit; sign 2 MDM enterprise contracts.</li>
+            <li>2027: Mass production ramp; 55k units sold; $65M run-rate.</li>
+        </ul>
+    </div>
+
+    <div class="section">
+        <h2>Financial Summary (Base Case)</h2>
+        <div class="metrics">
+            <div class="metric">
+                <div class="metric-value">$43M</div>
+                <div class="metric-label">2026 Revenue</div>
+            </div>
+            <div class="metric">
+                <div class="metric-value">$23M</div>
+                <div class="metric-label">Device Revenue</div>
+            </div>
+            <div class="metric">
+                <div class="metric-value">$15M</div>
+                <div class="metric-label">Software & Cloud</div>
+            </div>
+            <div class="metric">
+                <div class="metric-value">$5M</div>
+                <div class="metric-label">Enterprise</div>
+            </div>
+        </div>
+        <p><strong>5-year target (2030):</strong> Revenue $750M (Device + SaaS growth)</p>
+    </div>
+
+    <div class="section highlight">
+        <h2>Revenue Clarification (important)</h2>
+        <p>Projections use a <em>blended device ASP</em>: direct retail ASP (TauBook/TauPhone) ~ $899–$1,099; OEM-licensed units sold to partners at lower ASP (~$150). Model assumes ~70% OEM-licensed units and 30% retail → blended ASP ≈ <strong>$400</strong>. This accelerates distribution while preserving high-margin direct retail.</p>
+    </div>
+
+    <div class="section">
+        <h2>Use of Funds (Seed $1.5M)</h2>
+        <table class="financial-table">
+            <thead>
+                <tr>
+                    <th>Use</th>
+                    <th>Amount (USD)</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td>Product R&D & Engineering</td><td>$500,000</td></tr>
+                <tr><td>Manufacturing samples & tooling</td><td>$300,000</td></tr>
+                <tr><td>Security Audit & Compliance</td><td>$100,000</td></tr>
+                <tr><td>Sales & BD (enterprise)</td><td>$200,000</td></tr>
+                <tr><td>Marketing & Pre-order Campaign</td><td>$150,000</td></tr>
+                <tr><td>Legal, IP & Ops</td><td>$100,000</td></tr>
+                <tr><td>Contingency</td><td>$150,000</td></tr>
+                <tr style="font-weight: bold; background: #f8f9fa;"><td><strong>Total</strong></td><td><strong>$1,500,000</strong></td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="section">
+        <h2>Risk Acknowledgement & Mitigation</h2>
+        <ul>
+            <li><strong>Supply Chain Risk</strong> — partner diversification + tooling validation.</li>
+            <li><strong>Adoption Risk</strong> — enterprise pilots + OEM licensing + developer incentives.</li>
+        </ul>
+    </div>
+
+    <div class="section">
+        <h2>Valuation & Exit</h2>
+        <ul>
+            <li><strong>Valuation sensitivity</strong> (based on EBITDA multiples 5x/7x/10x). See downloadable valuation table.</li>
+            <li>Exit strategy: <strong>IPO only</strong> (no M&A).</li>
+        </ul>
+    </div>
+
+    <div class="section cta-section">
+        <h2>Downloads & Contact</h2>
+        <div class="download-buttons">
+            <a href="TauOS_Investor_Deck.pdf" class="download-btn" download>Download Investor Deck (PDF)</a>
+            <a href="TauOS_Financial_Model.xlsx" class="download-btn" download>Download Financial Model (Excel)</a>
+            <a href="TauOS_Investor_Snapshot.pdf" class="download-btn" download>Download Investor Snapshot (PDF)</a>
+        </div>
+        <p><strong>Request a Call with Leadership</strong> — <a href="mailto:investors@tauos.org" style="color: white;">investors@tauos.org</a></p>
+    </div>
+
+    <div class="contact-info">
+        <p><strong>AR Holdings Group Corporation — Tau Foundation / Tau LLC</strong></p>
+        <p>2126 Market Street, San Francisco, CA 94114, USA</p>
+    </div>
+</body>
+</html>

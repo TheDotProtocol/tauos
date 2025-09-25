@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TauGuard - AI-Powered Security</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: white;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .logo {
+            font-size: 3rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .security-dashboard {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .card-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #4ecdc4;
+        }
+
+        .security-status {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .status-indicator {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #2ed573;
+            animation: pulse 2s infinite;
+        }
+
+        .status-indicator.warning {
+            background: #ffa726;
+        }
+
+        .status-indicator.danger {
+            background: #ff6b6b;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .security-metrics {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .metric-item {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .metric-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #4ecdc4;
+            margin-bottom: 5px;
+        }
+
+        .metric-label {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        .threat-list {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .threat-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 12px;
+            margin: 8px 0;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .threat-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateX(5px);
+        }
+
+        .threat-icon {
+            font-size: 1.5rem;
+        }
+
+        .threat-info {
+            flex: 1;
+        }
+
+        .threat-name {
+            font-weight: 600;
+            margin-bottom: 3px;
+        }
+
+        .threat-details {
+            font-size: 0.8rem;
+            opacity: 0.7;
+        }
+
+        .threat-severity {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .severity-low {
+            background: rgba(46, 213, 115, 0.2);
+            color: #2ed573;
+        }
+
+        .severity-medium {
+            background: rgba(255, 167, 38, 0.2);
+            color: #ffa726;
+        }
+
+        .severity-high {
+            background: rgba(255, 107, 107, 0.2);
+            color: #ff6b6b;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 25px;
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 5px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-danger {
+            background: linear-gradient(45deg, #ff6b6b, #ff4757);
+        }
+
+        .btn-success {
+            background: linear-gradient(45deg, #2ed573, #4ecdc4);
+        }
+
+        .scan-progress {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 15px 0;
+        }
+
+        .scan-fill {
+            height: 100%;
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+
+        .alert {
+            background: rgba(255, 107, 107, 0.1);
+            border: 1px solid rgba(255, 107, 107, 0.3);
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .alert-title {
+            font-weight: 600;
+            color: #ff6b6b;
+            margin-bottom: 10px;
+        }
+
+        .alert-text {
+            font-size: 0.9rem;
+            opacity: 0.9;
+            margin-bottom: 15px;
+        }
+
+        .alert-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .privacy-badge {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(46, 213, 115, 0.2);
+            color: #2ed573;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            border: 1px solid rgba(46, 213, 115, 0.3);
+        }
+
+        .security-controls {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin: 20px 0;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .feature-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border-radius: 15px;
+            padding: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .feature-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #4ecdc4;
+        }
+
+        .scan-status {
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .scan-time {
+            font-size: 0.9rem;
+            opacity: 0.8;
+            margin-top: 10px;
+        }
+
+        @media (max-width: 768px) {
+            .security-dashboard {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="privacy-badge">🔒 100% Local Processing</div>
+    
+    <div class="container">
+        <div class="header">
+            <div class="logo">TauGuard</div>
+            <div class="subtitle">AI-Powered Security & Threat Detection</div>
+        </div>
+
+        <div class="security-dashboard">
+            <div class="card">
+                <div class="card-title">🛡️ Security Status</div>
+                <div class="security-status">
+                    <div class="status-indicator" id="securityIndicator"></div>
+                    <div>
+                        <div style="font-weight: 600; margin-bottom: 5px;" id="securityText">All systems secure</div>
+                        <div style="font-size: 0.9rem; opacity: 0.8;" id="securityDetails">Last scan: 5 minutes ago</div>
+                    </div>
+                </div>
+
+                <div class="security-metrics">
+                    <div class="metric-item">
+                        <div class="metric-value" id="threatsBlocked">0</div>
+                        <div class="metric-label">Threats Blocked</div>
+                    </div>
+                    <div class="metric-item">
+                        <div class="metric-value" id="filesScanned">12,847</div>
+                        <div class="metric-label">Files Scanned</div>
+                    </div>
+                    <div class="metric-item">
+                        <div class="metric-value" id="vulnerabilities">0</div>
+                        <div class="metric-label">Vulnerabilities</div>
+                    </div>
+                    <div class="metric-item">
+                        <div class="metric-value" id="protectionLevel">100%</div>
+                        <div class="metric-label">Protection Level</div>
+                    </div>
+                </div>
+
+                <div class="scan-progress">
+                    <div class="scan-fill" id="scanProgress" style="width: 100%"></div>
+                </div>
+
+                <div class="scan-status">
+                    <div id="scanStatus">Security scan complete</div>
+                    <div class="scan-time" id="scanTime">Completed 5 minutes ago</div>
+                </div>
+
+                <div class="security-controls">
+                    <button class="btn" onclick="startScan()" id="scanBtn">🔍 Scan Now</button>
+                    <button class="btn" onclick="viewLogs()">📋 View Logs</button>
+                    <button class="btn" onclick="updateDefinitions()">🔄 Update</button>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">⚠️ Threat Detection</div>
+                <div class="threat-list" id="threatList">
+                    <div class="threat-item">
+                        <div class="threat-icon">✅</div>
+                        <div class="threat-info">
+                            <div class="threat-name">No active threats detected</div>
+                            <div class="threat-details">All systems are clean and secure</div>
+                        </div>
+                        <div class="threat-severity severity-low">Clean</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="alert" id="securityAlert" style="display: none;">
+            <div class="alert-title">🚨 Security Alert</div>
+            <div class="alert-text" id="alertText">
+                A potential security threat has been detected. Immediate action may be required.
+            </div>
+            <div class="alert-actions">
+                <button class="btn btn-danger" onclick="quarantineThreat()">Quarantine</button>
+                <button class="btn" onclick="ignoreThreat()">Ignore</button>
+                <button class="btn" onclick="dismissAlert()">Dismiss</button>
+            </div>
+        </div>
+
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-title">🤖 AI Threat Detection</div>
+                <div style="margin-bottom: 15px;">
+                    <div style="font-weight: 600; margin-bottom: 5px;">Behavioral Analysis</div>
+                    <div style="font-size: 0.9rem; opacity: 0.8;">Learns your normal patterns to detect anomalies</div>
+                </div>
+                <div style="margin-bottom: 15px;">
+                    <div style="font-weight: 600; margin-bottom: 5px;">Real-time Scanning</div>
+                    <div style="font-size: 0.9rem; opacity: 0.8;">Continuously monitors files and network activity</div>
+                </div>
+                <div>
+                    <div style="font-weight: 600; margin-bottom: 5px;">Zero-Day Protection</div>
+                    <div style="font-size: 0.9rem; opacity: 0.8;">Detects unknown threats using AI patterns</div>
+                </div>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-title">🔒 Privacy Protection</div>
+                <div style="margin-bottom: 15px;">
+                    <div style="font-weight: 600; margin-bottom: 5px;">Data Leak Prevention</div>
+                    <div style="font-size: 0.9rem; opacity: 0.8;">Prevents unauthorized data transmission</div>
+                </div>
+                <div style="margin-bottom: 15px;">
+                    <div style="font-weight: 600; margin-bottom: 5px;">Local Processing</div>
+                    <div style="font-size: 0.9rem; opacity: 0.8;">All analysis happens on your device</div>
+                </div>
+                <div>
+                    <div style="font-weight: 600; margin-bottom: 5px;">Encryption Monitoring</div>
+                    <div style="font-size: 0.9rem; opacity: 0.8;">Ensures your data stays encrypted</div>
+                </div>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-title">⚡ Smart Response</div>
+                <div style="margin-bottom: 15px;">
+                    <div style="font-weight: 600; margin-bottom: 5px;">Automatic Quarantine</div>
+                    <div style="font-size: 0.9rem; opacity: 0.8;">Isolates threats without user intervention</div>
+                </div>
+                <div style="margin-bottom: 15px;">
+                    <div style="font-weight: 600; margin-bottom: 5px;">Smart Recovery</div>
+                    <div style="font-size: 0.9rem; opacity: 0.8;">Automatically restores false positives</div>
+                </div>
+                <div>
+                    <div style="font-weight: 600; margin-bottom: 5px;">Learning System</div>
+                    <div style="font-size: 0.9rem; opacity: 0.8;">Improves detection accuracy over time</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        class TauGuard {
+            constructor() {
+                this.isScanning = false;
+                this.scanProgress = 100;
+                this.threatsBlocked = 0;
+                this.filesScanned = 12847;
+                this.vulnerabilities = 0;
+                this.protectionLevel = 100;
+                this.lastScanTime = new Date();
+                
+                this.initializeSecurity();
+                this.startRealTimeMonitoring();
+            }
+
+            initializeSecurity() {
+                this.updateSecurityStatus();
+                this.updateThreatList();
+            }
+
+            updateSecurityStatus() {
+                const securityIndicator = document.getElementById('securityIndicator');
+                const securityText = document.getElementById('securityText');
+                const securityDetails = document.getElementById('securityDetails');
+                const scanProgress = document.getElementById('scanProgress');
+                
+                if (this.isScanning) {
+                    securityIndicator.className = 'status-indicator warning';
+                    securityText.textContent = 'Security scan in progress...';
+                    securityDetails.textContent = `Scanning files... ${Math.round(this.scanProgress)}% complete`;
+                } else if (this.vulnerabilities > 0) {
+                    securityIndicator.className = 'status-indicator danger';
+                    securityText.textContent = 'Vulnerabilities detected';
+                    securityDetails.textContent = `${this.vulnerabilities} issues found`;
+                } else {
+                    securityIndicator.className = 'status-indicator';
+                    securityText.textContent = 'All systems secure';
+                    securityDetails.textContent = `Last scan: ${this.getTimeAgo(this.lastScanTime)}`;
+                }
+                
+                scanProgress.style.width = `${this.scanProgress}%`;
+                
+                document.getElementById('threatsBlocked').textContent = this.threatsBlocked;
+                document.getElementById('filesScanned').textContent = this.filesScanned.toLocaleString();
+                document.getElementById('vulnerabilities').textContent = this.vulnerabilities;
+                document.getElementById('protectionLevel').textContent = `${this.protectionLevel}%`;
+            }
+
+            updateThreatList() {
+                const threatList = document.getElementById('threatList');
+                
+                if (this.vulnerabilities === 0) {
+                    threatList.innerHTML = `
+                        <div class="threat-item">
+                            <div class="threat-icon">✅</div>
+                            <div class="threat-info">
+                                <div class="threat-name">No active threats detected</div>
+                                <div class="threat-details">All systems are clean and secure</div>
+                            </div>
+                            <div class="threat-severity severity-low">Clean</div>
+                        </div>
+                    `;
+                } else {
+                    // Show detected threats
+                    threatList.innerHTML = this.generateThreatList();
+                }
+            }
+
+            generateThreatList() {
+                const threats = [
+                    { name: 'Suspicious file detected', details: 'File: suspicious.exe', severity: 'high' },
+                    { name: 'Unusual network activity', details: 'Connection to unknown IP', severity: 'medium' },
+                    { name: 'Potential malware signature', details: 'File: document.pdf', severity: 'low' }
+                ];
+                
+                return threats.map(threat => `
+                    <div class="threat-item">
+                        <div class="threat-icon">⚠️</div>
+                        <div class="threat-info">
+                            <div class="threat-name">${threat.name}</div>
+                            <div class="threat-details">${threat.details}</div>
+                        </div>
+                        <div class="threat-severity severity-${threat.severity}">${threat.severity}</div>
+                    </div>
+                `).join('');
+            }
+
+            startRealTimeMonitoring() {
+                // Simulate real-time security monitoring
+                setInterval(() => {
+                    this.simulateSecurityActivity();
+                }, 10000); // Check every 10 seconds
+            }
+
+            simulateSecurityActivity() {
+                // Occasionally detect a threat
+                if (Math.random() < 0.1 && this.vulnerabilities === 0) {
+                    this.detectThreat();
+                }
+                
+                // Update scan time
+                this.updateSecurityStatus();
+            }
+
+            detectThreat() {
+                this.vulnerabilities = 1;
+                this.threatsBlocked++;
+                this.protectionLevel = 95;
+                this.showSecurityAlert();
+                this.updateSecurityStatus();
+                this.updateThreatList();
+            }
+
+            showSecurityAlert() {
+                const alert = document.getElementById('securityAlert');
+                const alertText = document.getElementById('alertText');
+                
+                alertText.textContent = 'A potential security threat has been detected. Immediate action may be required.';
+                alert.style.display = 'block';
+            }
+
+            startScan() {
+                if (!this.isScanning) {
+                    this.isScanning = true;
+                    this.scanProgress = 0;
+                    this.updateSecurityStatus();
+                    this.showNotification('Security scan started...');
+                    
+                    document.getElementById('scanBtn').disabled = true;
+                    
+                    // Simulate scan progress
+                    this.simulateScan();
+                }
+            }
+
+            simulateScan() {
+                const scanInterval = setInterval(() => {
+                    this.scanProgress += Math.random() * 10;
+                    
+                    if (this.scanProgress >= 100) {
+                        this.scanProgress = 100;
+                        this.isScanning = false;
+                        this.lastScanTime = new Date();
+                        this.filesScanned += Math.floor(Math.random() * 1000);
+                        this.updateSecurityStatus();
+                        this.showNotification('Security scan completed!');
+                        
+                        document.getElementById('scanBtn').disabled = false;
+                        clearInterval(scanInterval);
+                    } else {
+                        this.updateSecurityStatus();
+                    }
+                }, 200);
+            }
+
+            quarantineThreat() {
+                this.vulnerabilities = 0;
+                this.protectionLevel = 100;
+                this.updateSecurityStatus();
+                this.updateThreatList();
+                this.dismissAlert();
+                this.showNotification('Threat quarantined successfully!');
+            }
+
+            ignoreThreat() {
+                this.dismissAlert();
+                this.showNotification('Threat ignored. Monitoring continues.');
+            }
+
+            dismissAlert() {
+                document.getElementById('securityAlert').style.display = 'none';
+            }
+
+            viewLogs() {
+                this.showNotification('Security logs would open here');
+            }
+
+            updateDefinitions() {
+                this.showNotification('Updating security definitions...');
+                setTimeout(() => {
+                    this.showNotification('Security definitions updated successfully!');
+                }, 2000);
+            }
+
+            getTimeAgo(date) {
+                const now = new Date();
+                const diff = now - date;
+                const minutes = Math.floor(diff / 60000);
+                
+                if (minutes < 1) return 'Just now';
+                if (minutes < 60) return `${minutes} minute${minutes > 1 ? 's' : ''} ago`;
+                
+                const hours = Math.floor(minutes / 60);
+                if (hours < 24) return `${hours} hour${hours > 1 ? 's' : ''} ago`;
+                
+                const days = Math.floor(hours / 24);
+                return `${days} day${days > 1 ? 's' : ''} ago`;
+            }
+
+            showNotification(message) {
+                const notification = document.createElement('div');
+                notification.style.cssText = `
+                    position: fixed;
+                    top: 20px;
+                    left: 50%;
+                    transform: translateX(-50%);
+                    background: rgba(0, 0, 0, 0.8);
+                    color: white;
+                    padding: 15px 25px;
+                    border-radius: 25px;
+                    font-weight: 600;
+                    z-index: 1000;
+                    animation: slideDown 0.3s ease;
+                `;
+                notification.textContent = message;
+                
+                document.body.appendChild(notification);
+                
+                setTimeout(() => {
+                    notification.remove();
+                }, 3000);
+            }
+        }
+
+        // Global functions
+        function startScan() {
+            if (window.tauGuard) {
+                window.tauGuard.startScan();
+            }
+        }
+
+        function viewLogs() {
+            if (window.tauGuard) {
+                window.tauGuard.viewLogs();
+            }
+        }
+
+        function updateDefinitions() {
+            if (window.tauGuard) {
+                window.tauGuard.updateDefinitions();
+            }
+        }
+
+        function quarantineThreat() {
+            if (window.tauGuard) {
+                window.tauGuard.quarantineThreat();
+            }
+        }
+
+        function ignoreThreat() {
+            if (window.tauGuard) {
+                window.tauGuard.ignoreThreat();
+            }
+        }
+
+        function dismissAlert() {
+            if (window.tauGuard) {
+                window.tauGuard.dismissAlert();
+            }
+        }
+
+        // Add CSS for notification animation
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideDown {
+                from {
+                    transform: translateX(-50%) translateY(-100%);
+                    opacity: 0;
+                }
+                to {
+                    transform: translateX(-50%) translateY(0);
+                    opacity: 1;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Initialize TauGuard when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            window.tauGuard = new TauGuard();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,17 @@
+[package]
+name = "tauos-demo"
+version = "0.1.0"
+edition = "2021"
+authors = ["Tau OS Developer"]
+description = "TauOS UI Demo - Showcase of visual identity and interface components"
+
+[dependencies]
+gtk4 = { workspace = true }
+glib = { workspace = true }
+gio = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+
+[[bin]]
+name = "tauos-demo"
+path = "src/main.rs" 
