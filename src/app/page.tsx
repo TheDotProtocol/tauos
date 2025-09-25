@@ -23,7 +23,7 @@ import {
 export default function Dashboard() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
-  // Mock data for demonstration
+// Mock data for demonstration
   const stats = [
     {
       title: 'Total Repositories',
@@ -216,7 +216,7 @@ export default function Dashboard() {
                   </button>
                 </div>
               </div>
-              
+
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {repositories.map((repo, index) => (
                   <RepositoryCard
@@ -238,7 +238,7 @@ export default function Dashboard() {
               <h2 className="text-2xl font-bold text-white mb-6">🛠️ Developer Tools</h2>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 {tools.map((tool, index) => (
-                  <motion.div
+                <motion.div
                     key={tool.name}
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -260,11 +260,11 @@ export default function Dashboard() {
                     </p>
                   </motion.div>
                 ))}
-              </div>
-            </motion.div>
+                  </div>
+                </motion.div>
           </div>
         </main>
       </div>
     </div>
   );
-}
+} 

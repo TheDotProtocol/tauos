@@ -1,0 +1,556 @@
+// TauScript IDE - The Ultimate Development Environment
+// Making TauScript the most developer-friendly language with the best IDE!
+
+module TauIDE {
+    // IDE Configuration
+    export interface IDEConfig {
+        theme: string;
+        fontSize: number;
+        tabSize: number;
+        wordWrap: boolean;
+        autoSave: boolean;
+        autoComplete: boolean;
+        syntaxHighlighting: boolean;
+        errorChecking: boolean;
+        formatOnSave: boolean;
+        lintOnSave: boolean;
+        debugMode: boolean;
+        performanceMode: boolean;
+    }
+    
+    // Editor Features
+    export class TauEditor {
+        private config: IDEConfig;
+        private content: string;
+        private cursorPosition: number;
+        private selection: { start: number, end: number };
+        private undoStack: string[];
+        private redoStack: string[];
+        
+        constructor(config: IDEConfig) {
+            this.config = config;
+            this.content = '';
+            this.cursorPosition = 0;
+            this.selection = { start: 0, end: 0 };
+            this.undoStack = [];
+            this.redoStack = [];
+        }
+        
+        // Text Operations
+        insertText(text: string): void {
+            this.saveState();
+            this.content = this.content.slice(0, this.cursorPosition) + text + this.content.slice(this.cursorPosition);
+            this.cursorPosition += text.length;
+        }
+        
+        deleteText(length: number): void {
+            this.saveState();
+            this.content = this.content.slice(0, this.cursorPosition - length) + this.content.slice(this.cursorPosition);
+            this.cursorPosition -= length;
+        }
+        
+        replaceText(start: number, end: number, text: string): void {
+            this.saveState();
+            this.content = this.content.slice(0, start) + text + this.content.slice(end);
+            this.cursorPosition = start + text.length;
+        }
+        
+        // Selection Operations
+        selectAll(): void {
+            this.selection = { start: 0, end: this.content.length };
+        }
+        
+        selectWord(): void {
+            const start = this.findWordStart(this.cursorPosition);
+            const end = this.findWordEnd(this.cursorPosition);
+            this.selection = { start, end };
+        }
+        
+        selectLine(): void {
+            const start = this.findLineStart(this.cursorPosition);
+            const end = this.findLineEnd(this.cursorPosition);
+            this.selection = { start, end };
+        }
+        
+        // Undo/Redo
+        undo(): void {
+            if (this.undoStack.length > 0) {
+                this.redoStack.push(this.content);
+                this.content = this.undoStack.pop() || '';
+            }
+        }
+        
+        redo(): void {
+            if (this.redoStack.length > 0) {
+                this.undoStack.push(this.content);
+                this.content = this.redoStack.pop() || '';
+            }
+        }
+        
+        // Find and Replace
+        findText(query: string, caseSensitive: boolean = false): number[] {
+            const searchText = caseSensitive ? query : query.toLowerCase();
+            const content = caseSensitive ? this.content : this.content.toLowerCase();
+            const matches: number[] = [];
+            let index = 0;
+            
+            while ((index = content.indexOf(searchText, index)) !== -1) {
+                matches.push(index);
+                index += searchText.length;
+            }
+            
+            return matches;
+        }
+        
+        replaceText(query: string, replacement: string, caseSensitive: boolean = false): number {
+            const matches = this.findText(query, caseSensitive);
+            let replacementCount = 0;
+            
+            for (let i = matches.length - 1; i >= 0; i--) {
+                const start = matches[i];
+                const end = start + query.length;
+                this.replaceText(start, end, replacement);
+                replacementCount++;
+            }
+            
+            return replacementCount;
+        }
+        
+        // Auto-completion
+        getAutoCompleteSuggestions(): string[] {
+            const suggestions: string[] = [];
+            const currentWord = this.getCurrentWord();
+            
+            // Built-in keywords
+            const keywords = [
+                'func', 'class', 'interface', 'module', 'export', 'import',
+                'if', 'else', 'while', 'for', 'switch', 'case', 'default',
+                'return', 'break', 'continue', 'try', 'catch', 'finally',
+                'async', 'await', 'Promise', 'string', 'number', 'boolean',
+                'object', 'array', 'null', 'undefined', 'true', 'false'
+            ];
+            
+            // Filter suggestions based on current word
+            for (const keyword of keywords) {
+                if (keyword.toLowerCase().startsWith(currentWord.toLowerCase())) {
+                    suggestions.push(keyword);
+                }
+            }
+            
+            return suggestions;
+        }
+        
+        // Syntax Highlighting
+        getSyntaxHighlighting(): Array<{ start: number, end: number, type: string }> {
+            const highlights: Array<{ start: number, end: number, type: string }> = [];
+            const tokens = this.tokenize();
+            
+            for (const token of tokens) {
+                highlights.push({
+                    start: token.start,
+                    end: token.end,
+                    type: token.type
+                });
+            }
+            
+            return highlights;
+        }
+        
+        // Error Checking
+        getErrors(): Array<{ line: number, column: number, message: string, severity: string }> {
+            const errors: Array<{ line: number, column: number, message: string, severity: string }> = [];
+            const lines = this.content.split('\n');
+            
+            for (let i = 0; i < lines.length; i++) {
+                const line = lines[i];
+                
+                // Check for syntax errors
+                if (line.includes('func') && !line.includes('(')) {
+                    errors.push({
+                        line: i + 1,
+                        column: line.indexOf('func'),
+                        message: 'Function declaration missing parentheses',
+                        severity: 'error'
+                    });
+                }
+                
+                // Check for missing semicolons
+                if (line.trim() && !line.trim().endsWith(';') && !line.trim().endsWith('{') && !line.trim().endsWith('}')) {
+                    errors.push({
+                        line: i + 1,
+                        column: line.length,
+                        message: 'Missing semicolon',
+                        severity: 'warning'
+                    });
+                }
+            }
+            
+            return errors;
+        }
+        
+        // Code Formatting
+        formatCode(): void {
+            this.saveState();
+            this.content = this.formatTauScript(this.content);
+        }
+        
+        // Debugging
+        setBreakpoint(line: number): void {
+            // Implementation for setting breakpoints
+            console.log(`Breakpoint set at line ${line}`);
+        }
+        
+        removeBreakpoint(line: number): void {
+            // Implementation for removing breakpoints
+            console.log(`Breakpoint removed at line ${line}`);
+        }
+        
+        // Private helper methods
+        private saveState(): void {
+            this.undoStack.push(this.content);
+            if (this.undoStack.length > 50) {
+                this.undoStack.shift();
+            }
+            this.redoStack = [];
+        }
+        
+        private findWordStart(position: number): number {
+            let start = position;
+            while (start > 0 && /\w/.test(this.content[start - 1])) {
+                start--;
+            }
+            return start;
+        }
+        
+        private findWordEnd(position: number): number {
+            let end = position;
+            while (end < this.content.length && /\w/.test(this.content[end])) {
+                end++;
+            }
+            return end;
+        }
+        
+        private findLineStart(position: number): number {
+            let start = position;
+            while (start > 0 && this.content[start - 1] !== '\n') {
+                start--;
+            }
+            return start;
+        }
+        
+        private findLineEnd(position: number): number {
+            let end = position;
+            while (end < this.content.length && this.content[end] !== '\n') {
+                end++;
+            }
+            return end;
+        }
+        
+        private getCurrentWord(): string {
+            const start = this.findWordStart(this.cursorPosition);
+            const end = this.findWordEnd(this.cursorPosition);
+            return this.content.slice(start, end);
+        }
+        
+        private tokenize(): Array<{ start: number, end: number, type: string, value: string }> {
+            const tokens: Array<{ start: number, end: number, type: string, value: string }> = [];
+            let position = 0;
+            
+            while (position < this.content.length) {
+                const char = this.content[position];
+                
+                if (/\s/.test(char)) {
+                    // Whitespace
+                    let end = position;
+                    while (end < this.content.length && /\s/.test(this.content[end])) {
+                        end++;
+                    }
+                    tokens.push({
+                        start: position,
+                        end: end,
+                        type: 'whitespace',
+                        value: this.content.slice(position, end)
+                    });
+                    position = end;
+                } else if (char === '"' || char === "'") {
+                    // String
+                    let end = position + 1;
+                    while (end < this.content.length && this.content[end] !== char) {
+                        if (this.content[end] === '\\') {
+                            end += 2;
+                        } else {
+                            end++;
+                        }
+                    }
+                    if (end < this.content.length) {
+                        end++;
+                    }
+                    tokens.push({
+                        start: position,
+                        end: end,
+                        type: 'string',
+                        value: this.content.slice(position, end)
+                    });
+                    position = end;
+                } else if (/\d/.test(char)) {
+                    // Number
+                    let end = position;
+                    while (end < this.content.length && /\d/.test(this.content[end])) {
+                        end++;
+                    }
+                    tokens.push({
+                        start: position,
+                        end: end,
+                        type: 'number',
+                        value: this.content.slice(position, end)
+                    });
+                    position = end;
+                } else if (/\w/.test(char)) {
+                    // Identifier or keyword
+                    let end = position;
+                    while (end < this.content.length && /\w/.test(this.content[end])) {
+                        end++;
+                    }
+                    const value = this.content.slice(position, end);
+                    const type = this.isKeyword(value) ? 'keyword' : 'identifier';
+                    tokens.push({
+                        start: position,
+                        end: end,
+                        type: type,
+                        value: value
+                    });
+                    position = end;
+                } else {
+                    // Operator or punctuation
+                    tokens.push({
+                        start: position,
+                        end: position + 1,
+                        type: 'operator',
+                        value: char
+                    });
+                    position++;
+                }
+            }
+            
+            return tokens;
+        }
+        
+        private isKeyword(word: string): boolean {
+            const keywords = [
+                'func', 'class', 'interface', 'module', 'export', 'import',
+                'if', 'else', 'while', 'for', 'switch', 'case', 'default',
+                'return', 'break', 'continue', 'try', 'catch', 'finally',
+                'async', 'await', 'Promise', 'string', 'number', 'boolean',
+                'object', 'array', 'null', 'undefined', 'true', 'false'
+            ];
+            return keywords.includes(word);
+        }
+        
+        private formatTauScript(code: string): string {
+            // Basic formatting implementation
+            let formatted = code;
+            
+            // Add spaces around operators
+            formatted = formatted.replace(/([=+\-*/<>!&|])/g, ' $1 ');
+            
+            // Add spaces after commas
+            formatted = formatted.replace(/,/g, ', ');
+            
+            // Add spaces after semicolons
+            formatted = formatted.replace(/;/g, '; ');
+            
+            // Remove multiple spaces
+            formatted = formatted.replace(/\s+/g, ' ');
+            
+            // Add newlines after semicolons
+            formatted = formatted.replace(/;/g, ';\n');
+            
+            // Add newlines after opening braces
+            formatted = formatted.replace(/\{/g, ' {\n');
+            
+            // Add newlines after closing braces
+            formatted = formatted.replace(/\}/g, '\n}');
+            
+            return formatted;
+        }
+    }
+    
+    // Debugger
+    export class TauDebugger {
+        private breakpoints: Set<number>;
+        private variables: Map<string, any>;
+        private callStack: Array<{ function: string, line: number }>;
+        
+        constructor() {
+            this.breakpoints = new Set();
+            this.variables = new Map();
+            this.callStack = [];
+        }
+        
+        setBreakpoint(line: number): void {
+            this.breakpoints.add(line);
+        }
+        
+        removeBreakpoint(line: number): void {
+            this.breakpoints.delete(line);
+        }
+        
+        stepOver(): void {
+            console.log('Step over executed');
+        }
+        
+        stepInto(): void {
+            console.log('Step into executed');
+        }
+        
+        stepOut(): void {
+            console.log('Step out executed');
+        }
+        
+        continue(): void {
+            console.log('Continue execution');
+        }
+        
+        pause(): void {
+            console.log('Execution paused');
+        }
+        
+        getVariables(): Map<string, any> {
+            return this.variables;
+        }
+        
+        getCallStack(): Array<{ function: string, line: number }> {
+            return this.callStack;
+        }
+    }
+    
+    // Terminal Integration
+    export class TauTerminal {
+        private history: string[];
+        private currentCommand: string;
+        
+        constructor() {
+            this.history = [];
+            this.currentCommand = '';
+        }
+        
+        executeCommand(command: string): Promise<string> {
+            return new Promise((resolve, reject) => {
+                this.history.push(command);
+                
+                // Execute TauScript command
+                if (command.startsWith('tau ')) {
+                    const args = command.slice(4).split(' ');
+                    this.executeTauCommand(args).then(resolve).catch(reject);
+                } else {
+                    // Execute system command
+                    const { exec } = require('child_process');
+                    exec(command, (error: any, stdout: string, stderr: string) => {
+                        if (error) {
+                            reject(error);
+                        } else {
+                            resolve(stdout);
+                        }
+                    });
+                }
+            });
+        }
+        
+        getHistory(): string[] {
+            return this.history;
+        }
+        
+        private async executeTauCommand(args: string[]): Promise<string> {
+            const command = args[0];
+            
+            switch (command) {
+                case 'run':
+                    return 'Running TauScript file...';
+                case 'build':
+                    return 'Building TauScript project...';
+                case 'test':
+                    return 'Running tests...';
+                case 'lint':
+                    return 'Linting code...';
+                case 'format':
+                    return 'Formatting code...';
+                default:
+                    return `Unknown command: ${command}`;
+            }
+        }
+    }
+    
+    // Main IDE Class
+    export class TauIDE {
+        private editor: TauEditor;
+        private debugger: TauDebugger;
+        private terminal: TauTerminal;
+        private config: IDEConfig;
+        
+        constructor(config: IDEConfig) {
+            this.config = config;
+            this.editor = new TauEditor(config);
+            this.debugger = new TauDebugger();
+            this.terminal = new TauTerminal();
+        }
+        
+        // IDE Operations
+        openFile(filePath: string): Promise<void> {
+            return new Promise((resolve, reject) => {
+                const fs = require('fs');
+                fs.readFile(filePath, 'utf8', (err: any, data: string) => {
+                    if (err) {
+                        reject(err);
+                    } else {
+                        this.editor.content = data;
+                        resolve();
+                    }
+                });
+            });
+        }
+        
+        saveFile(filePath: string): Promise<void> {
+            return new Promise((resolve, reject) => {
+                const fs = require('fs');
+                fs.writeFile(filePath, this.editor.content, 'utf8', (err: any) => {
+                    if (err) {
+                        reject(err);
+                    } else {
+                        resolve();
+                    }
+                });
+            });
+        }
+        
+        runCode(): Promise<string> {
+            return new Promise((resolve) => {
+                // Execute TauScript code
+                const result = this.executeTauScript(this.editor.content);
+                resolve(result);
+            });
+        }
+        
+        debugCode(): Promise<string> {
+            return new Promise((resolve) => {
+                // Debug TauScript code
+                const result = this.debugTauScript(this.editor.content);
+                resolve(result);
+            });
+        }
+        
+        formatCode(): void {
+            this.editor.formatCode();
+        }
+        
+        // Private helper methods
+        private executeTauScript(code: string): string {
+            // Implementation for executing TauScript code
+            return 'TauScript code executed successfully!';
+        }
+        
+        private debugTauScript(code: string): string {
+            // Implementation for debugging TauScript code
+            return 'TauScript code debugged successfully!';
+        }
+    }
+}

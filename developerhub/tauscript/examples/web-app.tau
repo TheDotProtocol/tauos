@@ -1,0 +1,325 @@
+// TauScript Web Application Example
+// A complete web application showcasing TauScript's web development capabilities
+
+import { TauWeb } from "./frameworks/web-framework.tau";
+import { TauAI } from "./ai-sdk/ai-sdk.tau";
+
+// Main Application
+module WebApp {
+    // Application configuration
+    const config = {
+        port: 3000,
+        host: "localhost",
+        database: {
+            host: "localhost",
+            port: 5432,
+            name: "tauapp",
+            user: "tauuser",
+            password: "taupass"
+        },
+        ai: {
+            model: "gpt-4",
+            apiKey: process.env.OPENAI_API_KEY
+        }
+    };
+    
+    // Initialize application
+    export func main(): void {
+        console.log("🚀 Starting TauScript Web Application...");
+        
+        // Create server
+        const server = new TauWeb.TauServer(config.port);
+        
+        // Setup routes
+        setupRoutes(server);
+        
+        // Setup middleware
+        setupMiddleware(server);
+        
+        // Setup AI integration
+        setupAI(server);
+        
+        // Start server
+        server.start();
+        
+        console.log(`✅ Server running on http://${config.host}:${config.port}`);
+    }
+    
+    // Route setup
+    func setupRoutes(server: TauWeb.TauServer): void {
+        // Home page
+        server.get("/", (req, res) => {
+            res.html(`
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>TauScript Web App</title>
+                    <style>
+                        body { font-family: Arial, sans-serif; margin: 40px; }
+                        .container { max-width: 800px; margin: 0 auto; }
+                        .header { text-align: center; margin-bottom: 40px; }
+                        .feature { margin: 20px 0; padding: 20px; border: 1px solid #ddd; border-radius: 8px; }
+                        .button { background: #007bff; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; }
+                        .button:hover { background: #0056b3; }
+                    </style>
+                </head>
+                <body>
+                    <div class="container">
+                        <div class="header">
+                            <h1>🚀 TauScript Web Application</h1>
+                            <p>Welcome to the future of web development!</p>
+                        </div>
+                        
+                        <div class="feature">
+                            <h3>✨ Modern Web Development</h3>
+                            <p>Build fast, secure, and scalable web applications with TauScript.</p>
+                        </div>
+                        
+                        <div class="feature">
+                            <h3>🤖 AI Integration</h3>
+                            <p>Built-in AI capabilities for intelligent applications.</p>
+                        </div>
+                        
+                        <div class="feature">
+                            <h3>🔒 Enterprise Security</h3>
+                            <p>Enterprise-grade security features built-in.</p>
+                        </div>
+                        
+                        <div style="text-align: center; margin-top: 40px;">
+                            <button class="button" onclick="window.location.href='/api/features'">Explore Features</button>
+                            <button class="button" onclick="window.location.href='/api/ai-demo'">Try AI Demo</button>
+                        </div>
+                    </div>
+                </body>
+                </html>
+            `);
+        });
+        
+        // API routes
+        server.get("/api/features", (req, res) => {
+            const features = [
+                {
+                    name: "Type Safety",
+                    description: "Strong typing system prevents runtime errors",
+                    icon: "🛡️"
+                },
+                {
+                    name: "Performance",
+                    description: "Compiled to native code for maximum speed",
+                    icon: "⚡"
+                },
+                {
+                    name: "AI Native",
+                    description: "Built-in AI and machine learning capabilities",
+                    icon: "🤖"
+                },
+                {
+                    name: "Universal",
+                    description: "Runs everywhere - web, desktop, mobile, server",
+                    icon: "🌐"
+                },
+                {
+                    name: "Developer Experience",
+                    description: "Best-in-class tooling and IDE support",
+                    icon: "🛠️"
+                },
+                {
+                    name: "Enterprise Ready",
+                    description: "Security, scalability, and compliance features",
+                    icon: "🏢"
+                }
+            ];
+            
+            res.json({
+                success: true,
+                data: features,
+                timestamp: new Date().toISOString()
+            });
+        });
+        
+        // AI Demo endpoint
+        server.post("/api/ai-demo", async (req, res) => {
+            try {
+                const { prompt } = req.body;
+                
+                if (!prompt) {
+                    res.status(400).json({
+                        success: false,
+                        error: "Prompt is required"
+                    });
+                    return;
+                }
+                
+                // Use AI to generate response
+                const aiResponse = await generateAIResponse(prompt);
+                
+                res.json({
+                    success: true,
+                    data: {
+                        prompt: prompt,
+                        response: aiResponse,
+                        timestamp: new Date().toISOString()
+                    }
+                });
+            } catch (error) {
+                res.status(500).json({
+                    success: false,
+                    error: "AI service unavailable"
+                });
+            }
+        });
+        
+        // User management endpoints
+        server.post("/api/users", async (req, res) => {
+            try {
+                const { name, email, age } = req.body;
+                
+                // Validate input
+                if (!name || !email) {
+                    res.status(400).json({
+                        success: false,
+                        error: "Name and email are required"
+                    });
+                    return;
+                }
+                
+                // Create user
+                const user = await createUser({ name, email, age });
+                
+                res.status(201).json({
+                    success: true,
+                    data: user,
+                    message: "User created successfully"
+                });
+            } catch (error) {
+                res.status(500).json({
+                    success: false,
+                    error: "Failed to create user"
+                });
+            }
+        });
+        
+        server.get("/api/users", async (req, res) => {
+            try {
+                const users = await getUsers();
+                
+                res.json({
+                    success: true,
+                    data: users,
+                    count: users.length
+                });
+            } catch (error) {
+                res.status(500).json({
+                    success: false,
+                    error: "Failed to fetch users"
+                });
+            }
+        });
+        
+        // Health check
+        server.get("/api/health", (req, res) => {
+            res.json({
+                status: "healthy",
+                timestamp: new Date().toISOString(),
+                uptime: process.uptime(),
+                memory: process.memoryUsage(),
+                version: "1.0.0"
+            });
+        });
+    }
+    
+    // Middleware setup
+    func setupMiddleware(server: TauWeb.TauServer): void {
+        // CORS middleware
+        server.use(TauWeb.TauMiddleware.cors());
+        
+        // Logging middleware
+        server.use(TauWeb.TauMiddleware.logger());
+        
+        // Authentication middleware (for protected routes)
+        server.use("/api/protected", TauWeb.TauMiddleware.auth(new TauWeb.TauAuth("secret")));
+    }
+    
+    // AI setup
+    func setupAI(server: TauWeb.TauServer): void {
+        // Initialize AI model
+        const aiModel = new TauAI.AIModel("gpt-4", "text-generation");
+        
+        // AI-powered features
+        server.get("/api/ai/suggestions", async (req, res) => {
+            try {
+                const suggestions = await generateSuggestions();
+                res.json({
+                    success: true,
+                    data: suggestions
+                });
+            } catch (error) {
+                res.status(500).json({
+                    success: false,
+                    error: "Failed to generate suggestions"
+                });
+            }
+        });
+    }
+    
+    // Helper functions
+    async func generateAIResponse(prompt: string): Promise<string> {
+        // Simulate AI response generation
+        const responses = [
+            "That's an interesting question! Let me think about that...",
+            "Based on my analysis, I would suggest...",
+            "Here's what I think about that topic...",
+            "That's a great point! Here's my perspective...",
+            "I understand your question. Let me provide some insights..."
+        ];
+        
+        // Simulate processing time
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        
+        return responses[Math.floor(Math.random() * responses.length)] + " " + prompt;
+    }
+    
+    async func generateSuggestions(): Promise<string[]> {
+        return [
+            "Try building a REST API with TauScript",
+            "Explore the AI SDK for machine learning",
+            "Create a desktop application with the desktop framework",
+            "Build a mobile app with cross-platform support",
+            "Implement real-time features with WebSockets"
+        ];
+    }
+    
+    async func createUser(userData: any): Promise<any> {
+        // Simulate user creation
+        const user = {
+            id: Date.now().toString(),
+            ...userData,
+            createdAt: new Date().toISOString()
+        };
+        
+        return user;
+    }
+    
+    async func getUsers(): Promise<any[]> {
+        // Simulate user retrieval
+        return [
+            {
+                id: "1",
+                name: "Alice",
+                email: "alice@example.com",
+                age: 25,
+                createdAt: new Date().toISOString()
+            },
+            {
+                id: "2",
+                name: "Bob",
+                email: "bob@example.com",
+                age: 30,
+                createdAt: new Date().toISOString()
+            }
+        ];
+    }
+}
+
+// Run the application
+WebApp.main();

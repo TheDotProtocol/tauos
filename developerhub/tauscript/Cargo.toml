@@ -1,0 +1,36 @@
+[package]
+name = "tauscript"
+version = "1.0.0"
+edition = "2021"
+description = "TauScript - Privacy-First, AI-Native Programming Language"
+authors = ["TauCore Team <team@tauos.org>"]
+license = "MIT"
+repository = "https://github.com/tauos/tauscript"
+homepage = "https://tauos.org"
+keywords = ["programming-language", "interpreter", "privacy", "ai"]
+categories = ["development-tools", "command-line-utilities"]
+
+[dependencies]
+clap = { version = "4.4", features = ["derive"] }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+anyhow = "1.0"
+thiserror = "1.0"
+
+[dev-dependencies]
+tempfile = "3.8"
+criterion = "0.5"
+
+[[bin]]
+name = "tauscript"
+path = "main.rs"
+
+[profile.release]
+opt-level = 3
+lto = true
+codegen-units = 1
+panic = "abort"
+
+[profile.dev]
+opt-level = 0
+debug = true

@@ -1,0 +1,126 @@
+{
+  "name": "TauCore Design System",
+  "version": "1.0.0",
+  "tokens": {
+    "colors": {
+      "tau": {
+        "gold": {
+          "50": "#FFFDF0",
+          "100": "#FFF9D9",
+          "200": "#FFF2B3",
+          "300": "#FFEB8D",
+          "400": "#FFE466",
+          "500": "#FFD700",
+          "600": "#E6C200",
+          "700": "#CCAD00",
+          "800": "#B39900",
+          "900": "#998500"
+        },
+        "black": {
+          "50": "#F5F5F5",
+          "100": "#E5E5E5",
+          "200": "#CCCCCC",
+          "300": "#B3B3B3",
+          "400": "#999999",
+          "500": "#666666",
+          "600": "#4D4D4D",
+          "700": "#333333",
+          "800": "#1A1A1A",
+          "900": "#000000"
+        },
+        "gray": {
+          "50": "#F8F9FA",
+          "100": "#F1F3F4",
+          "200": "#E8EAED",
+          "300": "#DADCE0",
+          "400": "#BDC1C6",
+          "500": "#9AA0A6",
+          "600": "#80868B",
+          "700": "#5F6368",
+          "800": "#3C4043",
+          "900": "#2E2E2E"
+        },
+        "bg": {
+          "primary": "#0F1113",
+          "secondary": "#121314",
+          "tertiary": "#1A1B1D",
+          "surface": "#121314",
+          "overlay": "rgba(0, 0, 0, 0.8)"
+        },
+        "white": {
+          "primary": "#FFFFFF",
+          "secondary": "#F8F9FA",
+          "tertiary": "#E8EAED"
+        }
+      },
+      "semantic": {
+        "success": "#10B981",
+        "warning": "#F59E0B",
+        "error": "#EF4444",
+        "info": "#3B82F6"
+      }
+    },
+    "typography": {
+      "fontFamily": {
+        "heading": "Montserrat, system-ui, sans-serif",
+        "body": "Inter, system-ui, sans-serif",
+        "mono": "JetBrains Mono, Consolas, monospace"
+      },
+      "fontSize": {
+        "xs": "12px",
+        "sm": "14px",
+        "base": "16px",
+        "lg": "18px",
+        "xl": "20px",
+        "2xl": "24px",
+        "3xl": "30px",
+        "4xl": "36px",
+        "5xl": "48px"
+      },
+      "fontWeight": {
+        "regular": "400",
+        "medium": "500",
+        "semibold": "600",
+        "bold": "700",
+        "extrabold": "800"
+      },
+      "lineHeight": {
+        "tight": "1.25",
+        "normal": "1.5",
+        "relaxed": "1.75"
+      }
+    },
+    "spacing": {
+      "xs": "4px",
+      "sm": "8px",
+      "md": "16px",
+      "lg": "24px",
+      "xl": "40px",
+      "2xl": "64px",
+      "3xl": "96px"
+    },
+    "borderRadius": {
+      "none": "0",
+      "sm": "4px",
+      "md": "8px",
+      "lg": "12px",
+      "xl": "16px",
+      "full": "9999px"
+    },
+    "shadows": {
+      "sm": "0 1px 2px 0 rgba(0, 0, 0, 0.05)",
+      "md": "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)",
+      "lg": "0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)",
+      "xl": "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
+      "2xl": "0 25px 50px -12px rgba(0, 0, 0, 0.25)"
+    },
+    "elevation": {
+      "level0": "none",
+      "level1": "0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24)",
+      "level2": "0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23)",
+      "level3": "0 10px 20px rgba(0, 0, 0, 0.19), 0 6px 6px rgba(0, 0, 0, 0.23)",
+      "level4": "0 14px 28px rgba(0, 0, 0, 0.25), 0 10px 10px rgba(0, 0, 0, 0.22)",
+      "level5": "0 19px 38px rgba(0, 0, 0, 0.30), 0 15px 12px rgba(0, 0, 0, 0.22)"
+    }
+  }
+}
