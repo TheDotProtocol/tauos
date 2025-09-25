@@ -11,7 +11,7 @@ DATABASE_URL=postgresql://postgres.tviqcormikopltejomkc:Ak1233%40%405@aws-0-ap-s
 
 ### **OpenAI Configuration**
 ```
-OPENAI_API_KEY=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
+OPENAI_API_KEY=your-openai-api-key-here
 ```
 
 ### **JWT Secrets for Each App**
@@ -31,7 +31,7 @@ JWT_SECRET=b8c3f1e7a9d2c5f8b1e4a7c0d3f6b9e2a5c8f1b4e7a0d3c6f9b2e5a8c1f4b7e0a3c6d
 
 ### **Email Configuration**
 ```
-SENDGRID_API_KEY=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
+SENDGRID_API_KEY=your-sendgrid-api-key-here
 EMAIL_DOMAIN=tauos.org
 ```
 
