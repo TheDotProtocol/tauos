@@ -65,3 +65,9 @@ export function formatRelativeTime(date: Date): string {
 export function generateId(): string {
   return Math.random().toString(36).substr(2, 9);
 }
+
+// Truncate text to specified length
+export function truncateText(text: string, maxLength: number): string {
+  if (text.length <= maxLength) return text;
+  return text.substring(0, maxLength) + '...';
+}

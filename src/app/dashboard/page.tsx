@@ -2,8 +2,8 @@
 
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Sidebar } from "@/components/layout/sidebar";
-import { Header } from "@/components/layout/header";
+import Sidebar from "@/components/layout/sidebar";
+import Header from "@/components/layout/header";
 import { EmailList } from "@/components/email/email-list";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -131,18 +131,13 @@ export default function Dashboard() {
       {/* Sidebar */}
       <Sidebar
         isOpen={isSidebarOpen}
-        onToggle={() => setIsSidebarOpen(!isSidebarOpen)}
-        activeSection={activeSection}
-        onSectionChange={setActiveSection}
+        onClose={() => setIsSidebarOpen(false)}
       />
 
       {/* Main Content */}
       <div className="lg:ml-80 h-full flex flex-col">
         {/* Header */}
-        <Header
-          onMenuToggle={() => setIsSidebarOpen(!isSidebarOpen)}
-          isSidebarOpen={isSidebarOpen}
-        />
+        <Header />
 
         {/* Content Area */}
         <div className="flex-1 flex">
