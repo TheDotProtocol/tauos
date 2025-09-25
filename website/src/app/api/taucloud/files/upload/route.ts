@@ -3,7 +3,7 @@ import { Pool } from 'pg';
 import jwt from 'jsonwebtoken';
 import { writeFile, mkdir } from 'fs/promises';
 import { join } from 'path';
-import { v4 as uuidv4 } from 'uuid';
+import { randomUUID } from 'crypto';
 
 // Database connection - production ready
 const pool = new Pool({
@@ -54,7 +54,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Generate unique filename
-    const fileId = uuidv4();
+    const fileId = randomUUID();
     const fileExtension = file.name.split('.').pop() || '';
     const fileName = `${fileId}.${fileExtension}`;
     const filePath = join(process.cwd(), 'uploads', 'taucloud', decoded.userId.toString(), folder, fileName);
