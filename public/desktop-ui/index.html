@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TauOS Desktop - Hybrid Interface</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="icon" type="image/svg+xml" href="tauos-logo.svg">
+</head>
+<body>
+    <!-- Welcome Splash Screen -->
+    <div class="welcome-splash" id="welcome-splash">
+        <div class="splash-content">
+            <div class="splash-logo">
+                <img src="tauos-logo.svg" alt="TauOS" class="logo-animated">
+                <div class="logo-glow"></div>
+            </div>
+            <div class="splash-text">
+                <h1>TauOS</h1>
+                <p>Privacy-First Operating System</p>
+            </div>
+            <div class="loading-bar">
+                <div class="loading-progress"></div>
+            </div>
+            <div class="loading-text">Initializing System...</div>
+        </div>
+    </div>
+
+    <!-- Desktop Interface -->
+    <div class="desktop-container" id="desktop-container" style="display: none;">
+        <!-- Top Menu Bar (macOS style) -->
+        <div class="menu-bar">
+            <div class="menu-left">
+                <div class="apple-menu">
+                    <img src="tauos-logo.svg" alt="TauOS" class="logo-small">
+                    <span class="menu-text">TauOS</span>
+                </div>
+                <div class="menu-items">
+                    <span class="menu-item" data-menu="file">File</span>
+                    <span class="menu-item" data-menu="edit">Edit</span>
+                    <span class="menu-item" data-menu="view">View</span>
+                    <span class="menu-item" data-menu="go">Go</span>
+                    <span class="menu-item" data-menu="window">Window</span>
+                    <span class="menu-item" data-menu="help">Help</span>
+                </div>
+            </div>
+            <div class="menu-right">
+                <div class="system-info">
+                    <span class="time" id="current-time">12:34 PM</span>
+                    <span class="battery">85%</span>
+                    <span class="wifi">📶</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Desktop Wallpaper Area -->
+        <div class="desktop-wallpaper" id="desktop-wallpaper">
+            <!-- Center Launcher -->
+            <div class="center-launcher" id="center-launcher">
+                <div class="launcher-logo" id="launcher-logo">
+                    <img src="tauos-logo.svg" alt="TauOS" class="main-logo">
+                    <div class="launcher-hint">Click to Launch</div>
+                </div>
+            </div>
+
+            <!-- App Grid (Hidden by default) -->
+            <div class="app-grid-overlay" id="app-grid-overlay" style="display: none;">
+                <div class="app-grid-container">
+                    <div class="app-grid">
+                        <div class="app-item" data-app="taumail">
+                            <div class="app-icon">
+                                <img src="icons/taumail-icon.svg" alt="TauMail" class="app-icon-svg">
+                            </div>
+                            <span class="app-name">TauMail</span>
+                        </div>
+                        <div class="app-item" data-app="taucloud">
+                            <div class="app-icon">
+                                <img src="icons/taucloud-icon.svg" alt="TauCloud" class="app-icon-svg">
+                            </div>
+                            <span class="app-name">TauCloud</span>
+                        </div>
+                        <div class="app-item" data-app="tauid">
+                            <div class="app-icon">
+                                <img src="icons/tauid-icon.svg" alt="TauID" class="app-icon-svg">
+                            </div>
+                            <span class="app-name">TauID</span>
+                        </div>
+                        <div class="app-item" data-app="taustore">
+                            <div class="app-icon">
+                                <img src="icons/taustore-icon.svg" alt="TauStore" class="app-icon-svg">
+                            </div>
+                            <span class="app-name">TauStore</span>
+                        </div>
+                        <div class="app-item" data-app="taubrowser">
+                            <div class="app-icon">
+                                <img src="icons/taubrowser-icon.svg" alt="TauBrowser" class="app-icon-svg">
+                            </div>
+                            <span class="app-name">TauBrowser</span>
+                        </div>
+                        <div class="app-item" data-app="files">
+                            <div class="app-icon">
+                                <i class="fas fa-folder"></i>
+                            </div>
+                            <span class="app-name">Files</span>
+                        </div>
+                        <div class="app-item" data-app="terminal">
+                            <div class="app-icon">
+                                <img src="icons/terminal-icon.svg" alt="Terminal" class="app-icon-svg">
+                            </div>
+                            <span class="app-name">Terminal</span>
+                        </div>
+                        <div class="app-item" data-app="settings">
+                            <div class="app-icon">
+                                <i class="fas fa-cog"></i>
+                            </div>
+                            <span class="app-name">Settings</span>
+                        </div>
+                        <div class="app-item" data-app="trash">
+                            <div class="app-icon">
+                                <i class="fas fa-trash"></i>
+                            </div>
+                            <span class="app-name">Trash</span>
+                        </div>
+                        <div class="app-item" data-app="phone-connect">
+                            <div class="app-icon">
+                                <i class="fas fa-mobile-alt"></i>
+                            </div>
+                            <span class="app-name">Phone Connect</span>
+                        </div>
+                        <div class="app-item" data-app="mobile-ui">
+                            <div class="app-icon">
+                                <i class="fas fa-mobile"></i>
+                            </div>
+                            <span class="app-name">Mobile UI</span>
+                        </div>
+                        <div class="app-item" data-app="tauai">
+                            <div class="app-icon">
+                                <i class="fas fa-robot"></i>
+                            </div>
+                            <span class="app-name">TauAI</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Windows (Application Windows) -->
+            <div class="windows-container" id="windows-container">
+                <!-- Windows will be dynamically added here -->
+            </div>
+        </div>
+
+        <!-- Bottom Taskbar (Windows style) -->
+        <div class="taskbar">
+            <div class="taskbar-left">
+                <div class="start-button" id="start-button">
+                    <img src="tauos-logo.svg" alt="TauOS" class="start-logo">
+                    <span>Launch</span>
+                </div>
+                <div class="taskbar-apps" id="taskbar-apps">
+                    <!-- Running apps will appear here -->
+                </div>
+            </div>
+            <div class="taskbar-right">
+                <div class="system-tray">
+                    <div class="tray-icon" title="Phone Connection" id="phone-tray-icon">
+                        <i class="fas fa-mobile-alt"></i>
+                        <div class="phone-status-indicator" id="phone-status"></div>
+                    </div>
+                    <div class="tray-icon" title="Network">
+                        <i class="fas fa-wifi"></i>
+                    </div>
+                    <div class="tray-icon" title="Volume">
+                        <i class="fas fa-volume-up"></i>
+                    </div>
+                    <div class="tray-icon" title="Battery">
+                        <i class="fas fa-battery-three-quarters"></i>
+                    </div>
+                    <div class="datetime" id="taskbar-time">12:34 PM</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Start Menu (Windows style) -->
+    <div class="start-menu" id="start-menu">
+        <div class="start-menu-header">
+            <img src="tauos-logo.svg" alt="TauOS" class="start-menu-logo">
+            <h2>TauOS</h2>
+        </div>
+        <div class="start-menu-content">
+            <div class="start-menu-section">
+                <h3>Applications</h3>
+                <div class="app-grid" id="start-menu-apps">
+                    <!-- Apps will be loaded here -->
+                </div>
+            </div>
+            <div class="start-menu-section">
+                <h3>System</h3>
+                <div class="system-apps">
+                    <div class="app-item" data-app="settings">
+                        <i class="fas fa-cog"></i>
+                        <span>Settings</span>
+                    </div>
+                    <div class="app-item" data-app="terminal">
+                        <i class="fas fa-terminal"></i>
+                        <span>Terminal</span>
+                    </div>
+                    <div class="app-item" data-app="files">
+                        <i class="fas fa-folder"></i>
+                        <span>Files</span>
+                    </div>
+                    <div class="app-item" data-app="trash">
+                        <i class="fas fa-trash"></i>
+                        <span>Trash</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dropdown Menus -->
+    <div class="dropdown-menu" id="file-menu">
+        <div class="dropdown-item">New Folder</div>
+        <div class="dropdown-item">New File</div>
+        <div class="dropdown-separator"></div>
+        <div class="dropdown-item">Open</div>
+        <div class="dropdown-item">Save</div>
+        <div class="dropdown-item">Save As...</div>
+        <div class="dropdown-separator"></div>
+        <div class="dropdown-item">Print</div>
+        <div class="dropdown-separator"></div>
+        <div class="dropdown-item">Exit</div>
+    </div>
+
+    <div class="dropdown-menu" id="edit-menu">
+        <div class="dropdown-item">Undo</div>
+        <div class="dropdown-item">Redo</div>
+        <div class="dropdown-separator"></div>
+        <div class="dropdown-item">Cut</div>
+        <div class="dropdown-item">Copy</div>
+        <div class="dropdown-item">Paste</div>
+        <div class="dropdown-separator"></div>
+        <div class="dropdown-item">Select All</div>
+        <div class="dropdown-item">Find</div>
+    </div>
+
+    <div class="dropdown-menu" id="view-menu">
+        <div class="dropdown-item">Refresh</div>
+        <div class="dropdown-item">Reload</div>
+        <div class="dropdown-separator"></div>
+        <div class="dropdown-item">Zoom In</div>
+        <div class="dropdown-item">Zoom Out</div>
+        <div class="dropdown-item">Reset Zoom</div>
+        <div class="dropdown-separator"></div>
+        <div class="dropdown-item">Full Screen</div>
+    </div>
+
+    <div class="dropdown-menu" id="go-menu">
+        <div class="dropdown-item">Home</div>
+        <div class="dropdown-item">Desktop</div>
+        <div class="dropdown-item">Documents</div>
+        <div class="dropdown-item">Downloads</div>
+        <div class="dropdown-separator"></div>
+        <div class="dropdown-item">Recent Files</div>
+        <div class="dropdown-item">Bookmarks</div>
+    </div>
+
+    <div class="dropdown-menu" id="window-menu">
+        <div class="dropdown-item">Minimize All</div>
+        <div class="dropdown-item">Maximize All</div>
+        <div class="dropdown-separator"></div>
+        <div class="dropdown-item">Cascade Windows</div>
+        <div class="dropdown-item">Tile Horizontally</div>
+        <div class="dropdown-item">Tile Vertically</div>
+        <div class="dropdown-separator"></div>
+        <div class="dropdown-item">Show Desktop</div>
+    </div>
+
+    <div class="dropdown-menu" id="help-menu">
+        <div class="dropdown-item">TauOS Help</div>
+        <div class="dropdown-item">User Guide</div>
+        <div class="dropdown-item">Keyboard Shortcuts</div>
+        <div class="dropdown-separator"></div>
+        <div class="dropdown-item">About TauOS</div>
+        <div class="dropdown-item">System Information</div>
+        <div class="dropdown-separator"></div>
+        <div class="dropdown-item">Support</div>
+        <div class="dropdown-item">Feedback</div>
+    </div>
+
+    <!-- Context Menu -->
+    <div class="context-menu" id="context-menu">
+        <div class="context-item">New Folder</div>
+        <div class="context-item">New File</div>
+        <div class="context-item">Paste</div>
+        <div class="context-separator"></div>
+        <div class="context-item">Properties</div>
+    </div>
+
+    <!-- System Info Modal -->
+    <div class="modal" id="system-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>System Information</h2>
+                <span class="close" id="close-system">&times;</span>
+            </div>
+            <div class="modal-body" id="system-info-content">
+                <!-- System info will be loaded here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div class="modal" id="settings-modal">
+        <div class="modal-content settings-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-cog"></i> TauOS Settings</h2>
+                <span class="close" id="close-settings">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="settings-tabs">
+                    <div class="tab active" data-tab="personalization">Personalization</div>
+                    <div class="tab" data-tab="privacy">Privacy</div>
+                    <div class="tab" data-tab="system">System</div>
+                    <div class="tab" data-tab="about">About</div>
+                </div>
+                
+                <div class="settings-content">
+                    <!-- Personalization Tab -->
+                    <div class="tab-content active" id="personalization-tab">
+                        <div class="settings-section">
+                            <h3>Wallpapers</h3>
+                            <div class="wallpaper-grid">
+                                <div class="wallpaper-item active" data-wallpaper="default">
+                                    <div class="wallpaper-preview default-bg"></div>
+                                    <span>Default</span>
+                                </div>
+                                <div class="wallpaper-item" data-wallpaper="dark-blue">
+                                    <div class="wallpaper-preview dark-blue-bg"></div>
+                                    <span>Dark Blue</span>
+                                </div>
+                                <div class="wallpaper-item" data-wallpaper="purple">
+                                    <div class="wallpaper-preview purple-bg"></div>
+                                    <span>Purple</span>
+                                </div>
+                                <div class="wallpaper-item" data-wallpaper="green">
+                                    <div class="wallpaper-preview green-bg"></div>
+                                    <span>Green</span>
+                                </div>
+                                <div class="wallpaper-item" data-wallpaper="red">
+                                    <div class="wallpaper-preview red-bg"></div>
+                                    <span>Red</span>
+                                </div>
+                                <div class="wallpaper-item" data-wallpaper="orange">
+                                    <div class="wallpaper-preview orange-bg"></div>
+                                    <span>Orange</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="settings-section">
+                            <h3>Theme</h3>
+                            <div class="theme-options">
+                                <label class="theme-option">
+                                    <input type="radio" name="theme" value="dark" checked>
+                                    <span class="theme-preview dark-theme"></span>
+                                    <span>Dark</span>
+                                </label>
+                                <label class="theme-option">
+                                    <input type="radio" name="theme" value="light">
+                                    <span class="theme-preview light-theme"></span>
+                                    <span>Light</span>
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <div class="settings-section">
+                            <h3>Desktop Layout</h3>
+                            <div class="layout-options">
+                                <label>
+                                    <input type="checkbox" id="show-center-launcher" checked>
+                                    Show Center Launcher
+                                </label>
+                                <label>
+                                    <input type="checkbox" id="show-desktop-icons">
+                                    Show Desktop Icons
+                                </label>
+                                <label>
+                                    <input type="checkbox" id="show-taskbar" checked>
+                                    Show Taskbar
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Privacy Tab -->
+                    <div class="tab-content" id="privacy-tab">
+                        <div class="settings-section">
+                            <h3>Privacy Settings</h3>
+                            <div class="privacy-options">
+                                <label>
+                                    <input type="checkbox" id="privacy-mode" checked>
+                                    Enable Privacy Mode
+                                </label>
+                                <label>
+                                    <input type="checkbox" id="tracking-protection" checked>
+                                    Tracking Protection
+                                </label>
+                                <label>
+                                    <input type="checkbox" id="data-encryption" checked>
+                                    Data Encryption
+                                </label>
+                                <label>
+                                    <input type="checkbox" id="anonymous-mode">
+                                    Anonymous Mode
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <div class="settings-section">
+                            <h3>Data Collection</h3>
+                            <div class="data-options">
+                                <label>
+                                    <input type="checkbox" id="usage-analytics">
+                                    Usage Analytics
+                                </label>
+                                <label>
+                                    <input type="checkbox" id="crash-reports">
+                                    Crash Reports
+                                </label>
+                                <label>
+                                    <input type="checkbox" id="performance-data">
+                                    Performance Data
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- System Tab -->
+                    <div class="tab-content" id="system-tab">
+                        <div class="settings-section">
+                            <h3>System Information</h3>
+                            <div class="system-info">
+                                <div class="info-item">
+                                    <span>OS Version:</span>
+                                    <span>TauOS v1.0.0</span>
+                                </div>
+                                <div class="info-item">
+                                    <span>Build:</span>
+                                    <span>2024.1.0</span>
+                                </div>
+                                <div class="info-item">
+                                    <span>Architecture:</span>
+                                    <span>x64</span>
+                                </div>
+                                <div class="info-item">
+                                    <span>Memory:</span>
+                                    <span>8GB RAM</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="settings-section">
+                            <h3>Updates</h3>
+                            <div class="update-options">
+                                <label>
+                                    <input type="checkbox" id="auto-updates" checked>
+                                    Automatic Updates
+                                </label>
+                                <button class="btn btn-primary">Check for Updates</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- About Tab -->
+                    <div class="tab-content" id="about-tab">
+                        <div class="about-content">
+                            <div class="about-logo">
+                                <img src="tauos-logo.svg" alt="TauOS" style="width: 100px; height: 100px;">
+                            </div>
+                            <h3>TauOS v1.0.0</h3>
+                            <p>Privacy-First Operating System</p>
+                            <p>Built with security and user privacy in mind</p>
+                            <div class="about-links">
+                                <a href="#" class="link">Privacy Policy</a>
+                                <a href="#" class="link">Terms of Service</a>
+                                <a href="#" class="link">Support</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Phone Connectivity Modal -->
+    <div class="modal" id="phone-connect-modal">
+        <div class="modal-content phone-connect-modal">
+            <div class="modal-header">
+                <h2>Phone Connectivity</h2>
+                <button class="close-btn" onclick="closeModal('phone-connect-modal')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="phone-connect-tabs">
+                    <button class="tab-btn active" data-tab="connect">Connect</button>
+                    <button class="tab-btn" data-tab="devices">Devices</button>
+                    <button class="tab-btn" data-tab="settings">Settings</button>
+                </div>
+                
+                <div class="tab-content active" id="connect-tab">
+                    <div class="connection-options">
+                        <div class="connection-option">
+                            <div class="option-icon">
+                                <i class="fab fa-apple"></i>
+                            </div>
+                            <div class="option-content">
+                                <h3>iPhone/iPad</h3>
+                                <p>Connect your Apple device via USB or Wi-Fi</p>
+                                <button class="btn btn-primary" onclick="connectAppleDevice()">
+                                    <i class="fas fa-link"></i> Connect iPhone
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="connection-option">
+                            <div class="option-icon">
+                                <i class="fab fa-android"></i>
+                            </div>
+                            <div class="option-content">
+                                <h3>Android Phone</h3>
+                                <p>Connect your Android device via USB or Bluetooth</p>
+                                <button class="btn btn-primary" onclick="connectAndroidDevice()">
+                                    <i class="fas fa-link"></i> Connect Android
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="connection-option">
+                            <div class="option-icon">
+                                <i class="fas fa-mobile-alt"></i>
+                            </div>
+                            <div class="option-content">
+                                <h3>TauOS Mobile</h3>
+                                <p>Connect to TauOS mobile interface</p>
+                                <button class="btn btn-primary" onclick="connectTauOSMobile()">
+                                    <i class="fas fa-link"></i> Connect Mobile UI
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="tab-content" id="devices-tab">
+                    <div class="connected-devices">
+                        <h3>Connected Devices</h3>
+                        <div class="device-list" id="device-list">
+                            <div class="device-item">
+                                <div class="device-icon">
+                                    <i class="fas fa-mobile-alt"></i>
+                                </div>
+                                <div class="device-info">
+                                    <h4>TauOS Mobile UI</h4>
+                                    <p>localhost:3007</p>
+                                    <span class="device-status connected">Connected</span>
+                                </div>
+                                <div class="device-actions">
+                                    <button class="btn btn-sm" onclick="openMobileUI()">
+                                        <i class="fas fa-external-link-alt"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-danger" onclick="disconnectDevice('mobile-ui')">
+                                        <i class="fas fa-unlink"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="tab-content" id="settings-tab">
+                    <div class="phone-settings">
+                        <h3>Phone Settings</h3>
+                        <div class="setting-group">
+                            <label>
+                                <input type="checkbox" id="auto-connect" checked>
+                                Auto-connect to known devices
+                            </label>
+                        </div>
+                        <div class="setting-group">
+                            <label>
+                                <input type="checkbox" id="sync-notifications" checked>
+                                Sync notifications from phone
+                            </label>
+                        </div>
+                        <div class="setting-group">
+                            <label>
+                                <input type="checkbox" id="sync-contacts" checked>
+                                Sync contacts
+                            </label>
+                        </div>
+                        <div class="setting-group">
+                            <label>
+                                <input type="checkbox" id="sync-messages" checked>
+                                Sync messages
+                            </label>
+                        </div>
+                        <div class="setting-group">
+                            <label>
+                                <input type="checkbox" id="sync-photos" checked>
+                                Sync photos
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mobile UI Window -->
+    <div class="window" id="mobile-ui-window" style="display: none;">
+        <div class="window-header">
+            <div class="window-title">
+                <i class="fas fa-mobile-alt"></i>
+                <span>TauOS Mobile UI</span>
+            </div>
+            <div class="window-controls">
+                <button class="window-btn minimize" onclick="minimizeWindow('mobile-ui-window')">
+                    <i class="fas fa-minus"></i>
+                </button>
+                <button class="window-btn maximize" onclick="maximizeWindow('mobile-ui-window')">
+                    <i class="fas fa-square"></i>
+                </button>
+                <button class="window-btn close" onclick="closeWindow('mobile-ui-window')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        </div>
+        <div class="window-content">
+            <iframe src="http://localhost:3007" frameborder="0" style="width: 100%; height: 100%; border: none;"></iframe>
+        </div>
+    </div>
+
+    <script src="desktop.js"></script>
+</body>
+</html>

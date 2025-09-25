@@ -1,0 +1,1479 @@
+/* TauOS Desktop UI - Hybrid Design */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%);
+    color: #ffffff;
+    overflow: hidden;
+    height: 100vh;
+}
+
+/* Welcome Splash Screen */
+.welcome-splash {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+    transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+}
+
+.welcome-splash.fade-out {
+    opacity: 0;
+    transform: scale(0.95);
+    pointer-events: none;
+}
+
+.splash-content {
+    text-align: center;
+    animation: fadeInUp 1s ease-out;
+}
+
+.splash-logo {
+    position: relative;
+    margin-bottom: 30px;
+}
+
+.logo-animated {
+    width: 120px;
+    height: 120px;
+    animation: logoFloat 3s ease-in-out infinite;
+    filter: drop-shadow(0 0 30px rgba(255, 255, 255, 0.3));
+}
+
+.logo-glow {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 150px;
+    height: 150px;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+    border-radius: 50%;
+    animation: pulse 2s ease-in-out infinite;
+}
+
+.splash-text h1 {
+    font-size: 3rem;
+    font-weight: 700;
+    margin-bottom: 10px;
+    background: linear-gradient(45deg, #ffffff, #a0a0a0);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.splash-text p {
+    font-size: 1.2rem;
+    color: #a0a0a0;
+    margin-bottom: 40px;
+}
+
+.loading-bar {
+    width: 300px;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 2px;
+    margin: 0 auto 20px;
+    overflow: hidden;
+}
+
+.loading-progress {
+    height: 100%;
+    background: linear-gradient(90deg, #4f46e5, #06b6d4);
+    border-radius: 2px;
+    animation: loadingProgress 3s ease-in-out;
+}
+
+.loading-text {
+    font-size: 0.9rem;
+    color: #666;
+    animation: fadeInOut 2s ease-in-out infinite;
+}
+
+@keyframes logoFloat {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 0.3; transform: translate(-50%, -50%) scale(1); }
+    50% { opacity: 0.6; transform: translate(-50%, -50%) scale(1.1); }
+}
+
+@keyframes loadingProgress {
+    0% { width: 0%; }
+    100% { width: 100%; }
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeInOut {
+    0%, 100% { opacity: 0.5; }
+    50% { opacity: 1; }
+}
+
+/* Desktop Container */
+.desktop-container {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+}
+
+/* Top Menu Bar (macOS style) */
+.menu-bar {
+    height: 25px;
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 15px;
+    font-size: 13px;
+    z-index: 1000;
+}
+
+.menu-left {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.apple-menu {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+}
+
+.logo-small {
+    width: 16px;
+    height: 16px;
+    filter: brightness(0) invert(1);
+}
+
+.menu-text {
+    font-weight: 600;
+    color: #ffffff;
+}
+
+.menu-items {
+    display: flex;
+    gap: 15px;
+}
+
+.menu-item {
+    cursor: pointer;
+    padding: 2px 8px;
+    border-radius: 4px;
+    transition: background-color 0.2s;
+}
+
+.menu-item:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Dropdown Menus */
+.dropdown-menu {
+    position: absolute;
+    top: 25px;
+    background: rgba(30, 30, 30, 0.95);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    padding: 8px 0;
+    min-width: 180px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    z-index: 1001;
+    display: none;
+}
+
+.dropdown-item {
+    padding: 8px 16px;
+    cursor: pointer;
+    font-size: 13px;
+    transition: background-color 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.dropdown-item:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.dropdown-separator {
+    height: 1px;
+    background: rgba(255, 255, 255, 0.1);
+    margin: 4px 0;
+}
+
+.menu-right {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.system-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 12px;
+}
+
+/* Desktop Wallpaper */
+.desktop-wallpaper {
+    flex: 1;
+    background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%);
+    position: relative;
+    overflow: hidden;
+    transition: background 0.5s ease;
+}
+
+/* Center Launcher */
+.center-launcher {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    z-index: 10;
+}
+
+.launcher-logo {
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.launcher-logo:hover {
+    transform: scale(1.05);
+}
+
+.main-logo {
+    width: 200px;
+    height: 200px;
+    filter: drop-shadow(0 0 40px rgba(255, 255, 255, 0.2));
+    transition: all 0.3s ease;
+}
+
+.launcher-logo:hover .main-logo {
+    filter: drop-shadow(0 0 60px rgba(255, 255, 255, 0.4));
+    transform: scale(1.02);
+}
+
+.launcher-hint {
+    margin-top: 20px;
+    font-size: 1.1rem;
+    color: rgba(255, 255, 255, 0.7);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.launcher-logo:hover .launcher-hint {
+    opacity: 1;
+}
+
+/* App Grid Overlay */
+.app-grid-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(20px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 20;
+    animation: fadeIn 0.3s ease;
+}
+
+.app-grid-container {
+    max-width: 800px;
+    width: 100%;
+    padding: 40px;
+}
+
+.app-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 40px;
+    justify-items: center;
+}
+
+.app-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    padding: 20px;
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.app-item:hover {
+    transform: translateY(-5px);
+    background: rgba(255, 255, 255, 0.1);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+.app-icon {
+    width: 80px;
+    height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 20px;
+    margin-bottom: 15px;
+    transition: all 0.3s ease;
+}
+
+.app-item:hover .app-icon {
+    background: rgba(255, 255, 255, 0.2);
+    transform: scale(1.1);
+}
+
+.app-icon i {
+    font-size: 2.5rem;
+    color: #ffffff;
+}
+
+/* Professional SVG Icons */
+.app-icon-svg {
+    width: 48px;
+    height: 48px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
+}
+
+.app-item:hover .app-icon-svg {
+    transform: scale(1.1);
+    filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.4));
+}
+
+/* Real App Windows */
+.real-app-window {
+    border: 2px solid rgba(251, 191, 36, 0.3);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(251, 191, 36, 0.1);
+}
+
+.real-app-content {
+    padding: 0;
+    overflow: hidden;
+    background: #ffffff;
+}
+
+.window-icon-svg {
+    width: 20px;
+    height: 20px;
+    margin-right: 8px;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+}
+
+.app-name {
+    font-size: 1rem;
+    font-weight: 500;
+    color: #ffffff;
+    text-align: center;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.desktop-wallpaper::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="rgba(255,255,255,0.03)" stroke-width="0.5"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
+    opacity: 0.3;
+}
+
+/* Desktop Icons */
+.desktop-icons {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, 80px);
+    gap: 20px;
+    z-index: 10;
+}
+
+.desktop-icon {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    cursor: pointer;
+    padding: 10px;
+    border-radius: 8px;
+    transition: all 0.2s;
+    user-select: none;
+}
+
+.desktop-icon:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    transform: scale(1.05);
+}
+
+.desktop-icon.selected {
+    background-color: rgba(59, 130, 246, 0.3);
+}
+
+.icon-container {
+    width: 48px;
+    height: 48px;
+    background: linear-gradient(135deg, #fbbf24, #f97316);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.icon-container i {
+    font-size: 24px;
+    color: #ffffff;
+}
+
+.icon-label {
+    font-size: 12px;
+    text-align: center;
+    color: #ffffff;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+/* Windows Container */
+.windows-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 100;
+}
+
+.window {
+    position: absolute;
+    background: rgba(15, 15, 35, 0.95);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+    min-width: 320px;
+    min-height: 240px;
+    max-width: 800px;
+    max-height: 600px;
+    z-index: 101;
+}
+
+.window-header {
+    height: 40px;
+    background: rgba(0, 0, 0, 0.3);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px 12px 0 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 15px;
+    cursor: move;
+}
+
+.window-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 500;
+}
+
+.window-controls {
+    display: flex;
+    gap: 8px;
+}
+
+.window-control {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: opacity 0.2s;
+}
+
+.window-control.close { background-color: #ff5f57; }
+.window-control.minimize { background-color: #ffbd2e; }
+.window-control.maximize { background-color: #28ca42; }
+
+.window-control:hover {
+    opacity: 0.8;
+}
+
+.window-content {
+    padding: 20px;
+    height: calc(100% - 40px);
+    overflow: auto;
+}
+
+/* Taskbar (Windows style) */
+.taskbar {
+    height: 50px;
+    background: rgba(0, 0, 0, 0.9);
+    backdrop-filter: blur(20px);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 15px;
+    z-index: 1000;
+}
+
+.taskbar-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.start-button {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 15px;
+    background: linear-gradient(135deg, #fbbf24, #f97316);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-weight: 500;
+}
+
+.start-button:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(251, 191, 36, 0.3);
+}
+
+.start-logo {
+    width: 20px;
+    height: 20px;
+    filter: brightness(0) invert(1);
+}
+
+.taskbar-apps {
+    display: flex;
+    gap: 5px;
+}
+
+.taskbar-app {
+    width: 40px;
+    height: 40px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.taskbar-app:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.taskbar-app.active {
+    background: linear-gradient(135deg, #fbbf24, #f97316);
+}
+
+.taskbar-right {
+    display: flex;
+    align-items: center;
+}
+
+.system-tray {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.tray-icon {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    border-radius: 6px;
+    transition: background-color 0.2s;
+}
+
+.tray-icon:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.datetime {
+    font-size: 14px;
+    font-weight: 500;
+    padding: 5px 10px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.datetime:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Start Menu */
+.start-menu {
+    position: fixed;
+    bottom: 60px;
+    left: 15px;
+    width: 400px;
+    max-height: 600px;
+    background: rgba(15, 15, 35, 0.95);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    z-index: 2000;
+    display: none;
+    overflow: hidden;
+}
+
+.start-menu.show {
+    display: block;
+    animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.start-menu-header {
+    padding: 20px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.start-menu-logo {
+    width: 40px;
+    height: 40px;
+    filter: brightness(0) invert(1);
+}
+
+.start-menu-header h2 {
+    font-size: 24px;
+    font-weight: 700;
+    background: linear-gradient(135deg, #fbbf24, #f97316);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.start-menu-content {
+    padding: 20px;
+    max-height: 500px;
+    overflow-y: auto;
+}
+
+.start-menu-section {
+    margin-bottom: 25px;
+}
+
+.start-menu-section h3 {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 15px;
+    color: #fbbf24;
+}
+
+.app-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+}
+
+.app-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 15px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: center;
+}
+
+.app-item:hover {
+    background: rgba(255, 255, 255, 0.1);
+    transform: scale(1.05);
+}
+
+.app-item i {
+    font-size: 32px;
+    margin-bottom: 8px;
+    color: #fbbf24;
+}
+
+.app-item span {
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.system-apps {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+/* Context Menu */
+.context-menu {
+    position: fixed;
+    background: rgba(15, 15, 35, 0.95);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    z-index: 3000;
+    display: none;
+    min-width: 150px;
+}
+
+.context-menu.show {
+    display: block;
+}
+
+.context-item {
+    padding: 10px 15px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    font-size: 14px;
+}
+
+.context-item:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.context-separator {
+    height: 1px;
+    background: rgba(255, 255, 255, 0.1);
+    margin: 5px 0;
+}
+
+/* Modal */
+/* Mac-style Terminal */
+.terminal-window {
+    background: #1e1e1e;
+    border: 1px solid #333;
+    border-radius: 8px;
+    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+}
+
+.terminal-header {
+    background: #2d2d2d;
+    border-bottom: 1px solid #333;
+    border-radius: 8px 8px 0 0;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    padding: 0 12px;
+    font-size: 12px;
+    color: #ccc;
+}
+
+.terminal-controls {
+    display: flex;
+    gap: 6px;
+    margin-right: 12px;
+}
+
+.terminal-control {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+.terminal-close { background: #ff5f57; }
+.terminal-minimize { background: #ffbd2e; }
+.terminal-maximize { background: #28ca42; }
+
+.terminal-content {
+    padding: 12px;
+    height: calc(100% - 32px);
+    overflow-y: auto;
+    background: #1e1e1e;
+    color: #f8f8f2;
+    font-size: 13px;
+    line-height: 1.4;
+}
+
+.terminal-line {
+    margin-bottom: 2px;
+    white-space: pre-wrap;
+}
+
+.terminal-prompt {
+    color: #50fa7b;
+}
+
+.terminal-command {
+    color: #8be9fd;
+}
+
+.terminal-output {
+    color: #f8f8f2;
+}
+
+.terminal-error {
+    color: #ff5555;
+}
+
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 4000;
+}
+
+.modal.show {
+    display: flex;
+}
+
+/* Settings Modal */
+.settings-content {
+    width: 90%;
+    max-width: 800px;
+    max-height: 80vh;
+}
+
+.settings-tabs {
+    display: flex;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    margin-bottom: 20px;
+}
+
+.tab {
+    padding: 12px 20px;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: all 0.3s ease;
+    color: #a0a0a0;
+}
+
+.tab.active {
+    color: #ffffff;
+    border-bottom-color: #4f46e5;
+}
+
+.tab:hover {
+    color: #ffffff;
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.tab-content {
+    display: none;
+    max-height: 500px;
+    overflow-y: auto;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+.settings-section {
+    margin-bottom: 30px;
+}
+
+.settings-section h3 {
+    margin-bottom: 15px;
+    color: #ffffff;
+    font-size: 1.1rem;
+}
+
+/* Wallpaper Grid */
+.wallpaper-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+}
+
+.wallpaper-item {
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.3s ease;
+    padding: 10px;
+    border-radius: 8px;
+    border: 2px solid transparent;
+}
+
+.wallpaper-item:hover {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.wallpaper-item.active {
+    border-color: #4f46e5;
+    background: rgba(79, 70, 229, 0.1);
+}
+
+.wallpaper-preview {
+    width: 80px;
+    height: 60px;
+    border-radius: 6px;
+    margin: 0 auto 8px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.default-bg { background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%); }
+.dark-blue-bg { background: linear-gradient(135deg, #1e1b4b 0%, #312e81 50%, #4338ca 100%); }
+.purple-bg { background: linear-gradient(135deg, #581c87 0%, #7c3aed 50%, #a855f7 100%); }
+.green-bg { background: linear-gradient(135deg, #064e3b 0%, #047857 50%, #059669 100%); }
+.red-bg { background: linear-gradient(135deg, #7f1d1d 0%, #dc2626 50%, #ef4444 100%); }
+.orange-bg { background: linear-gradient(135deg, #9a3412 0%, #ea580c 50%, #f97316 100%); }
+
+/* Theme Options */
+.theme-options {
+    display: flex;
+    gap: 20px;
+}
+
+.theme-option {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    cursor: pointer;
+    padding: 15px;
+    border-radius: 8px;
+    border: 2px solid transparent;
+    transition: all 0.3s ease;
+}
+
+.theme-option:hover {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.theme-option input[type="radio"]:checked + .theme-preview {
+    border-color: #4f46e5;
+}
+
+.theme-preview {
+    width: 60px;
+    height: 40px;
+    border-radius: 6px;
+    margin-bottom: 8px;
+    border: 2px solid rgba(255, 255, 255, 0.1);
+}
+
+.dark-theme { background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); }
+.light-theme { background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%); }
+
+/* Layout Options */
+.layout-options {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.layout-options label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 6px;
+    transition: background 0.3s ease;
+}
+
+.layout-options label:hover {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+/* Privacy Options */
+.privacy-options, .data-options {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.privacy-options label, .data-options label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 6px;
+    transition: background 0.3s ease;
+}
+
+.privacy-options label:hover, .data-options label:hover {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+/* System Info */
+.system-info {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+    padding: 15px;
+}
+
+.info-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.info-item:last-child {
+    border-bottom: none;
+}
+
+/* Update Options */
+.update-options {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.update-options label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+}
+
+/* About Content */
+.about-content {
+    text-align: center;
+    padding: 20px;
+}
+
+.about-logo {
+    margin-bottom: 20px;
+}
+
+.about-content h3 {
+    margin-bottom: 10px;
+    color: #ffffff;
+}
+
+.about-content p {
+    color: #a0a0a0;
+    margin-bottom: 10px;
+}
+
+.about-links {
+    margin-top: 20px;
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+}
+
+.link {
+    color: #4f46e5;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.link:hover {
+    color: #06b6d4;
+}
+
+/* Form Elements */
+input[type="checkbox"], input[type="radio"] {
+    accent-color: #4f46e5;
+}
+
+.btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.btn-primary {
+    background: #4f46e5;
+    color: white;
+}
+
+.btn-primary:hover {
+    background: #4338ca;
+}
+
+.modal-content {
+    background: rgba(15, 15, 35, 0.95);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    max-width: 600px;
+    width: 90%;
+    max-height: 80%;
+    overflow: hidden;
+}
+
+.modal-header {
+    padding: 20px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.modal-header h2 {
+    font-size: 20px;
+    font-weight: 600;
+}
+
+.close {
+    font-size: 24px;
+    cursor: pointer;
+    color: #999;
+    transition: color 0.2s;
+}
+
+.close:hover {
+    color: #fff;
+}
+
+.modal-body {
+    padding: 20px;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .desktop-icons {
+        grid-template-columns: repeat(auto-fill, 60px);
+        gap: 15px;
+    }
+    
+    .icon-container {
+        width: 40px;
+        height: 40px;
+    }
+    
+    .icon-container i {
+        font-size: 20px;
+    }
+    
+    .start-menu {
+        width: 90%;
+        left: 5%;
+    }
+    
+    .app-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes slideIn {
+    from { transform: translateX(-100%); }
+    to { transform: translateX(0); }
+}
+
+.fade-in {
+    animation: fadeIn 0.3s ease-out;
+}
+
+.slide-in {
+    animation: slideIn 0.3s ease-out;
+}
+
+/* Phone Connectivity Styles */
+.phone-status-indicator {
+    position: absolute;
+    top: -2px;
+    right: -2px;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #ff3b30;
+    border: 2px solid #1a1a2e;
+}
+
+.phone-status-indicator.connected {
+    background: #34c759;
+}
+
+.phone-status-indicator.connecting {
+    background: #ff9500;
+    animation: pulse 1s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+/* Phone Connect Modal */
+.phone-connect-modal {
+    width: 600px;
+    max-width: 90vw;
+}
+
+.phone-connect-tabs {
+    display: flex;
+    border-bottom: 1px solid #333;
+    margin-bottom: 20px;
+}
+
+.tab-btn {
+    background: none;
+    border: none;
+    color: #888;
+    padding: 10px 20px;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: all 0.3s ease;
+}
+
+.tab-btn.active {
+    color: #007AFF;
+    border-bottom-color: #007AFF;
+}
+
+.tab-btn:hover {
+    color: #fff;
+}
+
+.connection-options {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.connection-option {
+    display: flex;
+    align-items: center;
+    padding: 20px;
+    background: #1a1a2e;
+    border-radius: 12px;
+    border: 1px solid #333;
+    transition: all 0.3s ease;
+}
+
+.connection-option:hover {
+    border-color: #007AFF;
+    background: #1e1e3a;
+}
+
+.option-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #007AFF, #5856d6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 20px;
+    font-size: 24px;
+    color: white;
+}
+
+.option-content {
+    flex: 1;
+}
+
+.option-content h3 {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 5px;
+    color: #fff;
+}
+
+.option-content p {
+    color: #888;
+    margin-bottom: 15px;
+    font-size: 14px;
+}
+
+.connected-devices {
+    margin-top: 20px;
+}
+
+.device-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.device-item {
+    display: flex;
+    align-items: center;
+    padding: 15px;
+    background: #1a1a2e;
+    border-radius: 10px;
+    border: 1px solid #333;
+}
+
+.device-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    background: #007AFF;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 15px;
+    color: white;
+}
+
+.device-info {
+    flex: 1;
+}
+
+.device-info h4 {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 5px;
+    color: #fff;
+}
+
+.device-info p {
+    color: #888;
+    font-size: 12px;
+    margin-bottom: 5px;
+}
+
+.device-status {
+    font-size: 12px;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-weight: 500;
+}
+
+.device-status.connected {
+    background: #34c759;
+    color: white;
+}
+
+.device-status.disconnected {
+    background: #ff3b30;
+    color: white;
+}
+
+.device-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.phone-settings {
+    margin-top: 20px;
+}
+
+.setting-group {
+    margin-bottom: 20px;
+}
+
+.setting-group label {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    color: #fff;
+    font-size: 14px;
+}
+
+.setting-group input[type="checkbox"] {
+    margin-right: 10px;
+    width: 16px;
+    height: 16px;
+    accent-color: #007AFF;
+}
+
+/* Mobile UI Window */
+#mobile-ui-window {
+    width: 400px;
+    height: 700px;
+    min-width: 300px;
+    min-height: 500px;
+}
+
+#mobile-ui-window .window-content {
+    padding: 0;
+    background: #000;
+}
+
+#mobile-ui-window iframe {
+    border-radius: 0 0 8px 8px;
+}
+
+/* Phone Tray Icon Animation */
+#phone-tray-icon {
+    position: relative;
+    transition: all 0.3s ease;
+}
+
+#phone-tray-icon:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+}
+
+/* Responsive Phone Modal */
+@media (max-width: 768px) {
+    .phone-connect-modal {
+        width: 95vw;
+        height: 90vh;
+    }
+    
+    .connection-option {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .option-icon {
+        margin-right: 0;
+        margin-bottom: 15px;
+    }
+}
