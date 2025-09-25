@@ -3,7 +3,7 @@ import { Pool } from 'pg';
 import jwt from 'jsonwebtoken';
 import { writeFile, mkdir } from 'fs/promises';
 import { join } from 'path';
-import { v4 as uuidv4 } from 'uuid';
+const { v4: uuidv4 } = require('uuid');
 
 // Database connection - production ready
 const pool = new Pool({
