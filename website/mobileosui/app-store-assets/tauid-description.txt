@@ -1,0 +1,28 @@
+🆔 TauID - Decentralized Identity
+
+Your sovereign digital identity. Manage verifiable credentials with complete privacy and user control.
+
+🔒 PRIVACY FEATURES:
+• Decentralized identity management
+• Self-sovereign identity
+• Zero tracking
+• Local key storage
+• Privacy-first design
+
+📱 KEY FEATURES:
+• Digital identity card
+• Verifiable credentials
+• Biometric authentication
+• Device management
+• Identity backup
+
+🛡️ SECURITY:
+• DID:WEB implementation
+• Cryptographic proofs
+• No blockchain dependency
+• GDPR compliant
+• Open source
+
+Perfect for managing digital identity, credentials, and personal information with complete sovereignty.
+
+Own your identity with TauID.

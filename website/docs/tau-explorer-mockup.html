@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>τ Explorer - File Manager with TauCloud Integration</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #0a0a0a;
+            color: #ffffff;
+            overflow: hidden;
+        }
+
+        .explorer-window {
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+        }
+
+        .sidebar {
+            background: rgba(26, 26, 26, 0.95);
+            backdrop-filter: blur(20px);
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+            width: 250px;
+            padding: 16px 0;
+        }
+
+        .sidebar-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 16px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .sidebar-item:hover {
+            background: rgba(139, 92, 246, 0.2);
+        }
+
+        .sidebar-item.active {
+            background: rgba(139, 92, 246, 0.3);
+        }
+
+        .sidebar-icon {
+            font-size: 16px;
+            margin-right: 12px;
+            min-width: 20px;
+        }
+
+        .sidebar-label {
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .toolbar {
+            background: rgba(26, 26, 26, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 8px 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .toolbar-button {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 6px;
+            color: white;
+            padding: 8px;
+            font-size: 14px;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+
+        .toolbar-button:hover {
+            background: rgba(139, 92, 246, 0.2);
+            border-color: #8b5cf6;
+            transform: translateY(-1px);
+        }
+
+        .path-bar {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            color: white;
+            padding: 8px 12px;
+            font-size: 14px;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            margin: 8px 16px;
+            flex: 1;
+        }
+
+        .path-bar:focus {
+            outline: none;
+            border-color: #8b5cf6;
+            box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.2);
+        }
+
+        .file-list {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.02);
+            overflow-y: auto;
+        }
+
+        .file-list-header {
+            background: rgba(26, 26, 26, 0.8);
+            padding: 8px 16px;
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            gap: 16px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            font-weight: 600;
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .file-item {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            gap: 16px;
+            padding: 8px 16px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .file-item:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .file-item.selected {
+            background: rgba(139, 92, 246, 0.3);
+        }
+
+        .file-name {
+            display: flex;
+            align-items: center;
+            font-size: 14px;
+        }
+
+        .file-icon {
+            font-size: 16px;
+            margin-right: 8px;
+        }
+
+        .file-size {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .file-modified {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .file-type {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .status-bar {
+            background: rgba(26, 26, 26, 0.95);
+            backdrop-filter: blur(20px);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 8px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .status-info {
+            display: flex;
+            gap: 16px;
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .cloud-status {
+            font-size: 12px;
+            font-weight: 500;
+            color: #10b981;
+            background: rgba(16, 185, 129, 0.1);
+            padding: 4px 8px;
+            border-radius: 4px;
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+
+        .cloud-dialog {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(26, 26, 26, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 24px;
+            display: none;
+            z-index: 1000;
+            width: 500px;
+        }
+
+        .cloud-dialog.show {
+            display: block;
+            animation: fadeIn 0.3s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translate(-50%, -50%) scale(0.9); }
+            to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+        }
+
+        .dialog-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .dialog-header h3 {
+            margin: 0;
+            color: white;
+            font-size: 20px;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            padding: 5px;
+            border-radius: 50%;
+            transition: background-color 0.2s ease;
+        }
+
+        .close-btn:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .cloud-info {
+            margin-bottom: 20px;
+        }
+
+        .cloud-info-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .cloud-info-item:last-child {
+            border-bottom: none;
+        }
+
+        .cloud-action-buttons {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+        }
+
+        .cloud-action-btn {
+            background: rgba(139, 92, 246, 0.1);
+            border: 1px solid rgba(139, 92, 246, 0.3);
+            border-radius: 6px;
+            color: #8b5cf6;
+            padding: 8px 16px;
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .cloud-action-btn:hover {
+            background: rgba(139, 92, 246, 0.2);
+            border-color: #8b5cf6;
+            transform: translateY(-1px);
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 2px;
+            overflow: hidden;
+            margin: 8px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #8b5cf6 0%, #6366f1 100%);
+            border-radius: 2px;
+            width: 75%;
+            transition: width 0.3s ease;
+        }
+    </style>
+</head>
+<body>
+    <div class="explorer-window">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="sidebar-item active" onclick="selectSidebarItem(this)">
+                <div class="sidebar-icon">🏠</div>
+                <div class="sidebar-label">Home</div>
+            </div>
+            <div class="sidebar-item" onclick="selectSidebarItem(this)">
+                <div class="sidebar-icon">📁</div>
+                <div class="sidebar-label">Documents</div>
+            </div>
+            <div class="sidebar-item" onclick="selectSidebarItem(this)">
+                <div class="sidebar-icon">🖼️</div>
+                <div class="sidebar-label">Pictures</div>
+            </div>
+            <div class="sidebar-item" onclick="selectSidebarItem(this)">
+                <div class="sidebar-icon">🎵</div>
+                <div class="sidebar-label">Music</div>
+            </div>
+            <div class="sidebar-item" onclick="selectSidebarItem(this)">
+                <div class="sidebar-icon">📹</div>
+                <div class="sidebar-label">Videos</div>
+            </div>
+            <div class="sidebar-item" onclick="selectSidebarItem(this)">
+                <div class="sidebar-icon">☁️</div>
+                <div class="sidebar-label">TauCloud</div>
+            </div>
+            <div class="sidebar-item" onclick="selectSidebarItem(this)">
+                <div class="sidebar-icon">🗑️</div>
+                <div class="sidebar-label">Trash</div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Toolbar -->
+            <div class="toolbar">
+                <button class="toolbar-button" onclick="goBack()">←</button>
+                <button class="toolbar-button" onclick="goForward()">→</button>
+                <button class="toolbar-button" onclick="goUp()">↑</button>
+                
+                <div style="width: 1px; height: 20px; background: rgba(255,255,255,0.1); margin: 0 8px;"></div>
+                
+                <button class="toolbar-button" onclick="newFolder()">📁</button>
+                <button class="toolbar-button" onclick="uploadToCloud()">📤</button>
+                <button class="toolbar-button" onclick="syncWithCloud()">🔄</button>
+                
+                <div style="width: 1px; height: 20px; background: rgba(255,255,255,0.1); margin: 0 8px;"></div>
+                
+                <button class="toolbar-button" onclick="listView()">📋</button>
+                <button class="toolbar-button" onclick="gridView()">📊</button>
+            </div>
+
+            <!-- Path Bar -->
+            <input type="text" class="path-bar" value="/home/documents" onkeypress="handlePathEnter(event)">
+
+            <!-- File List -->
+            <div class="file-list">
+                <div class="file-list-header">
+                    <div>Name</div>
+                    <div>Size</div>
+                    <div>Modified</div>
+                    <div>Type</div>
+                </div>
+                
+                <div class="file-item" onclick="selectFile(this)">
+                    <div class="file-name">
+                        <span class="file-icon">📁</span>
+                        Documents
+                    </div>
+                    <div class="file-size">--</div>
+                    <div class="file-modified">Today</div>
+                    <div class="file-type">Folder</div>
+                </div>
+                
+                <div class="file-item" onclick="selectFile(this)">
+                    <div class="file-name">
+                        <span class="file-icon">📄</span>
+                        report.pdf
+                    </div>
+                    <div class="file-size">2.5 MB</div>
+                    <div class="file-modified">Yesterday</div>
+                    <div class="file-type">PDF</div>
+                </div>
+                
+                <div class="file-item" onclick="selectFile(this)">
+                    <div class="file-name">
+                        <span class="file-icon">🖼️</span>
+                        photo.jpg
+                    </div>
+                    <div class="file-size">1.2 MB</div>
+                    <div class="file-modified">2 days ago</div>
+                    <div class="file-type">Image</div>
+                </div>
+                
+                <div class="file-item" onclick="selectFile(this)">
+                    <div class="file-name">
+                        <span class="file-icon">📁</span>
+                        Pictures
+                    </div>
+                    <div class="file-size">--</div>
+                    <div class="file-modified">3 days ago</div>
+                    <div class="file-type">Folder</div>
+                </div>
+                
+                <div class="file-item" onclick="selectFile(this)">
+                    <div class="file-name">
+                        <span class="file-icon">🎵</span>
+                        song.mp3
+                    </div>
+                    <div class="file-size">5.8 MB</div>
+                    <div class="file-modified">1 week ago</div>
+                    <div class="file-type">Audio</div>
+                </div>
+                
+                <div class="file-item" onclick="selectFile(this)">
+                    <div class="file-name">
+                        <span class="file-icon">📹</span>
+                        video.mp4
+                    </div>
+                    <div class="file-size">15.2 MB</div>
+                    <div class="file-modified">2 weeks ago</div>
+                    <div class="file-type">Video</div>
+                </div>
+                
+                <div class="file-item" onclick="selectFile(this)">
+                    <div class="file-name">
+                        <span class="file-icon">📄</span>
+                        document.txt
+                    </div>
+                    <div class="file-size">1 KB</div>
+                    <div class="file-modified">1 month ago</div>
+                    <div class="file-type">Text</div>
+                </div>
+            </div>
+
+            <!-- Status Bar -->
+            <div class="status-bar">
+                <div class="status-info">
+                    <span>7 items</span>
+                    <span>24.8 MB</span>
+                </div>
+                <div class="cloud-status" onclick="showCloudDialog()">☁️ TauCloud Connected</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cloud Dialog -->
+    <div class="cloud-dialog" id="cloudDialog">
+        <div class="dialog-header">
+            <h3>TauCloud Integration</h3>
+            <button class="close-btn" onclick="hideCloudDialog()">✕</button>
+        </div>
+        
+        <div class="cloud-info">
+            <div class="cloud-info-item">
+                <span>Connection Status:</span>
+                <span style="color: #10b981;">🔗 Connected</span>
+            </div>
+            <div class="cloud-info-item">
+                <span>Sync Status:</span>
+                <span style="color: #10b981;">✅ All files synced</span>
+            </div>
+            <div class="cloud-info-item">
+                <span>Storage Usage:</span>
+                <span style="color: #8b5cf6;">📊 2.5 GB / 10 GB</span>
+            </div>
+            <div class="cloud-info-item">
+                <span>Last Sync:</span>
+                <span>Just now</span>
+            </div>
+        </div>
+        
+        <div class="progress-bar">
+            <div class="progress-fill"></div>
+        </div>
+        
+        <div class="cloud-action-buttons">
+            <button class="cloud-action-btn" onclick="syncNow()">🔄 Sync Now</button>
+            <button class="cloud-action-btn" onclick="uploadFiles()">📤 Upload Files</button>
+            <button class="cloud-action-btn" onclick="cloudSettings()">⚙️ Settings</button>
+        </div>
+    </div>
+
+    <script>
+        function selectSidebarItem(element) {
+            // Remove active class from all items
+            document.querySelectorAll('.sidebar-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            
+            // Add active class to clicked item
+            element.classList.add('active');
+            
+            // Update path bar based on selection
+            const label = element.querySelector('.sidebar-label').textContent;
+            document.querySelector('.path-bar').value = `/home/${label.toLowerCase()}`;
+        }
+
+        function selectFile(element) {
+            // Remove selected class from all items
+            document.querySelectorAll('.file-item').forEach(item => {
+                item.classList.remove('selected');
+            });
+            
+            // Add selected class to clicked item
+            element.classList.add('selected');
+        }
+
+        function goBack() {
+            console.log('Go back clicked');
+        }
+
+        function goForward() {
+            console.log('Go forward clicked');
+        }
+
+        function goUp() {
+            console.log('Go up clicked');
+        }
+
+        function newFolder() {
+            console.log('New folder clicked');
+        }
+
+        function uploadToCloud() {
+            console.log('Upload to cloud clicked');
+        }
+
+        function syncWithCloud() {
+            console.log('Sync with cloud clicked');
+        }
+
+        function listView() {
+            console.log('List view clicked');
+        }
+
+        function gridView() {
+            console.log('Grid view clicked');
+        }
+
+        function handlePathEnter(event) {
+            if (event.key === 'Enter') {
+                console.log('Navigating to:', event.target.value);
+            }
+        }
+
+        function showCloudDialog() {
+            document.getElementById('cloudDialog').classList.add('show');
+        }
+
+        function hideCloudDialog() {
+            document.getElementById('cloudDialog').classList.remove('show');
+        }
+
+        function syncNow() {
+            console.log('Sync now clicked');
+        }
+
+        function uploadFiles() {
+            console.log('Upload files clicked');
+        }
+
+        function cloudSettings() {
+            console.log('Cloud settings clicked');
+        }
+
+        // Close dialog when clicking outside
+        document.addEventListener('click', function(event) {
+            const dialog = document.getElementById('cloudDialog');
+            if (event.target === dialog) {
+                hideCloudDialog();
+            }
+        });
+    </script>
+</body>
+</html> 

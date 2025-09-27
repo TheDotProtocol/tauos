@@ -1,0 +1,22 @@
+apiVersion: 1
+
+notifiers:
+  - name: tauos-email-alerts
+    type: email
+    uid: tauos-email
+    org_id: 1
+    is_default: true
+    settings:
+      addresses: foundationtau@gmail.com
+      subject: "[TauCore Alert] {{ .RuleName }}"
+      message: |
+        Alert: {{ .RuleName }}
+        State: {{ .State }}
+        Description: {{ .RuleMessage }}
+        
+        Dashboard: {{ .DashboardURL }}
+        Panel: {{ .PanelTitle }}
+        
+        Time: {{ .Time }}
+        
+        TauCore Monitoring System

@@ -1,0 +1,24 @@
+{
+  "name": "tauos-desktop-ui",
+  "version": "1.0.0",
+  "description": "TauOS Desktop UI - Hybrid Desktop Interface",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "dev": "nodemon app.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "multer": "^1.4.5-lts.1",
+    "bcrypt": "^5.1.1",
+    "jsonwebtoken": "^9.0.2",
+    "pg": "^8.11.3"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  },
+  "keywords": ["tauos", "desktop", "ui", "operating-system"],
+  "author": "TauOS Team",
+  "license": "MIT"
+}

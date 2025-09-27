@@ -1,0 +1,31 @@
+# Copy these environment variables to your Vercel deployments
+# DO NOT commit this file to git
+
+# MAIN WEBSITE (tauos.org)
+DATABASE_URL=postgresql://postgres.tviqcormikopltejomkc:Ak1233%40%405@aws-0-ap-southeast-1.pooler.supabase.com:5432/postgres
+JWT_SECRET=tauos_super_secure_jwt_secret_2025_production_ready_xyz789
+LOG_LEVEL=info
+NODE_ENV=production
+
+# MAIL BACKEND
+DATABASE_URL=postgresql://postgres.tviqcormikopltejomkc:Ak1233%40%405@aws-0-ap-southeast-1.pooler.supabase.com:5432/postgres
+JWT_SECRET=tauos_super_secure_jwt_secret_2025_production_ready_xyz789
+SENDGRID_API_KEY=your_sendgrid_api_key_here
+SENDGRID_FROM_EMAIL=noreply@tauos.org
+SENDGRID_FROM_NAME=TauOS Mail
+SMTP_HOST=136.244.83.147
+SMTP_PORT=587
+SMTP_SECURE=false
+SMTP_USER=admin@tauos.org
+SMTP_PASS=your_smtp_password_here
+MAX_FILE_SIZE=10485760
+LOG_LEVEL=info
+NODE_ENV=production
+
+# CLOUD BACKEND
+DATABASE_URL=postgresql://postgres.tviqcormikopltejomkc:Ak1233%40%405@aws-0-ap-southeast-1.pooler.supabase.com:5432/postgres
+JWT_SECRET=tauos_super_secure_jwt_secret_2025_production_ready_xyz789
+MAX_FILE_SIZE=104857600
+UPLOAD_DIR=uploads
+LOG_LEVEL=info
+NODE_ENV=production

@@ -1,0 +1,41 @@
+{
+  "version": "1.0.0",
+  "timestamp": "2025-09-11T05:12:46.820Z",
+  "security": {
+    "codeSigning": {
+      "algorithm": "RSA-SHA256",
+      "keySize": 4096,
+      "publicKey": "-----BEGIN PUBLIC KEY-----\nMIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEA2rNijgYiaCfj+jzbABdY\nlKEV0rQWFFWd9aNu0bzP9lPCuTE+O2YK9+oIqAJKrdTtpeIoiEOvFvAbzVQyHDgf\nzxfi/X4VHDKVCuoGya75FqkmW+O3XvT6B91YXeguRpexT75YLq8t2oXvsjbr9FaQ\nAPDeL8qAFIT7OJgpFXdi/IRX50f7JZ54sgcb00WYgKhPnTDrDpRsmmPyh04uJ4fn\ny+0QJLupMpzAiJlYAAhLgL4B/kFgzt9d3ezdP3IC8BfgLbVCMD8N6o0Dwx+r9zJe\naJZwY+zNB2RIlP74pQofpSa2GuZ5rIAgUcf1tGYgoWPlFPTJ8djl+6NckG+sXnPT\nNs+hHbwQNkzl8NwTIp6y8+rPT0bXC0uopj6CrfpPWCr1Fk5+HwwMAZxQ/BJnC6ar\ngPm+1vgsxuy+ljlkBxHwcYR/OTZK5TZP0xTHm7wTtryJRKWpmyZ9NiJ32Zw+hgUm\ndXD7ChvvWfXKADZIVBOTWFANwuAoxcOAYZ3Q0QNWitM01GwEJNyGr9Lmmw6ahI2/\nGCRGtuOIl1B0PWWfk/hWEr881PXuiv1KrHLV41mwn5uMJhDWhd8PpNEaL7mwE26c\n+s7+SnmRGDFAvqpHDU2GuLWeAit87BTOlflsD8gQ8V6iXk4cO0uYNpOZUtuxNLn+\np1quQoAGLmu65l0NaV5RKkUCAwEAAQ==\n-----END PUBLIC KEY-----\n"
+    },
+    "checksums": {
+      "algorithm": "SHA256",
+      "files": {
+        "dist/TauOS Setup 1.0.0.exe": "29dc1b95757624589740a26dfcd96a240488c1c1eeed7f88cd8328256f8c02d5",
+        "dist/TauOS-1.0.0.dmg": "d178cc4d2948fb8ad4d50ca8a57d02f2edbb6c260f319e50b5bfbc600179aeae",
+        "dist/tauos-installer_1.0.0_amd64.deb": "310baaa6d79636b1f6d9ccdcf38516a1b3630e43cd0699f595b4c88d4b8fb0c1"
+      }
+    },
+    "verification": {
+      "integrity": true,
+      "authenticity": true,
+      "timestamp": "2025-09-11T05:12:46.821Z"
+    }
+  },
+  "installer": {
+    "platforms": [
+      "win32",
+      "darwin",
+      "linux"
+    ],
+    "architectures": [
+      "x64",
+      "arm64"
+    ],
+    "securityFeatures": [
+      "Code signing",
+      "Checksum verification",
+      "Integrity checking",
+      "Authenticity verification"
+    ]
+  }
+}

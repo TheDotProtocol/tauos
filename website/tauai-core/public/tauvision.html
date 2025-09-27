@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TauVision - AI-Powered Visual Intelligence</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: white;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .logo {
+            font-size: 3rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .camera-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .camera-container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 20px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .camera-feed {
+            width: 100%;
+            height: 300px;
+            background: #000;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .camera-feed video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .camera-feed canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .camera-controls {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 25px;
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .ai-analysis {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .analysis-item {
+            background: rgba(255, 255, 255, 0.1);
+            margin: 15px 0;
+            padding: 15px;
+            border-radius: 10px;
+            border-left: 4px solid #4ecdc4;
+        }
+
+        .analysis-label {
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: #4ecdc4;
+        }
+
+        .analysis-value {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .feature-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .feature-icon {
+            font-size: 2rem;
+            margin-bottom: 15px;
+        }
+
+        .feature-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .feature-desc {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        .privacy-badge {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(46, 213, 115, 0.2);
+            color: #2ed573;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            border: 1px solid rgba(46, 213, 115, 0.3);
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .loading.show {
+            display: block;
+        }
+
+        .spinner {
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-top: 3px solid #4ecdc4;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 768px) {
+            .camera-section {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="privacy-badge">🔒 100% Local Processing</div>
+    
+    <div class="container">
+        <div class="header">
+            <div class="logo">TauVision</div>
+            <div class="subtitle">AI-Powered Visual Intelligence</div>
+        </div>
+
+        <div class="camera-section">
+            <div class="camera-container">
+                <h3>📷 Live Camera Feed</h3>
+                <div class="camera-feed" id="cameraFeed">
+                    <video id="video" autoplay muted></video>
+                    <canvas id="canvas"></canvas>
+                </div>
+                <div class="camera-controls">
+                    <button class="btn" id="startCamera">Start Camera</button>
+                    <button class="btn" id="capturePhoto" disabled>Capture Photo</button>
+                    <button class="btn" id="analyzeImage" disabled>Analyze Image</button>
+                </div>
+                <div class="loading" id="loading">
+                    <div class="spinner"></div>
+                    <div>Processing image...</div>
+                </div>
+            </div>
+
+            <div class="ai-analysis">
+                <h3>🧠 AI Analysis Results</h3>
+                <div id="analysisResults">
+                    <div class="analysis-item">
+                        <div class="analysis-label">Status</div>
+                        <div class="analysis-value">Ready to analyze images</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">📄</div>
+                <div class="feature-title">OCR Text Recognition</div>
+                <div class="feature-desc">Extract text from any image instantly</div>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">👁️</div>
+                <div class="feature-title">Object Detection</div>
+                <div class="feature-desc">Identify objects, people, and scenes</div>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">♿</div>
+                <div class="feature-title">Accessibility</div>
+                <div class="feature-desc">Describe scenes for visually impaired users</div>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🎯</div>
+                <div class="feature-title">Smart Focus</div>
+                <div class="feature-desc">Auto-focus and composition assistance</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        class TauVision {
+            constructor() {
+                this.video = document.getElementById('video');
+                this.canvas = document.getElementById('canvas');
+                this.ctx = this.canvas.getContext('2d');
+                this.stream = null;
+                this.capturedImage = null;
+                this.setupEventListeners();
+            }
+
+            setupEventListeners() {
+                document.getElementById('startCamera').addEventListener('click', () => this.startCamera());
+                document.getElementById('capturePhoto').addEventListener('click', () => this.capturePhoto());
+                document.getElementById('analyzeImage').addEventListener('click', () => this.analyzeImage());
+            }
+
+            async startCamera() {
+                try {
+                    this.stream = await navigator.mediaDevices.getUserMedia({ 
+                        video: { 
+                            width: 640, 
+                            height: 480,
+                            facingMode: 'environment'
+                        } 
+                    });
+                    
+                    this.video.srcObject = this.stream;
+                    this.video.play();
+                    
+                    document.getElementById('startCamera').disabled = true;
+                    document.getElementById('capturePhoto').disabled = false;
+                    
+                    this.updateAnalysis('Camera started successfully', 'success');
+                } catch (error) {
+                    console.error('Camera error:', error);
+                    this.updateAnalysis('Camera access denied or not available', 'error');
+                }
+            }
+
+            capturePhoto() {
+                if (!this.video.videoWidth) {
+                    this.updateAnalysis('Please start the camera first', 'error');
+                    return;
+                }
+
+                this.canvas.width = this.video.videoWidth;
+                this.canvas.height = this.video.videoHeight;
+                
+                this.ctx.drawImage(this.video, 0, 0);
+                this.capturedImage = this.canvas.toDataURL('image/jpeg');
+                
+                document.getElementById('analyzeImage').disabled = false;
+                this.updateAnalysis('Photo captured successfully! Click "Analyze Image" to process', 'success');
+            }
+
+            async analyzeImage() {
+                if (!this.capturedImage) {
+                    this.updateAnalysis('Please capture a photo first', 'error');
+                    return;
+                }
+
+                this.showLoading(true);
+                
+                try {
+                    // Simulate AI analysis (in production, this would use actual ML models)
+                    const analysis = await this.performAIAnalysis();
+                    this.displayAnalysis(analysis);
+                } catch (error) {
+                    console.error('Analysis error:', error);
+                    this.updateAnalysis('Analysis failed. Please try again.', 'error');
+                } finally {
+                    this.showLoading(false);
+                }
+            }
+
+            async performAIAnalysis() {
+                // Simulate processing time
+                await new Promise(resolve => setTimeout(resolve, 2000));
+                
+                // Mock AI analysis results
+                return {
+                    objects: [
+                        { name: 'Person', confidence: 0.95, boundingBox: { x: 100, y: 50, width: 200, height: 300 } },
+                        { name: 'Mobile Phone', confidence: 0.87, boundingBox: { x: 300, y: 200, width: 80, height: 120 } },
+                        { name: 'Coffee Cup', confidence: 0.73, boundingBox: { x: 50, y: 300, width: 60, height: 80 } }
+                    ],
+                    text: [
+                        { text: 'TauOS', confidence: 0.98, boundingBox: { x: 200, y: 100, width: 100, height: 30 } },
+                        { text: 'Privacy First', confidence: 0.92, boundingBox: { x: 180, y: 130, width: 140, height: 25 } }
+                    ],
+                    scene: 'Office environment with person using mobile device',
+                    colors: ['#667eea', '#764ba2', '#ff6b6b', '#4ecdc4'],
+                    mood: 'Professional and focused',
+                    accessibility: 'Person sitting at desk with mobile phone, appears to be working or studying'
+                };
+            }
+
+            displayAnalysis(analysis) {
+                const resultsContainer = document.getElementById('analysisResults');
+                resultsContainer.innerHTML = '';
+
+                // Objects detected
+                const objectsItem = document.createElement('div');
+                objectsItem.className = 'analysis-item';
+                objectsItem.innerHTML = `
+                    <div class="analysis-label">Objects Detected</div>
+                    <div class="analysis-value">${analysis.objects.map(obj => `${obj.name} (${Math.round(obj.confidence * 100)}%)`).join(', ')}</div>
+                `;
+                resultsContainer.appendChild(objectsItem);
+
+                // Text recognized
+                if (analysis.text.length > 0) {
+                    const textItem = document.createElement('div');
+                    textItem.className = 'analysis-item';
+                    textItem.innerHTML = `
+                        <div class="analysis-label">Text Recognized</div>
+                        <div class="analysis-value">${analysis.text.map(t => t.text).join(', ')}</div>
+                    `;
+                    resultsContainer.appendChild(textItem);
+                }
+
+                // Scene description
+                const sceneItem = document.createElement('div');
+                sceneItem.className = 'analysis-item';
+                sceneItem.innerHTML = `
+                    <div class="analysis-label">Scene Description</div>
+                    <div class="analysis-value">${analysis.scene}</div>
+                `;
+                resultsContainer.appendChild(sceneItem);
+
+                // Mood analysis
+                const moodItem = document.createElement('div');
+                moodItem.className = 'analysis-item';
+                moodItem.innerHTML = `
+                    <div class="analysis-label">Mood Analysis</div>
+                    <div class="analysis-value">${analysis.mood}</div>
+                `;
+                resultsContainer.appendChild(moodItem);
+
+                // Accessibility description
+                const accessibilityItem = document.createElement('div');
+                accessibilityItem.className = 'analysis-item';
+                accessibilityItem.innerHTML = `
+                    <div class="analysis-label">Accessibility Description</div>
+                    <div class="analysis-value">${analysis.accessibility}</div>
+                `;
+                resultsContainer.appendChild(accessibilityItem);
+
+                // Draw bounding boxes on canvas
+                this.drawBoundingBoxes(analysis);
+            }
+
+            drawBoundingBoxes(analysis) {
+                const ctx = this.ctx;
+                ctx.strokeStyle = '#4ecdc4';
+                ctx.lineWidth = 2;
+
+                // Draw object bounding boxes
+                analysis.objects.forEach(obj => {
+                    const box = obj.boundingBox;
+                    ctx.strokeRect(box.x, box.y, box.width, box.height);
+                    ctx.fillStyle = '#4ecdc4';
+                    ctx.font = '12px Arial';
+                    ctx.fillText(`${obj.name} (${Math.round(obj.confidence * 100)}%)`, box.x, box.y - 5);
+                });
+
+                // Draw text bounding boxes
+                analysis.text.forEach(text => {
+                    const box = text.boundingBox;
+                    ctx.strokeStyle = '#ff6b6b';
+                    ctx.strokeRect(box.x, box.y, box.width, box.height);
+                    ctx.fillStyle = '#ff6b6b';
+                    ctx.font = '12px Arial';
+                    ctx.fillText(text.text, box.x, box.y - 5);
+                });
+            }
+
+            updateAnalysis(message, type) {
+                const resultsContainer = document.getElementById('analysisResults');
+                resultsContainer.innerHTML = `
+                    <div class="analysis-item">
+                        <div class="analysis-label">Status</div>
+                        <div class="analysis-value" style="color: ${type === 'error' ? '#ff6b6b' : type === 'success' ? '#2ed573' : '#4ecdc4'}">${message}</div>
+                    </div>
+                `;
+            }
+
+            showLoading(show) {
+                const loading = document.getElementById('loading');
+                if (show) {
+                    loading.classList.add('show');
+                } else {
+                    loading.classList.remove('show');
+                }
+            }
+        }
+
+        // Initialize TauVision when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            new TauVision();
+        });
+    </script>
+</body>
+</html>

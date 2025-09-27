@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TauMail - Email Client</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="design-system/tauos-design-system.css">
+    <style>
+        .taumail-gradient {
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a0f3a 50%, #0a0a0a 100%);
+        }
+        
+        .email-item {
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .email-item:hover {
+            background: rgba(147, 51, 234, 0.1);
+        }
+        
+        .email-item.selected {
+            background: rgba(147, 51, 234, 0.2);
+            border-left: 3px solid #9333ea;
+        }
+        
+        .encrypted-badge {
+            background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+        }
+        
+        .spam-score {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+        }
+        
+        .compose-window {
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
+        }
+        
+        .sidebar-item {
+            transition: all 0.3s ease;
+        }
+        
+        .sidebar-item:hover {
+            background: rgba(147, 51, 234, 0.1);
+        }
+        
+        .sidebar-item.active {
+            background: rgba(147, 51, 234, 0.2);
+            border-left: 3px solid #9333ea;
+        }
+    </style>
+</head>
+<body class="taumail-gradient min-h-screen font-inter">
+    <!-- Top Bar -->
+    <div class="fixed top-0 left-0 right-0 z-50 bg-black/20 backdrop-blur-xl border-b border-gray-800">
+        <div class="flex items-center justify-between px-6 py-4">
+            <!-- Left: App Title and Search -->
+            <div class="flex items-center space-x-6">
+                <div class="flex items-center space-x-3">
+                    <div class="w-8 h-8 bg-purple-600 rounded-lg flex items-center justify-center">
+                        <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                        </svg>
+                    </div>
+                    <h1 class="text-xl font-bold text-white">TauMail</h1>
+                </div>
+                
+                <div class="flex items-center space-x-3 bg-black/30 rounded-xl px-4 py-2">
+                    <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                    </svg>
+                    <input type="text" placeholder="Search emails..." class="bg-transparent text-white placeholder-gray-400 outline-none w-64">
+                </div>
+            </div>
+
+            <!-- Right: Actions -->
+            <div class="flex items-center space-x-4">
+                <button class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg transition-colors flex items-center space-x-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                    </svg>
+                    <span>Compose</span>
+                </button>
+                
+                <div class="flex items-center space-x-2">
+                    <div class="w-2 h-2 bg-green-400 rounded-full"></div>
+                    <span class="text-green-400 text-sm">Secure</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="flex h-screen pt-16">
+        <!-- Sidebar -->
+        <div class="w-64 bg-black/20 backdrop-blur-xl border-r border-gray-800">
+            <div class="p-4">
+                <!-- Navigation -->
+                <div class="space-y-2 mb-8">
+                    <div class="sidebar-item active flex items-center space-x-3 p-3 rounded-lg">
+                        <svg class="w-5 h-5 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path>
+                        </svg>
+                        <span class="text-white font-medium">Inbox</span>
+                        <span class="ml-auto bg-purple-600 text-white text-xs px-2 py-1 rounded-full">3</span>
+                    </div>
+                    
+                    <div class="sidebar-item flex items-center space-x-3 p-3 rounded-lg">
+                        <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
+                        </svg>
+                        <span class="text-gray-300">Sent</span>
+                    </div>
+                    
+                    <div class="sidebar-item flex items-center space-x-3 p-3 rounded-lg">
+                        <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                        </svg>
+                        <span class="text-gray-300">Drafts</span>
+                    </div>
+                    
+                    <div class="sidebar-item flex items-center space-x-3 p-3 rounded-lg">
+                        <svg class="w-5 h-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+                        </svg>
+                        <span class="text-gray-300">TauSafe</span>
+                        <span class="ml-auto bg-green-600 text-white text-xs px-2 py-1 rounded-full">2</span>
+                    </div>
+                    
+                    <div class="sidebar-item flex items-center space-x-3 p-3 rounded-lg">
+                        <svg class="w-5 h-5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                        </svg>
+                        <span class="text-gray-300">Trash</span>
+                    </div>
+                </div>
+
+                <!-- Security Status -->
+                <div class="bg-black/30 rounded-xl p-4 border border-gray-700">
+                    <h3 class="text-white font-semibold mb-3">Security Status</h3>
+                    <div class="space-y-2">
+                        <div class="flex items-center justify-between">
+                            <span class="text-gray-400 text-sm">Encryption</span>
+                            <span class="text-green-400 text-sm">AES-256</span>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <span class="text-gray-400 text-sm">Anti-Spam</span>
+                            <span class="text-green-400 text-sm">Active</span>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <span class="text-gray-400 text-sm">PGP</span>
+                            <span class="text-green-400 text-sm">Enabled</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Email List -->
+        <div class="w-96 bg-black/10 border-r border-gray-800">
+            <div class="p-4">
+                <div class="flex items-center justify-between mb-4">
+                    <h2 class="text-white font-semibold">Inbox</h2>
+                    <span class="text-gray-400 text-sm">3 unread</span>
+                </div>
+                
+                <!-- Email Items -->
+                <div class="space-y-2">
+                    <div class="email-item selected p-4 rounded-lg border border-gray-700">
+                        <div class="flex items-start space-x-3">
+                            <div class="flex-shrink-0">
+                                <div class="w-8 h-8 bg-purple-600 rounded-full flex items-center justify-center">
+                                    <span class="text-white text-sm font-semibold">J</span>
+                                </div>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <div class="flex items-center justify-between">
+                                    <p class="text-white font-medium truncate">John Smith</p>
+                                    <span class="text-gray-400 text-sm">2:30 PM</span>
+                                </div>
+                                <p class="text-gray-300 text-sm truncate">Project update for Q3</p>
+                                <div class="flex items-center space-x-2 mt-2">
+                                    <div class="encrypted-badge text-xs px-2 py-1 rounded-full text-white">🔒 Encrypted</div>
+                                    <div class="spam-score text-xs px-2 py-1 rounded-full text-white">Spam: 0%</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="email-item p-4 rounded-lg border border-gray-700">
+                        <div class="flex items-start space-x-3">
+                            <div class="flex-shrink-0">
+                                <div class="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
+                                    <span class="text-white text-sm font-semibold">S</span>
+                                </div>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <div class="flex items-center justify-between">
+                                    <p class="text-white font-medium truncate">Sarah Johnson</p>
+                                    <span class="text-gray-400 text-sm">1:45 PM</span>
+                                </div>
+                                <p class="text-gray-300 text-sm truncate">Meeting notes from yesterday</p>
+                                <div class="flex items-center space-x-2 mt-2">
+                                    <div class="encrypted-badge text-xs px-2 py-1 rounded-full text-white">🔒 Encrypted</div>
+                                    <div class="spam-score text-xs px-2 py-1 rounded-full text-white">Spam: 0%</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="email-item p-4 rounded-lg border border-gray-700">
+                        <div class="flex items-start space-x-3">
+                            <div class="flex-shrink-0">
+                                <div class="w-8 h-8 bg-green-600 rounded-full flex items-center justify-center">
+                                    <span class="text-white text-sm font-semibold">M</span>
+                                </div>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <div class="flex items-center justify-between">
+                                    <p class="text-white font-medium truncate">Marketing Team</p>
+                                    <span class="text-gray-400 text-sm">12:20 PM</span>
+                                </div>
+                                <p class="text-gray-300 text-sm truncate">New campaign launch details</p>
+                                <div class="flex items-center space-x-2 mt-2">
+                                    <div class="bg-gray-600 text-xs px-2 py-1 rounded-full text-white">Standard</div>
+                                    <div class="spam-score text-xs px-2 py-1 rounded-full text-white">Spam: 5%</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="email-item p-4 rounded-lg border border-gray-700">
+                        <div class="flex items-start space-x-3">
+                            <div class="flex-shrink-0">
+                                <div class="w-8 h-8 bg-yellow-600 rounded-full flex items-center justify-center">
+                                    <span class="text-white text-sm font-semibold">T</span>
+                                </div>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <div class="flex items-center justify-between">
+                                    <p class="text-white font-medium truncate">Tech Support</p>
+                                    <span class="text-gray-400 text-sm">11:15 AM</span>
+                                </div>
+                                <p class="text-gray-300 text-sm truncate">System maintenance notification</p>
+                                <div class="flex items-center space-x-2 mt-2">
+                                    <div class="bg-gray-600 text-xs px-2 py-1 rounded-full text-white">Standard</div>
+                                    <div class="spam-score text-xs px-2 py-1 rounded-full text-white">Spam: 2%</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Email Preview -->
+        <div class="flex-1 bg-black/5">
+            <div class="p-6">
+                <!-- Email Header -->
+                <div class="bg-black/30 backdrop-blur-xl rounded-xl p-6 border border-gray-700 mb-6">
+                    <div class="flex items-start justify-between mb-4">
+                        <div class="flex items-center space-x-4">
+                            <div class="w-12 h-12 bg-purple-600 rounded-full flex items-center justify-center">
+                                <span class="text-white text-lg font-semibold">J</span>
+                            </div>
+                            <div>
+                                <h2 class="text-white text-xl font-semibold">John Smith</h2>
+                                <p class="text-gray-400">john.smith@company.com</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <div class="encrypted-badge text-sm px-3 py-1 rounded-full text-white">🔒 Encrypted</div>
+                            <span class="text-gray-400 text-sm">2:30 PM</span>
+                        </div>
+                    </div>
+                    
+                    <h3 class="text-white text-lg font-medium mb-4">Project update for Q3</h3>
+                    
+                    <!-- Email Content -->
+                    <div class="text-gray-300 leading-relaxed">
+                        <p class="mb-4">Hi team,</p>
+                        <p class="mb-4">I wanted to provide an update on our Q3 project progress. We've made significant strides in the following areas:</p>
+                        <ul class="list-disc list-inside mb-4 space-y-2">
+                            <li>Completed the security audit phase</li>
+                            <li>Implemented new encryption protocols</li>
+                            <li>Deployed the updated user interface</li>
+                            <li>Conducted comprehensive testing</li>
+                        </ul>
+                        <p class="mb-4">The project is currently 85% complete and we're on track to meet our deadline. Please review the attached documents for detailed specifications.</p>
+                        <p class="mb-4">Best regards,<br>John</p>
+                    </div>
+                    
+                    <!-- Attachments -->
+                    <div class="mt-6 pt-6 border-t border-gray-700">
+                        <h4 class="text-white font-medium mb-3">Attachments</h4>
+                        <div class="space-y-2">
+                            <div class="flex items-center space-x-3 p-3 bg-black/20 rounded-lg">
+                                <svg class="w-6 h-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                </svg>
+                                <span class="text-white text-sm">Q3_Project_Report.pdf</span>
+                                <span class="text-gray-400 text-sm">2.4 MB</span>
+                            </div>
+                            <div class="flex items-center space-x-3 p-3 bg-black/20 rounded-lg">
+                                <svg class="w-6 h-6 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                </svg>
+                                <span class="text-white text-sm">Security_Specs.xlsx</span>
+                                <span class="text-gray-400 text-sm">1.8 MB</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="flex items-center space-x-4">
+                    <button class="bg-purple-600 hover:bg-purple-700 text-white px-6 py-2 rounded-lg transition-colors flex items-center space-x-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"></path>
+                        </svg>
+                        <span>Reply</span>
+                    </button>
+                    <button class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg transition-colors flex items-center space-x-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z"></path>
+                        </svg>
+                        <span>Forward</span>
+                    </button>
+                    <button class="bg-gray-600 hover:bg-gray-700 text-white px-6 py-2 rounded-lg transition-colors flex items-center space-x-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                        </svg>
+                        <span>Delete</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Compose Window (Hidden by default) -->
+    <div class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden" id="compose-window">
+        <div class="compose-window absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-2/3 max-w-4xl bg-black/30 rounded-2xl border border-gray-700">
+            <div class="p-6">
+                <div class="flex items-center justify-between mb-6">
+                    <h2 class="text-white text-xl font-semibold">New Message</h2>
+                    <button class="text-gray-400 hover:text-white" onclick="closeCompose()">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+                
+                <div class="space-y-4">
+                    <div>
+                        <label class="text-gray-300 text-sm mb-2 block">To:</label>
+                        <input type="email" class="w-full bg-black/30 border border-gray-600 rounded-lg px-4 py-2 text-white placeholder-gray-400">
+                    </div>
+                    
+                    <div>
+                        <label class="text-gray-300 text-sm mb-2 block">Subject:</label>
+                        <input type="text" class="w-full bg-black/30 border border-gray-600 rounded-lg px-4 py-2 text-white placeholder-gray-400">
+                    </div>
+                    
+                    <div>
+                        <label class="text-gray-300 text-sm mb-2 block">Message:</label>
+                        <textarea rows="10" class="w-full bg-black/30 border border-gray-600 rounded-lg px-4 py-2 text-white placeholder-gray-400 resize-none"></textarea>
+                    </div>
+                    
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center space-x-4">
+                            <button class="bg-purple-600 hover:bg-purple-700 text-white px-6 py-2 rounded-lg transition-colors">
+                                Send
+                            </button>
+                            <button class="bg-gray-600 hover:bg-gray-700 text-white px-6 py-2 rounded-lg transition-colors">
+                                Save Draft
+                            </button>
+                        </div>
+                        
+                        <div class="flex items-center space-x-2">
+                            <div class="encrypted-badge text-sm px-3 py-1 rounded-full text-white">🔒 Encrypt</div>
+                            <div class="bg-gray-600 text-sm px-3 py-1 rounded-full text-white">📎 Attach</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Email item selection
+        document.querySelectorAll('.email-item').forEach(item => {
+            item.addEventListener('click', function() {
+                document.querySelectorAll('.email-item').forEach(i => i.classList.remove('selected'));
+                this.classList.add('selected');
+            });
+        });
+
+        // Sidebar item selection
+        document.querySelectorAll('.sidebar-item').forEach(item => {
+            item.addEventListener('click', function() {
+                document.querySelectorAll('.sidebar-item').forEach(i => i.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+
+        // Compose window functionality
+        function openCompose() {
+            document.getElementById('compose-window').classList.remove('hidden');
+        }
+
+        function closeCompose() {
+            document.getElementById('compose-window').classList.add('hidden');
+        }
+
+        // Compose button
+        document.querySelector('button').addEventListener('click', openCompose);
+
+        // Close compose window when clicking outside
+        document.getElementById('compose-window').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeCompose();
+            }
+        });
+    </script>
+</body>
+</html> 
