@@ -1,14 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { 
-  universalSecurityMiddleware, 
-  verifyJWTSecure, 
-  setSecurityHeaders, 
-  EnterpriseAuth,
-  InputSecurity,
-  logSecurityEvent,
-  QuantumSecurity
-} from '../../../lib/security/universal-security';
 import { Pool } from 'pg';
+import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
 
 // Database connection - enterprise grade security
 const pool = new Pool({
@@ -20,35 +13,15 @@ const pool = new Pool({
 });
 
 export async function POST(request: NextRequest) {
-  const clientIP = request.ip || request.headers.get('x-forwarded-for') || 'unknown';
-  
   try {
-    // 🛡️ UNIVERSAL SECURITY MIDDLEWARE
-    const securityResponse = await universalSecurityMiddleware(request);
-    if (securityResponse) return securityResponse;
-
     const { email, password } = await request.json();
 
-    // 🔐 ENTERPRISE INPUT VALIDATION
+    // Basic input validation
     if (!email || !password) {
       return NextResponse.json({ error: 'Email and password are required' }, { status: 400 });
     }
 
-    if (!InputSecurity.validateEmail(email)) {
-      return NextResponse.json({ error: 'Invalid email format' }, { status: 400 });
-    }
-
-    // 🚨 RATE LIMITING CHECK
-    const rateLimitCheck = EnterpriseAuth.checkRateLimit(clientIP, 'taucloud-login');
-    if (!rateLimitCheck.allowed) {
-      logSecurityEvent('RATE_LIMIT_EXCEEDED', { endpoint: 'taucloud-login' }, request);
-      return NextResponse.json({ 
-        error: `Too many login attempts. Try again in ${rateLimitCheck.remainingTime} minutes.` 
-      }, { status: 429 });
-    }
-
-    // 🧹 SANITIZE INPUTS
-    const sanitizedEmail = InputSecurity.sanitize(email.toLowerCase().trim());
+    const sanitizedEmail = email.toLowerCase().trim();
 
     // 🔍 ENHANCED USER QUERY WITH ORGANIZATION INFO
     const result = await pool.query(
@@ -61,35 +34,28 @@ export async function POST(request: NextRequest) {
     );
 
     if (result.rows.length === 0) {
-      logSecurityEvent('FAILED_LOGIN_ATTEMPT', { email: sanitizedEmail, clientIP }, request);
       return NextResponse.json({ error: 'Invalid credentials' }, { status: 401 });
     }
 
     const user = result.rows[0];
 
     if (!user.is_active) {
-      logSecurityEvent('LOGIN_DEACTIVATED_ACCOUNT', { email: sanitizedEmail, clientIP }, request);
       return NextResponse.json({ error: 'Account is deactivated' }, { status: 401 });
     }
 
-    // 🔐 QUANTUM-RESISTANT PASSWORD VERIFICATION
-    const isValidPassword = await QuantumSecurity.verifyPassword(password, user.password_hash);
+    // Password verification
+    const isValidPassword = await bcrypt.compare(password, user.password_hash);
     if (!isValidPassword) {
-      logSecurityEvent('INVALID_PASSWORD_ATTEMPT', { email: sanitizedEmail, clientIP }, request);
       return NextResponse.json({ error: 'Invalid credentials' }, { status: 401 });
     }
 
-    // 🎯 CLEAR FAILED ATTEMPTS ON SUCCESS
-    const rateLimitKey = `${clientIP}:taucloud-login`;
-    // Clear from rate limit store on successful login
-
-    // 📊 UPDATE LAST LOGIN
+    // Update last login
     await pool.query(
-      'UPDATE users SET last_login = CURRENT_TIMESTAMP WHERE id = $1',
+      'UPDATE users SET last_login_at = CURRENT_TIMESTAMP WHERE id = $1',
       [user.id]
     );
 
-    // 🔐 ENHANCED JWT TOKEN WITH QUANTUM SECURITY
+    // Create JWT token
     const jwtSecret = process.env.JWT_SECRET_TAUCLOUD || 'tauos-taucloud-jwt-secret-2025-launch-b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0';
     const token = jwt.sign(
       { 
@@ -97,23 +63,13 @@ export async function POST(request: NextRequest) {
         email: user.email, 
         username: user.username, 
         app: 'taucloud',
-        organizationId: user.organization_id,
-        iat: Math.floor(Date.now() / 1000),
-        securityLevel: 'enterprise'
+        organizationId: user.organization_id
       },
       jwtSecret,
       { expiresIn: '24h' }
     );
 
-    // 📝 LOG SUCCESSFUL LOGIN
-    logSecurityEvent('SUCCESSFUL_LOGIN', { 
-      userId: user.id, 
-      email: user.email, 
-      app: 'taucloud',
-      clientIP 
-    }, request);
-
-    const response = NextResponse.json({
+    return NextResponse.json({
       message: 'Login successful',
       token,
       user: {
@@ -129,20 +85,8 @@ export async function POST(request: NextRequest) {
       }
     });
 
-    // 🛡️ APPLY SECURITY HEADERS
-    setSecurityHeaders(response);
-    return response;
-
   } catch (error) {
     console.error('TauCloud Login Error:', error);
-    
-    // 🚨 ENHANCED ERROR LOGGING
-    logSecurityEvent('LOGIN_ERROR', { 
-      error: error.message,
-      stack: error.stack,
-      clientIP,
-      app: 'taucloud'
-    }, request);
     
     return NextResponse.json({ 
       error: 'Internal server error',

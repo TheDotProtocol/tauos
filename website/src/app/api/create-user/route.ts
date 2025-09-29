@@ -8,9 +8,6 @@ const pool = new Pool({
   ssl: {
     rejectUnauthorized: false
   }
-  ssl: {
-    rejectUnauthorized: false
-  }
 });
 
 export async function POST(request: NextRequest) {
