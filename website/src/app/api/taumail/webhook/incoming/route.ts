@@ -15,6 +15,8 @@ export async function POST(request: NextRequest) {
     const emailData = await request.json();
     
     console.log('📨 Incoming Email Webhook:', JSON.stringify(emailData, null, 2));
+    console.log('📨 Webhook called at:', new Date().toISOString());
+    console.log('📨 Request headers:', Object.fromEntries(request.headers.entries()));
 
     // Extract email details from SendGrid webhook format
     const {
