@@ -46,7 +46,7 @@ export default function TauMailSent() {
       
       if (response.ok) {
         const data = await response.json();
-        setSentEmails(data);
+        setSentEmails(data.emails || []);
       } else {
         console.log('No sent emails endpoint available');
         setSentEmails([]);
