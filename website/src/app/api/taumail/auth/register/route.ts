@@ -143,6 +143,28 @@ export async function POST(request: NextRequest) {
       { expiresIn: '24h' }
     );
 
+    // Send welcome email to new user
+    try {
+      const welcomeResponse = await fetch(`${process.env.NEXT_PUBLIC_TAUMAIL_API_URL || 'https://www.tauos.org/api'}/taumail/welcome`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          userEmail: user.email,
+          userName: user.full_name
+        })
+      });
+      
+      if (welcomeResponse.ok) {
+        console.log(`✅ Welcome email sent to ${user.email}`);
+      } else {
+        console.log(`⚠️ Welcome email failed for ${user.email}`);
+      }
+    } catch (welcomeError) {
+      console.log(`⚠️ Welcome email error for ${user.email}:`, welcomeError.message);
+    }
+
     const responseTime = Date.now() - startTime;
     trackMetrics('taumail', '/api/taumail/auth/register', responseTime, 200);
 
