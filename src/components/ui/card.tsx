@@ -1,6 +1,5 @@
 import React from "react";
 import { cn } from "@/lib/utils";
-import { motion } from "framer-motion";
 
 interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
   variant?: "default" | "glass" | "elevated";
@@ -16,18 +15,17 @@ const Card = React.forwardRef<HTMLDivElement, CardProps>(
     };
 
     return (
-      <motion.div
+      <div
         ref={ref}
         className={cn(
           "p-6 transition-all duration-200",
           variants[variant],
           className
         )}
-        whileHover={variant === "elevated" ? { y: -2 } : {}}
         {...props}
       >
         {children}
-      </motion.div>
+      </div>
     );
   }
 );

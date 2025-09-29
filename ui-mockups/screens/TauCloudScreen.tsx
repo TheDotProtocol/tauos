@@ -9,7 +9,7 @@ import {
   ArchiveBoxIcon,
   MagnifyingGlassIcon,
   PlusIcon,
-  UploadIcon,
+  ArrowUpTrayIcon,
   ShareIcon,
   TrashIcon,
   StarIcon,
@@ -17,10 +17,10 @@ import {
   LockClosedIcon,
   UserCircleIcon,
   Cog6ToothIcon,
-  GridIcon,
-  ListIcon,
-  SortAscendingIcon,
-  SortDescendingIcon,
+  Squares2X2Icon,
+  Bars3Icon,
+  ChevronUpIcon,
+  ChevronDownIcon,
   CalendarIcon,
   ClockIcon,
   DocumentIcon,
@@ -172,7 +172,7 @@ const TauCloudScreen: React.FC = () => {
             onClick={handleUpload}
             disabled={isUploading}
           >
-            <UploadIcon className="w-5 h-5 mr-2" />
+            <ArrowUpTrayIcon className="w-5 h-5 mr-2" />
             {isUploading ? 'Uploading...' : 'Upload Files'}
           </TauOSButton>
         </div>
@@ -254,14 +254,14 @@ const TauCloudScreen: React.FC = () => {
           
           <div className="flex items-center space-x-2">
             <TauOSButton variant="ghost" size="sm">
-              <SortAscendingIcon className="w-4 h-4" />
+              <ChevronUpIcon className="w-4 h-4" />
             </TauOSButton>
             <TauOSButton 
               variant="ghost" 
               size="sm"
               onClick={() => setViewMode(viewMode === 'grid' ? 'list' : 'grid')}
             >
-              {viewMode === 'grid' ? <ListIcon className="w-4 h-4" /> : <GridIcon className="w-4 h-4" />}
+              {viewMode === 'grid' ? <Bars3Icon className="w-4 h-4" /> : <Squares2X2Icon className="w-4 h-4" />}
             </TauOSButton>
             <TauOSButton variant="ghost" size="sm">
               <Cog6ToothIcon className="w-4 h-4" />
@@ -280,7 +280,7 @@ const TauCloudScreen: React.FC = () => {
                   New Folder
                 </TauOSButton>
                 <TauOSButton variant="ghost" size="sm">
-                  <UploadIcon className="w-4 h-4 mr-2" />
+                  <ArrowUpTrayIcon className="w-4 h-4 mr-2" />
                   Upload
                 </TauOSButton>
               </div>

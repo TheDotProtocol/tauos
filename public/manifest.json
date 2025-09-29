@@ -1,15 +1,15 @@
 {
   "name": "TauOS Mail",
   "short_name": "TauMail",
-  "description": "Privacy-first email client for TauOS",
-  "start_url": "/apps/mail",
+  "description": "Privacy-focused email service by TauOS",
+  "start_url": "/taumail",
   "display": "standalone",
-  "background_color": "#000000",
-  "theme_color": "#0066cc",
+  "background_color": "#ffffff",
+  "theme_color": "#000000",
   "icons": [
     {
       "src": "/favicon.ico",
-      "sizes": "64x64 32x32 24x24 16x16",
+      "sizes": "16x16 32x32 48x48",
       "type": "image/x-icon"
     }
   ]

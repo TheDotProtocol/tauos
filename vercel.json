@@ -1,81 +1,11 @@
 {
-  "redirects": [
-    {
-      "source": "/",
-      "destination": "https://tauos.org/taumail",
-      "has": [
-        {
-          "type": "host",
-          "value": "mail.tauos.org"
-        }
-      ],
-      "permanent": false
-    },
-    {
-      "source": "/",
-      "destination": "https://tauos.org/taucloud",
-      "has": [
-        {
-          "type": "host",
-          "value": "cloud.tauos.org"
-        }
-      ],
-      "permanent": false
-    },
-    {
-      "source": "/",
-      "destination": "https://www.tauos.org/tauid",
-      "has": [
-        {
-          "type": "host",
-          "value": "id.tauos.org"
-        }
-      ],
-      "permanent": false
-    },
-    {
-      "source": "/",
-      "destination": "https://tauos-store-backend.vercel.app",
-      "has": [
-        {
-          "type": "host",
-          "value": "store.tauos.org"
-        }
-      ],
-      "permanent": false
-    },
-    {
-      "source": "/",
-      "destination": "https://tauos-nmlq.vercel.app",
-      "has": [
-        {
-          "type": "host",
-          "value": "browser.tauos.org"
-        }
-      ],
-      "permanent": false
-    },
-    {
-      "source": "/",
-      "destination": "https://tauos-desktop-demo.vercel.app",
-      "has": [
-        {
-          "type": "host",
-          "value": "desktop.tauos.org"
-        }
-      ],
-      "permanent": false
-    },
-    {
-      "source": "/",
-      "destination": "https://tauos-mobile-demo.vercel.app",
-      "has": [
-        {
-          "type": "host",
-          "value": "mobile.tauos.org"
-        }
-      ],
-      "permanent": false
-    }
-  ]
-}
+  "version": 2,
+  "framework": "nextjs",
+  "buildCommand": "npm run build",
+  "installCommand": "npm install",
+  "outputDirectory": ".next",
+  "public": true,
+  "env": {
+    "NEXT_PUBLIC_SITE_URL": "https://tauos.org"
+  }
+} 
