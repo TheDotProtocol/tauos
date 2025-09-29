@@ -5,20 +5,17 @@ import { Pool } from 'pg';
 
 // Database connection - production ready with enhanced error handling
 const pool = new Pool({
-  connectionString: process.env.DATABASE_URL || 'postgresql://postgres.tviqcormikopltejomkc:Ak1233%40%405@aws-0-ap-southeast-1.pooler.supabase.com:5432/postgres?sslmode=require',
-  ssl: {
-    rejectUnauthorized: false
-  },
+  connectionString: process.env.DATABASE_URL || 'postgresql://postgres.tviqcormikopltejomkc:Ak1233%40%405@aws-0-ap-southeast-1.pooler.supabase.com:5432/postgres?sslmode=disable',
   max: 20,
   idleTimeoutMillis: 30000,
   connectionTimeoutMillis: 2000,
 });
 
-// Rate limiting for login attempts
+// Rate limiting for login attempts - Enterprise optimized
 const loginAttempts = new Map<string, { count: number; resetTime: number; lastAttempt: number }>();
 const LOGIN_RATE_LIMIT_WINDOW = 15 * 60 * 1000; // 15 minutes
-const MAX_LOGIN_ATTEMPTS = 5;
-const LOCKOUT_DURATION = 30 * 60 * 1000; // 30 minutes
+const MAX_LOGIN_ATTEMPTS = 20; // Increased for enterprise load
+const LOCKOUT_DURATION = 5 * 60 * 1000; // Reduced to 5 minutes
 
 function checkLoginRateLimit(ip: string, email: string): { allowed: boolean; remainingTime?: number } {
   const now = Date.now();
@@ -130,7 +127,7 @@ export async function POST(request: NextRequest) {
 
     // Update last login
     await pool.query(
-      'UPDATE users SET last_login = CURRENT_TIMESTAMP WHERE id = $1',
+      'UPDATE users SET last_login_at = CURRENT_TIMESTAMP WHERE id = $1',
       [user.id]
     );
 

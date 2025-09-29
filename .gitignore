@@ -1,36 +1,74 @@
-# Environment variables
+# TauOS Production .gitignore
+
+# Environment variables and secrets
 .env
 .env.local
-.env.development.local
-.env.test.local
-.env.production.local
-env/
+.env.production
+.env.development
+*.env
+*secret*
+*password*
+*key*
 
-# Dependencies
+# Database files
+*.sql
+*.db
+*.sqlite
+
+# Test files
+*test*.js
+*verification*.js
+*create*.js
+*verify*.js
+*check*.js
+
+# Documentation with sensitive info
+TAUOS_EMAIL_ACCOUNTS.md
+SECURITY_*.md
+STATUS.md
+RELEASE_*.md
+ROLLBACK.md
+RUNBOOK.md
+
+# Node modules
 node_modules/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
-# Next.js
+# Build outputs
 .next/
 out/
 build/
-
-# Production
 dist/
 
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Logs
+*.log
+logs/
+
 # Runtime data
-pids
+pids/
 *.pid
 *.seed
 *.pid.lock
 
 # Coverage directory used by tools like istanbul
 coverage/
-
-# nyc test coverage
-.nyc_output
 
 # Dependency directories
 jspm_packages/
@@ -78,107 +116,6 @@ jspm_packages/
 # Stores VSCode versions used for testing VSCode extensions
 .vscode-test
 
-# IDE
-.vscode/
-.idea/
-*.swp
-*.swo
-
-# OS
-.DS_Store
-Thumbs.db
-
-# Logs
-logs
-*.log
-
-# Database
-*.db
-*.sqlite
-
-# Temporary files
+# Temporary folders
 tmp/
 temp/
-
-# Monitoring data
-monitoring/grafana/data/
-monitoring/prometheus/data/
-
-# Docker
-docker-compose.override.yml
-
-# Sensitive documentation
-docs/sensitive/
-docs/private/
-
-# API keys and secrets
-*.key
-*.pem
-*.p12
-*.pfx
-
-# Backup files
-*.bak
-*.backup
-
-# Test results
-test_results_*.json
-coverage/
-
-# Python
-__pycache__/
-*.py[cod]
-*$py.class
-*.so
-.Python
-env/
-venv/
-ENV/
-env.bak/
-venv.bak/
-
-# Jupyter Notebook
-.ipynb_checkpoints
-
-# pyenv
-.python-version
-
-# pipenv
-Pipfile.lock
-
-# PEP 582
-__pypackages__/
-
-# Celery stuff
-celerybeat-schedule
-celerybeat.pid
-
-# SageMath parsed files
-*.sage.py
-
-# Environments
-.env
-.venv
-env/
-venv/
-ENV/
-env.bak/
-venv.bak/
-
-# Spyder project settings
-.spyderproject
-.spyproject
-
-# Rope project settings
-.ropeproject
-
-# mkdocs documentation
-/site
-
-# mypy
-.mypy_cache/
-.dmypy.json
-dmypy.json
-
-# Pyre type checker
-.pyre/

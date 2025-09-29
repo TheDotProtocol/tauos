@@ -3,12 +3,12 @@ import { Pool } from 'pg';
 import jwt from 'jsonwebtoken';
 import sgMail from '@sendgrid/mail';
 
-// Database connection - production ready
+// Database connection - production ready with enhanced error handling
 const pool = new Pool({
-  connectionString: process.env.DATABASE_URL || 'postgresql://postgres.tviqcormikopltejomkc:Ak1233%40%405@aws-0-ap-southeast-1.pooler.supabase.com:5432/postgres?sslmode=require',
-  ssl: {
-    rejectUnauthorized: false
-  }
+  connectionString: process.env.DATABASE_URL || 'postgresql://postgres.tviqcormikopltejomkc:Ak1233%40%405@aws-0-ap-southeast-1.pooler.supabase.com:5432/postgres?sslmode=disable',
+  max: 20,
+  idleTimeoutMillis: 30000,
+  connectionTimeoutMillis: 2000,
 });
 
 // Initialize SendGrid
@@ -27,7 +27,7 @@ export async function POST(request: NextRequest) {
     const token = authHeader.substring(7);
     
     // Verify token
-    const jwtSecret = process.env.JWT_SECRET || 'tauos-prod-jwt-secret-2025-launch-a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6';
+    const jwtSecret = process.env.JWT_SECRET_TAUMAIL || 'tauos-taumail-jwt-secret-2025-launch-a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6';
     const decoded = jwt.verify(token, jwtSecret) as any;
     
     const { to, subject, body, cc, bcc } = await request.json();
