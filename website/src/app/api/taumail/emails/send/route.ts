@@ -57,7 +57,7 @@ export async function POST(request: NextRequest) {
     }
 
     const user = userResult.rows[0];
-    const fromEmail = user.email || `${user.username}@tauos.org`;
+    const fromEmail = user.email || `saleena@tauos.org`;
 
     // Prepare SendGrid email message
     const msg = {
