@@ -4,8 +4,18 @@ import jwt from 'jsonwebtoken';
 import sgMail from '@sendgrid/mail';
 
 // Database connection - production ready with enhanced error handling
+const connectionString = process.env.DATABASE_URL || 'postgresql://postgres.tviqcormikopltejomkc:Ak1233%40%405@aws-0-ap-southeast-1.pooler.supabase.com:5432/postgres?sslmode=disable';
+
+// Force sslmode=disable for production
+const finalConnectionString = connectionString.includes('sslmode=') 
+  ? connectionString.replace(/sslmode=[^&]*/, 'sslmode=disable')
+  : connectionString + (connectionString.includes('?') ? '&' : '?') + 'sslmode=disable';
+
 const pool = new Pool({
-  connectionString: process.env.DATABASE_URL || 'postgresql://postgres.tviqcormikopltejomkc:Ak1233%40%405@aws-0-ap-southeast-1.pooler.supabase.com:5432/postgres?sslmode=disable',
+  connectionString: finalConnectionString,
+  ssl: {
+    rejectUnauthorized: false
+  },
   max: 20,
   idleTimeoutMillis: 30000,
   connectionTimeoutMillis: 2000,

@@ -7,7 +7,7 @@ export const dynamic = 'force-dynamic';
 
 // Database connection - production ready with enhanced error handling
 const pool = new Pool({
-  connectionString: process.env.DATABASE_URL || 'postgresql://postgres.tviqcormikopltejomkc:Ak1233%40%405@aws-0-ap-southeast-1.pooler.supabase.com:5432/postgres?sslmode=disable',
+  connectionString = process.env.DATABASE_URL || 'postgresql://postgres.tviqcormikopltejomkc:Ak1233%40%405@aws-0-ap-southeast-1.pooler.supabase.com:5432/postgres?sslmode=disable',
   max: 20,
   idleTimeoutMillis: 30000,
   connectionTimeoutMillis: 2000,
