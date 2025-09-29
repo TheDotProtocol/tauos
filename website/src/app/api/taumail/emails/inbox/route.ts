@@ -55,7 +55,7 @@ export async function GET(request: NextRequest) {
        WHERE ie.user_id = $1
        ORDER BY ie.received_at DESC
        LIMIT 50`,
-      [decoded.userId]
+      [userId]
     );
 
     // Return inbox emails
