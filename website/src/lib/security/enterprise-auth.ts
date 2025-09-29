@@ -77,7 +77,7 @@ export class MFASecurity {
   private static readonly TOTP_PERIOD = 30;
 
   static generateSecret(): string {
-    return crypto.randomBytes(32).toString('base32');
+    return crypto.randomBytes(32).toString('base64');
   }
 
   static generateQRCodeURL(user: string, secret: string): string {
