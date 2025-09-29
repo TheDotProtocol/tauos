@@ -5,7 +5,7 @@ import jwt from 'jsonwebtoken';
 
 // Database connection - enterprise grade security
 const pool = new Pool({
-  connectionString: process.env.DATABASE_URL || 'postgresql://postgres.tviqcormikopltejomkc:Ak1233%40%405@aws-0-ap-southeast-1.pooler.supabase.com:5432/postgres?sslmode=require',
+  connectionString: process.env.DATABASE_URL || 'postgresql://postgres.tviqcormikopltejomkc:Ak1233%40%405@aws-0-ap-southeast-1.pooler.supabase.com:5432/postgres?sslmode=disable',
   ssl: { rejectUnauthorized: false },
   max: 20,
   idleTimeoutMillis: 30000,
