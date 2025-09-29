@@ -114,6 +114,30 @@ export default function TauMailInbox() {
     window.location.href = '/taumail';
   };
 
+  const markAsRead = async (emailId) => {
+    try {
+      const token = localStorage.getItem('tauos_token');
+      const response = await fetch('/api/taumail/emails/mark-read', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ emailId })
+      });
+      
+      if (response.ok) {
+        // Update local state
+        setEmails(emails.map(email => 
+          email.id === emailId ? { ...email, unread: false } : email
+        ));
+        console.log('Email marked as read');
+      }
+    } catch (error) {
+      console.error('Error marking email as read:', error);
+    }
+  };
+
   const filteredEmails = emails.filter(email => 
     email.subject.toLowerCase().includes(searchQuery.toLowerCase()) ||
     email.from.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -260,6 +284,15 @@ export default function TauMailInbox() {
                       </p>
                     </div>
                     <div className="flex items-center space-x-2">
+                      {email.unread && (
+                        <button 
+                          onClick={() => markAsRead(email.id)}
+                          className="p-1 text-yellow-400 hover:text-yellow-300 transition-colors"
+                          title="Mark as read"
+                        >
+                          <CheckCircle className="w-4 h-4" />
+                        </button>
+                      )}
                       <button className="p-1 text-gray-400 hover:text-white transition-colors">
                         <Reply className="w-4 h-4" />
                       </button>
