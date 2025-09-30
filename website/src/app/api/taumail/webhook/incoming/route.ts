@@ -45,7 +45,7 @@ export async function POST(request: NextRequest) {
       // Handle JSON requests (manual simulation)
       emailData = await request.json();
       console.log('📨 JSON Email Data:', JSON.stringify(emailData, null, 2));
-    } else {
+    } else if (contentType?.includes('multipart/form-data')) {
       // Handle multipart/form-data from SendGrid Inbound Parse
       const formData = await request.formData();
       emailData = {
@@ -61,6 +61,51 @@ export async function POST(request: NextRequest) {
         envelope: formData.get('envelope')
       };
       console.log('📨 Multipart Email Data:', JSON.stringify(emailData, null, 2));
+    } else if (contentType?.includes('application/x-www-form-urlencoded')) {
+      // Handle URL-encoded form data
+      const formData = await request.formData();
+      emailData = {
+        from: formData.get('from'),
+        to: formData.get('to'),
+        subject: formData.get('subject'),
+        text: formData.get('text'),
+        html: formData.get('html'),
+        headers: formData.get('headers'),
+        attachments: formData.get('attachments'),
+        spam_score: formData.get('spam_score'),
+        spam_report: formData.get('spam_report'),
+        envelope: formData.get('envelope')
+      };
+      console.log('📨 URL-Encoded Email Data:', JSON.stringify(emailData, null, 2));
+    } else {
+      // Handle raw email content
+      const rawEmail = await request.text();
+      console.log('📨 Raw Email Content:', rawEmail.substring(0, 200) + '...');
+      
+      // Simple parsing of raw email
+      const lines = rawEmail.split('\n');
+      let from = '';
+      let to = '';
+      let subject = '';
+      let body = '';
+      let inBody = false;
+
+      for (const line of lines) {
+        if (line.startsWith('From:')) {
+          from = line.replace('From:', '').trim();
+        } else if (line.startsWith('To:')) {
+          to = line.replace('To:', '').trim();
+        } else if (line.startsWith('Subject:')) {
+          subject = line.replace('Subject:', '').trim();
+        } else if (line.trim() === '') {
+          inBody = true;
+        } else if (inBody) {
+          body += line + '\n';
+        }
+      }
+
+      emailData = { from, to, subject, text: body.trim() };
+      console.log('📨 Parsed Raw Email:', JSON.stringify(emailData, null, 2));
     }
 
     // Extract email details from SendGrid webhook format
