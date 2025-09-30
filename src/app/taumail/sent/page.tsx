@@ -46,7 +46,7 @@ export default function TauMailSent() {
       
       if (response.ok) {
         const data = await response.json();
-        setSentEmails(data);
+        setSentEmails(data.emails || []);
       } else {
         console.log('No sent emails endpoint available');
         setSentEmails([]);
@@ -66,9 +66,9 @@ export default function TauMailSent() {
   };
 
   const filteredEmails = sentEmails.filter(email => 
-    email.subject.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    email.to.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    email.text.toLowerCase().includes(searchQuery.toLowerCase())
+    email.subject?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    email.recipient_email?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    email.body?.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   if (!isLoggedIn) {
@@ -196,7 +196,7 @@ export default function TauMailSent() {
                     <div className="flex-shrink-0">
                       <div className="w-10 h-10 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full flex items-center justify-center">
                         <span className="text-black font-semibold text-sm">
-                          {email.to.charAt(0).toUpperCase()}
+                          {email.recipient_email?.charAt(0).toUpperCase() || '?'}
                         </span>
                       </div>
                     </div>
@@ -204,19 +204,19 @@ export default function TauMailSent() {
                       <div className="flex items-center justify-between">
                         <div className="flex items-center space-x-2">
                           <p className="font-medium text-gray-300">
-                            To: {email.to}
+                            To: {email.recipient_email}
                           </p>
                           <div className="w-2 h-2 bg-green-500 rounded-full" title="Sent successfully"></div>
                         </div>
                         <p className="text-sm text-gray-400">
-                          {new Date(email.sentAt).toLocaleString()}
+                          {new Date(email.sent_at).toLocaleString()}
                         </p>
                       </div>
                       <p className="text-sm mt-1 text-white font-medium">
                         {email.subject}
                       </p>
                       <p className="text-sm text-gray-500 mt-1 truncate">
-                        {email.text.substring(0, 100)}...
+                        {email.body?.substring(0, 100)}...
                       </p>
                     </div>
                     <div className="flex items-center space-x-2">
@@ -261,19 +261,19 @@ export default function TauMailSent() {
               <div className="flex items-center space-x-4">
                 <div className="w-12 h-12 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full flex items-center justify-center">
                   <span className="text-black font-semibold text-lg">
-                    {selectedEmail.to.charAt(0).toUpperCase()}
+                    {selectedEmail.recipient_email?.charAt(0).toUpperCase() || '?'}
                   </span>
                 </div>
                 <div>
-                  <p className="text-white font-semibold">To: {selectedEmail.to}</p>
+                  <p className="text-white font-semibold">To: {selectedEmail.recipient_email}</p>
                   <p className="text-gray-400 text-sm">
-                    Sent: {new Date(selectedEmail.sentAt).toLocaleString()}
+                    Sent: {new Date(selectedEmail.sent_at).toLocaleString()}
                   </p>
                 </div>
               </div>
 
               <div className="border-t border-gray-800 pt-4">
-                <p className="text-gray-300 leading-relaxed whitespace-pre-wrap">{selectedEmail.text}</p>
+                <p className="text-gray-300 leading-relaxed whitespace-pre-wrap">{selectedEmail.body}</p>
               </div>
 
               <div className="flex space-x-3 pt-4">
