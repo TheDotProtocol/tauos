@@ -7,7 +7,7 @@ This guide explains how to configure SendGrid webhooks to handle incoming emails
 
 ### 1. Webhook URL
 ```
-https://taumail-backend.vercel.app/api/v2/webhook/incoming
+https://www.tauos.org/api/taumail/webhook/incoming
 ```
 
 ### 2. SendGrid Dashboard Setup
@@ -17,7 +17,7 @@ https://taumail-backend.vercel.app/api/v2/webhook/incoming
 4. Configure the following:
 
 **Hostname:** `mail.tauos.org` (or your domain)
-**URL:** `https://taumail-backend.vercel.app/api/v2/webhook/incoming`
+**URL:** `https://www.tauos.org/api/taumail/webhook/incoming`
 **Spam Check:** ✅ Enabled
 **Send Raw:** ✅ Enabled
 
@@ -44,7 +44,7 @@ TTL: 3600
 ### 4. Webhook Event Configuration
 In SendGrid Dashboard → **Settings** → **Webhooks** → **Event Webhook**:
 
-**HTTP POST URL:** `https://taumail-backend.vercel.app/api/v2/webhook/incoming`
+**HTTP POST URL:** `https://www.tauos.org/api/taumail/webhook/incoming`
 **Events to Send:**
 - ✅ Delivered
 - ✅ Processed
@@ -54,7 +54,7 @@ In SendGrid Dashboard → **Settings** → **Webhooks** → **Event Webhook**:
 
 #### Test with curl:
 ```bash
-curl -X POST https://taumail-backend.vercel.app/api/v2/webhook/incoming \
+curl -X POST https://www.tauos.org/api/taumail/webhook/incoming \
   -H "Content-Type: application/json" \
   -d '{
     "from": "test@example.com",
@@ -106,7 +106,7 @@ SENDGRID_API_KEY=SG.YOUR_SENDGRID_API_KEY_HERE.e6ZWQceUGnGkI9C9xQu4zmd0NbI5Zh1WZ
 ### Debug Commands:
 ```bash
 # Check webhook status
-curl https://taumail-backend.vercel.app/api/v2/webhook/incoming
+curl https://www.tauos.org/api/taumail/webhook/incoming
 
 # Test email sending
 curl -X POST https://tauos.vercel.app/api/taumail/emails/send \

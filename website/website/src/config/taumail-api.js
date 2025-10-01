@@ -22,11 +22,11 @@ const API_CONFIG = {
   nextjs: {
     baseUrl: '',
     endpoints: {
-      inbox: '/api/v2/emails/inbox',
-      sent: '/api/v2/emails/sent',
-      send: '/api/v2/emails/send',
-      webhook: '/api/v2/webhook/incoming',
-      health: '/api/v2/health'
+      inbox: '/api/taumail/emails/inbox',
+      sent: '/api/taumail/emails/sent',
+      send: '/api/taumail/emails/send',
+      webhook: '/api/taumail/webhook/incoming',
+      health: '/api/health'
     }
   }
 };
