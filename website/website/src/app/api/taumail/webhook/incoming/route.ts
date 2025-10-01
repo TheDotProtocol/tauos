@@ -133,6 +133,10 @@ export async function POST(request: NextRequest) {
         .replace(/--\d+[a-f0-9]+/g, '') // Remove MIME boundaries
         .replace(/Content-Type:.*?charset="UTF-8"/g, '') // Remove content type headers
         .replace(/Content-Transfer-Encoding:.*?\n/g, '') // Remove transfer encoding
+        .replace(/Content-Type: text\/plain; charset="UTF-8"/g, '') // Remove specific content type
+        .replace(/Content-Type: text\/html; charset="UTF-8"/g, '') // Remove HTML content type
+        .replace(/--\d+[a-f0-9]+--/g, '') // Remove MIME boundary endings
+        .replace(/^\s*$/gm, '') // Remove empty lines
         .trim();
 
       emailData = { from, to, subject, text: body };
@@ -185,6 +189,12 @@ export async function POST(request: NextRequest) {
     } else if (from.includes('@')) {
       // Format: "email@domain.com"
       fromEmail = from.trim();
+      senderName = fromEmail.split('@')[0]; // Use email prefix as name
+    }
+    
+    // If no sender name extracted, use email prefix
+    if (!senderName) {
+      senderName = fromEmail.split('@')[0];
     }
     
     // Find the user by email (more reliable than username)
@@ -206,6 +216,34 @@ export async function POST(request: NextRequest) {
                    from?.toLowerCase().includes('noreply') ||
                    false;
 
+    // Clean up email body content
+    let cleanText = text || '';
+    let cleanHtml = html || '';
+    
+    // Remove MIME artifacts from text content
+    if (cleanText) {
+      cleanText = cleanText
+        .replace(/--\d+[a-f0-9]+/g, '') // Remove MIME boundaries
+        .replace(/Content-Type:.*?charset="UTF-8"/g, '') // Remove content type headers
+        .replace(/Content-Transfer-Encoding:.*?\n/g, '') // Remove transfer encoding
+        .replace(/Content-Type: text\/plain; charset="UTF-8"/g, '') // Remove specific content type
+        .replace(/Content-Type: text\/html; charset="UTF-8"/g, '') // Remove HTML content type
+        .replace(/--\d+[a-f0-9]+--/g, '') // Remove MIME boundary endings
+        .replace(/^\s*$/gm, '') // Remove empty lines
+        .trim();
+    }
+    
+    // Clean up HTML content
+    if (cleanHtml) {
+      cleanHtml = cleanHtml
+        .replace(/--\d+[a-f0-9]+/g, '') // Remove MIME boundaries
+        .replace(/Content-Type:.*?charset="UTF-8"/g, '') // Remove content type headers
+        .replace(/Content-Transfer-Encoding:.*?\n/g, '') // Remove transfer encoding
+        .replace(/Content-Type: text\/html; charset="UTF-8"/g, '') // Remove HTML content type
+        .replace(/--\d+[a-f0-9]+--/g, '') // Remove MIME boundary endings
+        .trim();
+    }
+
     // Save incoming email to database
     const result = await pool.query(
       `INSERT INTO incoming_emails (
@@ -217,19 +255,19 @@ export async function POST(request: NextRequest) {
         body_text, 
         body_html, 
         received_at, 
-        is_spam,
-        headers,
+        is_spam, 
+        headers, 
         attachments
-      ) VALUES ($1, $2, $3, $4, $5, $6, $7, CURRENT_TIMESTAMP, $8, $9, $10) 
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, CURRENT_TIMESTAMP, $8, $9, $10)
        RETURNING id, subject, received_at`,
       [
         user.id,
         fromEmail || 'unknown@example.com',
         senderName || fromEmail?.split('@')[0] || 'Unknown Sender',
         subject || 'No Subject',
-        text || 'No text content', // body column (required)
-        text || 'No text content', // body_text column
-        html || '<p>No HTML content</p>', // body_html column
+        cleanText || 'No text content', // body column (required)
+        cleanText || 'No text content', // body_text column
+        cleanHtml || '<p>No HTML content</p>', // body_html column
         isSpam,
         JSON.stringify(headers || {}),
         JSON.stringify(attachments || [])
