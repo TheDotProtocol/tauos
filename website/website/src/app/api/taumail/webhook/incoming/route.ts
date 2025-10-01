@@ -136,7 +136,12 @@ export async function POST(request: NextRequest) {
         .replace(/Content-Type: text\/plain; charset="UTF-8"/g, '') // Remove specific content type
         .replace(/Content-Type: text\/html; charset="UTF-8"/g, '') // Remove HTML content type
         .replace(/--\d+[a-f0-9]+--/g, '') // Remove MIME boundary endings
+        .replace(/Content-Type: text\/plain; charset="UTF-8"/g, '') // Remove plain text content type
+        .replace(/Content-Type: text\/html; charset="UTF-8"/g, '') // Remove HTML content type
+        .replace(/<div dir="ltr">/g, '') // Remove HTML div tags
+        .replace(/<\/div>/g, '') // Remove closing div tags
         .replace(/^\s*$/gm, '') // Remove empty lines
+        .replace(/\n\s*\n/g, '\n') // Remove multiple newlines
         .trim();
 
       emailData = { from, to, subject, text: body };
@@ -229,7 +234,12 @@ export async function POST(request: NextRequest) {
         .replace(/Content-Type: text\/plain; charset="UTF-8"/g, '') // Remove specific content type
         .replace(/Content-Type: text\/html; charset="UTF-8"/g, '') // Remove HTML content type
         .replace(/--\d+[a-f0-9]+--/g, '') // Remove MIME boundary endings
+        .replace(/Content-Type: text\/plain; charset="UTF-8"/g, '') // Remove plain text content type
+        .replace(/Content-Type: text\/html; charset="UTF-8"/g, '') // Remove HTML content type
+        .replace(/<div dir="ltr">/g, '') // Remove HTML div tags
+        .replace(/<\/div>/g, '') // Remove closing div tags
         .replace(/^\s*$/gm, '') // Remove empty lines
+        .replace(/\n\s*\n/g, '\n') // Remove multiple newlines
         .trim();
     }
     
