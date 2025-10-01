@@ -82,15 +82,36 @@ export async function POST(request: NextRequest) {
       const rawEmail = await request.text();
       console.log('📨 Raw Email Content:', rawEmail.substring(0, 200) + '...');
       
-      // Simple parsing of raw email
+      // Better email parsing to handle MIME boundaries
       const lines = rawEmail.split('\n');
       let from = '';
       let to = '';
       let subject = '';
       let body = '';
       let inBody = false;
+      let inMimePart = false;
+      let mimeBoundary = '';
 
       for (const line of lines) {
+        // Extract MIME boundary
+        if (line.includes('boundary=')) {
+          const match = line.match(/boundary="?([^"\s]+)"?/);
+          if (match) {
+            mimeBoundary = match[1];
+          }
+        }
+        
+        // Check for MIME boundary
+        if (mimeBoundary && line.includes(mimeBoundary)) {
+          inMimePart = !inMimePart;
+          continue;
+        }
+        
+        // Skip MIME headers
+        if (inMimePart && (line.startsWith('Content-Type:') || line.startsWith('Content-Transfer-Encoding:'))) {
+          continue;
+        }
+        
         if (line.startsWith('From:')) {
           from = line.replace('From:', '').trim();
         } else if (line.startsWith('To:')) {
@@ -99,12 +120,22 @@ export async function POST(request: NextRequest) {
           subject = line.replace('Subject:', '').trim();
         } else if (line.trim() === '') {
           inBody = true;
-        } else if (inBody) {
-          body += line + '\n';
+        } else if (inBody && !inMimePart) {
+          // Skip MIME boundary lines
+          if (!line.includes('--' + mimeBoundary) && !line.includes('--' + mimeBoundary + '--')) {
+            body += line + '\n';
+          }
         }
       }
 
-      emailData = { from, to, subject, text: body.trim() };
+      // Clean up the body - remove MIME artifacts
+      body = body
+        .replace(/--\d+[a-f0-9]+/g, '') // Remove MIME boundaries
+        .replace(/Content-Type:.*?charset="UTF-8"/g, '') // Remove content type headers
+        .replace(/Content-Transfer-Encoding:.*?\n/g, '') // Remove transfer encoding
+        .trim();
+
+      emailData = { from, to, subject, text: body };
       console.log('📨 Parsed Raw Email:', JSON.stringify(emailData, null, 2));
     }
 
@@ -130,6 +161,22 @@ export async function POST(request: NextRequest) {
     // Assuming format: username@tauos.org
     const recipientEmail = Array.isArray(to) ? to[0] : to;
     const recipientUsername = recipientEmail.split('@')[0];
+    
+    // Clean up the from field - extract email and name properly
+    let fromEmail = from;
+    let senderName = '';
+    
+    if (from.includes('<') && from.includes('>')) {
+      // Format: "Name <email@domain.com>"
+      const match = from.match(/^(.+?)\s*<(.+?)>$/);
+      if (match) {
+        senderName = match[1].trim().replace(/^["']|["']$/g, ''); // Remove quotes
+        fromEmail = match[2].trim();
+      }
+    } else if (from.includes('@')) {
+      // Format: "email@domain.com"
+      fromEmail = from.trim();
+    }
     
     // Find the user by username
     const userResult = await pool.query(
@@ -168,8 +215,8 @@ export async function POST(request: NextRequest) {
        RETURNING id, subject, received_at`,
       [
         user.id,
-        from || 'unknown@example.com',
-        headers?.['from-name'] || from?.split('@')[0] || 'Unknown Sender',
+        fromEmail || 'unknown@example.com',
+        senderName || fromEmail?.split('@')[0] || 'Unknown Sender',
         subject || 'No Subject',
         text || 'No text content', // body column (required)
         text || 'No text content', // body_text column
