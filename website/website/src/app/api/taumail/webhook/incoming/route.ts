@@ -157,10 +157,19 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
     }
 
-    // Extract the recipient username from the email address
-    // Assuming format: username@tauos.org
+    // Extract the recipient email from the 'to' field
+    // Handle formats: "saleena@tauos.org" or "saleena <saleena@tauos.org>"
     const recipientEmail = Array.isArray(to) ? to[0] : to;
-    const recipientUsername = recipientEmail.split('@')[0];
+    let cleanRecipientEmail = recipientEmail;
+    
+    // Clean up the recipient email - extract email from angle brackets
+    if (recipientEmail.includes('<') && recipientEmail.includes('>')) {
+      // Format: "Name <email@domain.com>"
+      const match = recipientEmail.match(/<(.+?)>/);
+      if (match) {
+        cleanRecipientEmail = match[1].trim();
+      }
+    }
     
     // Clean up the from field - extract email and name properly
     let fromEmail = from;
@@ -178,14 +187,14 @@ export async function POST(request: NextRequest) {
       fromEmail = from.trim();
     }
     
-    // Find the user by username
+    // Find the user by email (more reliable than username)
     const userResult = await pool.query(
-      'SELECT id, username, email FROM users WHERE username = $1 OR email = $2',
-      [recipientUsername, recipientEmail]
+      'SELECT id, username, email FROM users WHERE email = $1',
+      [cleanRecipientEmail]
     );
 
     if (userResult.rows.length === 0) {
-      console.log(`❌ User not found for email: ${recipientEmail}`);
+      console.log(`❌ User not found for email: ${cleanRecipientEmail} (original: ${recipientEmail})`);
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
 
