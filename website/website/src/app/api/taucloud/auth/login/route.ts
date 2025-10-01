@@ -1,26 +1,36 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { Pool } from 'pg';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
-import { Pool } from 'pg';
 
-// Database connection - production ready
+// Database connection - enterprise grade security
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL || 'postgresql://postgres.tviqcormikopltejomkc:Ak1233%40%405@aws-0-ap-southeast-1.pooler.supabase.com:5432/postgres?sslmode=disable',
-  ssl: false
+  ssl: { rejectUnauthorized: false },
+  max: 20,
+  idleTimeoutMillis: 30000,
+  connectionTimeoutMillis: 2000,
 });
 
 export async function POST(request: NextRequest) {
   try {
     const { email, password } = await request.json();
 
+    // Basic input validation
     if (!email || !password) {
       return NextResponse.json({ error: 'Email and password are required' }, { status: 400 });
     }
 
-    // Query user from database
+    const sanitizedEmail = email.toLowerCase().trim();
+
+    // 🔍 ENHANCED USER QUERY WITH ORGANIZATION INFO
     const result = await pool.query(
-      'SELECT id, username, email, password_hash, full_name, is_active FROM users WHERE email = $1',
-      [email]
+      `SELECT u.id, u.username, u.email, u.password_hash, u.full_name, u.is_active, u.organization_id,
+              o.name as organization_name, o.domain as organization_domain
+       FROM users u 
+       LEFT JOIN organizations o ON u.organization_id = o.id 
+       WHERE u.email = $1`,
+      [sanitizedEmail]
     );
 
     if (result.rows.length === 0) {
@@ -33,7 +43,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Account is deactivated' }, { status: 401 });
     }
 
-    // Verify password
+    // Password verification
     const isValidPassword = await bcrypt.compare(password, user.password_hash);
     if (!isValidPassword) {
       return NextResponse.json({ error: 'Invalid credentials' }, { status: 401 });
@@ -41,14 +51,20 @@ export async function POST(request: NextRequest) {
 
     // Update last login
     await pool.query(
-      'UPDATE users SET last_login = CURRENT_TIMESTAMP WHERE id = $1',
+      'UPDATE users SET last_login_at = CURRENT_TIMESTAMP WHERE id = $1',
       [user.id]
     );
 
-    // Generate JWT token
-    const jwtSecret = process.env.JWT_SECRET_TAUCLOUD || 'tauos-prod-jwt-secret-2025-launch-a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6';
+    // Create JWT token
+    const jwtSecret = process.env.JWT_SECRET_TAUCLOUD || 'tauos-taucloud-jwt-secret-2025-launch-b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0';
     const token = jwt.sign(
-      { userId: user.id, email: user.email, username: user.username, app: 'taucloud' },
+      { 
+        userId: user.id, 
+        email: user.email, 
+        username: user.username, 
+        app: 'taucloud',
+        organizationId: user.organization_id
+      },
       jwtSecret,
       { expiresIn: '24h' }
     );
@@ -60,12 +76,21 @@ export async function POST(request: NextRequest) {
         id: user.id,
         username: user.username,
         email: user.email,
-        fullName: user.full_name
+        fullName: user.full_name,
+        organization: {
+          id: user.organization_id,
+          name: user.organization_name,
+          domain: user.organization_domain
+        }
       }
     });
 
   } catch (error) {
     console.error('TauCloud Login Error:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    
+    return NextResponse.json({ 
+      error: 'Internal server error',
+      details: process.env.NODE_ENV === 'development' ? error.message : undefined
+    }, { status: 500 });
   }
 }

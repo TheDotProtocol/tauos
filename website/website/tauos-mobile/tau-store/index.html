@@ -1,0 +1,780 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tau Store - Privacy-First App Marketplace</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);
+            color: #ffffff;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: rgba(42, 42, 42, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-icon {
+            font-size: 32px;
+            font-weight: bold;
+            background: linear-gradient(135deg, #667eea 0%, #8b5cf6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .logo-text {
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        .search-section {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .search-input {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            padding: 8px 12px;
+            color: #ffffff;
+            font-size: 14px;
+            width: 300px;
+        }
+
+        .search-input::placeholder {
+            color: #a1a1aa;
+        }
+
+        .filter-button {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            padding: 8px 16px;
+            color: #ffffff;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .filter-button:hover {
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .filter-button.active {
+            background: #667eea;
+            border-color: #667eea;
+        }
+
+        .categories {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 24px;
+            overflow-x: auto;
+            padding: 8px 0;
+        }
+
+        .category-button {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            padding: 8px 16px;
+            color: #ffffff;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+
+        .category-button:hover {
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .category-button.active {
+            background: #667eea;
+            border-color: #667eea;
+        }
+
+        .apps-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .app-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 16px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .app-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .app-header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        .app-icon {
+            width: 64px;
+            height: 64px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #667eea 0%, #8b5cf6 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            flex-shrink: 0;
+        }
+
+        .app-info {
+            flex: 1;
+        }
+
+        .app-name {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .app-developer {
+            font-size: 12px;
+            color: #a1a1aa;
+            margin-bottom: 8px;
+        }
+
+        .privacy-score {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .privacy-score.excellent {
+            color: #4ade80;
+        }
+
+        .privacy-score.good {
+            color: #fbbf24;
+        }
+
+        .privacy-score.poor {
+            color: #f87171;
+        }
+
+        .app-description {
+            font-size: 14px;
+            color: #a1a1aa;
+            line-height: 1.4;
+            margin-bottom: 16px;
+        }
+
+        .app-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 12px;
+            color: #a1a1aa;
+            margin-bottom: 16px;
+        }
+
+        .app-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .install-button {
+            background: linear-gradient(135deg, #667eea 0%, #8b5cf6 100%);
+            border: none;
+            border-radius: 8px;
+            padding: 8px 16px;
+            color: #ffffff;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+            flex: 1;
+        }
+
+        .install-button:hover {
+            transform: translateY(-1px);
+        }
+
+        .info-button {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            padding: 8px 12px;
+            color: #ffffff;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .info-button:hover {
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .section-title {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .section-subtitle {
+            font-size: 16px;
+            color: #a1a1aa;
+            margin-bottom: 24px;
+        }
+
+        .ecosystem-badge {
+            background: rgba(102, 126, 234, 0.2);
+            border: 1px solid rgba(102, 126, 234, 0.3);
+            border-radius: 6px;
+            padding: 4px 8px;
+            font-size: 10px;
+            color: #667eea;
+            font-weight: 600;
+        }
+
+        .trending-badge {
+            background: rgba(251, 191, 36, 0.2);
+            border: 1px solid rgba(251, 191, 36, 0.3);
+            border-radius: 6px;
+            padding: 4px 8px;
+            font-size: 10px;
+            color: #fbbf24;
+            font-weight: 600;
+        }
+
+        .stats-bar {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 24px;
+            display: flex;
+            justify-content: space-around;
+            text-align: center;
+        }
+
+        .stat-item {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: #667eea;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #a1a1aa;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="logo">
+                <div class="logo-icon">τ</div>
+                <div class="logo-text">Tau Store</div>
+            </div>
+            <div class="search-section">
+                <input type="text" class="search-input" placeholder="Search apps..." id="searchInput">
+                <button class="filter-button" onclick="toggleFilter('all')" id="filterAll">All</button>
+                <button class="filter-button" onclick="toggleFilter('ecosystem')" id="filterEcosystem">Ecosystem</button>
+                <button class="filter-button" onclick="toggleFilter('trending')" id="filterTrending">Trending</button>
+            </div>
+        </div>
+
+        <!-- Stats Bar -->
+        <div class="stats-bar">
+            <div class="stat-item">
+                <div class="stat-value" id="totalApps">24</div>
+                <div class="stat-label">Total Apps</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="ecosystemApps">6</div>
+                <div class="stat-label">Ecosystem Apps</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="avgPrivacyScore">94</div>
+                <div class="stat-label">Avg Privacy Score</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="totalDownloads">1.2K</div>
+                <div class="stat-label">Total Downloads</div>
+            </div>
+        </div>
+
+        <!-- Categories -->
+        <div class="categories">
+            <button class="category-button active" onclick="filterByCategory('all')">All</button>
+            <button class="category-button" onclick="filterByCategory('communication')">Communication</button>
+            <button class="category-button" onclick="filterByCategory('productivity')">Productivity</button>
+            <button class="category-button" onclick="filterByCategory('finance')">Finance</button>
+            <button class="category-button" onclick="filterByCategory('entertainment')">Entertainment</button>
+            <button class="category-button" onclick="filterByCategory('tools')">Tools</button>
+            <button class="category-button" onclick="filterByCategory('games')">Games</button>
+        </div>
+
+        <!-- Ecosystem Apps -->
+        <div class="section-title">
+            🌟 Ecosystem Apps
+            <span class="ecosystem-badge">Official</span>
+        </div>
+        <div class="section-subtitle">Core TauOS applications with maximum privacy and security</div>
+        
+        <div class="apps-grid" id="ecosystemApps">
+            <!-- AskTrabaajo -->
+            <div class="app-card" data-category="productivity" data-type="ecosystem">
+                <div class="app-header">
+                    <div class="app-icon">🤖</div>
+                    <div class="app-info">
+                        <div class="app-name">AskTrabaajo</div>
+                        <div class="app-developer">TauOS Team</div>
+                        <div class="privacy-score excellent">🔒 98/100</div>
+                    </div>
+                </div>
+                <div class="app-description">
+                    AI-powered productivity assistant with complete privacy protection. Get intelligent answers and task management without data collection.
+                </div>
+                <div class="app-meta">
+                    <span>Version 2.1.0</span>
+                    <span>15.2 MB</span>
+                </div>
+                <div class="app-actions">
+                    <button class="install-button">Install</button>
+                    <button class="info-button">ℹ️</button>
+                </div>
+            </div>
+
+            <!-- Global Dot Bank -->
+            <div class="app-card" data-category="finance" data-type="ecosystem">
+                <div class="app-header">
+                    <div class="app-icon">🏦</div>
+                    <div class="app-info">
+                        <div class="app-name">Global Dot Bank</div>
+                        <div class="app-developer">TauOS Team</div>
+                        <div class="privacy-score excellent">🔒 99/100</div>
+                    </div>
+                </div>
+                <div class="app-description">
+                    Decentralized banking platform with zero-knowledge architecture. Manage your finances with complete privacy and security.
+                </div>
+                <div class="app-meta">
+                    <span>Version 1.5.2</span>
+                    <span>28.7 MB</span>
+                </div>
+                <div class="app-actions">
+                    <button class="install-button">Install</button>
+                    <button class="info-button">ℹ️</button>
+                </div>
+            </div>
+
+            <!-- 3DOT Wallet -->
+            <div class="app-card" data-category="finance" data-type="ecosystem">
+                <div class="app-header">
+                    <div class="app-icon">💎</div>
+                    <div class="app-info">
+                        <div class="app-name">3DOT Wallet</div>
+                        <div class="app-developer">TauOS Team</div>
+                        <div class="privacy-score excellent">🔒 97/100</div>
+                    </div>
+                </div>
+                <div class="app-description">
+                    Secure cryptocurrency wallet with hardware security and zero tracking. Store and manage your digital assets privately.
+                </div>
+                <div class="app-meta">
+                    <span>Version 3.0.1</span>
+                    <span>22.4 MB</span>
+                </div>
+                <div class="app-actions">
+                    <button class="install-button">Install</button>
+                    <button class="info-button">ℹ️</button>
+                </div>
+            </div>
+
+            <!-- TauMail -->
+            <div class="app-card" data-category="communication" data-type="ecosystem">
+                <div class="app-header">
+                    <div class="app-icon">📧</div>
+                    <div class="app-info">
+                        <div class="app-name">TauMail</div>
+                        <div class="app-developer">TauOS Team</div>
+                        <div class="privacy-score excellent">🔒 100/100</div>
+                    </div>
+                </div>
+                <div class="app-description">
+                    Privacy-first email client with end-to-end encryption. Zero telemetry, complete user sovereignty.
+                </div>
+                <div class="app-meta">
+                    <span>Version 1.2.0</span>
+                    <span>18.9 MB</span>
+                </div>
+                <div class="app-actions">
+                    <button class="install-button">Install</button>
+                    <button class="info-button">ℹ️</button>
+                </div>
+            </div>
+
+            <!-- TauCloud -->
+            <div class="app-card" data-category="productivity" data-type="ecosystem">
+                <div class="app-header">
+                    <div class="app-icon">☁️</div>
+                    <div class="app-info">
+                        <div class="app-name">TauCloud</div>
+                        <div class="app-developer">TauOS Team</div>
+                        <div class="privacy-score excellent">🔒 100/100</div>
+                    </div>
+                </div>
+                <div class="app-description">
+                    Secure cloud storage with client-side encryption. Your files, your control, zero knowledge architecture.
+                </div>
+                <div class="app-meta">
+                    <span>Version 1.1.5</span>
+                    <span>25.3 MB</span>
+                </div>
+                <div class="app-actions">
+                    <button class="install-button">Install</button>
+                    <button class="info-button">ℹ️</button>
+                </div>
+            </div>
+
+            <!-- TauID -->
+            <div class="app-card" data-category="tools" data-type="ecosystem">
+                <div class="app-header">
+                    <div class="app-icon">🆔</div>
+                    <div class="app-info">
+                        <div class="app-name">TauID</div>
+                        <div class="app-developer">TauOS Team</div>
+                        <div class="privacy-score excellent">🔒 100/100</div>
+                    </div>
+                </div>
+                <div class="app-description">
+                    Decentralized identity management with verifiable credentials. Own your digital identity completely.
+                </div>
+                <div class="app-meta">
+                    <span>Version 1.0.8</span>
+                    <span>16.7 MB</span>
+                </div>
+                <div class="app-actions">
+                    <button class="install-button">Install</button>
+                    <button class="info-button">ℹ️</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Trending Apps -->
+        <div class="section-title">
+            🔥 Trending Apps
+            <span class="trending-badge">Popular</span>
+        </div>
+        <div class="section-subtitle">Discover amazing apps with privacy-first design</div>
+        
+        <div class="apps-grid" id="trendingApps">
+            <!-- SignalX -->
+            <div class="app-card" data-category="communication" data-type="trending">
+                <div class="app-header">
+                    <div class="app-icon">📱</div>
+                    <div class="app-info">
+                        <div class="app-name">SignalX</div>
+                        <div class="app-developer">Privacy Labs</div>
+                        <div class="privacy-score excellent">🔒 95/100</div>
+                    </div>
+                </div>
+                <div class="app-description">
+                    Next-generation messaging with quantum-resistant encryption. Group chats, voice calls, and file sharing with maximum privacy.
+                </div>
+                <div class="app-meta">
+                    <span>Version 2.3.1</span>
+                    <span>31.5 MB</span>
+                </div>
+                <div class="app-actions">
+                    <button class="install-button">Install</button>
+                    <button class="info-button">ℹ️</button>
+                </div>
+            </div>
+
+            <!-- IndieBird -->
+            <div class="app-card" data-category="entertainment" data-type="trending">
+                <div class="app-header">
+                    <div class="app-icon">🐦</div>
+                    <div class="app-info">
+                        <div class="app-name">IndieBird</div>
+                        <div class="app-developer">Indie Collective</div>
+                        <div class="privacy-score good">🔒 88/100</div>
+                    </div>
+                </div>
+                <div class="app-description">
+                    Microblogging platform for independent creators. Share your thoughts without algorithmic manipulation or data mining.
+                </div>
+                <div class="app-meta">
+                    <span>Version 1.8.2</span>
+                    <span>19.8 MB</span>
+                </div>
+                <div class="app-actions">
+                    <button class="install-button">Install</button>
+                    <button class="info-button">ℹ️</button>
+                </div>
+            </div>
+
+            <!-- VayCays -->
+            <div class="app-card" data-category="entertainment" data-type="trending">
+                <div class="app-header">
+                    <div class="app-icon">✈️</div>
+                    <div class="app-info">
+                        <div class="app-name">VayCays</div>
+                        <div class="app-developer">Travel Privacy</div>
+                        <div class="privacy-score excellent">🔒 92/100</div>
+                    </div>
+                </div>
+                <div class="app-description">
+                    Privacy-focused travel planning and booking. Find the best deals without sacrificing your personal data.
+                </div>
+                <div class="app-meta">
+                    <span>Version 1.4.7</span>
+                    <span>27.3 MB</span>
+                </div>
+                <div class="app-actions">
+                    <button class="install-button">Install</button>
+                    <button class="info-button">ℹ️</button>
+                </div>
+            </div>
+
+            <!-- OrbitRunner -->
+            <div class="app-card" data-category="games" data-type="trending">
+                <div class="app-header">
+                    <div class="app-icon">🚀</div>
+                    <div class="app-info">
+                        <div class="app-name">OrbitRunner</div>
+                        <div class="app-developer">Space Games</div>
+                        <div class="privacy-score excellent">🔒 96/100</div>
+                    </div>
+                </div>
+                <div class="app-description">
+                    Epic space exploration game with stunning graphics. No ads, no tracking, pure gaming experience.
+                </div>
+                <div class="app-meta">
+                    <span>Version 1.2.5</span>
+                    <span>156.7 MB</span>
+                </div>
+                <div class="app-actions">
+                    <button class="install-button">Install</button>
+                    <button class="info-button">ℹ️</button>
+                </div>
+            </div>
+
+            <!-- LuminoSketch -->
+            <div class="app-card" data-category="tools" data-type="trending">
+                <div class="app-header">
+                    <div class="app-icon">🎨</div>
+                    <div class="app-info">
+                        <div class="app-name">LuminoSketch</div>
+                        <div class="app-developer">AI Art Studio</div>
+                        <div class="privacy-score good">🔒 85/100</div>
+                    </div>
+                </div>
+                <div class="app-description">
+                    AI-powered image editor with local processing. Create stunning artwork without sending data to the cloud.
+                </div>
+                <div class="app-meta">
+                    <span>Version 2.0.3</span>
+                    <span>89.4 MB</span>
+                </div>
+                <div class="app-actions">
+                    <button class="install-button">Install</button>
+                    <button class="info-button">ℹ️</button>
+                </div>
+            </div>
+
+            <!-- FlowJournal -->
+            <div class="app-card" data-category="tools" data-type="trending">
+                <div class="app-header">
+                    <div class="app-icon">📝</div>
+                    <div class="app-info">
+                        <div class="app-name">FlowJournal</div>
+                        <div class="app-developer">Mindful Apps</div>
+                        <div class="privacy-score excellent">🔒 98/100</div>
+                    </div>
+                </div>
+                <div class="app-description">
+                    Private journaling app with end-to-end encryption. Your thoughts stay yours, with beautiful writing experience.
+                </div>
+                <div class="app-meta">
+                    <span>Version 1.6.1</span>
+                    <span>14.2 MB</span>
+                </div>
+                <div class="app-actions">
+                    <button class="install-button">Install</button>
+                    <button class="info-button">ℹ️</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentFilter = 'all';
+        let currentCategory = 'all';
+
+        function toggleFilter(filter) {
+            currentFilter = filter;
+            
+            // Update filter buttons
+            document.querySelectorAll('.filter-button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.getElementById('filter' + filter.charAt(0).toUpperCase() + filter.slice(1)).classList.add('active');
+            
+            filterApps();
+        }
+
+        function filterByCategory(category) {
+            currentCategory = category;
+            
+            // Update category buttons
+            document.querySelectorAll('.category-button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            filterApps();
+        }
+
+        function filterApps() {
+            const appCards = document.querySelectorAll('.app-card');
+            
+            appCards.forEach(card => {
+                const appType = card.dataset.type;
+                const appCategory = card.dataset.category;
+                
+                let showCard = true;
+                
+                // Filter by type
+                if (currentFilter !== 'all' && appType !== currentFilter) {
+                    showCard = false;
+                }
+                
+                // Filter by category
+                if (currentCategory !== 'all' && appCategory !== currentCategory) {
+                    showCard = false;
+                }
+                
+                card.style.display = showCard ? 'block' : 'none';
+            });
+        }
+
+        // Search functionality
+        document.getElementById('searchInput').addEventListener('input', (e) => {
+            const searchTerm = e.target.value.toLowerCase();
+            const appCards = document.querySelectorAll('.app-card');
+            
+            appCards.forEach(card => {
+                const appName = card.querySelector('.app-name').textContent.toLowerCase();
+                const appDescription = card.querySelector('.app-description').textContent.toLowerCase();
+                const appDeveloper = card.querySelector('.app-developer').textContent.toLowerCase();
+                
+                const matches = appName.includes(searchTerm) || 
+                              appDescription.includes(searchTerm) || 
+                              appDeveloper.includes(searchTerm);
+                
+                card.style.display = matches ? 'block' : 'none';
+            });
+        });
+
+        // Install button functionality
+        document.querySelectorAll('.install-button').forEach(button => {
+            button.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const appName = e.target.closest('.app-card').querySelector('.app-name').textContent;
+                alert(`Installing ${appName}...\n\nThis app will be downloaded and installed securely with privacy protection.`);
+            });
+        });
+
+        // Info button functionality
+        document.querySelectorAll('.info-button').forEach(button => {
+            button.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const appCard = e.target.closest('.app-card');
+                const appName = appCard.querySelector('.app-name').textContent;
+                const appDeveloper = appCard.querySelector('.app-developer').textContent;
+                const privacyScore = appCard.querySelector('.privacy-score').textContent;
+                const description = appCard.querySelector('.app-description').textContent;
+                
+                alert(`${appName}\n\nDeveloper: ${appDeveloper}\nPrivacy Score: ${privacyScore}\n\n${description}\n\nThis app has been verified for privacy and security by the TauOS team.`);
+            });
+        });
+
+        // Initialize stats
+        function updateStats() {
+            const totalApps = document.querySelectorAll('.app-card').length;
+            const ecosystemApps = document.querySelectorAll('.app-card[data-type="ecosystem"]').length;
+            const trendingApps = document.querySelectorAll('.app-card[data-type="trending"]').length;
+            
+            // Calculate average privacy score
+            const privacyScores = Array.from(document.querySelectorAll('.privacy-score')).map(score => {
+                const scoreText = score.textContent;
+                return parseInt(scoreText.match(/\d+/)[0]);
+            });
+            const avgScore = Math.round(privacyScores.reduce((a, b) => a + b, 0) / privacyScores.length);
+            
+            document.getElementById('totalApps').textContent = totalApps;
+            document.getElementById('ecosystemApps').textContent = ecosystemApps;
+            document.getElementById('avgPrivacyScore').textContent = avgScore;
+        }
+
+        updateStats();
+    </script>
+</body>
+</html> 

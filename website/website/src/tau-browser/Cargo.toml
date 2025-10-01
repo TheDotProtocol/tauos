@@ -1,0 +1,22 @@
+[package]
+name = "tau-browser"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+gtk = { version = "0.7", features = ["v4_8"] }
+glib = "0.18"
+webkit2gtk = "0.18"
+webkit2gtk-rs = "0.18"
+cairo-rs = "0.18"
+gdk = { version = "0.7", features = ["v4_8"] }
+gdk-pixbuf = "0.18"
+rand = "0.8"
+
+[lib]
+name = "tau_browser"
+path = "lib.rs"
+
+[[bin]]
+name = "tau-browser"
+path = "main.rs" 

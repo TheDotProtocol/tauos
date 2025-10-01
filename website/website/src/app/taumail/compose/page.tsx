@@ -57,7 +57,7 @@ export default function TauMailCompose() {
           cc: composeData.cc || undefined,
           bcc: composeData.bcc || undefined,
           subject: composeData.subject,
-          text: composeData.text
+          body: composeData.text
         })
       });
 

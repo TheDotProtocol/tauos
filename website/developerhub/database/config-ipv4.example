@@ -1,0 +1,44 @@
+# TauCore™ Database Configuration - IPv4 Compatible
+# Copy this file to .env and update with your actual values
+
+# Database URL (Supabase with IPv4)
+DATABASE_URL=postgresql://postgres:[YOUR_PASSWORD]@db.[YOUR_PROJECT_REF].supabase.co:5432/postgres
+
+# IPv4 Configuration
+DB_HOST=db.[YOUR_PROJECT_REF].supabase.co
+DB_PORT=5432
+DB_NAME=postgres
+DB_USER=postgres
+DB_PASSWORD=[YOUR_PASSWORD]
+DB_SSL=true
+DB_SSL_REJECT_UNAUTHORIZED=false
+
+# JWT Configuration
+JWT_SECRET=your-jwt-secret-key-here
+BCRYPT_ROUNDS=12
+
+# SMTP Configuration (Vultr + SendGrid)
+SMTP_HOST=smtp.tauos.org
+SMTP_PORT=587
+SMTP_USER=saleena@tauos.org
+SMTP_PASS=Saleena@132
+SMTP_SECURE=false
+
+# SendGrid Configuration
+SENDGRID_API_KEY=your-sendgrid-api-key
+SENDGRID_FROM_EMAIL=saleena@tauos.org
+
+# Email Configuration
+EMAIL_DOMAIN=tauos.org
+RATE_LIMIT_WINDOW_MS=900000
+RATE_LIMIT_MAX_REQUESTS=100
+MAX_FILE_SIZE=10485760
+
+# IPv4 Network Configuration
+NETWORK_INTERFACE=eth0
+IPV4_ENABLED=true
+IPV6_ENABLED=false
+
+# Logging
+LOG_LEVEL=info
+NODE_ENV=development

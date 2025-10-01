@@ -1,112 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { Pool } from 'pg';
-import crypto from 'crypto';
-
-// Database connection - production ready with enhanced error handling
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL || 'postgresql://postgres.tviqcormikopltejomkc:Ak1233%40%405@aws-0-ap-southeast-1.pooler.supabase.com:5432/postgres?sslmode=disable',
-  max: 20,
-  idleTimeoutMillis: 30000,
-  connectionTimeoutMillis: 2000,
-});
-
-// SendGrid webhook signature verification
-function verifySignature(payload: string, signature: string, timestamp: string, publicKey: string): boolean {
-  try {
-    // For now, we'll skip signature verification to get emails working
-    // TODO: Implement proper ECDSA signature verification
-    console.log('🔐 Signature verification skipped for now');
-    return true;
-  } catch (error) {
-    console.error('🔐 Signature verification error:', error);
-    return false;
-  }
-}
+import { unifiedPool, testDatabaseConnection, ensureIncomingEmailsTable } from '@/lib/database';
 
 export async function POST(request: NextRequest) {
   try {
-    const contentType = request.headers.get('content-type');
+    // Ensure incoming_emails table exists using unified connection
+    await ensureIncomingEmailsTable();
+
+    // Parse the incoming email data from SendGrid webhook
+    const emailData = await request.json();
+    
+    console.log('📨 Incoming Email Webhook:', JSON.stringify(emailData, null, 2));
     console.log('📨 Webhook called at:', new Date().toISOString());
-    console.log('📨 Content-Type:', contentType);
     console.log('📨 Request headers:', Object.fromEntries(request.headers.entries()));
-
-    // Check for SendGrid security headers
-    const signature = request.headers.get('X-Twilio-Email-Event-Webhook-Signature');
-    const timestamp = request.headers.get('X-Twilio-Email-Event-Webhook-Timestamp');
-    
-    if (signature && timestamp) {
-      console.log('🔐 Security headers detected - signature verification enabled');
-      // TODO: Implement proper signature verification
-    }
-
-    let emailData;
-    
-    if (contentType?.includes('application/json')) {
-      // Handle JSON requests (manual simulation)
-      emailData = await request.json();
-      console.log('📨 JSON Email Data:', JSON.stringify(emailData, null, 2));
-    } else if (contentType?.includes('multipart/form-data')) {
-      // Handle multipart/form-data from SendGrid Inbound Parse
-      const formData = await request.formData();
-      emailData = {
-        from: formData.get('from'),
-        to: formData.get('to'),
-        subject: formData.get('subject'),
-        text: formData.get('text'),
-        html: formData.get('html'),
-        headers: formData.get('headers'),
-        attachments: formData.get('attachments'),
-        spam_score: formData.get('spam_score'),
-        spam_report: formData.get('spam_report'),
-        envelope: formData.get('envelope')
-      };
-      console.log('📨 Multipart Email Data:', JSON.stringify(emailData, null, 2));
-    } else if (contentType?.includes('application/x-www-form-urlencoded')) {
-      // Handle URL-encoded form data
-      const formData = await request.formData();
-      emailData = {
-        from: formData.get('from'),
-        to: formData.get('to'),
-        subject: formData.get('subject'),
-        text: formData.get('text'),
-        html: formData.get('html'),
-        headers: formData.get('headers'),
-        attachments: formData.get('attachments'),
-        spam_score: formData.get('spam_score'),
-        spam_report: formData.get('spam_report'),
-        envelope: formData.get('envelope')
-      };
-      console.log('📨 URL-Encoded Email Data:', JSON.stringify(emailData, null, 2));
-    } else {
-      // Handle raw email content
-      const rawEmail = await request.text();
-      console.log('📨 Raw Email Content:', rawEmail.substring(0, 200) + '...');
-      
-      // Simple parsing of raw email
-      const lines = rawEmail.split('\n');
-      let from = '';
-      let to = '';
-      let subject = '';
-      let body = '';
-      let inBody = false;
-
-      for (const line of lines) {
-        if (line.startsWith('From:')) {
-          from = line.replace('From:', '').trim();
-        } else if (line.startsWith('To:')) {
-          to = line.replace('To:', '').trim();
-        } else if (line.startsWith('Subject:')) {
-          subject = line.replace('Subject:', '').trim();
-        } else if (line.trim() === '') {
-          inBody = true;
-        } else if (inBody) {
-          body += line + '\n';
-        }
-      }
-
-      emailData = { from, to, subject, text: body.trim() };
-      console.log('📨 Parsed Raw Email:', JSON.stringify(emailData, null, 2));
-    }
 
     // Extract email details from SendGrid webhook format
     const {
@@ -116,9 +21,7 @@ export async function POST(request: NextRequest) {
       text,
       html,
       headers,
-      attachments,
-      spam_score,
-      spam_report
+      attachments
     } = emailData;
 
     if (!to || !from) {
@@ -126,15 +29,33 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
     }
 
-    // Extract the recipient username from the email address
-    // Assuming format: username@tauos.org
-    const recipientEmail = Array.isArray(to) ? to[0] : to;
-    const recipientUsername = recipientEmail.split('@')[0];
+    // Extract the recipient email address
+    let recipientEmail = Array.isArray(to) ? to[0] : to;
     
-    // Find the user by username
-    const userResult = await pool.query(
-      'SELECT id, username, email FROM users WHERE username = $1 OR email = $2',
-      [recipientUsername, recipientEmail]
+    // Clean email format - handle ALL possible formats
+    // Remove quotes first
+    recipientEmail = recipientEmail.replace(/"/g, '').trim();
+    
+    // If contains angle brackets, extract the email from them
+    if (recipientEmail.includes('<') && recipientEmail.includes('>')) {
+      const match = recipientEmail.match(/<([^>]+)>/);
+      if (match) {
+        recipientEmail = match[1];
+      }
+    }
+    
+    console.log('🔧 Cleaned email format:', recipientEmail);
+    
+    console.log('🔍 Looking for user with email:', recipientEmail);
+    console.log('🔧 Email parsing fix deployed - testing angle bracket format - FINAL VERSION');
+    
+    // Test database connection and verify we're using the unified database
+    await testDatabaseConnection();
+    
+    // Find the user by email address (more reliable than username)
+    const userResult = await unifiedPool.query(
+      'SELECT id, username, email FROM users WHERE email = $1',
+      [recipientEmail]
     );
 
     if (userResult.rows.length === 0) {
@@ -151,7 +72,7 @@ export async function POST(request: NextRequest) {
                    false;
 
     // Save incoming email to database
-    const result = await pool.query(
+    const result = await unifiedPool.query(
       `INSERT INTO incoming_emails (
         user_id, 
         from_email, 
@@ -181,6 +102,15 @@ export async function POST(request: NextRequest) {
     );
 
     console.log('✅ Incoming email saved:', result.rows[0]);
+    console.log('🔍 Database connection test - checking if table exists...');
+    
+    // Test if we can query the table directly
+    try {
+      const testQuery = await unifiedPool.query('SELECT COUNT(*) as count FROM incoming_emails');
+      console.log('🔍 Table exists, total emails:', testQuery.rows[0].count);
+    } catch (error) {
+      console.log('🔍 Table query failed:', error.message);
+    }
 
     return NextResponse.json({
       success: true,

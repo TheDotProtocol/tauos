@@ -60,7 +60,17 @@ export default function TauMailDashboard() {
       
       if (response.ok) {
         const data = await response.json();
-        setEmails(data.emails || []);
+        // Map API response to frontend format
+        const mappedEmails = (data.emails || []).map(email => ({
+          id: email.id,
+          from: email.display_name || email.sender_name || email.from_email || 'Unknown',
+          subject: email.subject || 'No Subject',
+          preview: email.body ? email.body.substring(0, 100) + '...' : 'No preview',
+          time: email.received_at ? new Date(email.received_at).toLocaleString() : 'Unknown time',
+          unread: !email.is_read,
+          starred: false
+        }));
+        setEmails(mappedEmails);
       } else {
         // If no inbox endpoint, create some sample emails for demo
         setEmails([
@@ -123,7 +133,7 @@ export default function TauMailDashboard() {
       
       if (response.ok) {
         const data = await response.json();
-        setSentEmails(data);
+        setSentEmails(data.emails || []);
       } else {
         console.log('No sent emails endpoint available');
         setSentEmails([]);

@@ -1,0 +1,340 @@
+// TauScript Standard Library - Network Module
+// HTTP, WebSocket, and network operations that make TauScript web-ready!
+
+module Network {
+    // HTTP Client Operations
+    export func httpGet(url: string, headers: object = {}): Promise<object> {
+        return new Promise((resolve, reject) => {
+            const https = require('https');
+            const http = require('http');
+            const urlObj = new URL(url);
+            const isHttps = urlObj.protocol === 'https:';
+            const client = isHttps ? https : http;
+            
+            const options = {
+                hostname: urlObj.hostname,
+                port: urlObj.port || (isHttps ? 443 : 80),
+                path: urlObj.pathname + urlObj.search,
+                method: 'GET',
+                headers: headers
+            };
+            
+            const req = client.request(options, (res: any) => {
+                let data = '';
+                res.on('data', (chunk: string) => {
+                    data += chunk;
+                });
+                res.on('end', () => {
+                    resolve({
+                        status: res.statusCode,
+                        headers: res.headers,
+                        data: data
+                    });
+                });
+            });
+            
+            req.on('error', reject);
+            req.end();
+        });
+    }
+    
+    export func httpPost(url: string, data: any, headers: object = {}): Promise<object> {
+        return new Promise((resolve, reject) => {
+            const https = require('https');
+            const http = require('http');
+            const urlObj = new URL(url);
+            const isHttps = urlObj.protocol === 'https:';
+            const client = isHttps ? https : http;
+            
+            const postData = typeof data === 'string' ? data : JSON.stringify(data);
+            const defaultHeaders = {
+                'Content-Type': 'application/json',
+                'Content-Length': Buffer.byteLength(postData)
+            };
+            
+            const options = {
+                hostname: urlObj.hostname,
+                port: urlObj.port || (isHttps ? 443 : 80),
+                path: urlObj.pathname + urlObj.search,
+                method: 'POST',
+                headers: { ...defaultHeaders, ...headers }
+            };
+            
+            const req = client.request(options, (res: any) => {
+                let responseData = '';
+                res.on('data', (chunk: string) => {
+                    responseData += chunk;
+                });
+                res.on('end', () => {
+                    resolve({
+                        status: res.statusCode,
+                        headers: res.headers,
+                        data: responseData
+                    });
+                });
+            });
+            
+            req.on('error', reject);
+            req.write(postData);
+            req.end();
+        });
+    }
+    
+    export func httpPut(url: string, data: any, headers: object = {}): Promise<object> {
+        return new Promise((resolve, reject) => {
+            const https = require('https');
+            const http = require('http');
+            const urlObj = new URL(url);
+            const isHttps = urlObj.protocol === 'https:';
+            const client = isHttps ? https : http;
+            
+            const putData = typeof data === 'string' ? data : JSON.stringify(data);
+            const defaultHeaders = {
+                'Content-Type': 'application/json',
+                'Content-Length': Buffer.byteLength(putData)
+            };
+            
+            const options = {
+                hostname: urlObj.hostname,
+                port: urlObj.port || (isHttps ? 443 : 80),
+                path: urlObj.pathname + urlObj.search,
+                method: 'PUT',
+                headers: { ...defaultHeaders, ...headers }
+            };
+            
+            const req = client.request(options, (res: any) => {
+                let responseData = '';
+                res.on('data', (chunk: string) => {
+                    responseData += chunk;
+                });
+                res.on('end', () => {
+                    resolve({
+                        status: res.statusCode,
+                        headers: res.headers,
+                        data: responseData
+                    });
+                });
+            });
+            
+            req.on('error', reject);
+            req.write(putData);
+            req.end();
+        });
+    }
+    
+    export func httpDelete(url: string, headers: object = {}): Promise<object> {
+        return new Promise((resolve, reject) => {
+            const https = require('https');
+            const http = require('http');
+            const urlObj = new URL(url);
+            const isHttps = urlObj.protocol === 'https:';
+            const client = isHttps ? https : http;
+            
+            const options = {
+                hostname: urlObj.hostname,
+                port: urlObj.port || (isHttps ? 443 : 80),
+                path: urlObj.pathname + urlObj.search,
+                method: 'DELETE',
+                headers: headers
+            };
+            
+            const req = client.request(options, (res: any) => {
+                let data = '';
+                res.on('data', (chunk: string) => {
+                    data += chunk;
+                });
+                res.on('end', () => {
+                    resolve({
+                        status: res.statusCode,
+                        headers: res.headers,
+                        data: data
+                    });
+                });
+            });
+            
+            req.on('error', reject);
+            req.end();
+        });
+    }
+    
+    // WebSocket Operations
+    export func createWebSocket(url: string): WebSocket {
+        const WebSocket = require('ws');
+        return new WebSocket(url);
+    }
+    
+    export func webSocketConnect(ws: WebSocket): Promise<void> {
+        return new Promise((resolve, reject) => {
+            ws.on('open', () => {
+                resolve();
+            });
+            ws.on('error', reject);
+        });
+    }
+    
+    export func webSocketSend(ws: WebSocket, data: any): void {
+        ws.send(typeof data === 'string' ? data : JSON.stringify(data));
+    }
+    
+    export func webSocketClose(ws: WebSocket): void {
+        ws.close();
+    }
+    
+    // URL Operations
+    export func parseURL(url: string): object {
+        const urlObj = new URL(url);
+        return {
+            protocol: urlObj.protocol,
+            hostname: urlObj.hostname,
+            port: urlObj.port,
+            pathname: urlObj.pathname,
+            search: urlObj.search,
+            hash: urlObj.hash,
+            origin: urlObj.origin
+        };
+    }
+    
+    export func buildURL(parts: object): string {
+        const { protocol, hostname, port, pathname, search, hash } = parts;
+        let url = `${protocol}//${hostname}`;
+        if (port) url += `:${port}`;
+        if (pathname) url += pathname;
+        if (search) url += search;
+        if (hash) url += hash;
+        return url;
+    }
+    
+    export func encodeURLComponent(str: string): string {
+        return encodeURIComponent(str);
+    }
+    
+    export func decodeURLComponent(str: string): string {
+        return decodeURIComponent(str);
+    }
+    
+    // DNS Operations
+    export func resolveDNS(hostname: string): Promise<string[]> {
+        return new Promise((resolve, reject) => {
+            const dns = require('dns');
+            dns.resolve4(hostname, (err: any, addresses: string[]) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(addresses);
+                }
+            });
+        });
+    }
+    
+    export func reverseDNS(ip: string): Promise<string> {
+        return new Promise((resolve, reject) => {
+            const dns = require('dns');
+            dns.reverse(ip, (err: any, hostnames: string[]) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(hostnames[0]);
+                }
+            });
+        });
+    }
+    
+    // Network Utilities
+    export func ping(host: string, timeout: number = 5000): Promise<boolean> {
+        return new Promise((resolve) => {
+            const net = require('net');
+            const socket = new net.Socket();
+            
+            socket.setTimeout(timeout);
+            socket.on('connect', () => {
+                socket.destroy();
+                resolve(true);
+            });
+            socket.on('timeout', () => {
+                socket.destroy();
+                resolve(false);
+            });
+            socket.on('error', () => {
+                resolve(false);
+            });
+            
+            socket.connect(80, host);
+        });
+    }
+    
+    export func checkPort(host: string, port: number, timeout: number = 5000): Promise<boolean> {
+        return new Promise((resolve) => {
+            const net = require('net');
+            const socket = new net.Socket();
+            
+            socket.setTimeout(timeout);
+            socket.on('connect', () => {
+                socket.destroy();
+                resolve(true);
+            });
+            socket.on('timeout', () => {
+                socket.destroy();
+                resolve(false);
+            });
+            socket.on('error', () => {
+                resolve(false);
+            });
+            
+            socket.connect(port, host);
+        });
+    }
+    
+    // HTTP Server
+    export func createHTTPServer(port: number, handler: func): any {
+        const http = require('http');
+        return http.createServer((req: any, res: any) => {
+            handler(req, res);
+        }).listen(port);
+    }
+    
+    export func createHTTPSServer(port: number, options: object, handler: func): any {
+        const https = require('https');
+        return https.createServer(options, (req: any, res: any) => {
+            handler(req, res);
+        }).listen(port);
+    }
+    
+    // Request/Response Helpers
+    export func sendJSON(res: any, data: any, status: number = 200): void {
+        res.writeHead(status, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify(data));
+    }
+    
+    export func sendText(res: any, text: string, status: number = 200): void {
+        res.writeHead(status, { 'Content-Type': 'text/plain' });
+        res.end(text);
+    }
+    
+    export func sendHTML(res: any, html: string, status: number = 200): void {
+        res.writeHead(status, { 'Content-Type': 'text/html' });
+        res.end(html);
+    }
+    
+    export func parseJSONBody(req: any): Promise<any> {
+        return new Promise((resolve, reject) => {
+            let body = '';
+            req.on('data', (chunk: string) => {
+                body += chunk;
+            });
+            req.on('end', () => {
+                try {
+                    resolve(JSON.parse(body));
+                } catch (error) {
+                    reject(error);
+                }
+            });
+        });
+    }
+    
+    // CORS Helper
+    export func enableCORS(res: any, origin: string = '*'): void {
+        res.setHeader('Access-Control-Allow-Origin', origin);
+        res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+        res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    }
+}

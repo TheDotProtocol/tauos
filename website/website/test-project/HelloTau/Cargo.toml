@@ -1,0 +1,17 @@
+[package]
+name = "HelloTau"
+version = "0.1.0"
+edition = "2021"
+authors = ["Tau OS Developer"]
+description = "A Tau OS application"
+
+[workspace]
+
+[dependencies]
+anyhow = "1.0"
+log = "0.4"
+env_logger = "0.10"
+
+[[bin]]
+name = "HelloTau"
+path = "src/main.rs"

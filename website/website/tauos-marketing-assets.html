@@ -1,0 +1,745 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TauOS Marketing Assets - Professional Device Mockups</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+            color: #ffffff;
+            overflow-x: hidden;
+        }
+
+        .marketing-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        .hero-section {
+            text-align: center;
+            margin-bottom: 80px;
+        }
+
+        .hero-title {
+            font-size: 4rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #8a2be2 0%, #4b0082 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 20px;
+        }
+
+        .hero-subtitle {
+            font-size: 1.5rem;
+            color: #888;
+            margin-bottom: 40px;
+        }
+
+        .device-showcase {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 60px;
+            margin-bottom: 80px;
+        }
+
+        .device-mockup {
+            text-align: center;
+            position: relative;
+        }
+
+        .device-title {
+            font-size: 2rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #ffffff;
+        }
+
+        .device-description {
+            font-size: 1.1rem;
+            color: #888;
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+
+        /* TauBook Pro Laptop */
+        .laptop-mockup {
+            width: 600px;
+            height: 400px;
+            background: linear-gradient(145deg, #2a2a2a 0%, #1a1a1a 100%);
+            border-radius: 20px;
+            position: relative;
+            margin: 0 auto;
+            box-shadow: 
+                0 40px 100px rgba(0, 0, 0, 0.6),
+                0 0 0 1px rgba(255, 255, 255, 0.1),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            transform: perspective(1000px) rotateX(5deg) rotateY(-5deg);
+        }
+
+        .laptop-screen {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            right: 20px;
+            bottom: 20px;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 50%, #2a1a3a 100%);
+            border-radius: 12px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .laptop-screen::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(circle at 20% 80%, rgba(138, 43, 226, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(75, 0, 130, 0.1) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        .laptop-status-bar {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 30px;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(20px);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 15px;
+            font-size: 12px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .laptop-dock {
+            position: absolute;
+            bottom: 15px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(20px);
+            border-radius: 15px;
+            padding: 8px 15px;
+            display: flex;
+            gap: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .laptop-dock-item {
+            width: 35px;
+            height: 35px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .laptop-dock-item:hover {
+            background: rgba(138, 43, 226, 0.4);
+            transform: scale(1.1);
+        }
+
+        /* Desktop Monitor */
+        .desktop-mockup {
+            width: 500px;
+            height: 350px;
+            background: linear-gradient(145deg, #2a2a2a 0%, #1a1a1a 100%);
+            border-radius: 15px;
+            position: relative;
+            margin: 0 auto;
+            box-shadow: 
+                0 30px 80px rgba(0, 0, 0, 0.5),
+                0 0 0 1px rgba(255, 255, 255, 0.1);
+            transform: perspective(1000px) rotateX(3deg);
+        }
+
+        .desktop-screen {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            right: 15px;
+            bottom: 15px;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 50%, #2a1a3a 100%);
+            border-radius: 8px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .desktop-screen::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(circle at 30% 70%, rgba(138, 43, 226, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 70% 30%, rgba(75, 0, 130, 0.1) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        .desktop-status-bar {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 25px;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(20px);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 12px;
+            font-size: 11px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .desktop-dock {
+            position: absolute;
+            bottom: 12px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(20px);
+            border-radius: 12px;
+            padding: 6px 12px;
+            display: flex;
+            gap: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .desktop-dock-item {
+            width: 30px;
+            height: 30px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .desktop-dock-item:hover {
+            background: rgba(138, 43, 226, 0.4);
+            transform: scale(1.1);
+        }
+
+        /* TauPhone Mobile */
+        .phone-mockup {
+            width: 200px;
+            height: 400px;
+            background: linear-gradient(145deg, #2a2a2a 0%, #1a1a1a 100%);
+            border-radius: 30px;
+            position: relative;
+            margin: 0 auto;
+            box-shadow: 
+                0 20px 60px rgba(0, 0, 0, 0.4),
+                0 0 0 1px rgba(255, 255, 255, 0.1);
+            transform: perspective(1000px) rotateY(-10deg) rotateX(5deg);
+        }
+
+        .phone-screen {
+            position: absolute;
+            top: 8px;
+            left: 8px;
+            right: 8px;
+            bottom: 8px;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+            border-radius: 22px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .phone-screen::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(circle at 50% 20%, rgba(138, 43, 226, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 50% 80%, rgba(75, 0, 130, 0.1) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        .phone-status-bar {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 30px;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 15px;
+            font-size: 10px;
+            border-radius: 22px 22px 0 0;
+        }
+
+        .phone-app-grid {
+            position: absolute;
+            top: 50px;
+            left: 15px;
+            right: 15px;
+            bottom: 60px;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            padding: 20px 0;
+        }
+
+        .phone-app {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            padding: 10px;
+            border-radius: 8px;
+        }
+
+        .phone-app:hover {
+            background: rgba(138, 43, 226, 0.2);
+            transform: scale(1.05);
+        }
+
+        .phone-app-icon {
+            width: 35px;
+            height: 35px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+
+        .phone-app-name {
+            font-size: 8px;
+            color: #ffffff;
+            text-align: center;
+        }
+
+        .phone-dock {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 50px;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(20px);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            border-radius: 0 0 22px 22px;
+        }
+
+        .phone-dock-item {
+            width: 30px;
+            height: 30px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .phone-dock-item:hover {
+            background: rgba(138, 43, 226, 0.4);
+            transform: scale(1.1);
+        }
+
+        /* Features Section */
+        .features-section {
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 20px;
+            padding: 60px 40px;
+            margin-bottom: 80px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .features-title {
+            font-size: 2.5rem;
+            font-weight: 600;
+            text-align: center;
+            margin-bottom: 40px;
+            color: #ffffff;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 40px;
+        }
+
+        .feature-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .feature-card:hover {
+            background: rgba(138, 43, 226, 0.1);
+            transform: translateY(-5px);
+        }
+
+        .feature-icon {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+        }
+
+        .feature-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #ffffff;
+        }
+
+        .feature-description {
+            color: #888;
+            line-height: 1.6;
+        }
+
+        /* Download Section */
+        .download-section {
+            text-align: center;
+            background: linear-gradient(135deg, rgba(138, 43, 226, 0.1) 0%, rgba(75, 0, 130, 0.1) 100%);
+            border-radius: 20px;
+            padding: 60px 40px;
+            border: 1px solid rgba(138, 43, 226, 0.2);
+        }
+
+        .download-title {
+            font-size: 2.5rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #ffffff;
+        }
+
+        .download-subtitle {
+            font-size: 1.2rem;
+            color: #888;
+            margin-bottom: 40px;
+        }
+
+        .download-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .download-btn {
+            background: linear-gradient(135deg, #8a2be2 0%, #4b0082 100%);
+            color: #ffffff;
+            padding: 15px 30px;
+            border-radius: 10px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+        }
+
+        .download-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(138, 43, 226, 0.4);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .hero-title {
+                font-size: 2.5rem;
+            }
+            
+            .device-showcase {
+                grid-template-columns: 1fr;
+                gap: 40px;
+            }
+            
+            .laptop-mockup,
+            .desktop-mockup {
+                transform: none;
+            }
+            
+            .phone-mockup {
+                transform: none;
+            }
+        }
+
+        /* Animations */
+        .fade-in {
+            animation: fadeIn 0.8s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .slide-in {
+            animation: slideIn 0.6s ease;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(-50px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <div class="marketing-container">
+        <!-- Hero Section -->
+        <div class="hero-section fade-in">
+            <h1 class="hero-title">TauOS Marketing Assets</h1>
+            <p class="hero-subtitle">Professional device mockups and visual assets for presentations, websites, and investor decks</p>
+        </div>
+
+        <!-- Device Showcase -->
+        <div class="device-showcase">
+            <!-- TauBook Pro Laptop -->
+            <div class="device-mockup slide-in">
+                <h2 class="device-title">TauBook Pro - 15.6" Laptop</h2>
+                <p class="device-description">
+                    Professional laptop featuring TauOS desktop environment with modern glassmorphism design, 
+                    privacy-first indicators, and seamless application integration.
+                </p>
+                <div class="laptop-mockup">
+                    <div class="laptop-screen">
+                        <div class="laptop-status-bar">
+                            <div>τ TauOS</div>
+                            <div>🔒 Privacy Protected</div>
+                            <div>9:41 AM</div>
+                        </div>
+                        <div class="laptop-dock">
+                            <div class="laptop-dock-item">🏠</div>
+                            <div class="laptop-dock-item">🌐</div>
+                            <div class="laptop-dock-item">📁</div>
+                            <div class="laptop-dock-item">📧</div>
+                            <div class="laptop-dock-item">☁️</div>
+                            <div class="laptop-dock-item">🎵</div>
+                            <div class="laptop-dock-item">⚙️</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Desktop Monitor -->
+            <div class="device-mockup slide-in">
+                <h2 class="device-title">TauOS Desktop Workstation</h2>
+                <p class="device-description">
+                    High-performance desktop setup with TauOS, featuring advanced file management, 
+                    system monitoring, and enterprise-grade security features.
+                </p>
+                <div class="desktop-mockup">
+                    <div class="desktop-screen">
+                        <div class="desktop-status-bar">
+                            <div>τ TauOS</div>
+                            <div>🔒 Secure</div>
+                            <div>9:41 AM</div>
+                        </div>
+                        <div class="desktop-dock">
+                            <div class="desktop-dock-item">🏠</div>
+                            <div class="desktop-dock-item">🌐</div>
+                            <div class="desktop-dock-item">📁</div>
+                            <div class="desktop-dock-item">📧</div>
+                            <div class="desktop-dock-item">☁️</div>
+                            <div class="desktop-dock-item">🎵</div>
+                            <div class="desktop-dock-item">⚙️</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TauPhone Mobile -->
+            <div class="device-mockup slide-in">
+                <h2 class="device-title">TauPhone - Mobile Experience</h2>
+                <p class="device-description">
+                    Mobile interface optimized for touch devices with TauOS apps, 
+                    privacy controls, and seamless cloud integration.
+                </p>
+                <div class="phone-mockup">
+                    <div class="phone-screen">
+                        <div class="phone-status-bar">
+                            <div>9:41</div>
+                            <div>📶 🔋</div>
+                        </div>
+                        <div class="phone-app-grid">
+                            <div class="phone-app">
+                                <div class="phone-app-icon">📧</div>
+                                <div class="phone-app-name">Mail</div>
+                            </div>
+                            <div class="phone-app">
+                                <div class="phone-app-icon">☁️</div>
+                                <div class="phone-app-name">Cloud</div>
+                            </div>
+                            <div class="phone-app">
+                                <div class="phone-app-icon">🌐</div>
+                                <div class="phone-app-name">Browser</div>
+                            </div>
+                            <div class="phone-app">
+                                <div class="phone-app-icon">📁</div>
+                                <div class="phone-app-name">Files</div>
+                            </div>
+                            <div class="phone-app">
+                                <div class="phone-app-icon">📞</div>
+                                <div class="phone-app-name">Phone</div>
+                            </div>
+                            <div class="phone-app">
+                                <div class="phone-app-icon">💬</div>
+                                <div class="phone-app-name">Messages</div>
+                            </div>
+                        </div>
+                        <div class="phone-dock">
+                            <div class="phone-dock-item">🏠</div>
+                            <div class="phone-dock-item">📧</div>
+                            <div class="phone-dock-item">☁️</div>
+                            <div class="phone-dock-item">⚙️</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Features Section -->
+        <div class="features-section fade-in">
+            <h2 class="features-title">TauOS Key Features</h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">🔒</div>
+                    <h3 class="feature-title">Privacy-First Design</h3>
+                    <p class="feature-description">
+                        Zero telemetry, built-in privacy protection, and user control over all data collection.
+                    </p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🎨</div>
+                    <h3 class="feature-title">Modern Interface</h3>
+                    <p class="feature-description">
+                        Glassmorphism effects, smooth animations, and intuitive user experience.
+                    </p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">⚡</div>
+                    <h3 class="feature-title">High Performance</h3>
+                    <p class="feature-description">
+                        Optimized for speed and efficiency with minimal resource consumption.
+                    </p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🛡️</div>
+                    <h3 class="feature-title">Enterprise Security</h3>
+                    <p class="feature-description">
+                        Advanced security features, sandboxing, and secure boot process.
+                    </p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">☁️</div>
+                    <h3 class="feature-title">Cloud Integration</h3>
+                    <p class="feature-description">
+                        Seamless TauCloud integration with end-to-end encryption.
+                    </p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🔧</div>
+                    <h3 class="feature-title">Developer Friendly</h3>
+                    <p class="feature-description">
+                        Comprehensive SDK, documentation, and developer tools.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Download Section -->
+        <div class="download-section fade-in">
+            <h2 class="download-title">Download Marketing Assets</h2>
+            <p class="download-subtitle">
+                High-resolution screenshots, device mockups, and presentation materials
+            </p>
+            <div class="download-buttons">
+                <button class="download-btn" onclick="downloadAssets()">📥 Download All Assets</button>
+                <button class="download-btn" onclick="generateScreenshots()">📸 Generate Screenshots</button>
+                <button class="download-btn" onclick="exportMockups()">🎨 Export Mockups</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Interactive functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add hover effects to device mockups
+            const deviceMockups = document.querySelectorAll('.laptop-mockup, .desktop-mockup, .phone-mockup');
+            deviceMockups.forEach(mockup => {
+                mockup.addEventListener('mouseenter', function() {
+                    this.style.transform = this.style.transform.replace('rotate', 'rotate') + ' scale(1.02)';
+                });
+                mockup.addEventListener('mouseleave', function() {
+                    this.style.transform = this.style.transform.replace(' scale(1.02)', '');
+                });
+            });
+
+            // Animate feature cards on scroll
+            const observerOptions = {
+                threshold: 0.1,
+                rootMargin: '0px 0px -50px 0px'
+            };
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.opacity = '1';
+                        entry.target.style.transform = 'translateY(0)';
+                    }
+                });
+            }, observerOptions);
+
+            const featureCards = document.querySelectorAll('.feature-card');
+            featureCards.forEach(card => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(30px)';
+                card.style.transition = 'all 0.6s ease';
+                observer.observe(card);
+            });
+        });
+
+        // Download functions
+        function downloadAssets() {
+            alert('📥 Downloading TauOS marketing assets...\n\nThis would include:\n• High-resolution screenshots\n• Device mockups (PSD/AI)\n• Presentation templates\n• Brand guidelines\n• Logo assets');
+        }
+
+        function generateScreenshots() {
+            alert('📸 Generating TauOS screenshots...\n\nThis would create:\n• Desktop environment screenshots\n• Mobile UI screenshots\n• App launcher screenshots\n• Settings panel screenshots\n• File manager screenshots');
+        }
+
+        function exportMockups() {
+            alert('🎨 Exporting device mockups...\n\nThis would export:\n• TauBook Pro laptop mockup\n• Desktop monitor mockup\n• TauPhone mobile mockup\n• Marketing presentation slides\n• Social media assets');
+        }
+    </script>
+</body>
+</html>

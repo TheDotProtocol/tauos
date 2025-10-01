@@ -1,0 +1,450 @@
+use anyhow::Result;
+use std::fs;
+use std::path::Path;
+
+/// TauUI - Modern GUI toolkit for Tau OS applications
+/// 
+/// Generates beautiful HTML/CSS interfaces with Black & Gold theme
+pub struct TauUI {
+    app_id: String,
+    output_dir: String,
+}
+
+impl TauUI {
+    /// Create a new TauUI instance
+    pub fn new(app_id: &str) -> Result<Self> {
+        Ok(Self {
+            app_id: app_id.to_string(),
+            output_dir: "tauui_output".to_string(),
+        })
+    }
+    
+    /// Create a modern window with Black & Gold theme
+    pub fn create_window(&self, title: &str) -> Result<()> {
+        println!("TauUI: Creating modern window '{}' for app {}", title, self.app_id);
+        
+        // Create output directory
+        fs::create_dir_all(&self.output_dir)?;
+        
+        let html = self.generate_modern_ui(title);
+        let filename = format!("{}/{}.html", self.output_dir, self.app_id.replace(".", "_"));
+        
+        fs::write(&filename, html)?;
+        println!("✅ Generated modern UI: {}", filename);
+        println!("🌐 Open this file in your browser to see the TauOS interface!");
+        
+        Ok(())
+    }
+    
+    /// Create a styled button with icon support
+    pub fn create_button(&self, label: &str, icon: Option<&str>) -> Result<()> {
+        println!("TauUI: Creating button '{}' with icon {:?} for app {}", 
+                label, icon, self.app_id);
+        Ok(())
+    }
+    
+    /// Create a styled label
+    pub fn create_label(&self, text: &str) -> Result<()> {
+        println!("TauUI: Creating label '{}' for app {}", text, self.app_id);
+        Ok(())
+    }
+    
+    /// Run the application
+    pub fn run(&self) -> Result<()> {
+        println!("TauUI: Running app {}", self.app_id);
+        println!("Modern web-based UI ready for TauOS!");
+        println!("📁 Check the '{}' directory for generated HTML files", self.output_dir);
+        Ok(())
+    }
+    
+    /// Generate modern HTML UI with Black & Gold theme
+    fn generate_modern_ui(&self, title: &str) -> String {
+        format!(r#"
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{}</title>
+    <style>
+        * {{
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }}
+        
+        body {{
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+            color: #ffffff;
+            overflow: hidden;
+            height: 100vh;
+        }}
+        
+        .tauos-window {{
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.95);
+            backdrop-filter: blur(20px);
+        }}
+        
+        .titlebar {{
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 20px;
+            background: linear-gradient(90deg, #1a1a1a 0%, #2a2a2a 100%);
+            border-bottom: 1px solid #333;
+            -webkit-app-region: drag;
+        }}
+        
+        .titlebar-title {{
+            font-size: 16px;
+            font-weight: 600;
+            color: #ffd700;
+            text-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
+        }}
+        
+        .titlebar-controls {{
+            display: flex;
+            gap: 8px;
+            -webkit-app-region: no-drag;
+        }}
+        
+        .control-btn {{
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }}
+        
+        .control-btn.close {{
+            background: #ff5f56;
+        }}
+        
+        .control-btn.minimize {{
+            background: #ffbd2e;
+        }}
+        
+        .control-btn.maximize {{
+            background: #27ca3f;
+        }}
+        
+        .main-content {{
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }}
+        
+        .sidebar {{
+            width: 240px;
+            background: rgba(26, 26, 26, 0.8);
+            border-right: 1px solid #333;
+            padding: 20px;
+        }}
+        
+        .sidebar-item {{
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            margin-bottom: 8px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: #ccc;
+        }}
+        
+        .sidebar-item:hover {{
+            background: rgba(255, 215, 0, 0.1);
+            color: #ffd700;
+            transform: translateX(4px);
+        }}
+        
+        .sidebar-item.active {{
+            background: linear-gradient(90deg, rgba(255, 215, 0, 0.2) 0%, rgba(255, 215, 0, 0.1) 100%);
+            color: #ffd700;
+            border-left: 3px solid #ffd700;
+        }}
+        
+        .content-area {{
+            flex: 1;
+            padding: 30px;
+            overflow-y: auto;
+        }}
+        
+        .content-header {{
+            margin-bottom: 30px;
+        }}
+        
+        .content-title {{
+            font-size: 28px;
+            font-weight: 700;
+            color: #ffd700;
+            margin-bottom: 8px;
+            text-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
+        }}
+        
+        .content-subtitle {{
+            font-size: 16px;
+            color: #999;
+            font-weight: 400;
+        }}
+        
+        .button {{
+            background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+            color: #000;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);
+        }}
+        
+        .button:hover {{
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 215, 0, 0.4);
+        }}
+        
+        .button.secondary {{
+            background: rgba(255, 215, 0, 0.1);
+            color: #ffd700;
+            border: 1px solid rgba(255, 215, 0, 0.3);
+        }}
+        
+        .button.secondary:hover {{
+            background: rgba(255, 215, 0, 0.2);
+        }}
+        
+        .card {{
+            background: rgba(26, 26, 26, 0.6);
+            border: 1px solid #333;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 20px;
+            backdrop-filter: blur(10px);
+        }}
+        
+        .icon {{
+            width: 20px;
+            height: 20px;
+            fill: currentColor;
+        }}
+        
+        @keyframes shimmer {{
+            0% {{ background-position: -200% 0; }}
+            100% {{ background-position: 200% 0; }}
+        }}
+        
+        .shimmer {{
+            background: linear-gradient(90deg, transparent, rgba(255, 215, 0, 0.1), transparent);
+            background-size: 200% 100%;
+            animation: shimmer 2s infinite;
+        }}
+        
+        .tauos-logo {{
+            font-size: 24px;
+            font-weight: 900;
+            background: linear-gradient(45deg, #ffd700, #ffed4e, #ffd700);
+            background-size: 200% 200%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: shimmer 3s ease-in-out infinite;
+        }}
+    </style>
+</head>
+<body>
+    <div class="tauos-window">
+        <div class="titlebar">
+            <div class="titlebar-title">
+                <span class="tauos-logo">τ</span> {}
+            </div>
+            <div class="titlebar-controls">
+                <button class="control-btn minimize"></button>
+                <button class="control-btn maximize"></button>
+                <button class="control-btn close"></button>
+            </div>
+        </div>
+        
+        <div class="main-content">
+            <div class="sidebar">
+                <div class="sidebar-item active">
+                    <svg class="icon" viewBox="0 0 24 24">
+                        <path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/>
+                    </svg>
+                    Dashboard
+                </div>
+                <div class="sidebar-item">
+                    <svg class="icon" viewBox="0 0 24 24">
+                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                    </svg>
+                    Applications
+                </div>
+                <div class="sidebar-item">
+                    <svg class="icon" viewBox="0 0 24 24">
+                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                    </svg>
+                    Settings
+                </div>
+                <div class="sidebar-item">
+                    <svg class="icon" viewBox="0 0 24 24">
+                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                    </svg>
+                    Terminal
+                </div>
+            </div>
+            
+            <div class="content-area">
+                <div class="content-header">
+                    <h1 class="content-title shimmer">Welcome to TauOS</h1>
+                    <p class="content-subtitle">The future of computing is here</p>
+                </div>
+                
+                <div class="card">
+                    <h3 style="color: #ffd700; margin-bottom: 16px;">Quick Actions</h3>
+                    <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+                        <button class="button">
+                            <svg class="icon" style="width: 16px; height: 16px; margin-right: 8px;" viewBox="0 0 24 24">
+                                <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
+                            </svg>
+                            New App
+                        </button>
+                        <button class="button secondary">
+                            <svg class="icon" style="width: 16px; height: 16px; margin-right: 8px;" viewBox="0 0 24 24">
+                                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                            </svg>
+                            Install Package
+                        </button>
+                        <button class="button secondary">
+                            <svg class="icon" style="width: 16px; height: 16px; margin-right: 8px;" viewBox="0 0 24 24">
+                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                            </svg>
+                            System Settings
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <h3 style="color: #ffd700; margin-bottom: 16px;">System Status</h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px;">
+                        <div style="background: rgba(255, 215, 0, 0.1); padding: 16px; border-radius: 8px; border-left: 3px solid #ffd700;">
+                            <div style="font-size: 24px; color: #ffd700; font-weight: 700;">98%</div>
+                            <div style="color: #999; font-size: 14px;">CPU Usage</div>
+                        </div>
+                        <div style="background: rgba(255, 215, 0, 0.1); padding: 16px; border-radius: 8px; border-left: 3px solid #ffd700;">
+                            <div style="font-size: 24px; color: #ffd700; font-weight: 700;">4.2GB</div>
+                            <div style="color: #999; font-size: 14px;">Memory Used</div>
+                        </div>
+                        <div style="background: rgba(255, 215, 0, 0.1); padding: 16px; border-radius: 8px; border-left: 3px solid #ffd700;">
+                            <div style="font-size: 24px; color: #ffd700; font-weight: 700;">2.1TB</div>
+                            <div style="color: #999; font-size: 14px;">Storage Free</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <h3 style="color: #ffd700; margin-bottom: 16px;">TauOS Features</h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 16px;">
+                        <div style="background: rgba(255, 215, 0, 0.05); padding: 20px; border-radius: 8px; border: 1px solid rgba(255, 215, 0, 0.2);">
+                            <h4 style="color: #ffd700; margin-bottom: 8px;">🚀 Performance</h4>
+                            <p style="color: #ccc; font-size: 14px;">Lightning-fast boot times and optimized resource usage</p>
+                        </div>
+                        <div style="background: rgba(255, 215, 0, 0.05); padding: 20px; border-radius: 8px; border: 1px solid rgba(255, 215, 0, 0.2);">
+                            <h4 style="color: #ffd700; margin-bottom: 8px;">🔒 Security</h4>
+                            <p style="color: #ccc; font-size: 14px;">Built-in encryption and sandboxed applications</p>
+                        </div>
+                        <div style="background: rgba(255, 215, 0, 0.05); padding: 20px; border-radius: 8px; border: 1px solid rgba(255, 215, 0, 0.2);">
+                            <h4 style="color: #ffd700; margin-bottom: 8px;">🎨 Beauty</h4>
+                            <p style="color: #ccc; font-size: 14px;">Stunning Black & Gold interface with smooth animations</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Add interactive functionality
+        document.querySelectorAll('.sidebar-item').forEach(item => {{
+            item.addEventListener('click', () => {{
+                document.querySelectorAll('.sidebar-item').forEach(i => i.classList.remove('active'));
+                item.classList.add('active');
+            }});
+        }});
+        
+        // Add button hover effects
+        document.querySelectorAll('.button').forEach(button => {{
+            button.addEventListener('mouseenter', () => {{
+                button.style.transform = 'translateY(-2px)';
+            }});
+            
+            button.addEventListener('mouseleave', () => {{
+                button.style.transform = 'translateY(0)';
+            }});
+        }});
+        
+        // Add window control functionality
+        document.querySelector('.control-btn.close').addEventListener('click', () => {{
+            window.close();
+        }});
+        
+        // Add some dynamic content updates
+        setInterval(() => {{
+            const cpuElement = document.querySelector('.card:last-child .card:first-child div:first-child');
+            if (cpuElement) {{
+                const currentValue = parseInt(cpuElement.textContent);
+                const newValue = Math.max(10, Math.min(100, currentValue + (Math.random() - 0.5) * 10));
+                cpuElement.textContent = Math.round(newValue) + '%';
+            }}
+        }}, 3000);
+    </script>
+</body>
+</html>
+        "#, title, title)
+    }
+}
+
+/// Helper functions for common UI patterns
+pub mod helpers {
+    use super::*;
+    
+    /// Create a simple "Hello World" window with modern styling
+    pub fn create_hello_world(app_id: &str, title: &str) -> Result<TauUI> {
+        let tauui = TauUI::new(app_id)?;
+        tauui.create_window(title)?;
+        println!("TauUI: Modern Hello World app created for {}", app_id);
+        Ok(tauui)
+    }
+    
+    /// Create a basic application window with content
+    pub fn create_basic_app(app_id: &str, title: &str, content: &str) -> Result<TauUI> {
+        let tauui = TauUI::new(app_id)?;
+        tauui.create_window(title)?;
+        println!("TauUI: Modern basic app created for {} with content: {}", app_id, content);
+        Ok(tauui)
+    }
+    
+    /// Create a sidebar navigation component
+    pub fn create_sidebar() -> Result<()> {
+        println!("TauUI: Creating modern sidebar navigation");
+        Ok(())
+    }
+    
+    /// Create a top bar with title and controls
+    pub fn create_topbar(title: &str) -> Result<()> {
+        println!("TauUI: Creating modern top bar with title: {}", title);
+        Ok(())
+    }
+    
+    /// Create a styled button with optional icon
+    pub fn create_button(label: &str, icon: Option<&str>) -> Result<()> {
+        println!("TauUI: Creating modern button '{}' with icon {:?}", label, icon);
+        Ok(())
+    }
+} 

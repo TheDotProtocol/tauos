@@ -1,0 +1,284 @@
+// TauScript Standard Library - Core Module
+// The foundation of TauScript that makes it the next mass-adopted language!
+
+// Core Data Types and Operations
+module Core {
+    // String Operations
+    export func stringLength(str: string): number {
+        return str.length;
+    }
+    
+    export func stringConcat(a: string, b: string): string {
+        return a + b;
+    }
+    
+    export func stringSplit(str: string, delimiter: string): string[] {
+        return str.split(delimiter);
+    }
+    
+    export func stringReplace(str: string, search: string, replace: string): string {
+        return str.replace(search, replace);
+    }
+    
+    export func stringToUpper(str: string): string {
+        return str.toUpperCase();
+    }
+    
+    export func stringToLower(str: string): string {
+        return str.toLowerCase();
+    }
+    
+    // Array Operations
+    export func arrayLength(arr: any[]): number {
+        return arr.length;
+    }
+    
+    export func arrayPush(arr: any[], item: any): void {
+        arr.push(item);
+    }
+    
+    export func arrayPop(arr: any[]): any {
+        return arr.pop();
+    }
+    
+    export func arrayMap(arr: any[], callback: func): any[] {
+        return arr.map(callback);
+    }
+    
+    export func arrayFilter(arr: any[], callback: func): any[] {
+        return arr.filter(callback);
+    }
+    
+    export func arrayReduce(arr: any[], callback: func, initial: any): any {
+        return arr.reduce(callback, initial);
+    }
+    
+    // Math Operations
+    export func mathAbs(x: number): number {
+        return Math.abs(x);
+    }
+    
+    export func mathMax(a: number, b: number): number {
+        return Math.max(a, b);
+    }
+    
+    export func mathMin(a: number, b: number): number {
+        return Math.min(a, b);
+    }
+    
+    export func mathRound(x: number): number {
+        return Math.round(x);
+    }
+    
+    export func mathFloor(x: number): number {
+        return Math.floor(x);
+    }
+    
+    export func mathCeil(x: number): number {
+        return Math.ceil(x);
+    }
+    
+    export func mathRandom(): number {
+        return Math.random();
+    }
+    
+    export func mathPow(base: number, exponent: number): number {
+        return Math.pow(base, exponent);
+    }
+    
+    export func mathSqrt(x: number): number {
+        return Math.sqrt(x);
+    }
+    
+    export func mathSin(x: number): number {
+        return Math.sin(x);
+    }
+    
+    export func mathCos(x: number): number {
+        return Math.cos(x);
+    }
+    
+    export func mathTan(x: number): number {
+        return Math.tan(x);
+    }
+    
+    // Date and Time Operations
+    export func dateNow(): Date {
+        return new Date();
+    }
+    
+    export func dateCreate(year: number, month: number, day: number): Date {
+        return new Date(year, month - 1, day);
+    }
+    
+    export func dateGetTime(date: Date): number {
+        return date.getTime();
+    }
+    
+    export func dateGetYear(date: Date): number {
+        return date.getFullYear();
+    }
+    
+    export func dateGetMonth(date: Date): number {
+        return date.getMonth() + 1;
+    }
+    
+    export func dateGetDay(date: Date): number {
+        return date.getDate();
+    }
+    
+    export func dateGetHours(date: Date): number {
+        return date.getHours();
+    }
+    
+    export func dateGetMinutes(date: Date): number {
+        return date.getMinutes();
+    }
+    
+    export func dateGetSeconds(date: Date): number {
+        return date.getSeconds();
+    }
+    
+    // Type Checking
+    export func isString(value: any): boolean {
+        return typeof value === 'string';
+    }
+    
+    export func isNumber(value: any): boolean {
+        return typeof value === 'number' && !isNaN(value);
+    }
+    
+    export func isBoolean(value: any): boolean {
+        return typeof value === 'boolean';
+    }
+    
+    export func isArray(value: any): boolean {
+        return Array.isArray(value);
+    }
+    
+    export func isObject(value: any): boolean {
+        return typeof value === 'object' && value !== null && !Array.isArray(value);
+    }
+    
+    export func isFunction(value: any): boolean {
+        return typeof value === 'function';
+    }
+    
+    export func isNull(value: any): boolean {
+        return value === null;
+    }
+    
+    export func isUndefined(value: any): boolean {
+        return value === undefined;
+    }
+    
+    // Utility Functions
+    export func deepClone(obj: any): any {
+        if (obj === null || typeof obj !== 'object') {
+            return obj;
+        }
+        
+        if (obj instanceof Date) {
+            return new Date(obj.getTime());
+        }
+        
+        if (Array.isArray(obj)) {
+            return obj.map(item => deepClone(item));
+        }
+        
+        const cloned = {};
+        for (const key in obj) {
+            if (obj.hasOwnProperty(key)) {
+                cloned[key] = deepClone(obj[key]);
+            }
+        }
+        
+        return cloned;
+    }
+    
+    export func debounce(func: func, delay: number): func {
+        let timeoutId: number;
+        return function(...args: any[]) {
+            clearTimeout(timeoutId);
+            timeoutId = setTimeout(() => func.apply(this, args), delay);
+        };
+    }
+    
+    export func throttle(func: func, limit: number): func {
+        let inThrottle: boolean;
+        return function(...args: any[]) {
+            if (!inThrottle) {
+                func.apply(this, args);
+                inThrottle = true;
+                setTimeout(() => inThrottle = false, limit);
+            }
+        };
+    }
+    
+    export func memoize(func: func): func {
+        const cache = new Map();
+        return function(...args: any[]) {
+            const key = JSON.stringify(args);
+            if (cache.has(key)) {
+                return cache.get(key);
+            }
+            const result = func.apply(this, args);
+            cache.set(key, result);
+            return result;
+        };
+    }
+    
+    // Error Handling
+    export func tryCatch(tryFunc: func, catchFunc: func): any {
+        try {
+            return tryFunc();
+        } catch (error) {
+            return catchFunc(error);
+        }
+    }
+    
+    export func assert(condition: boolean, message: string): void {
+        if (!condition) {
+            throw new Error(`Assertion failed: ${message}`);
+        }
+    }
+    
+    // Async Operations
+    export func sleep(ms: number): Promise<void> {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
+    
+    export func timeout(func: func, ms: number): Promise<any> {
+        return new Promise((resolve, reject) => {
+            setTimeout(() => {
+                try {
+                    resolve(func());
+                } catch (error) {
+                    reject(error);
+                }
+            }, ms);
+        });
+    }
+    
+    export func retry(func: func, maxAttempts: number, delay: number): Promise<any> {
+        return new Promise((resolve, reject) => {
+            let attempts = 0;
+            
+            const attempt = () => {
+                attempts++;
+                try {
+                    const result = func();
+                    resolve(result);
+                } catch (error) {
+                    if (attempts < maxAttempts) {
+                        setTimeout(attempt, delay);
+                    } else {
+                        reject(error);
+                    }
+                }
+            };
+            
+            attempt();
+        });
+    }
+}

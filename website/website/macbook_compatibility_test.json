@@ -1,0 +1,22 @@
+{
+  "test_date": "2025-07-30T13:21:45Z",
+  "macbook_model": "MacBook Pro",
+  "macbook_year": "MacBookPro16,3",
+  "cpu_architecture": "x86_64",
+  "memory_gb": 8,
+  "disk_space_gb": 205.659,
+  "iso_file": "tauos-x86_64-20250730.iso",
+  "iso_size_mb": ,
+  "compatibility_score": 85,
+  "recommendations": [
+    "Backup all data before installation",
+    "Use USB 3.0 drive for better performance",
+    "Disable Secure Boot if installation fails",
+    "Test in QEMU first if available"
+  ],
+  "known_issues": [
+    "Apple Silicon MacBooks have limited compatibility",
+    "Some graphics drivers may need manual configuration",
+    "WiFi drivers may require additional setup"
+  ]
+}

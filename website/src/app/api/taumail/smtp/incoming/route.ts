@@ -22,7 +22,7 @@ const smtpConfig = {
   }
 };
 
-const transporter = nodemailer.createTransport(smtpConfig);
+const transporter = nodemailer.createTransporter(smtpConfig);
 
 export async function POST(request: NextRequest) {
   try {

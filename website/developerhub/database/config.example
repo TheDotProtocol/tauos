@@ -1,0 +1,30 @@
+# TauCore™ Database Configuration
+# Copy this file to .env and update with your actual values
+
+# Database URL (Supabase)
+DATABASE_URL=postgresql://postgres:[YOUR_PASSWORD]@db.[YOUR_PROJECT_REF].supabase.co:5432/postgres
+
+# JWT Configuration
+JWT_SECRET=your-jwt-secret-key-here
+BCRYPT_ROUNDS=12
+
+# SMTP Configuration (Vultr + SendGrid)
+SMTP_HOST=smtp.tauos.org
+SMTP_PORT=587
+SMTP_USER=saleena@tauos.org
+SMTP_PASS=Saleena@132
+SMTP_SECURE=false
+
+# SendGrid Configuration
+SENDGRID_API_KEY=your-sendgrid-api-key
+SENDGRID_FROM_EMAIL=saleena@tauos.org
+
+# Email Configuration
+EMAIL_DOMAIN=tauos.org
+RATE_LIMIT_WINDOW_MS=900000
+RATE_LIMIT_MAX_REQUESTS=100
+MAX_FILE_SIZE=10485760
+
+# Logging
+LOG_LEVEL=info
+NODE_ENV=development

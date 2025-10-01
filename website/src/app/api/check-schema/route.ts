@@ -30,11 +30,46 @@ export async function GET(request: NextRequest) {
     // Get all users to see the actual data structure
     const users = await pool.query('SELECT * FROM users LIMIT 5');
     
+    // Create incoming_emails table if it doesn't exist
+    try {
+      await pool.query(`
+        CREATE TABLE IF NOT EXISTS incoming_emails (
+          id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+          user_id UUID NOT NULL,
+          from_email VARCHAR(255) NOT NULL,
+          sender_name VARCHAR(255),
+          subject TEXT,
+          body TEXT,
+          body_text TEXT,
+          body_html TEXT,
+          received_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+          is_read BOOLEAN DEFAULT FALSE,
+          is_spam BOOLEAN DEFAULT FALSE,
+          headers JSONB,
+          attachments JSONB,
+          created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+          updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+        );
+      `);
+      console.log('✅ incoming_emails table created/ensured');
+    } catch (tableError: any) {
+      console.log('⚠️ Table creation warning:', tableError.message);
+    }
+
+    // Check incoming_emails table - FORCE FRESH DEPLOYMENT
+    const incomingEmailsResult = await pool.query(`
+      SELECT id, user_id, from_email, subject, received_at, is_spam
+      FROM incoming_emails 
+      ORDER BY received_at DESC 
+      LIMIT 5
+    `);
+
     return NextResponse.json({
       success: true,
       message: 'Users table structure found',
       columns: tableCheck.rows,
-      sampleUsers: users.rows
+      sampleUsers: users.rows,
+      incomingEmails: incomingEmailsResult.rows
     });
 
   } catch (error) {

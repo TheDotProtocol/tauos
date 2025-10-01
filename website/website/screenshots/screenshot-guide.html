@@ -1,0 +1,150 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TauOS Screenshot Guide</title>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #000000;
+            color: #ffffff;
+            padding: 40px;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        h1 {
+            color: #fbbf24;
+            font-size: 2.5rem;
+            margin-bottom: 2rem;
+        }
+        .screenshot-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 2rem;
+        }
+        .screenshot-item {
+            background: rgba(17, 24, 39, 0.5);
+            border: 1px solid rgba(75, 85, 99, 0.5);
+            border-radius: 12px;
+            padding: 20px;
+            transition: all 0.3s ease;
+        }
+        .screenshot-item:hover {
+            border-color: #fbbf24;
+            transform: translateY(-2px);
+        }
+        .screenshot-item h3 {
+            color: #fbbf24;
+            margin-bottom: 10px;
+        }
+        .screenshot-item a {
+            color: #3b82f6;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        .screenshot-item a:hover {
+            text-decoration: underline;
+        }
+        .status {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-top: 10px;
+        }
+        .status.ready {
+            background: rgba(34, 197, 94, 0.2);
+            color: #22c55e;
+        }
+        .status.updated {
+            background: rgba(251, 191, 36, 0.2);
+            color: #fbbf24;
+        }
+        .status.corporate {
+            background: rgba(59, 130, 246, 0.2);
+            color: #3b82f6;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📸 TauOS Screenshot Guide</h1>
+        <p>Use this guide to capture screenshots of all TauOS applications for marketing and documentation purposes.</p>
+        
+        <div class="screenshot-list">
+            <div class="screenshot-item">
+                <h3>🌐 Website Pages</h3>
+                <p><a href="http://localhost:3000" target="_blank">Landing Page</a></p>
+                <p><a href="http://localhost:3000/about" target="_blank">About Page</a></p>
+                <p><a href="http://localhost:3000/developers" target="_blank">Developers Page</a></p>
+                <p><a href="http://localhost:3000/governance" target="_blank">Governance Page</a></p>
+                <span class="status ready">Ready</span>
+            </div>
+            
+            <div class="screenshot-item">
+                <h3>📧 TauMail Applications</h3>
+                <p><a href="http://localhost:3001" target="_blank">TauMail Dashboard (App) - CORPORATE DESIGN</a></p>
+                <p><a href="http://localhost:3000/taumail" target="_blank">TauMail Dashboard (Web) - CORPORATE DESIGN</a></p>
+                <span class="status corporate">Corporate Branding</span>
+            </div>
+            
+            <div class="screenshot-item">
+                <h3>☁️ TauCloud Applications</h3>
+                <p><a href="http://localhost:3002" target="_blank">TauCloud Dashboard (App) - CORPORATE DESIGN</a></p>
+                <p><a href="http://localhost:3000/taucloud" target="_blank">TauCloud Dashboard (Web) - CORPORATE DESIGN</a></p>
+                <span class="status corporate">Corporate Branding</span>
+            </div>
+            
+            <div class="screenshot-item">
+                <h3>🆔 TauID & TauStore</h3>
+                <p><a href="http://localhost:3000/tauid" target="_blank">TauID Dashboard</a></p>
+                <p><a href="http://localhost:3000/taustore" target="_blank">TauStore Dashboard</a></p>
+                <span class="status ready">Ready</span>
+            </div>
+            
+            <div class="screenshot-item">
+                <h3>🏢 Enterprise Tools</h3>
+                <p><a href="http://localhost:3000/enterprise/mdm" target="_blank">MDM Dashboard</a></p>
+                <p><a href="http://localhost:3000/enterprise/ota" target="_blank">OTA Dashboard</a></p>
+                <p><a href="http://localhost:3000/enterprise/security" target="_blank">Security Dashboard</a></p>
+                <span class="status ready">Ready</span>
+            </div>
+        </div>
+        
+        <div style="margin-top: 40px; padding: 20px; background: rgba(251, 191, 36, 0.1); border-radius: 12px;">
+            <h3>📋 Screenshot Instructions:</h3>
+            <ol>
+                <li>Click on each link above to open the application</li>
+                <li>Use your browser's developer tools (F12) to set viewport to 1920x1080</li>
+                <li>Take full-page screenshots using browser dev tools or system screenshot tool</li>
+                <li>Save screenshots in the <code>screenshots/</code> folder</li>
+                <li>Use consistent naming: <code>app-name-view.png</code></li>
+            </ol>
+            
+            <h4 style="margin-top: 20px; color: #fbbf24;">🎯 Key Screenshots to Capture:</h4>
+            <ul>
+                <li><strong>TauMail App Dashboard:</strong> http://localhost:3001 - Shows the corporate email interface with professional branding</li>
+                <li><strong>TauCloud App Dashboard:</strong> http://localhost:3002 - Shows the corporate file management interface with professional branding</li>
+                <li><strong>Website Landing:</strong> http://localhost:3000 - Shows the main corporate website</li>
+                <li><strong>All Service Interfaces:</strong> TauID, TauStore, Enterprise tools with consistent corporate design</li>
+            </ul>
+            
+            <h4 style="margin-top: 20px; color: #22c55e;">✅ Corporate Branding Achieved:</h4>
+            <ul>
+                <li><strong>Consistent Design:</strong> All applications now use the same corporate styling</li>
+                <li><strong>Professional Appearance:</strong> Black backgrounds, gold accents, enterprise-ready UI</li>
+                <li><strong>Logo Integration:</strong> Proper TauOS logo implementation across all platforms</li>
+                <li><strong>Brand Consistency:</strong> Unified color scheme and typography throughout</li>
+            </ul>
+        </div>
+    </div>
+</body>
+</html>
+    

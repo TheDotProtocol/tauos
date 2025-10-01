@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Frontend Login</title>
+</head>
+<body>
+    <h1>Test TauMail Frontend Login</h1>
+    <button onclick="testLogin()">Test Login</button>
+    <div id="result"></div>
+
+    <script>
+        async function testLogin() {
+            try {
+                // Test login
+                const loginResponse = await fetch('http://localhost:3001/api/auth/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        email: 'saleena@tauos.org',
+                        password: 'Saleena@132'
+                    })
+                });
+                
+                const loginResult = await loginResponse.json();
+                console.log('Login result:', loginResult);
+                
+                if (loginResult.token) {
+                    // Test inbox
+                    const inboxResponse = await fetch('http://localhost:3001/api/emails/inbox', {
+                        headers: {
+                            'Authorization': `Bearer ${loginResult.token}`
+                        }
+                    });
+                    
+                    const inboxResult = await inboxResponse.json();
+                    console.log('Inbox result:', inboxResult);
+                    
+                    document.getElementById('result').innerHTML = `
+                        <h3>Login Success!</h3>
+                        <p>Token: ${loginResult.token.substring(0, 50)}...</p>
+                        <p>Inbox: ${JSON.stringify(inboxResult)}</p>
+                    `;
+                }
+                
+            } catch (error) {
+                console.error('Test error:', error);
+                document.getElementById('result').innerHTML = `<p style="color: red;">Error: ${error.message}</p>`;
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,429 @@
+// TauPkg - TauScript Package Manager
+// The ultimate package manager that makes TauScript the most developer-friendly language!
+
+module TauPkg {
+    // Package Configuration
+    export interface PackageConfig {
+        name: string;
+        version: string;
+        description: string;
+        author: string;
+        license: string;
+        keywords: string[];
+        dependencies: Record<string, string>;
+        devDependencies: Record<string, string>;
+        scripts: Record<string, string>;
+        main: string;
+        types: string;
+        repository: string;
+        homepage: string;
+        bugs: string;
+        engines: Record<string, string>;
+    }
+    
+    // Package Registry
+    export interface PackageRegistry {
+        name: string;
+        version: string;
+        description: string;
+        author: string;
+        license: string;
+        keywords: string[];
+        dependencies: Record<string, string>;
+        main: string;
+        types: string;
+        repository: string;
+        homepage: string;
+        downloads: number;
+        rating: number;
+        lastUpdated: Date;
+    }
+    
+    // Package Manager Class
+    export class PackageManager {
+        private registryUrl: string;
+        private cacheDir: string;
+        private nodeModulesDir: string;
+        
+        constructor(registryUrl: string = 'https://registry.taupkg.com') {
+            this.registryUrl = registryUrl;
+            this.cacheDir = './.taupkg/cache';
+            this.nodeModulesDir = './node_modules';
+        }
+        
+        // Initialize a new package
+        async initPackage(name: string, version: string = '1.0.0'): Promise<PackageConfig> {
+            const config: PackageConfig = {
+                name: name,
+                version: version,
+                description: '',
+                author: '',
+                license: 'MIT',
+                keywords: [],
+                dependencies: {},
+                devDependencies: {},
+                scripts: {
+                    'start': 'tau run',
+                    'build': 'tau build',
+                    'test': 'tau test',
+                    'lint': 'tau lint',
+                    'format': 'tau format'
+                },
+                main: 'index.tau',
+                types: 'index.d.ts',
+                repository: '',
+                homepage: '',
+                bugs: '',
+                engines: {
+                    'tau': '>=1.0.0'
+                }
+            };
+            
+            await this.writePackageConfig(config);
+            return config;
+        }
+        
+        // Install a package
+        async installPackage(packageName: string, version: string = 'latest'): Promise<void> {
+            console.log(`📦 Installing ${packageName}@${version}...`);
+            
+            // Check if package exists in registry
+            const packageInfo = await this.getPackageInfo(packageName, version);
+            if (!packageInfo) {
+                throw new Error(`Package ${packageName} not found in registry`);
+            }
+            
+            // Download package
+            const packagePath = await this.downloadPackage(packageName, packageInfo.version);
+            
+            // Install dependencies
+            await this.installDependencies(packageInfo.dependencies);
+            
+            // Copy to node_modules
+            await this.copyToNodeModules(packageName, packagePath);
+            
+            // Update package.json
+            await this.updatePackageJson(packageName, packageInfo.version);
+            
+            console.log(`✅ ${packageName}@${packageInfo.version} installed successfully!`);
+        }
+        
+        // Install all dependencies
+        async installAll(): Promise<void> {
+            console.log('📦 Installing all dependencies...');
+            
+            const config = await this.readPackageConfig();
+            const allDependencies = { ...config.dependencies, ...config.devDependencies };
+            
+            for (const [name, version] of Object.entries(allDependencies)) {
+                await this.installPackage(name, version);
+            }
+            
+            console.log('✅ All dependencies installed successfully!');
+        }
+        
+        // Update packages
+        async updatePackage(packageName: string): Promise<void> {
+            console.log(`🔄 Updating ${packageName}...`);
+            
+            const config = await this.readPackageConfig();
+            const currentVersion = config.dependencies[packageName] || config.devDependencies[packageName];
+            
+            if (!currentVersion) {
+                throw new Error(`Package ${packageName} not found in dependencies`);
+            }
+            
+            // Get latest version
+            const latestVersion = await this.getLatestVersion(packageName);
+            
+            if (latestVersion !== currentVersion) {
+                await this.installPackage(packageName, latestVersion);
+                console.log(`✅ ${packageName} updated from ${currentVersion} to ${latestVersion}`);
+            } else {
+                console.log(`✅ ${packageName} is already up to date`);
+            }
+        }
+        
+        // Update all packages
+        async updateAll(): Promise<void> {
+            console.log('🔄 Updating all packages...');
+            
+            const config = await this.readPackageConfig();
+            const allDependencies = { ...config.dependencies, ...config.devDependencies };
+            
+            for (const packageName of Object.keys(allDependencies)) {
+                await this.updatePackage(packageName);
+            }
+            
+            console.log('✅ All packages updated successfully!');
+        }
+        
+        // Remove a package
+        async removePackage(packageName: string): Promise<void> {
+            console.log(`🗑️  Removing ${packageName}...`);
+            
+            // Remove from node_modules
+            await this.removeFromNodeModules(packageName);
+            
+            // Update package.json
+            await this.removeFromPackageJson(packageName);
+            
+            console.log(`✅ ${packageName} removed successfully!`);
+        }
+        
+        // List installed packages
+        async listPackages(): Promise<Record<string, string>> {
+            const config = await this.readPackageConfig();
+            return { ...config.dependencies, ...config.devDependencies };
+        }
+        
+        // Search packages
+        async searchPackages(query: string): Promise<PackageRegistry[]> {
+            console.log(`🔍 Searching for packages matching "${query}"...`);
+            
+            const response = await fetch(`${this.registryUrl}/search?q=${encodeURIComponent(query)}`);
+            const results = await response.json();
+            
+            return results.packages || [];
+        }
+        
+        // Get package info
+        async getPackageInfo(packageName: string, version: string = 'latest'): Promise<PackageRegistry | null> {
+            try {
+                const response = await fetch(`${this.registryUrl}/package/${packageName}/${version}`);
+                if (response.ok) {
+                    return await response.json();
+                }
+            } catch (error) {
+                console.error(`Error fetching package info for ${packageName}:`, error);
+            }
+            return null;
+        }
+        
+        // Get latest version
+        async getLatestVersion(packageName: string): Promise<string> {
+            const packageInfo = await this.getPackageInfo(packageName, 'latest');
+            return packageInfo?.version || '1.0.0';
+        }
+        
+        // Check for outdated packages
+        async checkOutdated(): Promise<Record<string, { current: string, latest: string }>> {
+            console.log('🔍 Checking for outdated packages...');
+            
+            const config = await this.readPackageConfig();
+            const allDependencies = { ...config.dependencies, ...config.devDependencies };
+            const outdated: Record<string, { current: string, latest: string }> = {};
+            
+            for (const [name, currentVersion] of Object.entries(allDependencies)) {
+                const latestVersion = await this.getLatestVersion(name);
+                if (latestVersion !== currentVersion) {
+                    outdated[name] = { current: currentVersion, latest: latestVersion };
+                }
+            }
+            
+            return outdated;
+        }
+        
+        // Audit packages for security vulnerabilities
+        async auditPackages(): Promise<Record<string, any[]>> {
+            console.log('🔒 Auditing packages for security vulnerabilities...');
+            
+            const config = await this.readPackageConfig();
+            const allDependencies = { ...config.dependencies, ...config.devDependencies };
+            const vulnerabilities: Record<string, any[]> = {};
+            
+            for (const packageName of Object.keys(allDependencies)) {
+                const vulns = await this.checkPackageVulnerabilities(packageName);
+                if (vulns.length > 0) {
+                    vulnerabilities[packageName] = vulns;
+                }
+            }
+            
+            return vulnerabilities;
+        }
+        
+        // Private helper methods
+        private async writePackageConfig(config: PackageConfig): Promise<void> {
+            const fs = require('fs').promises;
+            await fs.writeFile('package.json', JSON.stringify(config, null, 2));
+        }
+        
+        private async readPackageConfig(): Promise<PackageConfig> {
+            const fs = require('fs').promises;
+            const content = await fs.readFile('package.json', 'utf8');
+            return JSON.parse(content);
+        }
+        
+        private async downloadPackage(packageName: string, version: string): Promise<string> {
+            const fs = require('fs').promises;
+            const path = require('path');
+            const https = require('https');
+            
+            const packageUrl = `${this.registryUrl}/package/${packageName}/${version}/download`;
+            const packagePath = path.join(this.cacheDir, `${packageName}-${version}.tgz`);
+            
+            // Ensure cache directory exists
+            await fs.mkdir(this.cacheDir, { recursive: true });
+            
+            return new Promise((resolve, reject) => {
+                const file = fs.createWriteStream(packagePath);
+                https.get(packageUrl, (response: any) => {
+                    response.pipe(file);
+                    file.on('finish', () => {
+                        file.close();
+                        resolve(packagePath);
+                    });
+                }).on('error', reject);
+            });
+        }
+        
+        private async installDependencies(dependencies: Record<string, string>): Promise<void> {
+            for (const [name, version] of Object.entries(dependencies)) {
+                await this.installPackage(name, version);
+            }
+        }
+        
+        private async copyToNodeModules(packageName: string, packagePath: string): Promise<void> {
+            const fs = require('fs').promises;
+            const path = require('path');
+            const tar = require('tar');
+            
+            const targetDir = path.join(this.nodeModulesDir, packageName);
+            await fs.mkdir(targetDir, { recursive: true });
+            
+            await tar.extract({
+                file: packagePath,
+                cwd: targetDir
+            });
+        }
+        
+        private async updatePackageJson(packageName: string, version: string): Promise<void> {
+            const config = await this.readPackageConfig();
+            config.dependencies[packageName] = version;
+            await this.writePackageConfig(config);
+        }
+        
+        private async removeFromNodeModules(packageName: string): Promise<void> {
+            const fs = require('fs').promises;
+            const path = require('path');
+            const packageDir = path.join(this.nodeModulesDir, packageName);
+            
+            try {
+                await fs.rmdir(packageDir, { recursive: true });
+            } catch (error) {
+                // Package directory might not exist
+            }
+        }
+        
+        private async removeFromPackageJson(packageName: string): Promise<void> {
+            const config = await this.readPackageConfig();
+            delete config.dependencies[packageName];
+            delete config.devDependencies[packageName];
+            await this.writePackageConfig(config);
+        }
+        
+        private async checkPackageVulnerabilities(packageName: string): Promise<any[]> {
+            try {
+                const response = await fetch(`${this.registryUrl}/audit/${packageName}`);
+                if (response.ok) {
+                    const result = await response.json();
+                    return result.vulnerabilities || [];
+                }
+            } catch (error) {
+                console.error(`Error checking vulnerabilities for ${packageName}:`, error);
+            }
+            return [];
+        }
+    }
+    
+    // CLI Commands
+    export class TauPkgCLI {
+        private pm: PackageManager;
+        
+        constructor() {
+            this.pm = new PackageManager();
+        }
+        
+        async init(args: string[]): Promise<void> {
+            const name = args[0] || 'my-tau-package';
+            const version = args[1] || '1.0.0';
+            
+            console.log(`🚀 Initializing new TauScript package: ${name}@${version}`);
+            await this.pm.initPackage(name, version);
+            console.log('✅ Package initialized successfully!');
+        }
+        
+        async install(args: string[]): Promise<void> {
+            if (args.length === 0) {
+                await this.pm.installAll();
+            } else {
+                for (const packageName of args) {
+                    await this.pm.installPackage(packageName);
+                }
+            }
+        }
+        
+        async update(args: string[]): Promise<void> {
+            if (args.length === 0) {
+                await this.pm.updateAll();
+            } else {
+                for (const packageName of args) {
+                    await this.pm.updatePackage(packageName);
+                }
+            }
+        }
+        
+        async remove(args: string[]): Promise<void> {
+            for (const packageName of args) {
+                await this.pm.removePackage(packageName);
+            }
+        }
+        
+        async list(): Promise<void> {
+            const packages = await this.pm.listPackages();
+            console.log('📦 Installed packages:');
+            for (const [name, version] of Object.entries(packages)) {
+                console.log(`  ${name}@${version}`);
+            }
+        }
+        
+        async search(args: string[]): Promise<void> {
+            const query = args.join(' ');
+            const results = await this.pm.searchPackages(query);
+            
+            console.log(`🔍 Search results for "${query}":`);
+            for (const pkg of results) {
+                console.log(`  ${pkg.name}@${pkg.version} - ${pkg.description}`);
+            }
+        }
+        
+        async outdated(): Promise<void> {
+            const outdated = await this.pm.checkOutdated();
+            
+            if (Object.keys(outdated).length === 0) {
+                console.log('✅ All packages are up to date!');
+            } else {
+                console.log('🔄 Outdated packages:');
+                for (const [name, versions] of Object.entries(outdated)) {
+                    console.log(`  ${name}: ${versions.current} → ${versions.latest}`);
+                }
+            }
+        }
+        
+        async audit(): Promise<void> {
+            const vulnerabilities = await this.pm.auditPackages();
+            
+            if (Object.keys(vulnerabilities).length === 0) {
+                console.log('✅ No security vulnerabilities found!');
+            } else {
+                console.log('🚨 Security vulnerabilities found:');
+                for (const [packageName, vulns] of Object.entries(vulnerabilities)) {
+                    console.log(`  ${packageName}:`);
+                    for (const vuln of vulns) {
+                        console.log(`    - ${vuln.severity}: ${vuln.description}`);
+                    }
+                }
+            }
+        }
+    }
+}

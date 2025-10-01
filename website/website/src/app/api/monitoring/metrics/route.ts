@@ -8,7 +8,9 @@ export const dynamic = 'force-dynamic';
 // Database connection for health checks
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL || 'postgresql://postgres.tviqcormikopltejomkc:Ak1233%40%405@aws-0-ap-southeast-1.pooler.supabase.com:5432/postgres?sslmode=disable',
-  ssl: false
+  ssl: {
+    rejectUnauthorized: false
+  }
 });
 
 export async function GET(request: NextRequest) {
