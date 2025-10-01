@@ -143,6 +143,7 @@ export async function POST(request: NextRequest) {
         .replace(/<div[^>]*>/g, '') // Remove any div tags with attributes
         .replace(/<\/div>/g, '') // Remove closing div tags
         .replace(/--$/g, '') // Remove trailing MIME boundary markers
+        .replace(/(.+?)\1/g, '$1') // Remove duplicate content
         .replace(/^\s*$/gm, '') // Remove empty lines
         .replace(/\n\s*\n/g, '\n') // Remove multiple newlines
         .trim();
@@ -244,6 +245,7 @@ export async function POST(request: NextRequest) {
         .replace(/<div[^>]*>/g, '') // Remove any div tags with attributes
         .replace(/<\/div>/g, '') // Remove closing div tags
         .replace(/--$/g, '') // Remove trailing MIME boundary markers
+        .replace(/(.+?)\1/g, '$1') // Remove duplicate content
         .replace(/^\s*$/gm, '') // Remove empty lines
         .replace(/\n\s*\n/g, '\n') // Remove multiple newlines
         .trim();
