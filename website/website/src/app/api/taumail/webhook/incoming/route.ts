@@ -140,6 +140,9 @@ export async function POST(request: NextRequest) {
         .replace(/Content-Type: text\/html; charset="UTF-8"/g, '') // Remove HTML content type
         .replace(/<div dir="ltr">/g, '') // Remove HTML div tags
         .replace(/<\/div>/g, '') // Remove closing div tags
+        .replace(/<div[^>]*>/g, '') // Remove any div tags with attributes
+        .replace(/<\/div>/g, '') // Remove closing div tags
+        .replace(/--$/g, '') // Remove trailing MIME boundary markers
         .replace(/^\s*$/gm, '') // Remove empty lines
         .replace(/\n\s*\n/g, '\n') // Remove multiple newlines
         .trim();
@@ -238,6 +241,9 @@ export async function POST(request: NextRequest) {
         .replace(/Content-Type: text\/html; charset="UTF-8"/g, '') // Remove HTML content type
         .replace(/<div dir="ltr">/g, '') // Remove HTML div tags
         .replace(/<\/div>/g, '') // Remove closing div tags
+        .replace(/<div[^>]*>/g, '') // Remove any div tags with attributes
+        .replace(/<\/div>/g, '') // Remove closing div tags
+        .replace(/--$/g, '') // Remove trailing MIME boundary markers
         .replace(/^\s*$/gm, '') // Remove empty lines
         .replace(/\n\s*\n/g, '\n') // Remove multiple newlines
         .trim();
