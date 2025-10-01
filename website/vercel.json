@@ -1,11 +1,8 @@
 {
   "version": 2,
   "framework": "nextjs",
-  "buildCommand": "npm run build",
-  "installCommand": "npm install",
-  "outputDirectory": ".next",
-  "public": true,
-  "env": {
-    "NEXT_PUBLIC_SITE_URL": "https://tauos.org"
-  }
-} 
+  "buildCommand": "cd website && npm install && npm run build",
+  "installCommand": "cd website && npm install",
+  "outputDirectory": "website/.next",
+  "rootDirectory": "website"
+}
