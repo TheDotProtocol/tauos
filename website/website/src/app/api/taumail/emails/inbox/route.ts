@@ -27,7 +27,7 @@ export async function GET(request: NextRequest) {
   try {
     // Get token from Authorization header
     const authHeader = request.headers.get('authorization');
-    let userId = 1; // Default to user ID 1 for testing
+    let userId = 'd60c22bb-0b23-4a09-9e14-ac6cbc7c1547'; // saleena@tauos.org user ID
     
     if (authHeader && authHeader.startsWith('Bearer ')) {
       try {
