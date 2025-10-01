@@ -10,6 +10,7 @@ import {
   RefreshCw, ChevronLeft
 } from 'lucide-react';
 import Link from 'next/link';
+import { taumailApi } from '@/config/taumail-api';
 
 export default function TauMailInbox() {
   const [user, setUser] = useState(null);

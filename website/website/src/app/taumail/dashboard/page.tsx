@@ -10,6 +10,7 @@ import {
   Activity, Settings, Calendar, Clock, LogOut, User, X, AlertTriangle
 } from 'lucide-react';
 import Link from 'next/link';
+import { taumailApi } from '@/config/taumail-api';
 
 export default function TauMailDashboard() {
   const [activeTab, setActiveTab] = useState('inbox');

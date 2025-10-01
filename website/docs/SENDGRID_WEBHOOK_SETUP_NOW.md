@@ -13,7 +13,7 @@ To receive emails at `saleena@tauos.org`, you need to configure SendGrid webhook
 - Click **Add Host & URL**
 - Fill in:
   - **Hostname:** `tauos.org` (or `mail.tauos.org`)
-  - **URL:** `https://tauos.vercel.app/api/taumail/webhook/incoming`
+  - **URL:** `https://taumail-backend.vercel.app/api/v2/webhook/incoming`
   - **Spam Check:** ✅ Enabled
   - **Send Raw:** ✅ Enabled
 
@@ -37,14 +37,14 @@ Once DNS is configured (can take 5-60 minutes):
 ### 5. Check Webhook Logs
 - Go to Vercel Dashboard → Your Project → Functions
 - Check the webhook logs for incoming emails
-- Or check: https://tauos.vercel.app/api/taumail/webhook/incoming
+- Or check: https://taumail-backend.vercel.app/api/v2/webhook/incoming
 
 ## 🔧 Alternative: Test with Webhook Directly
 
 If you want to test immediately without DNS setup:
 
 ```bash
-curl -X POST https://tauos.vercel.app/api/taumail/webhook/incoming \
+curl -X POST https://taumail-backend.vercel.app/api/v2/webhook/incoming \
   -H "Content-Type: application/json" \
   -d '{
     "from": "test@gmail.com",

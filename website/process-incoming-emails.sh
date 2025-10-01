@@ -3,7 +3,7 @@
 # Process incoming emails and forward to TauOS webhook
 # This script should run on your Vultr server
 
-WEBHOOK_URL="https://www.tauos.org/api/taumail/smtp/incoming"
+WEBHOOK_URL="https://taumail-backend.vercel.app/api/v2/webhook/incoming"
 LOG_FILE="/var/log/tauos-mail.log"
 
 echo "📧 Starting TauOS Mail Inbound Processor..."
