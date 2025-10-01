@@ -4,7 +4,7 @@
 const API_CONFIG = {
   // Set to 'express' to use the new Express.js backend
   // Set to 'nextjs' to use the old Next.js API routes
-  backend: 'express',
+  backend: 'nextjs',
   
   // Express.js backend configuration
   express: {
@@ -22,11 +22,11 @@ const API_CONFIG = {
   nextjs: {
     baseUrl: '',
     endpoints: {
-      inbox: '/api/taumail/emails/inbox',
-      sent: '/api/taumail/emails/sent',
-      send: '/api/taumail/emails/send',
-      webhook: '/api/taumail/webhook/incoming',
-      health: '/api/health'
+      inbox: '/api/v2/emails/inbox',
+      sent: '/api/v2/emails/sent',
+      send: '/api/v2/emails/send',
+      webhook: '/api/v2/webhook/incoming',
+      health: '/api/v2/health'
     }
   }
 };
