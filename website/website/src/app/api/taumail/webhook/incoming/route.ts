@@ -187,6 +187,7 @@ export async function POST(request: NextRequest) {
     // Clean up the from field - extract email and name properly
     let fromEmail = from;
     let senderName = '';
+    let displayName = '';
     
     if (from.includes('<') && from.includes('>')) {
       // Format: "Name <email@domain.com>"
@@ -194,16 +195,23 @@ export async function POST(request: NextRequest) {
       if (match) {
         senderName = match[1].trim().replace(/^["']|["']$/g, ''); // Remove quotes
         fromEmail = match[2].trim();
+        displayName = `${senderName} <${fromEmail}>`; // Full display format
       }
     } else if (from.includes('@')) {
       // Format: "email@domain.com"
       fromEmail = from.trim();
       senderName = fromEmail.split('@')[0]; // Use email prefix as name
+      displayName = fromEmail; // Just show email
     }
     
     // If no sender name extracted, use email prefix
     if (!senderName) {
       senderName = fromEmail.split('@')[0];
+    }
+    
+    // If no display name set, use full format
+    if (!displayName) {
+      displayName = `${senderName} <${fromEmail}>`;
     }
     
     // Find the user by email (more reliable than username)
@@ -246,6 +254,10 @@ export async function POST(request: NextRequest) {
         .replace(/<\/div>/g, '') // Remove closing div tags
         .replace(/--$/g, '') // Remove trailing MIME boundary markers
         .replace(/(.+?)\1/g, '$1') // Remove duplicate content
+        .replace(/Content-Transfer-Encoding: quoted-printable/g, '') // Remove quoted-printable headers
+        .replace(/=C2=A0/g, ' ') // Decode quoted-printable spaces
+        .replace(/=\n/g, '') // Remove quoted-printable line breaks
+        .replace(/=[0-9A-F]{2}/g, '') // Remove quoted-printable encoded characters
         .replace(/^\s*$/gm, '') // Remove empty lines
         .replace(/\n\s*\n/g, '\n') // Remove multiple newlines
         .trim();
@@ -280,7 +292,7 @@ export async function POST(request: NextRequest) {
        RETURNING id, subject, received_at`,
       [
         user.id,
-        fromEmail || 'unknown@example.com',
+        displayName || fromEmail || 'unknown@example.com',
         senderName || fromEmail?.split('@')[0] || 'Unknown Sender',
         subject || 'No Subject',
         cleanText || 'No text content', // body column (required)
