@@ -255,6 +255,7 @@ export async function POST(request: NextRequest) {
         .replace(/--$/g, '') // Remove trailing MIME boundary markers
         .replace(/(.+?)\1/g, '$1') // Remove duplicate content
         .replace(/Content-Transfer-Encoding: quoted-printable/g, '') // Remove quoted-printable headers
+        .replace(/=C2=A0\.\.\./g, '...') // Decode quoted-printable ellipsis
         .replace(/=C2=A0/g, ' ') // Decode quoted-printable spaces
         .replace(/=\n/g, '') // Remove quoted-printable line breaks
         .replace(/=[0-9A-F]{2}/g, '') // Remove quoted-printable encoded characters
