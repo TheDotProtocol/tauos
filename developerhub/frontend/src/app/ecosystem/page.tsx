@@ -14,7 +14,11 @@ import {
   ArrowRight,
   CheckCircle,
   Clock,
-  Zap
+  Zap,
+  Code,
+  Terminal,
+  Play,
+  Download
 } from 'lucide-react';
 
 export default function EcosystemPage() {
@@ -28,7 +32,8 @@ export default function EcosystemPage() {
       icon: Mail,
       color: 'from-blue-500 to-cyan-500',
       href: 'https://tauos.org/taumail',
-      features: ['End-to-end encryption', 'Private SMTP server', 'No data mining']
+      features: ['End-to-end encryption', 'Private SMTP server', 'No data mining'],
+      stats: { users: '10K+', uptime: '99.9%' }
     },
     {
       name: 'TauCloud',
@@ -37,7 +42,8 @@ export default function EcosystemPage() {
       icon: Cloud,
       color: 'from-green-500 to-emerald-500',
       href: 'https://tauos.org/taucloud',
-      features: ['Zero-knowledge encryption', 'File versioning', 'Secure sharing']
+      features: ['Zero-knowledge encryption', 'File versioning', 'Secure sharing'],
+      stats: { users: '25K+', uptime: '99.8%' }
     },
     {
       name: 'TauAI',
@@ -46,7 +52,8 @@ export default function EcosystemPage() {
       icon: Brain,
       color: 'from-purple-500 to-pink-500',
       href: 'https://tauos.org/tauai',
-      features: ['Privacy-first AI', 'Local processing', 'No data collection']
+      features: ['Privacy-first AI', 'Local processing', 'No data collection'],
+      stats: { users: '50K+', uptime: '99.7%' }
     },
     {
       name: 'TauID',
@@ -55,7 +62,8 @@ export default function EcosystemPage() {
       icon: Shield,
       color: 'from-orange-500 to-red-500',
       href: 'https://tauos.org/tauid',
-      features: ['DID:WEB identities', 'Verifiable credentials', 'Self-sovereign identity']
+      features: ['DID:WEB identities', 'Verifiable credentials', 'Self-sovereign identity'],
+      stats: { users: '5K+', uptime: '99.5%' }
     },
     {
       name: 'TauStore',
@@ -64,46 +72,41 @@ export default function EcosystemPage() {
       icon: Star,
       color: 'from-yellow-500 to-orange-500',
       href: 'https://tauos.org/taustore',
-      features: ['Privacy scoring', 'Transparent audits', 'No tracking']
+      features: ['Privacy scoring', 'Transparent audits', 'No tracking'],
+      stats: { users: '0', uptime: 'N/A' }
     },
     {
       name: 'TauBrowser',
       description: 'Privacy-focused web browser',
       status: 'coming-soon',
       icon: Globe,
-      color: 'from-indigo-500 to-blue-500',
+      color: 'from-indigo-500 to-purple-500',
       href: 'https://tauos.org/taubrowser',
-      features: ['Built-in VPN', 'Ad blocking', 'Tracker protection']
+      features: ['Built-in VPN', 'Ad blocking', 'Privacy protection'],
+      stats: { users: '0', uptime: 'N/A' }
     }
   ];
 
-  const openEcosystemApp = (href: string, appName: string) => {
-    // Open in new tab with context
-    const context = 'developer-hub';
-    const url = `${href}?context=${context}&source=developer-hub`;
-    window.open(url, '_blank');
-  };
-
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'active': return 'text-green-600 dark:text-green-400 bg-green-100 dark:bg-green-900/20';
-      case 'beta': return 'text-yellow-600 dark:text-yellow-400 bg-yellow-100 dark:bg-yellow-900/20';
-      case 'coming-soon': return 'text-gray-600 dark:text-gray-400 bg-gray-100 dark:bg-gray-700';
-      default: return 'text-gray-600 dark:text-gray-400 bg-gray-100 dark:bg-gray-700';
-    }
-  };
-
   const getStatusText = (status: string) => {
     switch (status) {
-      case 'active': return 'Live';
+      case 'active': return 'Available';
       case 'beta': return 'Beta';
       case 'coming-soon': return 'Coming Soon';
       default: return 'Unknown';
     }
   };
 
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'active': return 'text-green-400 bg-green-400/20';
+      case 'beta': return 'text-yellow-400 bg-yellow-400/20';
+      case 'coming-soon': return 'text-gray-400 bg-gray-400/20';
+      default: return 'text-gray-400 bg-gray-400/20';
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+    <div className="min-h-screen" style={{ background: 'var(--bg-primary)' }}>
       <Header />
       
       <div className="flex">
@@ -114,27 +117,27 @@ export default function EcosystemPage() {
             {/* Page Header */}
             <div className="mb-8">
               <div className="flex items-center space-x-4 mb-4">
-                <div className="w-12 h-12 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-lg flex items-center justify-center">
-                  <Globe className="h-6 w-6 text-white" />
+                <div className="w-12 h-12 glass rounded-lg flex items-center justify-center">
+                  <Globe className="h-6 w-6" style={{ color: 'var(--brand-primary)' }} />
                 </div>
                 <div>
-                  <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-                    TauCore™ Ecosystem
+                  <h1 className="display-huge mb-2" style={{ color: 'var(--text-primary)' }}>
+                    TauCore™ <span style={{ color: 'var(--brand-primary)' }}>Ecosystem</span>
                   </h1>
-                  <p className="text-gray-600 dark:text-gray-400">
+                  <p className="body-large" style={{ color: 'var(--text-secondary)' }}>
                     Access all TauCore™ applications from your developer hub
                   </p>
                 </div>
               </div>
               
-              <div className="bg-gradient-to-r from-yellow-50 to-orange-50 dark:from-yellow-900/10 dark:to-orange-900/10 rounded-lg border border-yellow-200 dark:border-yellow-800 p-4">
+              <div className="glass p-6 rounded-xl">
                 <div className="flex items-start space-x-3">
-                  <Zap className="h-5 w-5 text-yellow-600 dark:text-yellow-400 mt-0.5" />
+                  <Zap className="h-5 w-5" style={{ color: 'var(--brand-primary)' }} />
                   <div>
-                    <h3 className="text-sm font-medium text-gray-900 dark:text-white mb-1">
+                    <h3 className="heading-3 mb-2" style={{ color: 'var(--text-primary)' }}>
                       Unified Experience
                     </h3>
-                    <p className="text-sm text-gray-700 dark:text-gray-300">
+                    <p className="body-medium" style={{ color: 'var(--text-secondary)' }}>
                       All applications open in new tabs with shared authentication. Your developer context is preserved across all apps.
                     </p>
                   </div>
@@ -144,110 +147,94 @@ export default function EcosystemPage() {
 
             {/* Ecosystem Apps Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {ecosystemApps.map((app, index) => (
-                <div
-                  key={index}
-                  className="group bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 hover:shadow-lg transition-all duration-200 hover:border-yellow-400/50 cursor-pointer"
-                  onClick={() => openEcosystemApp(app.href, app.name)}
-                >
-                  <div className="p-6">
-                    {/* App Header */}
-                    <div className="flex items-start justify-between mb-4">
-                      <div className="flex items-center space-x-3">
-                        <div className={`w-12 h-12 bg-gradient-to-r ${app.color} rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform`}>
-                          <app.icon className="h-6 w-6 text-white" />
-                        </div>
-                        <div>
-                          <h3 className="text-lg font-semibold text-gray-900 dark:text-white group-hover:text-yellow-600 dark:group-hover:text-yellow-400 transition-colors">
-                            {app.name}
-                          </h3>
-                          <div className="flex items-center space-x-2 mt-1">
-                            <span className={`px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(app.status)}`}>
-                              {getStatusText(app.status)}
-                            </span>
-                            {app.status === 'active' && (
-                              <CheckCircle className="h-4 w-4 text-green-500" />
-                            )}
-                          </div>
-                        </div>
+              {ecosystemApps.map((app, index) => {
+                const Icon = app.icon;
+                return (
+                  <div 
+                    key={index}
+                    className="glass p-6 rounded-xl dark-hover dark-transition cursor-pointer group"
+                    onClick={() => window.open(app.href, '_blank')}
+                  >
+                    <div className="flex items-center justify-between mb-4">
+                      <div className={`w-12 h-12 bg-gradient-to-r ${app.color} rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform duration-300`}>
+                        <Icon className="w-6 h-6 text-white" />
                       </div>
-                      <ExternalLink className="h-5 w-5 text-gray-400 group-hover:text-yellow-500 group-hover:translate-x-1 transition-all" />
+                      <div className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(app.status)}`}>
+                        {getStatusText(app.status)}
+                      </div>
                     </div>
-
-                    {/* App Description */}
-                    <p className="text-gray-600 dark:text-gray-400 mb-4 line-clamp-2">
+                    
+                    <h3 className="heading-3 mb-2" style={{ color: 'var(--text-primary)' }}>
+                      {app.name}
+                    </h3>
+                    
+                    <p className="body-medium mb-4" style={{ color: 'var(--text-secondary)' }}>
                       {app.description}
                     </p>
-
-                    {/* App Features */}
+                    
                     <div className="space-y-2 mb-4">
-                      {app.features.map((feature, featureIndex) => (
-                        <div key={featureIndex} className="flex items-center space-x-2">
-                          <div className="w-1.5 h-1.5 bg-yellow-500 rounded-full"></div>
-                          <span className="text-xs text-gray-600 dark:text-gray-400">
+                      {app.features.map((feature, idx) => (
+                        <div key={idx} className="flex items-center space-x-2">
+                          <CheckCircle className="w-4 h-4 text-green-400" />
+                          <span className="body-small" style={{ color: 'var(--text-muted)' }}>
                             {feature}
                           </span>
                         </div>
                       ))}
                     </div>
-
-                    {/* Action Button */}
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm text-gray-500 dark:text-gray-400">
-                        {app.status === 'active' ? 'Click to open' : 
-                         app.status === 'beta' ? 'Beta access' : 'Coming soon'}
-                      </span>
-                      <ArrowRight className="h-4 w-4 text-gray-400 group-hover:text-yellow-500 group-hover:translate-x-1 transition-all" />
+                    
+                    <div className="flex items-center justify-between pt-4 border-t border-gray-200 dark:border-gray-700">
+                      <div className="flex items-center space-x-4">
+                        <div className="text-center">
+                          <div className="text-sm font-medium text-white">{app.stats.users}</div>
+                          <div className="text-xs" style={{ color: 'var(--text-muted)' }}>Users</div>
+                        </div>
+                        <div className="text-center">
+                          <div className="text-sm font-medium text-white">{app.stats.uptime}</div>
+                          <div className="text-xs" style={{ color: 'var(--text-muted)' }}>Uptime</div>
+                        </div>
+                      </div>
+                      <ArrowRight className="w-5 h-5 text-gray-400 group-hover:text-white transition-colors" />
                     </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
 
-            {/* Integration Benefits */}
-            <div className="mt-12">
-              <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-8">
-                <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6 text-center">
-                  Why Unified Ecosystem?
-                </h2>
-                
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                  <div className="text-center">
-                    <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-lg flex items-center justify-center mx-auto mb-4">
-                      <Shield className="h-8 w-8 text-white" />
-                    </div>
-                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-                      Single Sign-On
-                    </h3>
-                    <p className="text-gray-600 dark:text-gray-400">
-                      One login works across all TauCore™ applications. No need to remember multiple passwords.
-                    </p>
+            {/* Quick Actions */}
+            <div className="mt-12 glass p-6 rounded-xl">
+              <h2 className="heading-2 mb-6" style={{ color: 'var(--text-primary)' }}>Quick Actions</h2>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <button 
+                  onClick={() => window.open('https://developerhub.tauos.org/ide', '_blank')}
+                  className="flex items-center space-x-3 p-4 glass rounded-lg dark-hover dark-transition"
+                >
+                  <Code className="w-5 h-5" style={{ color: 'var(--brand-primary)' }} />
+                  <div className="text-left">
+                    <div className="font-medium text-white">Launch IDE</div>
+                    <div className="text-sm" style={{ color: 'var(--text-secondary)' }}>TauStudio development environment</div>
                   </div>
-                  
-                  <div className="text-center">
-                    <div className="w-16 h-16 bg-gradient-to-r from-green-500 to-emerald-500 rounded-lg flex items-center justify-center mx-auto mb-4">
-                      <Zap className="h-8 w-8 text-white" />
-                    </div>
-                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-                      Seamless Integration
-                    </h3>
-                    <p className="text-gray-600 dark:text-gray-400">
-                      All apps work together seamlessly. Share files, send emails, and collaborate without friction.
-                    </p>
+                </button>
+                <button 
+                  onClick={() => window.open('https://developerhub.tauos.org/terminal', '_blank')}
+                  className="flex items-center space-x-3 p-4 glass rounded-lg dark-hover dark-transition"
+                >
+                  <Terminal className="w-5 h-5" style={{ color: 'var(--brand-primary)' }} />
+                  <div className="text-left">
+                    <div className="font-medium text-white">Open Terminal</div>
+                    <div className="text-sm" style={{ color: 'var(--text-secondary)' }}>TauScript REPL and command line</div>
                   </div>
-                  
-                  <div className="text-center">
-                    <div className="w-16 h-16 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg flex items-center justify-center mx-auto mb-4">
-                      <Globe className="h-8 w-8 text-white" />
-                    </div>
-                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-                      Consistent Experience
-                    </h3>
-                    <p className="text-gray-600 dark:text-gray-400">
-                      Same design language and user experience across all applications. Learn once, use everywhere.
-                    </p>
+                </button>
+                <button 
+                  onClick={() => window.open('https://docs.tauos.org', '_blank')}
+                  className="flex items-center space-x-3 p-4 glass rounded-lg dark-hover dark-transition"
+                >
+                  <Globe className="w-5 h-5" style={{ color: 'var(--brand-primary)' }} />
+                  <div className="text-left">
+                    <div className="font-medium text-white">View Documentation</div>
+                    <div className="text-sm" style={{ color: 'var(--text-secondary)' }}>Complete guides and tutorials</div>
                   </div>
-                </div>
+                </button>
               </div>
             </div>
           </div>

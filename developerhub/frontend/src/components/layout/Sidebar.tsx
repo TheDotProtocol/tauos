@@ -16,7 +16,10 @@ import {
   ChevronDown,
   X,
   Globe,
-  ExternalLink
+  ExternalLink,
+  Play,
+  Database,
+  Brain
 } from 'lucide-react';
 
 interface SidebarProps {
@@ -25,7 +28,7 @@ interface SidebarProps {
 }
 
 export default function Sidebar({ isOpen, onClose }: SidebarProps) {
-  const [expandedItems, setExpandedItems] = useState<string[]>(['repositories']);
+  const [expandedItems, setExpandedItems] = useState<string[]>(['projects']);
 
   const toggleExpanded = (item: string) => {
     setExpandedItems(prev => 
@@ -44,18 +47,6 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
       active: true
     },
     {
-      id: 'control-center',
-      label: 'Control Center',
-      icon: Settings,
-      href: '/control-center',
-      children: [
-        { label: 'Overview', href: '/control-center' },
-        { label: 'Personal Projects', href: '/projects' },
-        { label: 'Ecosystem Apps', href: '/ecosystem' },
-        { label: 'Quick Actions', href: '/quick-actions' }
-      ]
-    },
-    {
       id: 'projects',
       label: 'Projects',
       icon: Code,
@@ -68,28 +59,28 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
       ]
     },
     {
+      id: 'ide',
+      label: 'TauStudio IDE',
+      icon: Code,
+      href: '/ide'
+    },
+    {
+      id: 'terminal',
+      label: 'Terminal',
+      icon: Terminal,
+      href: '/terminal',
+      children: [
+        { label: 'Local Terminal', href: '/terminal' },
+        { label: 'TauScript REPL', href: '/terminal/tauscript' },
+        { label: 'Remote Servers', href: '/terminal/remote' },
+        { label: 'Docker Containers', href: '/terminal/docker' }
+      ]
+    },
+    {
       id: 'git',
       label: 'Git',
       icon: GitBranch,
       href: '/git'
-    },
-    {
-      id: 'code-reviews',
-      label: 'Code Reviews',
-      icon: GitBranch,
-      href: '/code-reviews'
-    },
-    {
-      id: 'tasks',
-      label: 'Tasks',
-      icon: FileText,
-      href: '/tasks'
-    },
-    {
-      id: 'packages',
-      label: 'Packages',
-      icon: Package,
-      href: '/packages'
     },
     {
       id: 'ecosystem',
@@ -107,16 +98,10 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
       ]
     },
     {
-      id: 'terminal',
-      label: 'Terminal',
-      icon: Terminal,
-      href: '/terminal',
-      children: [
-        { label: 'Local Terminal', href: '/terminal' },
-        { label: 'TauScript REPL', href: '/terminal/tauscript' },
-        { label: 'Remote Servers', href: '/terminal/remote' },
-        { label: 'Docker Containers', href: '/terminal/docker' }
-      ]
+      id: 'automation',
+      label: 'CI/CD',
+      icon: Zap,
+      href: '/automation'
     },
     {
       id: 'analytics',
@@ -136,18 +121,6 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
       icon: Shield,
       href: '/security'
     },
-  {
-    id: 'automation',
-    label: 'CI/CD',
-    icon: Zap,
-    href: '/automation'
-  },
-  {
-    id: 'privacy',
-    label: 'Privacy & Safety',
-    icon: Shield,
-    href: '/privacy'
-  },
     {
       id: 'settings',
       label: 'Settings',
@@ -161,113 +134,106 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
       {/* Overlay for mobile */}
       {isOpen && (
         <div 
-          className="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden"
+          className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
           onClick={onClose}
         />
       )}
 
       {/* Sidebar */}
       <div className={`
-        fixed inset-y-0 left-0 z-50 w-64 bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-700 transform transition-transform duration-300 ease-in-out
+        fixed inset-y-0 left-0 z-50 w-64 glass-strong transform transition-transform duration-300 ease-in-out
         ${isOpen ? 'translate-x-0' : '-translate-x-full'}
-        md:translate-x-0 md:static md:inset-0
+        lg:translate-x-0 lg:static lg:inset-0
       `}>
         <div className="flex flex-col h-full">
-          {/* Logo */}
-          <div className="flex items-center justify-between h-16 px-6 border-b border-gray-200 dark:border-gray-700">
-            <div className="flex items-center">
-              <div className="w-8 h-8 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-sm">TC</span>
+          {/* Header */}
+          <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
+            <div className="flex items-center space-x-3">
+              <div className="w-8 h-8 glass rounded-lg flex items-center justify-center">
+                <img src="/taucore-logo.png" alt="TauCore" className="w-6 h-6" />
               </div>
-              <div className="ml-3">
-                <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
-                  TauCore™
-                </h2>
-                <p className="text-xs text-gray-500 dark:text-gray-400">
-                  Dev Hub
-                </p>
+              <div>
+                <h2 className="text-lg font-semibold text-white">Developer Hub</h2>
+                <p className="text-xs text-gray-400">TauCore™ Platform</p>
               </div>
             </div>
             <button
               onClick={onClose}
-              className="md:hidden p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+              className="lg:hidden p-1 text-gray-400 hover:text-white transition-colors"
             >
-              <X className="h-5 w-5" />
+              <X className="w-5 h-5" />
             </button>
           </div>
 
           {/* Navigation */}
           <nav className="flex-1 px-4 py-6 space-y-2 overflow-y-auto">
-            {menuItems.map((item) => (
-              <div key={item.id}>
-                <a
-                  href={item.href}
-                  className={`
-                    flex items-center justify-between px-3 py-2 text-sm font-medium rounded-lg transition-colors
-                    ${item.active 
-                      ? 'bg-yellow-100 dark:bg-yellow-900/20 text-yellow-700 dark:text-yellow-300' 
-                      : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
-                    }
-                  `}
-                >
-                  <div className="flex items-center">
-                    <item.icon className="h-5 w-5 mr-3" />
-                    {item.label}
-                  </div>
-                  {item.children && (
-                    <button
-                      onClick={(e) => {
-                        e.preventDefault();
-                        toggleExpanded(item.id);
-                      }}
-                      className="p-1 hover:bg-gray-200 dark:hover:bg-gray-700 rounded"
-                    >
-                      <ChevronDown 
-                        className={`h-4 w-4 transition-transform ${
-                          expandedItems.includes(item.id) ? 'rotate-180' : ''
-                        }`} 
-                      />
-                    </button>
+            {menuItems.map((item) => {
+              const Icon = item.icon;
+              const isExpanded = expandedItems.includes(item.id);
+              const hasChildren = item.children && item.children.length > 0;
+
+              return (
+                <div key={item.id}>
+                  <a
+                    href={item.href}
+                    className={`
+                      flex items-center justify-between w-full px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200
+                      ${item.active 
+                        ? 'bg-cyan-500/20 text-cyan-400 border border-cyan-500/30' 
+                        : 'text-gray-300 hover:text-white hover:bg-white/5'
+                      }
+                    `}
+                    onClick={hasChildren ? (e) => {
+                      e.preventDefault();
+                      toggleExpanded(item.id);
+                    } : undefined}
+                  >
+                    <div className="flex items-center space-x-3">
+                      <Icon className="w-5 h-5" />
+                      <span>{item.label}</span>
+                    </div>
+                    {hasChildren && (
+                      <ChevronDown className={`w-4 h-4 transition-transform ${isExpanded ? 'rotate-180' : ''}`} />
+                    )}
+                  </a>
+
+                  {/* Children */}
+                  {hasChildren && isExpanded && (
+                    <div className="ml-6 mt-2 space-y-1">
+                      {item.children.map((child) => (
+                        <a
+                          key={child.href}
+                          href={child.href}
+                          target={child.external ? '_blank' : undefined}
+                          rel={child.external ? 'noopener noreferrer' : undefined}
+                          className="flex items-center space-x-3 px-3 py-2 text-sm text-gray-400 hover:text-white hover:bg-white/5 rounded-lg transition-all duration-200"
+                        >
+                          <span>{child.label}</span>
+                          {child.external && <ExternalLink className="w-3 h-3" />}
+                        </a>
+                      ))}
+                    </div>
                   )}
-                </a>
-                
-                {/* Submenu */}
-                {item.children && expandedItems.includes(item.id) && (
-                  <div className="ml-8 mt-2 space-y-1">
-                    {item.children.map((child) => (
-                      <a
-                        key={child.href}
-                        href={child.href}
-                        target={child.external ? '_blank' : undefined}
-                        rel={child.external ? 'noopener noreferrer' : undefined}
-                        className="flex items-center justify-between px-3 py-2 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg transition-colors"
-                      >
-                        <span>{child.label}</span>
-                        {child.external && (
-                          <ExternalLink className="h-3 w-3" />
-                        )}
-                      </a>
-                    ))}
-                  </div>
-                )}
-              </div>
-            ))}
+                </div>
+              );
+            })}
           </nav>
 
           {/* Footer */}
           <div className="p-4 border-t border-gray-200 dark:border-gray-700">
-            <div className="flex items-center space-x-3">
-              <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
-                <span className="text-white text-sm font-medium">D</span>
+            <div className="glass p-3 rounded-lg">
+              <div className="flex items-center space-x-3 mb-2">
+                <div className="w-8 h-8 bg-gradient-to-r from-cyan-500 to-blue-500 rounded-full flex items-center justify-center">
+                  <Brain className="w-4 h-4 text-white" />
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-white">TauScript</p>
+                  <p className="text-xs text-gray-400">v1.0.0</p>
+                </div>
               </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
-                  Developer
-                </p>
-                <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
-                  developer@tauos.org
-                </p>
-              </div>
+              <p className="text-xs text-gray-400">
+                Privacy-first, AI-native programming language
+              </p>
             </div>
           </div>
         </div>

@@ -11,14 +11,14 @@ interface TauScriptResponse {
   success: boolean;
   output: string;
   error?: string;
-  result?: any;
+  result?: unknown;
   executionTime: number;
 }
 
 // TauScript Interpreter (Simplified)
 class TauScriptInterpreter {
-  private variables: Map<string, any> = new Map();
-  private functions: Map<string, Function> = new Map();
+  private variables: Map<string, unknown> = new Map();
+  private functions: Map<string, (...args: unknown[]) => unknown> = new Map();
 
   constructor() {
     this.initializeBuiltins();
@@ -26,28 +26,47 @@ class TauScriptInterpreter {
 
   private initializeBuiltins() {
     // Built-in functions
-    this.functions.set('print', (...args: any[]) => {
+    this.functions.set('print', (...args: unknown[]) => {
       return args.map(arg => this.stringify(arg)).join(' ');
     });
 
-    this.functions.set('add', (a: number, b: number) => a + b);
-    this.functions.set('subtract', (a: number, b: number) => a - b);
-    this.functions.set('multiply', (a: number, b: number) => a * b);
-    this.functions.set('divide', (a: number, b: number) => b !== 0 ? a / b : 'Error: Division by zero');
+    this.functions.set('add', (a: unknown, b: unknown) => {
+      const numA = typeof a === 'number' ? a : parseFloat(String(a));
+      const numB = typeof b === 'number' ? b : parseFloat(String(b));
+      return !isNaN(numA) && !isNaN(numB) ? numA + numB : 'Error: Invalid numbers';
+    });
+    
+    this.functions.set('subtract', (a: unknown, b: unknown) => {
+      const numA = typeof a === 'number' ? a : parseFloat(String(a));
+      const numB = typeof b === 'number' ? b : parseFloat(String(b));
+      return !isNaN(numA) && !isNaN(numB) ? numA - numB : 'Error: Invalid numbers';
+    });
+    
+    this.functions.set('multiply', (a: unknown, b: unknown) => {
+      const numA = typeof a === 'number' ? a : parseFloat(String(a));
+      const numB = typeof b === 'number' ? b : parseFloat(String(b));
+      return !isNaN(numA) && !isNaN(numB) ? numA * numB : 'Error: Invalid numbers';
+    });
+    
+    this.functions.set('divide', (a: unknown, b: unknown) => {
+      const numA = typeof a === 'number' ? a : parseFloat(String(a));
+      const numB = typeof b === 'number' ? b : parseFloat(String(b));
+      return !isNaN(numA) && !isNaN(numB) ? (numB !== 0 ? numA / numB : 'Error: Division by zero') : 'Error: Invalid numbers';
+    });
 
-    this.functions.set('length', (arr: any[]) => Array.isArray(arr) ? arr.length : 'Error: Not an array');
-    this.functions.set('first', (arr: any[]) => Array.isArray(arr) && arr.length > 0 ? arr[0] : 'Error: Empty array');
-    this.functions.set('last', (arr: any[]) => Array.isArray(arr) && arr.length > 0 ? arr[arr.length - 1] : 'Error: Empty array');
+    this.functions.set('length', (arr: unknown) => Array.isArray(arr) ? arr.length : 'Error: Not an array');
+    this.functions.set('first', (arr: unknown) => Array.isArray(arr) && arr.length > 0 ? arr[0] : 'Error: Empty array');
+    this.functions.set('last', (arr: unknown) => Array.isArray(arr) && arr.length > 0 ? arr[arr.length - 1] : 'Error: Empty array');
 
-    this.functions.set('is_empty', (arr: any[]) => Array.isArray(arr) ? arr.length === 0 : 'Error: Not an array');
-    this.functions.set('contains', (arr: any[], item: any) => Array.isArray(arr) ? arr.includes(item) : 'Error: Not an array');
+    this.functions.set('is_empty', (arr: unknown) => Array.isArray(arr) ? arr.length === 0 : 'Error: Not an array');
+    this.functions.set('contains', (arr: unknown, item: unknown) => Array.isArray(arr) ? arr.includes(item) : 'Error: Not an array');
 
-    this.functions.set('sort', (arr: any[]) => Array.isArray(arr) ? [...arr].sort() : 'Error: Not an array');
-    this.functions.set('reverse', (arr: any[]) => Array.isArray(arr) ? [...arr].reverse() : 'Error: Not an array');
+    this.functions.set('sort', (arr: unknown) => Array.isArray(arr) ? [...arr].sort() : 'Error: Not an array');
+    this.functions.set('reverse', (arr: unknown) => Array.isArray(arr) ? [...arr].reverse() : 'Error: Not an array');
 
-    this.functions.set('to_string', (value: any) => this.stringify(value));
-    this.functions.set('to_number', (value: any) => {
-      const num = parseFloat(value);
+    this.functions.set('to_string', (value: unknown) => this.stringify(value));
+    this.functions.set('to_number', (value: unknown) => {
+      const num = parseFloat(String(value));
       return isNaN(num) ? 'Error: Cannot convert to number' : num;
     });
 
@@ -86,7 +105,7 @@ Strings: Use 'hello world' or "hello world"`;
     });
   }
 
-  private stringify(value: any): string {
+  private stringify(value: unknown): string {
     if (value === null) return 'null';
     if (value === undefined) return 'undefined';
     if (typeof value === 'string') return value;
@@ -97,7 +116,7 @@ Strings: Use 'hello world' or "hello world"`;
     return String(value);
   }
 
-  private parseValue(token: string): any {
+  private parseValue(token: string): unknown {
     // Numbers
     if (/^\d+\.?\d*$/.test(token)) {
       return parseFloat(token);
@@ -169,7 +188,7 @@ Strings: Use 'hello world' or "hello world"`;
     return tokens;
   }
 
-  execute(code: string): { output: string; result?: any; error?: string } {
+  execute(code: string): { output: string; result?: unknown; error?: string } {
     try {
       const tokens = this.tokenize(code.trim());
       
@@ -191,15 +210,23 @@ Strings: Use 'hello world' or "hello world"`;
         const args = tokens.slice(1).map(token => this.parseValue(token));
         
         try {
-          const result = this.functions.get(funcName)!(...args);
-          return { 
-            output: this.stringify(result),
-            result: result
-          };
-        } catch (error: any) {
+          const func = this.functions.get(funcName);
+          if (func) {
+            const result = func(...args);
+            return { 
+              output: this.stringify(result),
+              result: result
+            };
+          }
           return { 
             output: '',
-            error: `Error in ${funcName}: ${error.message}`
+            error: `Function ${funcName} not found`
+          };
+        } catch (error: unknown) {
+          const errorMessage = error instanceof Error ? error.message : String(error);
+          return { 
+            output: '',
+            error: `Error in ${funcName}: ${errorMessage}`
           };
         }
       }
@@ -220,10 +247,11 @@ Strings: Use 'hello world' or "hello world"`;
         error: 'Complex expressions not yet supported'
       };
 
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
       return {
         output: '',
-        error: `Parse error: ${error.message}`
+        error: `Parse error: ${errorMessage}`
       };
     }
   }
@@ -257,13 +285,14 @@ export async function POST(request: NextRequest) {
       executionTime
     } as TauScriptResponse);
 
-  } catch (error: any) {
+  } catch (error: unknown) {
     const executionTime = Date.now() - startTime;
+    const errorMessage = error instanceof Error ? error.message : 'TauScript execution failed';
     
     return NextResponse.json({
       success: false,
       output: '',
-      error: error.message || 'TauScript execution failed',
+      error: errorMessage,
       executionTime
     } as TauScriptResponse);
   }

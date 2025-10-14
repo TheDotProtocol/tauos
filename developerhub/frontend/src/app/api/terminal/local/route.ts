@@ -45,7 +45,7 @@ export async function POST(request: NextRequest) {
       executionMode: 'local'
     } as LocalTerminalResponse);
 
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Local terminal execution error:', error);
     
     return NextResponse.json({

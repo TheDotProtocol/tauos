@@ -191,7 +191,7 @@ export async function POST(request: NextRequest) {
       cwd: process.cwd()
     } as TerminalResponse);
 
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Terminal execution error:', error);
     
     return NextResponse.json({

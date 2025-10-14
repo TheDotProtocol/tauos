@@ -21,7 +21,7 @@ export const POST = withCORS(withSecurityHeaders(withRateLimit(5, 15 * 60 * 1000
     }
 
     // Get client information
-    const ipAddress = req.ip || req.headers.get('x-forwarded-for') || 'unknown';
+    const ipAddress = req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip') || 'unknown';
     const userAgent = req.headers.get('user-agent') || 'unknown';
 
     // Find user by email
@@ -100,7 +100,7 @@ export const POST = withCORS(withSecurityHeaders(withRateLimit(5, 15 * 60 * 1000
 
     // Update user last login
     await userRepository.update(user.id, {
-      last_login_at: new Date().toISOString(),
+      lastLoginAt: new Date().toISOString(),
     });
 
     // Log successful attempt

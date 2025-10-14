@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { withAuthAndSecurity } from '@/middleware/auth';
 import { sessionRepository } from '@/lib/database';
 
-export const POST = withAuthAndSecurity(async (req: NextRequest) => {
+export const POST = withAuthAndSecurity(async (req: NextRequest & { user?: { sessionId: string } }) => {
   try {
     const sessionId = req.user?.sessionId;
     

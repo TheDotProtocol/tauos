@@ -17,7 +17,10 @@ import {
   Search,
   Filter,
   Grid,
-  List
+  List,
+  Terminal,
+  Play,
+  Zap
 } from 'lucide-react';
 
 export default function Dashboard() {
@@ -63,62 +66,14 @@ export default function Dashboard() {
   const repositories = [
     {
       name: 'tauos-core',
-      description: 'The core operating system kernel and system services for TauCore™. Built with Rust for maximum performance and security.',
+      description: 'The core operating system built with Rust, featuring privacy-first architecture and zero telemetry.',
       language: 'Rust',
       stars: 1247,
       forks: 89,
       watchers: 156,
-      lastUpdated: '2025-01-15T10:30:00Z',
+      lastUpdated: '2025-01-10T18:30:00Z',
       isPrivate: false,
-      topics: ['operating-system', 'rust', 'kernel', 'security'],
-      owner: 'tauos'
-    },
-    {
-      name: 'tauos-desktop',
-      description: 'Modern desktop environment built with GTK4 and TypeScript. Features a beautiful, privacy-first user interface.',
-      language: 'TypeScript',
-      stars: 892,
-      forks: 45,
-      watchers: 98,
-      lastUpdated: '2025-01-14T15:45:00Z',
-      isPrivate: false,
-      topics: ['desktop', 'gtk4', 'typescript', 'ui'],
-      owner: 'tauos'
-    },
-    {
-      name: 'tauos-mobile',
-      description: 'Mobile operating system for smartphones and tablets. Built with Flutter and optimized for privacy.',
-      language: 'Dart',
-      stars: 634,
-      forks: 23,
-      watchers: 67,
-      lastUpdated: '2025-01-13T09:20:00Z',
-      isPrivate: false,
-      topics: ['mobile', 'flutter', 'dart', 'privacy'],
-      owner: 'tauos'
-    },
-    {
-      name: 'taumail-client',
-      description: 'Privacy-first email client with end-to-end encryption. Built with React and Electron.',
-      language: 'TypeScript',
-      stars: 445,
-      forks: 34,
-      watchers: 52,
-      lastUpdated: '2025-01-12T14:15:00Z',
-      isPrivate: false,
-      topics: ['email', 'encryption', 'react', 'electron'],
-      owner: 'tauos'
-    },
-    {
-      name: 'taucloud-storage',
-      description: 'Decentralized cloud storage solution with zero-knowledge encryption. Built with Go and IPFS.',
-      language: 'Go',
-      stars: 378,
-      forks: 28,
-      watchers: 41,
-      lastUpdated: '2025-01-11T11:30:00Z',
-      isPrivate: false,
-      topics: ['storage', 'encryption', 'go', 'ipfs'],
+      topics: ['operating-system', 'privacy', 'security', 'rust'],
       owner: 'tauos'
     },
     {
@@ -132,11 +87,35 @@ export default function Dashboard() {
       isPrivate: false,
       topics: ['programming-language', 'compiler', 'rust', 'ai'],
       owner: 'tauos'
+    },
+    {
+      name: 'taucloud-backend',
+      description: 'Backend services for TauCloud - secure cloud storage with zero-knowledge encryption.',
+      language: 'TypeScript',
+      stars: 234,
+      forks: 12,
+      watchers: 45,
+      lastUpdated: '2025-01-10T14:20:00Z',
+      isPrivate: false,
+      topics: ['cloud-storage', 'encryption', 'privacy'],
+      owner: 'tauos'
+    },
+    {
+      name: 'taumail-server',
+      description: 'Private email server with end-to-end encryption and zero data collection.',
+      language: 'Go',
+      stars: 189,
+      forks: 8,
+      watchers: 32,
+      lastUpdated: '2025-01-10T12:15:00Z',
+      isPrivate: false,
+      topics: ['email', 'privacy', 'encryption', 'smtp'],
+      owner: 'tauos'
     }
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+    <div className="min-h-screen" style={{ background: 'var(--bg-primary)' }}>
       <Header />
       
       <div className="flex">
@@ -146,80 +125,112 @@ export default function Dashboard() {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
             {/* Page Header */}
             <div className="mb-8">
-              <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-                Developer Dashboard
-              </h1>
-              <p className="text-gray-600 dark:text-gray-400">
-                Welcome to the TauCore™ Developer Hub. Manage your repositories, track progress, and collaborate with your team.
-              </p>
+              <div className="flex items-center justify-between">
+                <div>
+                  <h1 className="display-huge mb-2" style={{ color: 'var(--text-primary)' }}>
+                    Developer <span style={{ color: 'var(--brand-primary)' }}>Dashboard</span>
+                  </h1>
+                  <p className="body-large" style={{ color: 'var(--text-secondary)' }}>
+                    Welcome to the TauCore™ Developer Hub. Manage your repositories, track progress, and collaborate with your team.
+                  </p>
+                </div>
+                <div className="flex items-center space-x-4">
+                  <button className="btn-primary">
+                    <Plus className="w-5 h-5" />
+                    New Project
+                  </button>
+                  <button className="btn-secondary">
+                    <Terminal className="w-5 h-5" />
+                    Open Terminal
+                  </button>
+                </div>
+              </div>
             </div>
 
             {/* Stats Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
               {stats.map((stat, index) => (
-                <StatsCard key={index} {...stat} />
+                <div key={index} className="glass p-6 rounded-xl dark-hover dark-transition">
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="w-12 h-12 glass rounded-lg flex items-center justify-center">
+                      <stat.icon className="w-6 h-6" style={{ color: 'var(--brand-primary)' }} />
+                    </div>
+                    <div className="text-right">
+                      <div className="text-2xl font-bold text-white">{stat.value}</div>
+                      <div className="text-sm" style={{ color: 'var(--text-secondary)' }}>{stat.title}</div>
+                    </div>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm" style={{ color: 'var(--text-muted)' }}>{stat.description}</span>
+                    <span className={`text-sm font-medium ${
+                      stat.changeType === 'positive' ? 'text-green-400' : 'text-gray-400'
+                    }`}>
+                      {stat.change}
+                    </span>
+                  </div>
+                </div>
               ))}
             </div>
 
+            {/* Quick Actions */}
+            <div className="glass p-6 rounded-xl mb-8">
+              <h2 className="heading-2 mb-4" style={{ color: 'var(--text-primary)' }}>Quick Actions</h2>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <button className="flex items-center space-x-3 p-4 glass rounded-lg dark-hover dark-transition">
+                  <Terminal className="w-5 h-5" style={{ color: 'var(--brand-primary)' }} />
+                  <div className="text-left">
+                    <div className="font-medium text-white">Open Terminal</div>
+                    <div className="text-sm" style={{ color: 'var(--text-secondary)' }}>Start coding with TauScript</div>
+                  </div>
+                </button>
+                <button className="flex items-center space-x-3 p-4 glass rounded-lg dark-hover dark-transition">
+                  <Code className="w-5 h-5" style={{ color: 'var(--brand-primary)' }} />
+                  <div className="text-left">
+                    <div className="font-medium text-white">Launch IDE</div>
+                    <div className="text-sm" style={{ color: 'var(--text-secondary)' }}>TauStudio development environment</div>
+                  </div>
+                </button>
+                <button className="flex items-center space-x-3 p-4 glass rounded-lg dark-hover dark-transition">
+                  <Zap className="w-5 h-5" style={{ color: 'var(--brand-primary)' }} />
+                  <div className="text-left">
+                    <div className="font-medium text-white">CI/CD Pipeline</div>
+                    <div className="text-sm" style={{ color: 'var(--text-secondary)' }}>Automate your deployments</div>
+                  </div>
+                </button>
+              </div>
+            </div>
+
             {/* Projects Section */}
-            <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
-              <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
-                      Recent Projects
-                    </h2>
-                    <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-                      Your latest projects and contributions
-                    </p>
-                  </div>
-                  
-                  <div className="flex items-center space-x-4">
-                    {/* Search */}
-                    <div className="relative">
-                      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-                      <input
-                        type="text"
-                        placeholder="Search projects..."
-                        className="pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-transparent"
-                      />
-                    </div>
-                    
-                    {/* Filter */}
-                    <button className="flex items-center space-x-2 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600">
-                      <Filter className="h-4 w-4" />
-                      <span>Filter</span>
-                    </button>
-                    
-                    {/* View Mode */}
-                    <div className="flex border border-gray-300 dark:border-gray-600 rounded-lg">
-                      <button
-                        onClick={() => setViewMode('grid')}
-                        className={`p-2 ${viewMode === 'grid' ? 'bg-yellow-500 text-white' : 'bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300'}`}
-                      >
-                        <Grid className="h-4 w-4" />
-                      </button>
-                      <button
-                        onClick={() => setViewMode('list')}
-                        className={`p-2 ${viewMode === 'list' ? 'bg-yellow-500 text-white' : 'bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300'}`}
-                      >
-                        <List className="h-4 w-4" />
-                      </button>
-                    </div>
-                    
-                    {/* New Project */}
-                    <button className="flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-yellow-400 to-orange-500 text-white rounded-lg hover:shadow-lg transition-shadow">
-                      <Plus className="h-4 w-4" />
-                      <span>New Project</span>
-                    </button>
-                  </div>
+            <div className="glass p-6 rounded-xl">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="heading-2" style={{ color: 'var(--text-primary)' }}>Recent Projects</h2>
+                <div className="flex items-center space-x-2">
+                  <button
+                    onClick={() => setViewMode('grid')}
+                    className={`p-2 rounded-lg transition-colors ${
+                      viewMode === 'grid' ? 'bg-cyan-500/20 text-cyan-400' : 'text-gray-400 hover:text-white'
+                    }`}
+                  >
+                    <Grid className="w-5 h-5" />
+                  </button>
+                  <button
+                    onClick={() => setViewMode('list')}
+                    className={`p-2 rounded-lg transition-colors ${
+                      viewMode === 'list' ? 'bg-cyan-500/20 text-cyan-400' : 'text-gray-400 hover:text-white'
+                    }`}
+                  >
+                    <List className="w-5 h-5" />
+                  </button>
                 </div>
               </div>
-              
-              {/* Projects Grid/List */}
-              <div className={`p-6 ${viewMode === 'grid' ? 'grid grid-cols-1 lg:grid-cols-2 gap-6' : 'space-y-4'}`}>
+
+              <div className={`grid gap-6 ${
+                viewMode === 'grid' 
+                  ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3' 
+                  : 'grid-cols-1'
+              }`}>
                 {repositories.map((repo, index) => (
-                  <RepositoryCard key={index} {...repo} />
+                  <RepositoryCard key={index} repository={repo} viewMode={viewMode} />
                 ))}
               </div>
             </div>
