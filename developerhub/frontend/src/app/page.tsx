@@ -1,10 +1,12 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import Header from '@/components/layout/Header';
 import Sidebar from '@/components/layout/Sidebar';
 import StatsCard from '@/components/dashboard/StatsCard';
 import RepositoryCard from '@/components/dashboard/RepositoryCard';
+import ProjectModal from '@/components/dashboard/ProjectModal';
 import { 
   Code, 
   GitBranch, 
@@ -24,8 +26,34 @@ import {
 } from 'lucide-react';
 
 export default function Dashboard() {
+  const router = useRouter();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+  const [projectModalOpen, setProjectModalOpen] = useState(false);
+  const [projects, setProjects] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchProjects();
+  }, []);
+
+  const fetchProjects = async () => {
+    try {
+      const response = await fetch('/api/projects');
+      const result = await response.json();
+      if (result.success) {
+        setProjects(result.data || []);
+      }
+    } catch (error) {
+      console.error('Failed to fetch projects:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleProjectCreated = () => {
+    fetchProjects();
+  };
 
   // Mock data for demonstration
   const stats = [
@@ -135,11 +163,17 @@ export default function Dashboard() {
                   </p>
                 </div>
                 <div className="flex items-center space-x-4">
-                  <button className="btn-primary">
+                  <button 
+                    onClick={() => setProjectModalOpen(true)}
+                    className="btn-primary"
+                  >
                     <Plus className="w-5 h-5" />
                     New Project
                   </button>
-                  <button className="btn-secondary">
+                  <button 
+                    onClick={() => router.push('/terminal')}
+                    className="btn-secondary"
+                  >
                     <Terminal className="w-5 h-5" />
                     Open Terminal
                   </button>
@@ -176,21 +210,30 @@ export default function Dashboard() {
             <div className="glass p-6 rounded-xl mb-8">
               <h2 className="heading-2 mb-4" style={{ color: 'var(--text-primary)' }}>Quick Actions</h2>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <button className="flex items-center space-x-3 p-4 glass rounded-lg dark-hover dark-transition">
+                <button 
+                  onClick={() => router.push('/terminal')}
+                  className="flex items-center space-x-3 p-4 glass rounded-lg dark-hover dark-transition"
+                >
                   <Terminal className="w-5 h-5" style={{ color: 'var(--brand-primary)' }} />
                   <div className="text-left">
                     <div className="font-medium text-white">Open Terminal</div>
                     <div className="text-sm" style={{ color: 'var(--text-secondary)' }}>Start coding with TauScript</div>
                   </div>
                 </button>
-                <button className="flex items-center space-x-3 p-4 glass rounded-lg dark-hover dark-transition">
+                <button 
+                  onClick={() => router.push('/ide')}
+                  className="flex items-center space-x-3 p-4 glass rounded-lg dark-hover dark-transition"
+                >
                   <Code className="w-5 h-5" style={{ color: 'var(--brand-primary)' }} />
                   <div className="text-left">
                     <div className="font-medium text-white">Launch IDE</div>
                     <div className="text-sm" style={{ color: 'var(--text-secondary)' }}>TauStudio development environment</div>
                   </div>
                 </button>
-                <button className="flex items-center space-x-3 p-4 glass rounded-lg dark-hover dark-transition">
+                <button 
+                  onClick={() => router.push('/automation')}
+                  className="flex items-center space-x-3 p-4 glass rounded-lg dark-hover dark-transition"
+                >
                   <Zap className="w-5 h-5" style={{ color: 'var(--brand-primary)' }} />
                   <div className="text-left">
                     <div className="font-medium text-white">CI/CD Pipeline</div>
@@ -224,19 +267,63 @@ export default function Dashboard() {
                 </div>
               </div>
 
-              <div className={`grid gap-6 ${
-                viewMode === 'grid' 
-                  ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3' 
-                  : 'grid-cols-1'
-              }`}>
-                {repositories.map((repo, index) => (
-                  <RepositoryCard key={index} repository={repo} viewMode={viewMode} />
-                ))}
-              </div>
+              {loading ? (
+                <div className="text-center py-12">
+                  <div className="text-white">Loading projects...</div>
+                </div>
+              ) : projects.length === 0 ? (
+                <div className="text-center py-12">
+                  <Code className="w-16 h-16 mx-auto mb-4" style={{ color: 'var(--text-secondary)' }} />
+                  <h3 className="heading-3 mb-2" style={{ color: 'var(--text-primary)' }}>
+                    No projects yet
+                  </h3>
+                  <p className="body-medium mb-6" style={{ color: 'var(--text-secondary)' }}>
+                    Create your first project to get started
+                  </p>
+                  <button 
+                    onClick={() => setProjectModalOpen(true)}
+                    className="btn-primary"
+                  >
+                    <Plus className="w-5 h-5" />
+                    Create Project
+                  </button>
+                </div>
+              ) : (
+                <div className={`grid gap-6 ${
+                  viewMode === 'grid' 
+                    ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3' 
+                    : 'grid-cols-1'
+                }`}>
+                  {projects.map((project, index) => (
+                    <RepositoryCard 
+                      key={project.id || index} 
+                      repository={{
+                        name: project.name,
+                        description: project.description || '',
+                        language: 'TauScript',
+                        stars: 0,
+                        forks: 0,
+                        watchers: 0,
+                        lastUpdated: project.created_at || new Date().toISOString(),
+                        isPrivate: !project.is_public,
+                        topics: [],
+                        owner: 'user'
+                      }} 
+                      viewMode={viewMode} 
+                    />
+                  ))}
+                </div>
+              )}
             </div>
           </div>
         </main>
       </div>
+      
+      <ProjectModal
+        isOpen={projectModalOpen}
+        onClose={() => setProjectModalOpen(false)}
+        onSuccess={handleProjectCreated}
+      />
     </div>
   );
 }

@@ -2,8 +2,14 @@ import { NextRequest, NextResponse } from 'next/server';
 import { spawn } from 'child_process';
 import { promisify } from 'util';
 import { exec } from 'child_process';
+import { dockerSandbox } from '@/lib/docker';
+import { sessionService } from '@/lib/session';
+import { randomBytes } from 'crypto';
 
 const execAsync = promisify(exec);
+
+// Enable Docker sandboxing by default (can be disabled via env var)
+const USE_DOCKER_SANDBOX = process.env.USE_DOCKER_SANDBOX !== 'false';
 
 export const dynamic = 'force-dynamic';
 
@@ -19,6 +25,7 @@ interface TerminalResponse {
   error?: string;
   exitCode: number;
   cwd: string;
+  sessionId?: string;
 }
 
 // Security: Commands that require local execution
@@ -104,23 +111,69 @@ function getCommandExecutionMode(command: string): 'local' | 'remote' | 'blocked
 }
 
 function sanitizeCommand(command: string): string {
-  // Remove potentially dangerous characters
-  return command
+  // Remove potentially dangerous characters and patterns
+  let sanitized = command
     .replace(/[;&|`$(){}[\]\\]/g, '') // Remove shell metacharacters
+    .replace(/;\s*(ls|cat|rm|dd|mkfs|fdisk)/gi, '') // Remove dangerous command sequences
+    .replace(/\|\s*(cat|less|more|head|tail|grep|awk|sed)\s+/gi, '') // Remove pipe to file reading commands
+    .replace(/&&\s*(rm|dd|mkfs|fdisk|shutdown|reboot)/gi, '') // Remove dangerous && sequences
+    .replace(/\$\([^)]+\)/g, '') // Remove command substitution
+    .replace(/`[^`]+`/g, '') // Remove backtick command substitution
     .replace(/\s+/g, ' ') // Normalize whitespace
     .trim();
+  
+  // Additional check: if command contains pipe, reject it entirely
+  if (command.includes('|') && !sanitized.includes('|')) {
+    // Pipe was removed, but original had it - this is suspicious
+    throw new Error('Command contains pipe operator which is not allowed');
+  }
+  
+  return sanitized;
 }
 
 export async function POST(request: NextRequest) {
   try {
     const body: TerminalRequest = await request.json();
-    const { command, cwd = process.cwd(), sessionId } = body;
+    let { command, cwd = process.cwd(), sessionId } = body;
 
     if (!command || typeof command !== 'string') {
       return NextResponse.json({
         success: false,
         output: '',
         error: 'Command is required',
+        exitCode: 1,
+        cwd
+      } as TerminalResponse);
+    }
+
+    // Generate or use session ID
+    if (!sessionId) {
+      sessionId = randomBytes(16).toString('hex');
+    }
+
+    // Load session state if exists
+    let sessionState = await sessionService.loadTerminalSession(sessionId);
+    if (sessionState) {
+      cwd = sessionState.cwd || cwd;
+    } else {
+      // Create new session state
+      sessionState = {
+        sessionId,
+        history: [],
+        cwd,
+        environment: {},
+        lastActivity: Date.now(),
+        createdAt: Date.now()
+      };
+    }
+
+    // Rate limiting
+    const rateLimit = await sessionService.checkRateLimit(sessionId, 100, 60000);
+    if (!rateLimit.allowed) {
+      return NextResponse.json({
+        success: false,
+        output: '',
+        error: `Rate limit exceeded. Please wait before sending more commands. (${rateLimit.remaining} requests remaining)`,
         exitCode: 1,
         cwd
       } as TerminalResponse);
@@ -173,23 +226,87 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // Execute command
-    const { stdout, stderr } = await execAsync(sanitizedCommand, {
-      cwd: cwd,
-      timeout: 30000, // 30 second timeout
-      maxBuffer: 1024 * 1024 // 1MB buffer
-    });
+    // Execute command (use Docker sandbox if available, fallback to direct execution)
+    let result: TerminalResponse;
+    
+    if (USE_DOCKER_SANDBOX && executionMode === 'remote') {
+      // Use Docker sandbox for remote commands
+      try {
+        const dockerResult = await dockerSandbox.executeCommand(
+          sanitizedCommand,
+          cwd,
+          sessionId,
+          {
+            timeout: 30000,
+            memoryLimit: '512m',
+            cpuLimit: '0.5',
+            networkDisabled: true // Disable network for security
+          }
+        );
 
-    const output = stdout || stderr || '';
-    const success = !stderr || stderr.length === 0;
+        result = {
+          success: dockerResult.success,
+          output: dockerResult.output,
+          error: dockerResult.error,
+          exitCode: dockerResult.exitCode,
+          cwd: cwd // Maintain CWD (Docker handles this internally)
+        };
+      } catch (dockerError: unknown) {
+        // Fallback to direct execution if Docker fails
+        console.warn('Docker execution failed, falling back to direct execution:', dockerError);
+        const { stdout, stderr } = await execAsync(sanitizedCommand, {
+          cwd: cwd,
+          timeout: 30000,
+          maxBuffer: 1024 * 1024
+        });
+
+        const output = stdout || stderr || '';
+        const success = !stderr || stderr.length === 0;
+
+        result = {
+          success,
+          output: output.trim(),
+          error: stderr ? stderr.trim() : undefined,
+          exitCode: success ? 0 : 1,
+          cwd: process.cwd()
+        };
+      }
+    } else {
+      // Direct execution for local commands or when Docker is disabled
+      const { stdout, stderr } = await execAsync(sanitizedCommand, {
+        cwd: cwd,
+        timeout: 30000, // 30 second timeout
+        maxBuffer: 1024 * 1024 // 1MB buffer
+      });
+
+      const output = stdout || stderr || '';
+      const success = !stderr || stderr.length === 0;
+
+      result = {
+        success,
+        output: output.trim(),
+        error: stderr ? stderr.trim() : undefined,
+        exitCode: success ? 0 : 1,
+        cwd: process.cwd()
+      };
+    }
+
+    // Update session state
+    if (sessionState) {
+      sessionState.history.push(command);
+      // Keep only last 100 commands
+      if (sessionState.history.length > 100) {
+        sessionState.history = sessionState.history.slice(-100);
+      }
+      sessionState.cwd = result.cwd;
+      sessionState.lastActivity = Date.now();
+      await sessionService.saveTerminalSession(sessionState);
+    }
 
     return NextResponse.json({
-      success,
-      output: output.trim(),
-      error: stderr ? stderr.trim() : undefined,
-      exitCode: success ? 0 : 1,
-      cwd: process.cwd()
-    } as TerminalResponse);
+      ...result,
+      sessionId // Include session ID in response
+    });
 
   } catch (error: unknown) {
     console.error('Terminal execution error:', error);

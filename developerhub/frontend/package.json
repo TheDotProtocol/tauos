@@ -14,6 +14,7 @@
     "@types/bcryptjs": "^2.4.6",
     "@types/jsonwebtoken": "^9.0.10",
     "@types/pg": "^8.15.5",
+    "@types/redis": "^4.0.10",
     "bcryptjs": "^3.0.2",
     "clsx": "^2.1.1",
     "framer-motion": "^12.23.16",
@@ -23,6 +24,7 @@
     "pg": "^8.16.3",
     "react": "19.1.0",
     "react-dom": "19.1.0",
+    "redis": "^5.9.0",
     "tailwind-merge": "^3.3.1"
   },
   "devDependencies": {

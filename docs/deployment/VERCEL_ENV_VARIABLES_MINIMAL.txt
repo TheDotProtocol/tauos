@@ -1,0 +1,59 @@
+# Minimal Environment Variables for Developer Hub (Required Only)
+# Copy these essential variables to Vercel
+# Date: January 2025
+
+# ============================================================================
+# REQUIRED VARIABLES
+# ============================================================================
+
+# Database (Required)
+DATABASE_URL=postgresql://postgres.tviqcormikopltejomkc:Ak1233%40%405@aws-0-ap-southeast-1.pooler.supabase.com:5432/postgres?sslmode=require
+
+# Redis (Required - REPLACE WITH YOUR ACTUAL REDIS_URL)
+REDIS_URL=rediss://default:YOUR_REDIS_PASSWORD@YOUR_REDIS_ENDPOINT.upstash.io:6380
+
+# JWT Secret (Required)
+JWT_SECRET=b8c3f1e7a9d2c5f8b1e4a7c0d3f6b9e2a5c8f1b4e7a0d3c6f9b2e5a8c1f4b7e0a3c6d9c2f5b8e1a4c7f0b3e6d9c2a5f8b1e4a7c0d3f6b9e2a5c8f1b4e7a0
+
+# Session Secret (Required)
+SESSION_SECRET=tauos-session-secret-2025-launch-s1e2c3r4e5t6k7e8y9a0b1c2d3e4f5g6h7i8j9k0l1m2n3o4p5q6r7s8t9u0v1w2x3y4z5
+
+# Next.js (Required)
+NODE_ENV=production
+NEXT_PUBLIC_APP_URL=https://tauos.vercel.app
+
+# ============================================================================
+# RECOMMENDED VARIABLES
+# ============================================================================
+
+# Session Configuration
+SESSION_MAX_AGE=86400000
+
+# Security
+BCRYPT_ROUNDS=12
+RATE_LIMIT_WINDOW_MS=900000
+RATE_LIMIT_MAX_REQUESTS=1000
+
+# ============================================================================
+# OPTIONAL VARIABLES (Add if needed)
+# ============================================================================
+
+# Encryption (Optional)
+# ENCRYPTION_KEY=your-32-byte-hex-key-here
+# ENCRYPTION_ALGORITHM=aes-256-gcm
+
+# ============================================================================
+# INSTRUCTIONS
+# ============================================================================
+# 1. Replace REDIS_URL with your actual Upstash Redis connection string
+#    Get it from: https://upstash.com
+#
+# 2. Copy each variable above to Vercel Dashboard
+#    Go to: Settings → Environment Variables
+#
+# 3. Set all variables for "Production" environment
+#
+# 4. Redeploy after adding variables
+#
+# ============================================================================
+

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import Header from '@/components/layout/Header';
 import Sidebar from '@/components/layout/Sidebar';
 import { 
@@ -72,10 +72,14 @@ fn handleRequest(req: net.Request) -> net.Response {
   ]);
   const [activeTab, setActiveTab] = useState('welcome');
   const [isRunning, setIsRunning] = useState(false);
-  const [output, setOutput] = useState<string[]>([]);
+  const [output, setOutput] = useState<string[]>(['TauCore™ Terminal - Type commands to get started', 'Type "help" for available commands']);
   const [fileExplorerOpen, setFileExplorerOpen] = useState(true);
   const [terminalOpen, setTerminalOpen] = useState(false);
   const [debuggerOpen, setDebuggerOpen] = useState(false);
+  const [terminalInput, setTerminalInput] = useState('');
+  const [terminalHistory, setTerminalHistory] = useState<string[]>([]);
+  const [historyIndex, setHistoryIndex] = useState(-1);
+  const terminalInputRef = useRef<HTMLInputElement>(null);
 
   const fileTree: FileNode[] = [
     {
@@ -145,26 +149,150 @@ fn handleRequest(req: net.Request) -> net.Response {
     setTabs(newTabs);
   };
 
+  // Focus terminal input when terminal opens
+  useEffect(() => {
+    if (terminalOpen && terminalInputRef.current) {
+      terminalInputRef.current.focus();
+    }
+  }, [terminalOpen]);
+
   const runCode = async () => {
     const currentTab = getCurrentTab();
     if (!currentTab) return;
 
     setIsRunning(true);
-    setOutput([]);
+    setOutput((prev) => [...prev, `\n> Executing ${currentTab.name}...\n`]);
     
-    // Simulate code execution
-    setTimeout(() => {
-      setOutput(prev => [
-        ...prev,
-        `🐢 TauScript v1.0.0 - Running ${currentTab.name}`,
-        'Compiling...',
-        '✅ Compilation successful',
-        'Starting server...',
-        '🚀 Server started on http://localhost:8080',
-        'Ready for requests!'
-      ]);
+    try {
+      const response = await fetch('/api/terminal/tauscript', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          code: currentTab.content || '',
+          sessionId: 'ide-session'
+        }),
+      });
+
+      const result = await response.json();
+      
+      if (result.success) {
+        setOutput((prev) => [...prev, result.output || 'Code executed successfully']);
+      } else {
+        setOutput((prev) => [...prev, `Error: ${result.error || 'Execution failed'}`]);
+      }
+    } catch (error) {
+      setOutput((prev) => [...prev, `Error: ${error}`]);
+    } finally {
       setIsRunning(false);
-    }, 2000);
+    }
+  };
+
+  const executeTerminalCommand = async (command: string) => {
+    if (!command.trim()) return;
+
+    // Add command to history
+    const newHistory = [...terminalHistory, command];
+    setTerminalHistory(newHistory);
+    setHistoryIndex(newHistory.length);
+    
+    // Display command
+    setOutput((prev) => [...prev, `$ ${command}`]);
+    setTerminalInput('');
+    setIsRunning(true);
+
+    try {
+      // Check if it's a TauScript command
+      if (command.trim().startsWith('tau ') || command.trim() === 'tau') {
+        // Execute as TauScript
+        const code = command.replace(/^tau\s+/, '');
+        const response = await fetch('/api/terminal/tauscript', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            code: code || getCurrentTab()?.content || '',
+            sessionId: 'ide-terminal'
+          }),
+        });
+
+        const result = await response.json();
+        if (result.success) {
+          setOutput((prev) => [...prev, result.output]);
+        } else {
+          setOutput((prev) => [...prev, `Error: ${result.error || 'Execution failed'}`]);
+        }
+      } else if (command.trim() === 'help' || command.trim() === 'h') {
+        // Built-in help
+        setOutput((prev) => [...prev, 
+          'Available commands:',
+          '  tau <code>     - Execute TauScript code',
+          '  tau help       - Show TauScript help',
+          '  ls             - List files',
+          '  pwd            - Print working directory',
+          '  echo <text>    - Print text',
+          '  help           - Show this help'
+        ]);
+      } else {
+        // Execute as shell command
+        const response = await fetch('/api/terminal/execute', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            command: command,
+            cwd: '/workspace',
+            sessionId: 'ide-terminal'
+          }),
+        });
+
+        const result = await response.json();
+        if (result.success) {
+          setOutput((prev) => [...prev, result.output]);
+        } else {
+          setOutput((prev) => [...prev, `Error: ${result.error || result.output || 'Command failed'}`]);
+        }
+      }
+    } catch (error) {
+      setOutput((prev) => [...prev, `Error: ${error}`]);
+    } finally {
+      setIsRunning(false);
+      // Focus input again
+      setTimeout(() => terminalInputRef.current?.focus(), 100);
+    }
+  };
+
+  const handleTerminalKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      executeTerminalCommand(terminalInput);
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      if (historyIndex > 0) {
+        const newIndex = historyIndex - 1;
+        setHistoryIndex(newIndex);
+        setTerminalInput(terminalHistory[newIndex]);
+      }
+    } else if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      if (historyIndex < terminalHistory.length - 1) {
+        const newIndex = historyIndex + 1;
+        setHistoryIndex(newIndex);
+        setTerminalInput(terminalHistory[newIndex]);
+      } else {
+        setTerminalInput('');
+        setHistoryIndex(terminalHistory.length);
+      }
+    } else if (e.key === 'c' && e.ctrlKey) {
+      e.preventDefault();
+      if (isRunning) {
+        setOutput((prev) => [...prev, '\n^C - Command interrupted']);
+        setIsRunning(false);
+      }
+    }
   };
 
   const stopCode = () => {
@@ -343,16 +471,34 @@ fn handleRequest(req: net.Request) -> net.Response {
 
                 {/* Terminal Panel */}
                 {terminalOpen && (
-                  <div className="h-64 bg-black text-green-400 font-mono text-sm p-4 border-t border-gray-200 dark:border-gray-700">
-                    <div className="space-y-1">
+                  <div className="h-64 bg-black text-green-400 font-mono text-sm border-t border-gray-200 dark:border-gray-700 flex flex-col">
+                    <div className="flex-1 overflow-y-auto p-4 space-y-1">
                       {output.map((line, index) => (
-                        <div key={index}>{line}</div>
+                        <div key={index} className="whitespace-pre-wrap break-words">{line}</div>
                       ))}
                       {isRunning && (
-                        <div className="flex items-center space-x-2">
+                        <div className="flex items-center space-x-2 text-yellow-400">
                           <Loader2 className="w-4 h-4 animate-spin" />
-                          <span>Executing code...</span>
+                          <span>Executing...</span>
                         </div>
+                      )}
+                    </div>
+                    {/* Terminal Input */}
+                    <div className="border-t border-gray-700 p-2 flex items-center space-x-2">
+                      <span className="text-gray-500">$</span>
+                      <input
+                        ref={terminalInputRef}
+                        type="text"
+                        value={terminalInput}
+                        onChange={(e) => setTerminalInput(e.target.value)}
+                        onKeyDown={handleTerminalKeyPress}
+                        disabled={isRunning}
+                        className="flex-1 bg-transparent text-green-400 outline-none disabled:opacity-50 placeholder-gray-600"
+                        placeholder="Type command and press Enter... (use 'tau' prefix for TauScript)"
+                        autoComplete="off"
+                      />
+                      {isRunning && (
+                        <Loader2 className="w-4 h-4 animate-spin text-yellow-400" />
                       )}
                     </div>
                   </div>

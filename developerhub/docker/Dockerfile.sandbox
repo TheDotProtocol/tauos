@@ -1,0 +1,40 @@
+# Hardened Docker base image for TauOS terminal sandboxing
+# This image provides a secure, minimal environment for command execution
+
+FROM alpine:3.19
+
+# Create non-root user for security
+RUN addgroup -g 1000 sandbox && \
+    adduser -D -u 1000 -G sandbox sandbox && \
+    apk add --no-cache \
+        bash \
+        coreutils \
+        findutils \
+        grep \
+        sed \
+        awk \
+        git \
+        curl \
+        wget \
+        nodejs \
+        npm \
+        python3 \
+        python3-pip \
+        && \
+    # Create workspace directory
+    mkdir -p /workspace && \
+    chown -R sandbox:sandbox /workspace
+
+# Switch to non-root user
+USER sandbox
+
+# Set working directory
+WORKDIR /workspace
+
+# Set environment variables
+ENV HOME=/home/sandbox
+ENV PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+
+# Default command (will be overridden)
+CMD ["/bin/bash"]
+

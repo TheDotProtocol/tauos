@@ -7,9 +7,10 @@ const pool = new Pool({
   database: process.env.DB_NAME || 'taucore_devhub',
   user: process.env.DB_USER || 'postgres',
   password: process.env.DB_PASSWORD || 'password',
-  max: 20, // Maximum number of clients in the pool
-  idleTimeoutMillis: 30000, // Close idle clients after 30 seconds
-  connectionTimeoutMillis: 2000, // Return an error after 2 seconds if connection could not be established
+  max: 50, // Maximum number of clients in the pool (increased for load)
+  idleTimeoutMillis: 10000, // Close idle clients after 10 seconds (faster cleanup)
+  connectionTimeoutMillis: 5000, // Return an error after 5 seconds if connection could not be established
+  allowExitOnIdle: true, // Allow process to exit when pool is idle
 });
 
 // Test database connection
