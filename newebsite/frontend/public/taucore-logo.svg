@@ -1,0 +1,19 @@
+<svg width="581" height="581" viewBox="0 0 581 581" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- TauCore Logo - Circuit Tau Symbol -->
+  <g id="taucore-logo">
+    <!-- Yellow/Gold Circuit Path -->
+    <path d="M188 1H525C553.719 1 577 24.2812 577 53V520C577 548.719 553.719 572 525 572H353" stroke="#FDB913" stroke-width="26" stroke-linecap="round"/>
+    <path d="M245 117H353V463" stroke="#FDB913" stroke-width="26" stroke-linecap="round"/>
+    <path d="M4 117H245" stroke="#FDB913" stroke-width="26" stroke-linecap="round"/>
+    
+    <!-- Circuit Nodes/Dots -->
+    <circle cx="39" cy="145" r="39" fill="#FDB913"/>
+    <circle cx="39" cy="145" r="20" fill="white"/>
+    <circle cx="39" cy="145" r="10" fill="black"/>
+    
+    <circle cx="399" cy="543" r="39" fill="#FDB913"/>
+    <circle cx="399" cy="543" r="20" fill="white"/>
+    <circle cx="399" cy="543" r="10" fill="black"/>
+  </g>
+</svg>
+

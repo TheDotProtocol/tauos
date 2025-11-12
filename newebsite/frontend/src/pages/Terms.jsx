@@ -1,0 +1,71 @@
+import React from 'react';
+import { Header } from '../components/Header';
+import { Footer } from '../components/Footer';
+
+export const Terms = () => {
+  return (
+    <div className="App">
+      <Header />
+      <main style={{ background: 'var(--bg-primary)' }}>
+        <section className="py-32" style={{ paddingTop: '120px' }}>
+          <div className="max-w-4xl mx-auto px-6 lg:px-12">
+            <h1 className="display-huge mb-6 text-center">
+              Terms of <span style={{ color: 'var(--brand-primary)' }}>Service</span>
+            </h1>
+            <p className="body-large text-center mb-12" style={{ color: 'var(--text-secondary)' }}>
+              Last updated: January 2025
+            </p>
+
+            <div className="space-y-12 glass-strong p-8" style={{ borderRadius: '0px' }}>
+              <section>
+                <h2 className="heading-1 mb-4">Acceptance of Terms</h2>
+                <p className="body-medium" style={{ color: 'var(--text-secondary)' }}>
+                  By accessing or using TauOS, you agree to be bound by these Terms of Service. If you do not agree to these terms, please do not use our services.
+                </p>
+              </section>
+
+              <section>
+                <h2 className="heading-1 mb-4">Use License</h2>
+                <p className="body-medium" style={{ color: 'var(--text-secondary)' }}>
+                  TauOS is provided under an open-source license. You are free to use, modify, and distribute the software subject to the terms of the applicable license agreement.
+                </p>
+              </section>
+
+              <section>
+                <h2 className="heading-1 mb-4">User Responsibilities</h2>
+                <ul className="space-y-2 ml-6">
+                  <li className="body-medium" style={{ color: 'var(--text-secondary)' }}>• You are responsible for maintaining the security of your account</li>
+                  <li className="body-medium" style={{ color: 'var(--text-secondary)' }}>• You agree not to use the service for illegal purposes</li>
+                  <li className="body-medium" style={{ color: 'var(--text-secondary)' }}>• You will not attempt to breach security or access unauthorized data</li>
+                  <li className="body-medium" style={{ color: 'var(--text-secondary)' }}>• You will respect other users' privacy and data</li>
+                </ul>
+              </section>
+
+              <section>
+                <h2 className="heading-1 mb-4">Disclaimer of Warranties</h2>
+                <p className="body-medium" style={{ color: 'var(--text-secondary)' }}>
+                  TauOS is provided "as is" without warranty of any kind. While we strive for excellence, we do not guarantee uninterrupted or error-free operation.
+                </p>
+              </section>
+
+              <section>
+                <h2 className="heading-1 mb-4">Limitation of Liability</h2>
+                <p className="body-medium" style={{ color: 'var(--text-secondary)' }}>
+                  To the maximum extent permitted by law, TauCore™ shall not be liable for any indirect, incidental, special, consequential, or punitive damages resulting from your use of the software.
+                </p>
+              </section>
+
+              <section>
+                <h2 className="heading-1 mb-4">Contact</h2>
+                <p className="body-medium" style={{ color: 'var(--text-secondary)' }}>
+                  Questions about these terms? Contact legal@tauos.org
+                </p>
+              </section>
+            </div>
+          </div>
+        </section>
+      </main>
+      <Footer />
+    </div>
+  );
+};

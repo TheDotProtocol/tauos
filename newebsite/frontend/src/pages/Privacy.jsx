@@ -1,0 +1,96 @@
+import React from 'react';
+import { Header } from '../components/Header';
+import { Footer } from '../components/Footer';
+import { Shield, Eye, Lock, Globe } from 'lucide-react';
+
+export const Privacy = () => {
+  return (
+    <div className="App">
+      <Header />
+      <main style={{ background: 'var(--bg-primary)' }}>
+        <section className="py-32" style={{ paddingTop: '120px' }}>
+          <div className="max-w-4xl mx-auto px-6 lg:px-12">
+            <h1 className="display-huge mb-6 text-center">
+              Privacy <span style={{ color: 'var(--brand-primary)' }}>Policy</span>
+            </h1>
+            <p className="body-large text-center mb-12" style={{ color: 'var(--text-secondary)' }}>
+              Last updated: January 2025
+            </p>
+
+            <div className="space-y-12 glass-strong p-8" style={{ borderRadius: '0px' }}>
+              <section>
+                <h2 className="heading-1 mb-4">Our Commitment to Privacy</h2>
+                <p className="body-medium" style={{ color: 'var(--text-secondary)' }}>
+                  TauCore™ is committed to protecting your privacy. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our operating system. We adhere to a strict zero-telemetry policy, meaning we do not collect any personal data, usage statistics, or diagnostic information from your device without your explicit consent.
+                </p>
+              </section>
+
+              <section>
+                <h2 className="heading-1 mb-4">Zero Telemetry Promise</h2>
+                <div className="space-y-4">
+                  {[
+                    'We do not collect usage statistics or analytics',
+                    'We do not track your behavior or activities',
+                    'We do not sell your data to third parties',
+                    'We do not use advertising trackers',
+                    'All data processing is done locally on your device'
+                  ].map((item, index) => (
+                    <div key={index} className="flex items-start space-x-3">
+                      <Shield className="w-5 h-5 mt-1" style={{ color: 'var(--brand-primary)' }} />
+                      <p className="body-medium" style={{ color: 'var(--text-secondary)' }}>{item}</p>
+                    </div>
+                  ))}
+                </div>
+              </section>
+
+              <section>
+                <h2 className="heading-1 mb-4">Information We Collect</h2>
+                <p className="body-medium mb-4" style={{ color: 'var(--text-secondary)' }}>
+                  When you create a TauID account, we collect only the information necessary to provide our services:
+                </p>
+                <ul className="space-y-2 ml-6">
+                  <li className="body-medium" style={{ color: 'var(--text-secondary)' }}>• Email address (for account recovery)</li>
+                  <li className="body-medium" style={{ color: 'var(--text-secondary)' }}>• Username (for identification)</li>
+                  <li className="body-medium" style={{ color: 'var(--text-secondary)' }}>• Encrypted password (we cannot access your password)</li>
+                </ul>
+              </section>
+
+              <section>
+                <h2 className="heading-1 mb-4">Data Storage & Encryption</h2>
+                <p className="body-medium" style={{ color: 'var(--text-secondary)' }}>
+                  All your data is encrypted using military-grade encryption (AES-256). Your files, emails, and communications are end-to-end encrypted, meaning only you can access them. We cannot decrypt your data even if we wanted to.
+                </p>
+              </section>
+
+              <section>
+                <h2 className="heading-1 mb-4">Your Rights</h2>
+                <div className="space-y-4">
+                  {[
+                    'Right to access your data',
+                    'Right to delete your data',
+                    'Right to export your data',
+                    'Right to opt-out of communications',
+                    'Right to privacy by default'
+                  ].map((right, index) => (
+                    <div key={index} className="flex items-start space-x-3">
+                      <Eye className="w-5 h-5 mt-1" style={{ color: 'var(--brand-primary)' }} />
+                      <p className="body-medium" style={{ color: 'var(--text-secondary)' }}>{right}</p>
+                    </div>
+                  ))}
+                </div>
+              </section>
+
+              <section>
+                <h2 className="heading-1 mb-4">Contact Us</h2>
+                <p className="body-medium" style={{ color: 'var(--text-secondary)' }}>
+                  If you have questions about this Privacy Policy, please contact us at privacy@tauos.org
+                </p>
+              </section>
+            </div>
+          </div>
+        </section>
+      </main>
+      <Footer />
+    </div>
+  );
+};
