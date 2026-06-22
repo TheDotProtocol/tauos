@@ -1,17 +1,12 @@
+import { getPool, getJwtSecret } from '@/lib/db-pool';
 import { NextRequest, NextResponse } from 'next/server';
-import { Pool } from 'pg';
 import jwt from 'jsonwebtoken';
 import { writeFile, mkdir } from 'fs/promises';
 import { join } from 'path';
 import { randomUUID } from 'crypto';
 
 // Database connection - production ready
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL || 'postgresql://postgres.tviqcormikopltejomkc:Ak1233%40%405@aws-0-ap-southeast-1.pooler.supabase.com:5432/postgres?sslmode=disable',
-  ssl: {
-    rejectUnauthorized: false
-  }
-});
+
 
 export async function POST(request: NextRequest) {
   try {
@@ -24,7 +19,7 @@ export async function POST(request: NextRequest) {
     const token = authHeader.substring(7);
     
     // Verify token
-    const jwtSecret = process.env.JWT_SECRET_TAUCLOUD || 'tauos-prod-jwt-secret-2025-launch-a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6';
+    const jwtSecret = getJwtSecret('taucloud');
     const decoded = jwt.verify(token, jwtSecret) as any;
     
     const formData = await request.formData();
@@ -36,7 +31,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Check user's storage quota
-    const quotaResult = await pool.query(
+    const quotaResult = await getPool().query(
       'SELECT storage_quota, storage_used FROM users WHERE id = $1',
       [decoded.userId]
     );
@@ -68,7 +63,7 @@ export async function POST(request: NextRequest) {
     await writeFile(filePath, buffer);
 
     // Save file metadata to database
-    const result = await pool.query(
+    const result = await getPool().query(
       `INSERT INTO taucloud_files (id, user_id, original_name, file_name, file_path, file_size, mime_type, folder, uploaded_at)
        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, CURRENT_TIMESTAMP)
        RETURNING id, original_name, file_size, uploaded_at`,
@@ -76,7 +71,7 @@ export async function POST(request: NextRequest) {
     );
 
     // Update user's storage usage
-    await pool.query(
+    await getPool().query(
       'UPDATE users SET storage_used = $1 WHERE id = $2',
       [newStorageUsed, decoded.userId]
     );

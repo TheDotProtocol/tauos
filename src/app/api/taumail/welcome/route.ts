@@ -1,24 +1,9 @@
+import { getPool, getJwtSecret } from '@/lib/db-pool';
 import { NextRequest, NextResponse } from 'next/server';
-import { Pool } from 'pg';
 import sgMail from '@sendgrid/mail';
 
 // Database connection - production ready with enhanced error handling
-const connectionString = process.env.DATABASE_URL || 'postgresql://postgres.tviqcormikopltejomkc:Ak1233%40%405@aws-0-ap-southeast-1.pooler.supabase.com:5432/postgres?sslmode=disable';
 
-// Force sslmode=disable for production
-const finalConnectionString = connectionString.includes('sslmode=') 
-  ? connectionString.replace(/sslmode=[^&]*/, 'sslmode=disable')
-  : connectionString + (connectionString.includes('?') ? '&' : '?') + 'sslmode=disable';
-
-const pool = new Pool({
-  connectionString: finalConnectionString,
-  ssl: {
-    rejectUnauthorized: false
-  },
-  max: 20,
-  idleTimeoutMillis: 30000,
-  connectionTimeoutMillis: 2000,
-});
 
 // Configure SendGrid
 sgMail.setApiKey(process.env.SENDGRID_API_KEY || '');
@@ -138,7 +123,7 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    const client = await pool.connect();
+    const client = await getPool().connect();
 
     // Check if user already received welcome email
     const existingWelcome = await client.query(

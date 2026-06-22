@@ -1,16 +1,10 @@
+import { getPool, getJwtSecret } from '@/lib/db-pool';
 import { NextRequest, NextResponse } from 'next/server';
-import { Pool } from 'pg';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 
 // Database connection - enterprise grade security
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL || 'postgresql://postgres.tviqcormikopltejomkc:Ak1233%40%405@aws-0-ap-southeast-1.pooler.supabase.com:5432/postgres?sslmode=disable',
-  ssl: { rejectUnauthorized: false },
-  max: 20,
-  idleTimeoutMillis: 30000,
-  connectionTimeoutMillis: 2000,
-});
+
 
 export async function POST(request: NextRequest) {
   try {
@@ -24,7 +18,7 @@ export async function POST(request: NextRequest) {
     const sanitizedEmail = email.toLowerCase().trim();
 
     // 🔍 ENHANCED USER QUERY WITH ORGANIZATION INFO
-    const result = await pool.query(
+    const result = await getPool().query(
       `SELECT u.id, u.username, u.email, u.password_hash, u.full_name, u.is_active, u.organization_id,
               o.name as organization_name, o.domain as organization_domain
        FROM users u 
@@ -50,13 +44,13 @@ export async function POST(request: NextRequest) {
     }
 
     // Update last login
-    await pool.query(
+    await getPool().query(
       'UPDATE users SET last_login_at = CURRENT_TIMESTAMP WHERE id = $1',
       [user.id]
     );
 
     // Create JWT token
-    const jwtSecret = process.env.JWT_SECRET_TAUCLOUD || 'tauos-taucloud-jwt-secret-2025-launch-b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0';
+    const jwtSecret = getJwtSecret('taucloud');
     const token = jwt.sign(
       { 
         userId: user.id, 

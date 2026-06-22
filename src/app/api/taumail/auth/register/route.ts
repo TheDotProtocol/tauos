@@ -1,16 +1,11 @@
+import { getPool, getJwtSecret } from '@/lib/db-pool';
 import { NextRequest, NextResponse } from 'next/server';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
-import { Pool } from 'pg';
 import { trackMetrics } from '../../../middleware/metrics';
 
 // Database connection - production ready with enhanced error handling
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL || 'postgresql://postgres.tviqcormikopltejomkc:Ak1233%40%405@aws-0-ap-southeast-1.pooler.supabase.com:5432/postgres?sslmode=disable',
-  max: 20,
-  idleTimeoutMillis: 30000,
-  connectionTimeoutMillis: 2000,
-});
+
 
 // Input validation and sanitization
 function validateInput(email: string, password: string, username: string, fullName: string) {
@@ -93,7 +88,7 @@ export async function POST(request: NextRequest) {
     const sanitizedFullName = fullName.trim();
 
     // Check if user already exists
-    const existingUser = await pool.query(
+    const existingUser = await getPool().query(
       'SELECT id FROM users WHERE email = $1 OR username = $2',
       [sanitizedEmail, sanitizedUsername]
     );
@@ -107,7 +102,7 @@ export async function POST(request: NextRequest) {
     const passwordHash = await bcrypt.hash(password, saltRounds);
 
     // Get default organization ID
-    const orgResult = await pool.query(
+    const orgResult = await getPool().query(
       'SELECT id FROM organizations WHERE domain = $1 LIMIT 1',
       ['tauos.org']
     );
@@ -120,7 +115,7 @@ export async function POST(request: NextRequest) {
     const organizationId = orgResult.rows[0].id;
 
     // Create user with proper UUID handling
-    const result = await pool.query(
+    const result = await getPool().query(
       `INSERT INTO users (organization_id, username, email, password_hash, full_name, is_active, created_at) 
        VALUES ($1, $2, $3, $4, $5, $6, CURRENT_TIMESTAMP) 
        RETURNING id, username, email, full_name`,
@@ -130,7 +125,7 @@ export async function POST(request: NextRequest) {
     const user = result.rows[0];
 
     // Generate JWT token with enhanced security
-    const jwtSecret = process.env.JWT_SECRET_TAUMAIL || 'tauos-taumail-jwt-secret-2025-launch-a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6';
+    const jwtSecret = getJwtSecret('taumail');
     const token = jwt.sign(
       { 
         userId: user.id, 

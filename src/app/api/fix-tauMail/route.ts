@@ -1,13 +1,8 @@
+import { getPool, getJwtSecret } from '@/lib/db-pool';
 import { NextRequest, NextResponse } from 'next/server';
-import { Pool } from 'pg';
 
 // Database connection - using IPv4 compatible URL
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL || 'postgresql://postgres.tviqcormikopltejomkc:Ak1233%40%405@aws-0-ap-southeast-1.pooler.supabase.com:5432/postgres?sslmode=disable',
-  ssl: {
-    rejectUnauthorized: false
-  }
-});
+
 
 export async function POST(request: NextRequest) {
   try {
@@ -18,7 +13,7 @@ export async function POST(request: NextRequest) {
     }
 
     // First, let's see what columns actually exist
-    const schemaCheck = await pool.query(`
+    const schemaCheck = await getPool().query(`
       SELECT column_name, data_type 
       FROM information_schema.columns 
       WHERE table_name = 'users' 
@@ -26,7 +21,7 @@ export async function POST(request: NextRequest) {
     `);
 
     // Try to find user with minimal query
-    const result = await pool.query(
+    const result = await getPool().query(
       'SELECT * FROM users WHERE email = $1',
       [email]
     );

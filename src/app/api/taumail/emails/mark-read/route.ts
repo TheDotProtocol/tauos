@@ -1,27 +1,12 @@
+import { getPool, getJwtSecret } from '@/lib/db-pool';
 import { NextRequest, NextResponse } from 'next/server';
-import { Pool } from 'pg';
 import jwt from 'jsonwebtoken';
 
 // Force dynamic rendering
 export const dynamic = 'force-dynamic';
 
 // Database connection - production ready with enhanced security
-const connectionString = process.env.DATABASE_URL || 'postgresql://postgres.tviqcormikopltejomkc:Ak1233%40%405@aws-0-ap-southeast-1.pooler.supabase.com:5432/postgres?sslmode=disable';
 
-// Force sslmode=disable for production
-const finalConnectionString = connectionString.includes('sslmode=') 
-  ? connectionString.replace(/sslmode=[^&]*/, 'sslmode=disable')
-  : connectionString + (connectionString.includes('?') ? '&' : '?') + 'sslmode=disable';
-
-const pool = new Pool({
-  connectionString: finalConnectionString,
-  ssl: {
-    rejectUnauthorized: false
-  },
-  max: 20,
-  idleTimeoutMillis: 30000,
-  connectionTimeoutMillis: 2000,
-});
 
 export async function POST(request: NextRequest) {
   try {
@@ -32,7 +17,7 @@ export async function POST(request: NextRequest) {
     if (authHeader && authHeader.startsWith('Bearer ')) {
       try {
         const token = authHeader.substring(7);
-        const jwtSecret = process.env.JWT_SECRET_TAUMAIL || 'tauos-taumail-jwt-secret-2025-launch-a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6';
+        const jwtSecret = getJwtSecret('taumail');
         const decoded = jwt.verify(token, jwtSecret) as any;
         userId = decoded.userId || 1;
       } catch (error) {
@@ -49,7 +34,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Mark email as read
-    const result = await pool.query(
+    const result = await getPool().query(
       'UPDATE incoming_emails SET is_read = true WHERE id = $1 AND user_id = $2 RETURNING id, subject',
       [emailId, userId]
     );
@@ -85,7 +70,7 @@ export async function PUT(request: NextRequest) {
     if (authHeader && authHeader.startsWith('Bearer ')) {
       try {
         const token = authHeader.substring(7);
-        const jwtSecret = process.env.JWT_SECRET_TAUMAIL || 'tauos-taumail-jwt-secret-2025-launch-a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6';
+        const jwtSecret = getJwtSecret('taumail');
         const decoded = jwt.verify(token, jwtSecret) as any;
         userId = decoded.userId || 1;
       } catch (error) {
@@ -102,7 +87,7 @@ export async function PUT(request: NextRequest) {
     }
 
     // Mark multiple emails as read
-    const result = await pool.query(
+    const result = await getPool().query(
       'UPDATE incoming_emails SET is_read = true WHERE id = ANY($1) AND user_id = $2 RETURNING id, subject',
       [emailIds, userId]
     );

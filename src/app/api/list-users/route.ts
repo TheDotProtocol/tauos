@@ -1,18 +1,13 @@
+import { getPool, getJwtSecret } from '@/lib/db-pool';
 import { NextRequest, NextResponse } from 'next/server';
-import { Pool } from 'pg';
 
 // Database connection - using IPv4 compatible URL
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL || 'postgresql://postgres.tviqcormikopltejomkc:Ak1233%40%405@aws-0-ap-southeast-1.pooler.supabase.com:5432/postgres?sslmode=disable',
-  ssl: {
-    rejectUnauthorized: false
-  }
-});
+
 
 export async function GET(request: NextRequest) {
   try {
     // Get all users
-    const result = await pool.query('SELECT * FROM users LIMIT 10');
+    const result = await getPool().query('SELECT * FROM users LIMIT 10');
     
     return NextResponse.json({
       success: true,

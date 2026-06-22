@@ -1,15 +1,10 @@
+import { getPool, getJwtSecret } from '@/lib/db-pool';
 import { NextRequest, NextResponse } from 'next/server';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
-import { Pool } from 'pg';
 
 // Database connection - production ready
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL || 'postgresql://postgres.tviqcormikopltejomkc:Ak1233%40%405@aws-0-ap-southeast-1.pooler.supabase.com:5432/postgres?sslmode=disable',
-  ssl: {
-    rejectUnauthorized: false
-  }
-});
+
 
 export async function POST(request: NextRequest) {
   try {
@@ -20,7 +15,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Check if user already exists
-    const existingUser = await pool.query(
+    const existingUser = await getPool().query(
       'SELECT id FROM users WHERE email = $1 OR username = $2',
       [email, username]
     );
@@ -34,7 +29,7 @@ export async function POST(request: NextRequest) {
     const passwordHash = await bcrypt.hash(password, saltRounds);
 
     // Create user
-    const result = await pool.query(
+    const result = await getPool().query(
       'INSERT INTO users (username, email, password_hash, full_name, is_active, created_at) VALUES ($1, $2, $3, $4, $5, CURRENT_TIMESTAMP) RETURNING id, username, email, full_name',
       [username, email, passwordHash, fullName, true]
     );
@@ -42,7 +37,7 @@ export async function POST(request: NextRequest) {
     const user = result.rows[0];
 
     // Generate JWT token
-    const jwtSecret = process.env.JWT_SECRET_TAUCLOUD || 'tauos-prod-jwt-secret-2025-launch-a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6';
+    const jwtSecret = getJwtSecret('taucloud');
     const token = jwt.sign(
       { userId: user.id, email: user.email, username: user.username, app: 'taucloud' },
       jwtSecret,

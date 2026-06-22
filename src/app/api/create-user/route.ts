@@ -1,14 +1,9 @@
+import { getPool, getJwtSecret } from '@/lib/db-pool';
 import { NextRequest, NextResponse } from 'next/server';
 import bcrypt from 'bcryptjs';
-import { Pool } from 'pg';
 
 // Database connection - using IPv4 compatible URL
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL || 'postgresql://postgres.tviqcormikopltejomkc:Ak1233%40%405@aws-0-ap-southeast-1.pooler.supabase.com:5432/postgres?sslmode=disable',
-  ssl: {
-    rejectUnauthorized: false
-  }
-});
+
 
 export async function POST(request: NextRequest) {
   try {
@@ -19,7 +14,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Check if user already exists
-    const existingUser = await pool.query(
+    const existingUser = await getPool().query(
       'SELECT id FROM users WHERE email = $1',
       [email]
     );
@@ -33,7 +28,7 @@ export async function POST(request: NextRequest) {
     const passwordHash = await bcrypt.hash(password, saltRounds);
 
     // Create user
-    const result = await pool.query(
+    const result = await getPool().query(
       'INSERT INTO users (username, email, password_hash, full_name, is_active, created_at) VALUES ($1, $2, $3, $4, $5, CURRENT_TIMESTAMP) RETURNING id, username, email, full_name',
       [username || email.split('@')[0], email, passwordHash, fullName || 'User', true]
     );

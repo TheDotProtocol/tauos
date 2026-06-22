@@ -1,25 +1,10 @@
+import { getPool, getJwtSecret } from '@/lib/db-pool';
 import { NextRequest, NextResponse } from 'next/server';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
-import { Pool } from 'pg';
 
 // Database connection - production ready with enhanced error handling
-const connectionString = process.env.DATABASE_URL || 'postgresql://postgres.tviqcormikopltejomkc:Ak1233%40%405@aws-0-ap-southeast-1.pooler.supabase.com:5432/postgres?sslmode=disable';
 
-// Force sslmode=disable for production
-const finalConnectionString = connectionString.includes('sslmode=') 
-  ? connectionString.replace(/sslmode=[^&]*/, 'sslmode=disable')
-  : connectionString + (connectionString.includes('?') ? '&' : '?') + 'sslmode=disable';
-
-const pool = new Pool({
-  connectionString: finalConnectionString,
-  ssl: {
-    rejectUnauthorized: false
-  },
-  max: 20,
-  idleTimeoutMillis: 30000,
-  connectionTimeoutMillis: 2000,
-});
 
 // Rate limiting for login attempts - Enterprise optimized
 const loginAttempts = new Map<string, { count: number; resetTime: number; lastAttempt: number }>();
@@ -101,7 +86,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Query user from database with organization info
-    const result = await pool.query(
+    const result = await getPool().query(
       `SELECT u.id, u.username, u.email, u.password_hash, u.full_name, u.is_active, u.organization_id,
               o.name as organization_name, o.domain as organization_domain
        FROM users u 
@@ -136,13 +121,13 @@ export async function POST(request: NextRequest) {
     loginAttempts.delete(key);
 
     // Update last login
-    await pool.query(
+    await getPool().query(
       'UPDATE users SET last_login_at = CURRENT_TIMESTAMP WHERE id = $1',
       [user.id]
     );
 
     // Generate JWT token with enhanced security
-    const jwtSecret = process.env.JWT_SECRET_TAUMAIL || 'tauos-taumail-jwt-secret-2025-launch-a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6';
+    const jwtSecret = getJwtSecret('taumail');
     const token = jwt.sign(
       { 
         userId: user.id, 

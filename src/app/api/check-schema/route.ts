@@ -1,18 +1,13 @@
+import { getPool, getJwtSecret } from '@/lib/db-pool';
 import { NextRequest, NextResponse } from 'next/server';
-import { Pool } from 'pg';
 
 // Database connection - using IPv4 compatible URL
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL || 'postgresql://postgres.tviqcormikopltejomkc:Ak1233%40%405@aws-0-ap-southeast-1.pooler.supabase.com:5432/postgres?sslmode=disable',
-  ssl: {
-    rejectUnauthorized: false
-  }
-});
+
 
 export async function GET(request: NextRequest) {
   try {
     // Check if users table exists and get its structure
-    const tableCheck = await pool.query(`
+    const tableCheck = await getPool().query(`
       SELECT column_name, data_type, is_nullable 
       FROM information_schema.columns 
       WHERE table_name = 'users' 
@@ -28,7 +23,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Get all users to see the actual data structure
-    const users = await pool.query('SELECT * FROM users LIMIT 5');
+    const users = await getPool().query('SELECT * FROM users LIMIT 5');
     
     return NextResponse.json({
       success: true,
@@ -48,7 +43,7 @@ export async function GET(request: NextRequest) {
 
 async function getTableList() {
   try {
-    const result = await pool.query(`
+    const result = await getPool().query(`
       SELECT table_name 
       FROM information_schema.tables 
       WHERE table_schema = 'public'

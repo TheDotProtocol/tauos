@@ -1,13 +1,8 @@
+import { getPool, getJwtSecret } from '@/lib/db-pool';
 import { NextRequest, NextResponse } from 'next/server';
-import { Pool } from 'pg';
 
 // Database connection - production ready with enhanced error handling
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL || 'postgresql://postgres.tviqcormikopltejomkc:Ak1233%40%405@aws-0-ap-southeast-1.pooler.supabase.com:5432/postgres?sslmode=disable',
-  max: 20,
-  idleTimeoutMillis: 30000,
-  connectionTimeoutMillis: 2000,
-});
+
 
 export async function POST(request: NextRequest) {
   try {
@@ -40,7 +35,7 @@ export async function POST(request: NextRequest) {
     const recipientUsername = recipientEmail.split('@')[0];
     
     // Find the user by username
-    const userResult = await pool.query(
+    const userResult = await getPool().query(
       'SELECT id, username, email FROM users WHERE username = $1 OR email = $2',
       [recipientUsername, recipientEmail]
     );
@@ -59,7 +54,7 @@ export async function POST(request: NextRequest) {
                    false;
 
     // Save incoming email to database
-    const result = await pool.query(
+    const result = await getPool().query(
       `INSERT INTO incoming_emails (
         user_id, 
         from_email, 

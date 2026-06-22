@@ -1,25 +1,10 @@
+import { getPool, getJwtSecret, isProductionDeploy } from '@/lib/db-pool';
 import { NextRequest, NextResponse } from 'next/server';
-import { Pool } from 'pg';
 import jwt from 'jsonwebtoken';
 import sgMail from '@sendgrid/mail';
 
 // Database connection - production ready with enhanced error handling
-const connectionString = process.env.DATABASE_URL || 'postgresql://postgres.tviqcormikopltejomkc:Ak1233%40%405@aws-0-ap-southeast-1.pooler.supabase.com:5432/postgres?sslmode=disable';
 
-// Force sslmode=disable for production
-const finalConnectionString = connectionString.includes('sslmode=') 
-  ? connectionString.replace(/sslmode=[^&]*/, 'sslmode=disable')
-  : connectionString + (connectionString.includes('?') ? '&' : '?') + 'sslmode=disable';
-
-const pool = new Pool({
-  connectionString: finalConnectionString,
-  ssl: {
-    rejectUnauthorized: false
-  },
-  max: 20,
-  idleTimeoutMillis: 30000,
-  connectionTimeoutMillis: 2000,
-});
 
 // Initialize SendGrid
 if (process.env.SENDGRID_API_KEY) {
@@ -37,7 +22,7 @@ export async function POST(request: NextRequest) {
     const token = authHeader.substring(7);
     
     // Verify token
-    const jwtSecret = process.env.JWT_SECRET_TAUMAIL || 'tauos-taumail-jwt-secret-2025-launch-a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6';
+    const jwtSecret = getJwtSecret('taumail');
     const decoded = jwt.verify(token, jwtSecret) as any;
     
     const { to, subject, body, cc, bcc } = await request.json();
@@ -47,7 +32,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Get user details for sender info
-    const userResult = await pool.query(
+    const userResult = await getPool().query(
       'SELECT username, email FROM users WHERE id = $1',
       [decoded.userId]
     );
@@ -86,17 +71,19 @@ export async function POST(request: NextRequest) {
     let response;
     let messageId = 'local-' + Date.now();
     
-    if (process.env.SENDGRID_API_KEY) {
+    if (!process.env.SENDGRID_API_KEY) {
+      if (isProductionDeploy()) {
+        return NextResponse.json({ error: 'Mail service not configured' }, { status: 503 });
+      }
+      console.warn('SendGrid not configured — development only');
+    } else {
       try {
         response = await sgMail.send(msg);
         messageId = response[0].headers['x-message-id'] || messageId;
       } catch (sgError) {
         console.error('SendGrid Error:', sgError);
-        // Continue with local storage even if SendGrid fails
-        messageId = 'sg-error-' + Date.now();
+        return NextResponse.json({ error: 'Failed to send email via mail provider' }, { status: 502 });
       }
-    } else {
-      console.log('⚠️ SendGrid API key not configured, storing email locally');
     }
 
     // Log email details for debugging
@@ -108,7 +95,7 @@ export async function POST(request: NextRequest) {
     console.log('---');
 
     // Save email to sent_emails table
-    const result = await pool.query(
+    const result = await getPool().query(
       `INSERT INTO sent_emails (user_id, recipient_email, subject, body, sent_at, smtp_status, message_id) 
        VALUES ($1, $2, $3, $4, CURRENT_TIMESTAMP, 'sent', $5) 
        RETURNING id, recipient_email, subject, sent_at`,

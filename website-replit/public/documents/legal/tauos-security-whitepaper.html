@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TauOS Security Whitepaper</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: #1f2937;
+            background: #ffffff;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+        
+        .header {
+            border-bottom: 3px solid #fbbf24;
+            padding-bottom: 30px;
+            margin-bottom: 40px;
+        }
+        
+        .logo {
+            width: 120px;
+            height: auto;
+            margin-bottom: 20px;
+        }
+        
+        .title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #000000;
+            margin-bottom: 10px;
+            line-height: 1.2;
+        }
+        
+        .subtitle {
+            font-size: 1.1rem;
+            color: #6b7280;
+            font-weight: 400;
+            margin-bottom: 20px;
+        }
+        
+        .meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.9rem;
+            color: #9ca3af;
+            margin-top: 20px;
+        }
+        
+        h1 {
+            font-size: 2rem;
+            font-weight: 600;
+            color: #000000;
+            margin: 40px 0 20px 0;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #fbbf24;
+        }
+        
+        h2 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #111827;
+            margin: 30px 0 15px 0;
+        }
+        
+        h3 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #374151;
+            margin: 25px 0 10px 0;
+        }
+        
+        p {
+            margin-bottom: 15px;
+            font-size: 1rem;
+            color: #374151;
+        }
+        
+        ul {
+            margin: 15px 0;
+            padding-left: 25px;
+        }
+        
+        li {
+            margin-bottom: 8px;
+            color: #374151;
+        }
+        
+        .highlight {
+            background: linear-gradient(135deg, #fbbf24, #f97316);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 600;
+        }
+        
+        .section {
+            margin: 30px 0;
+            padding: 25px;
+            background: #f9fafb;
+            border-left: 4px solid #fbbf24;
+            border-radius: 8px;
+        }
+        
+        .security-layer {
+            background: #fef3c7;
+            border: 1px solid #fbbf24;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .security-layer h3 {
+            color: #92400e;
+            margin-bottom: 15px;
+        }
+        
+        .commitment {
+            background: linear-gradient(135deg, #000000, #111827);
+            color: #ffffff;
+            padding: 30px;
+            border-radius: 12px;
+            text-align: center;
+            margin: 40px 0;
+        }
+        
+        .commitment h2 {
+            color: #fbbf24;
+            margin-bottom: 15px;
+        }
+        
+        .commitment p {
+            color: #d1d5db;
+            font-size: 1.1rem;
+        }
+        
+        .page-break {
+            page-break-before: always;
+        }
+        
+        @media print {
+            body {
+                padding: 20px;
+            }
+            
+            .page-break {
+                page-break-before: always;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <svg class="logo" viewBox="0 0 120 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M10 8h100v24H10z" fill="#fbbf24"/>
+            <text x="60" y="24" text-anchor="middle" fill="#000" font-family="Inter, sans-serif" font-size="16" font-weight="700">TAU OS</text>
+        </svg>
+        <h1 class="title">🛡 TauOS Security Whitepaper</h1>
+        <p class="subtitle">Sovereign Privacy First Operating System</p>
+        <div class="meta">
+            <span>Document Version: 1.0</span>
+            <span>Date: August 2025</span>
+        </div>
+    </div>
+
+    <h2>Introduction</h2>
+    <p>The <span class="highlight">Tau Foundation</span> and <span class="highlight">Tau LLC</span> are committed to protecting user data, communications, and digital freedom.</p>
+    <p>This whitepaper explains our <strong>security approach</strong>, written in plain language for everyone — from developers to everyday users.</p>
+
+    <div class="page-break"></div>
+
+    <h1>1. Design Philosophy</h1>
+    <div class="section">
+        <ul>
+            <li><strong>User First:</strong> Users own their data. We never sell or monetize personal data.</li>
+            <li><strong>Minimal Collection:</strong> We collect the least possible information to provide the service.</li>
+            <li><strong>Open Governance:</strong> Like the Linux Foundation, Tau is community-governed with independent oversight.</li>
+        </ul>
+    </div>
+
+    <h1>2. Security Layers</h1>
+
+    <div class="security-layer">
+        <h3>🔐 Encryption</h3>
+        <ul>
+            <li><strong>End-to-End Encryption (E2EE):</strong> All personal communications are encrypted before leaving a device.</li>
+            <li><strong>At Rest Encryption:</strong> Files stored on Tau servers are encrypted using AES-256.</li>
+            <li><strong>In Transit Encryption:</strong> TLS 1.3 protects all network traffic.</li>
+        </ul>
+    </div>
+
+    <div class="security-layer">
+        <h3>🛡 Access Control</h3>
+        <ul>
+            <li><strong>Zero Backdoors:</strong> No hidden access for governments or corporations.</li>
+            <li><strong>Role-Based Access:</strong> Staff access is limited and audited.</li>
+            <li><strong>User Notification:</strong> If your data is subject to legal request (unless forbidden by law), you'll be notified.</li>
+        </ul>
+    </div>
+
+    <div class="security-layer">
+        <h3>🧩 Isolation</h3>
+        <ul>
+            <li>Each user's data is logically separated.</li>
+            <li>Multi-tenancy risks are reduced through strict compartmentalization.</li>
+        </ul>
+    </div>
+
+    <div class="security-layer">
+        <h3>⚡ Incident Response</h3>
+        <ul>
+            <li>24/7 monitoring and logging.</li>
+            <li>Breach protocols aligned with international best practices.</li>
+            <li>Users notified of material breaches within <strong>72 hours</strong>.</li>
+        </ul>
+    </div>
+
+    <h1>3. Independent Oversight</h1>
+    <div class="section">
+        <ul>
+            <li>The <strong>Tau Foundation</strong> oversees governance.</li>
+            <li><strong>External auditors</strong> review our practices yearly.</li>
+            <li>Security improvements are published publicly.</li>
+        </ul>
+    </div>
+
+    <div class="commitment">
+        <h2>4. Commitment</h2>
+        <p><strong>TauOS is built on trust.</strong></p>
+        <p>Security is not just a feature — it is the foundation.</p>
+    </div>
+
+    <div class="meta" style="margin-top: 60px; padding-top: 20px; border-top: 1px solid #e5e7eb;">
+        <span>© 2026 Tau Foundation & Tau LLC</span>
+        <span>verify@tauos.org</span>
+    </div>
+</body>
+</html>

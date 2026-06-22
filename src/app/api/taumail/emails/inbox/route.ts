@@ -1,27 +1,12 @@
+import { getPool, getJwtSecret } from '@/lib/db-pool';
 import { NextRequest, NextResponse } from 'next/server';
-import { Pool } from 'pg';
 import jwt from 'jsonwebtoken';
 
 // Force dynamic rendering
 export const dynamic = 'force-dynamic';
 
 // Database connection - production ready with enhanced security
-const connectionString = process.env.DATABASE_URL || 'postgresql://postgres.tviqcormikopltejomkc:Ak1233%40%405@aws-0-ap-southeast-1.pooler.supabase.com:5432/postgres?sslmode=disable';
 
-// Force sslmode=disable for production
-const finalConnectionString = connectionString.includes('sslmode=') 
-  ? connectionString.replace(/sslmode=[^&]*/, 'sslmode=disable')
-  : connectionString + (connectionString.includes('?') ? '&' : '?') + 'sslmode=disable';
-
-const pool = new Pool({
-  connectionString: finalConnectionString,
-  ssl: {
-    rejectUnauthorized: false
-  },
-  max: 20,
-  idleTimeoutMillis: 30000,
-  connectionTimeoutMillis: 2000,
-});
 
 export async function GET(request: NextRequest) {
   try {
@@ -32,7 +17,7 @@ export async function GET(request: NextRequest) {
     if (authHeader && authHeader.startsWith('Bearer ')) {
       try {
         const token = authHeader.substring(7);
-        const jwtSecret = process.env.JWT_SECRET_TAUMAIL || 'tauos-taumail-jwt-secret-2025-launch-a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6';
+        const jwtSecret = getJwtSecret('taumail');
         const decoded = jwt.verify(token, jwtSecret) as any;
         userId = decoded.userId || 1;
       } catch (error) {
@@ -41,7 +26,7 @@ export async function GET(request: NextRequest) {
     }
     
     // Get user's incoming emails with proper sender information and security filtering
-    const result = await pool.query(
+    const result = await getPool().query(
       `SELECT ie.id, ie.subject, ie.body, ie.from_email, ie.sender_name, 
               ie.received_at, ie.is_read, ie.is_spam,
               COALESCE(ie.sender_name, ie.from_email) as display_name,

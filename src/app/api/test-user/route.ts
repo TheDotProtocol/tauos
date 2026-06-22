@@ -1,18 +1,13 @@
+import { getPool, getJwtSecret } from '@/lib/db-pool';
 import { NextRequest, NextResponse } from 'next/server';
-import { Pool } from 'pg';
 
 // Database connection - using IPv4 compatible URL
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL || 'postgresql://postgres.tviqcormikopltejomkc:Ak1233%40%405@aws-0-ap-southeast-1.pooler.supabase.com:5432/postgres?sslmode=disable',
-  ssl: {
-    rejectUnauthorized: false
-  }
-});
+
 
 export async function GET(request: NextRequest) {
   try {
     // Check if user exists
-    const result = await pool.query(
+    const result = await getPool().query(
       'SELECT id, username, email, full_name, is_active, created_at FROM users WHERE email = $1',
       ['saleena@tauos.org']
     );

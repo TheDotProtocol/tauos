@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TauOS Sub-processor List</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: #1f2937;
+            background: #ffffff;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+        
+        .header {
+            border-bottom: 3px solid #fbbf24;
+            padding-bottom: 30px;
+            margin-bottom: 40px;
+        }
+        
+        .logo {
+            width: 120px;
+            height: auto;
+            margin-bottom: 20px;
+        }
+        
+        .title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #000000;
+            margin-bottom: 10px;
+            line-height: 1.2;
+        }
+        
+        .subtitle {
+            font-size: 1.1rem;
+            color: #6b7280;
+            font-weight: 400;
+            margin-bottom: 20px;
+        }
+        
+        .meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.9rem;
+            color: #9ca3af;
+            margin-top: 20px;
+        }
+        
+        h1 {
+            font-size: 2rem;
+            font-weight: 600;
+            color: #000000;
+            margin: 40px 0 20px 0;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #fbbf24;
+        }
+        
+        h2 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #111827;
+            margin: 30px 0 15px 0;
+        }
+        
+        h3 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #374151;
+            margin: 25px 0 10px 0;
+        }
+        
+        p {
+            margin-bottom: 15px;
+            font-size: 1rem;
+            color: #374151;
+        }
+        
+        ul {
+            margin: 15px 0;
+            padding-left: 25px;
+        }
+        
+        li {
+            margin-bottom: 8px;
+            color: #374151;
+        }
+        
+        .highlight {
+            background: linear-gradient(135deg, #fbbf24, #f97316);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 600;
+        }
+        
+        .section {
+            margin: 30px 0;
+            padding: 25px;
+            background: #f9fafb;
+            border-left: 4px solid #fbbf24;
+            border-radius: 8px;
+        }
+        
+        .provider-box {
+            background: #fef3c7;
+            border: 1px solid #fbbf24;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .provider-box h3 {
+            color: #92400e;
+            margin-bottom: 15px;
+        }
+        
+        .provider-name {
+            font-weight: 600;
+            color: #000000;
+            font-size: 1.1rem;
+        }
+        
+        .provider-description {
+            color: #6b7280;
+            font-style: italic;
+        }
+        
+        .principles {
+            background: linear-gradient(135deg, #000000, #111827);
+            color: #ffffff;
+            padding: 30px;
+            border-radius: 12px;
+            margin: 40px 0;
+        }
+        
+        .principles h2 {
+            color: #fbbf24;
+            margin-bottom: 15px;
+        }
+        
+        .principles ul {
+            color: #d1d5db;
+        }
+        
+        .contact {
+            background: #f0f9ff;
+            border: 1px solid #0ea5e9;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 30px 0;
+            text-align: center;
+        }
+        
+        .contact h3 {
+            color: #0369a1;
+            margin-bottom: 10px;
+        }
+        
+        .page-break {
+            page-break-before: always;
+        }
+        
+        @media print {
+            body {
+                padding: 20px;
+            }
+            
+            .page-break {
+                page-break-before: always;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <svg class="logo" viewBox="0 0 120 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M10 8h100v24H10z" fill="#fbbf24"/>
+            <text x="60" y="24" text-anchor="middle" fill="#000" font-family="Inter, sans-serif" font-size="16" font-weight="700">TAU OS</text>
+        </svg>
+        <h1 class="title">🌍 TauOS Sub-processor List</h1>
+        <p class="subtitle">Sovereign Privacy First Operating System</p>
+        <div class="meta">
+            <span>Document Version: 1.0</span>
+            <span>Date: August 2025</span>
+        </div>
+    </div>
+
+    <p>Transparency matters. Below is the current list of third-party providers ("Sub-processors") engaged by <span class="highlight">Tau LLC</span> to deliver TauOS services.</p>
+
+    <div class="page-break"></div>
+
+    <h1>1. Infrastructure</h1>
+    
+    <div class="provider-box">
+        <h3>🏗️ Cloud Provider</h3>
+        <p><span class="provider-name">TauCloud Infrastructure</span></p>
+        <p class="provider-description">Our sovereign cloud infrastructure for hosting and compute resources, built on open-source technologies and operated under strict privacy controls.</p>
+    </div>
+
+    <div class="provider-box">
+        <h3>⚡ CDN Provider</h3>
+        <p><span class="provider-name">TauCDN Network</span></p>
+        <p class="provider-description">Our distributed content delivery network for performance optimization and global content distribution, ensuring fast and secure access worldwide.</p>
+    </div>
+
+    <h1>2. Security</h1>
+    
+    <div class="provider-box">
+        <h3>🛡️ Monitoring Service</h3>
+        <p><span class="provider-name">TauGuard Security</span></p>
+        <p class="provider-description">Our proprietary intrusion detection and uptime monitoring system, providing 24/7 security oversight and threat detection capabilities.</p>
+    </div>
+
+    <h1>3. Support & Communication</h1>
+    
+    <div class="provider-box">
+        <h3>🎧 Helpdesk Provider</h3>
+        <p><span class="provider-name">TauSupport Platform</span></p>
+        <p class="provider-description">Our integrated user support ticketing system, designed with privacy-first principles and end-to-end encryption for all support communications.</p>
+    </div>
+
+    <div class="provider-box">
+        <h3>📧 Email Service Provider</h3>
+        <p><span class="provider-name">TauMail System</span></p>
+        <p class="provider-description">Our sovereign email infrastructure for transactional and system emails, featuring end-to-end encryption and zero-knowledge architecture.</p>
+    </div>
+
+    <h1>4. Principles for Sub-processing</h1>
+    
+    <div class="principles">
+        <h2>🔒 Our Commitment to Privacy</h2>
+        <ul>
+            <li>Sub-processors only process data required for their service.</li>
+            <li>Each sub-processor is bound by confidentiality and security obligations.</li>
+            <li>No sub-processor may use data for advertising, profiling, or resale.</li>
+            <li>New sub-processors are announced with <strong>30 days' notice</strong>.</li>
+            <li>All sub-processors undergo rigorous security and privacy audits.</li>
+            <li>Data sovereignty is maintained through strict contractual controls.</li>
+        </ul>
+    </div>
+
+    <h1>5. Updates</h1>
+    
+    <div class="contact">
+        <h3>📞 Stay Informed</h3>
+        <p>The latest version of this Sub-processor List is always available at:</p>
+        <p><strong>👉 verify@tauos.org</strong></p>
+        <p>For questions about our sub-processors or to request additional information, please contact our privacy team.</p>
+    </div>
+
+    <div class="meta" style="margin-top: 60px; padding-top: 20px; border-top: 1px solid #e5e7eb;">
+        <span>© 2026 Tau Foundation & Tau LLC</span>
+        <span>verify@tauos.org</span>
+    </div>
+</body>
+</html>

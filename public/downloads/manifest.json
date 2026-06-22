@@ -1,0 +1,127 @@
+{
+  "version": "1.0.0-beta.1",
+  "updatedAt": "2026-06-22T15:42:55Z",
+  "artifacts": [
+{
+  "id": "iso-desktop-x64",
+  "label": "TauOS Desktop ISO (x86_64)",
+  "platform": "linux",
+  "arch": "x64",
+  "kind": "iso",
+  "filename": "TauOS-Desktop-v1.0.0.iso",
+  "url": "https://github.com/TheDotProtocol/tauos/releases/download/beta-1.0.0/TauOS-Desktop-v1.0.0.iso",
+  "size": 419192832,
+  "sha256": "8f7f8c8ebf59b5ceabf34e06f7088200580a5d500fcbd7c852512db613d8bf2f",
+  "available": true,
+  "description": "Bootable live/install ISO for Intel/AMD PCs"
+},{
+  "id": "installer-windows-x64",
+  "label": "TauOS Installer for Windows (x64)",
+  "platform": "windows",
+  "arch": "x64",
+  "kind": "installer",
+  "filename": "TauOS Setup 1.0.0.exe",
+  "url": "/downloads/TauOS Setup 1.0.0.exe",
+  "size": 81768850,
+  "sha256": "29dc1b95757624589740a26dfcd96a240488c1c1eeed7f88cd8328256f8c02d5",
+  "available": true,
+  "description": "USB boot drive creator + TauOS apps"
+},{
+  "id": "installer-macos-universal",
+  "label": "TauOS Installer for macOS",
+  "platform": "macos",
+  "arch": "universal",
+  "kind": "installer",
+  "filename": "TauOS-1.0.0.dmg",
+  "url": "/downloads/TauOS-1.0.0.dmg",
+  "size": 98901980,
+  "sha256": "d178cc4d2948fb8ad4d50ca8a57d02f2edbb6c260f319e50b5bfbc600179aeae",
+  "available": true,
+  "description": "USB boot drive creator + TauOS apps (Electron)"
+},{
+  "id": "installer-linux-x64-deb",
+  "label": "TauOS Installer for Linux (amd64 .deb)",
+  "platform": "linux",
+  "arch": "x64",
+  "kind": "package",
+  "filename": "tauos-installer_1.0.0_amd64.deb",
+  "url": "/downloads/tauos-installer_1.0.0_amd64.deb",
+  "size": 72712914,
+  "sha256": "310baaa6d79636b1f6d9ccdcf38516a1b3630e43cd0699f595b4c88d4b8fb0c1",
+  "available": true,
+  "description": "Debian/Ubuntu installer package"
+},{
+  "id": "installer-macos-x64",
+  "label": "TauOS Installer for macOS (Intel)",
+  "platform": "macos",
+  "arch": "x64",
+  "kind": "installer",
+  "filename": "TauOS-1.0.0-beta.1-x64.dmg",
+  "url": "/downloads/TauOS-1.0.0-beta.1-x64.dmg",
+  "size": 0,
+  "sha256": "",
+  "available": false,
+  "description": "Intel Mac installer — build with electron-builder --x64"
+},{
+  "id": "installer-macos-arm64",
+  "label": "TauOS Installer for macOS (Apple Silicon)",
+  "platform": "macos",
+  "arch": "arm64",
+  "kind": "installer",
+  "filename": "TauOS-1.0.0-beta.1-arm64.dmg",
+  "url": "/downloads/TauOS-1.0.0-beta.1-arm64.dmg",
+  "size": 0,
+  "sha256": "",
+  "available": false,
+  "description": "Apple Silicon installer — build with electron-builder --arm64"
+},{
+  "id": "installer-windows-arm64",
+  "label": "TauOS Installer for Windows (ARM)",
+  "platform": "windows",
+  "arch": "arm64",
+  "kind": "installer",
+  "filename": "TauOS Setup 1.0.0-beta.1-arm64.exe",
+  "url": "/downloads/TauOS Setup 1.0.0-beta.1-arm64.exe",
+  "size": 0,
+  "sha256": "",
+  "available": false,
+  "description": "Windows on ARM installer"
+},{
+  "id": "installer-linux-x64-appimage",
+  "label": "TauOS AppImage (x64)",
+  "platform": "linux",
+  "arch": "x64",
+  "kind": "installer",
+  "filename": "TauOS-1.0.0-beta.1-x86_64.AppImage",
+  "url": "/downloads/TauOS-1.0.0-beta.1-x86_64.AppImage",
+  "size": 0,
+  "sha256": "",
+  "available": false,
+  "description": "Portable Linux AppImage"
+},{
+  "id": "installer-linux-arm64-appimage",
+  "label": "TauOS AppImage (ARM64)",
+  "platform": "linux",
+  "arch": "arm64",
+  "kind": "installer",
+  "filename": "TauOS-1.0.0-beta.1-aarch64.AppImage",
+  "url": "/downloads/TauOS-1.0.0-beta.1-aarch64.AppImage",
+  "size": 0,
+  "sha256": "",
+  "available": false,
+  "description": "ARM64 Linux AppImage"
+},{
+  "id": "iso-desktop-arm64",
+  "label": "TauOS Desktop ISO (ARM64)",
+  "platform": "linux",
+  "arch": "arm64",
+  "kind": "iso",
+  "filename": "TauOS-Desktop-arm64-v1.0.0-beta.1.iso",
+  "url": "/downloads/TauOS-Desktop-arm64-v1.0.0-beta.1.iso",
+  "size": 0,
+  "sha256": "",
+  "available": false,
+  "description": "ARM64 bootable ISO — run build-tauos.sh --arch arm64"
+}
+  ]
+}
