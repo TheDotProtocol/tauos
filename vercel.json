@@ -1,5 +1,5 @@
 {
   "framework": "nextjs",
   "installCommand": "npm install",
-  "buildCommand": "node -e \"const fs=require('fs'); const p='src/components/marketing/MarketingPageShell.tsx'; console.log('[deploy-check]', p, fs.existsSync(p)?'EXISTS':'MISSING'); console.log('[deploy-check] marketing dir', fs.readdirSync('src/components/marketing').length,'files');\" && npm run build"
+  "buildCommand": "node -e \"const fs=require('fs'); const c='src/components/marketing'; console.log('[deploy-check]', c, fs.existsSync(c)?fs.readdirSync(c).length+' files':'MISSING'); if(!fs.existsSync('src/components/marketing/MarketingPageShell.tsx')) process.exit(1);\" && npm run build"
 }
