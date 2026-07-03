@@ -1,15 +1,24 @@
-# Root-anchored excludes only — never use global globs like build/ or apps/
-/kernel-build/
-/release-files/
-/os-code/
-/developerhub/
-/newebsite/
-/tauos-mobile/
-/website/
-/apps/
-/.git/
+# Ignore everything at repo root, then allowlist the Next.js app only.
+/*
+!/package.json
+!/package-lock.json
+!/next.config.js
+!/vercel.json
+!/tsconfig.json
+!/tailwind.config.ts
+!/tailwind.config.js
+!/postcss.config.js
+!/next-env.d.ts
+!/components.json
+!/.vercelignore
+!/src
+!/src/**/*
+!/public
+!/public/**/*
+# Large tracked binaries — host via GitHub Releases, not Vercel
 /public/downloads/*.iso
 /public/downloads/*.dmg
 /public/downloads/*.exe
 /public/downloads/*.deb
 /public/downloads/*.AppImage
+/public/tauos-simple-20250730.iso
