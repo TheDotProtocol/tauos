@@ -1,40 +1,158 @@
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap');
-
+/* Canonical Replit TAU CORE theme (artifacts/tau-website/src/index.css) */
 :root {
-  --foreground-rgb: 248, 250, 252;
-  --background-start-rgb: 0, 0, 0;
-  --background-end-rgb: 10, 10, 15;
-  --tau-purple: 139, 92, 246;
-  --tau-blue: 59, 130, 246;
-  --tau-cyan: 34, 211, 238;
-  --tau-pink: 236, 72, 153;
+  --font-space-grotesk: 'Space Grotesk', sans-serif;
+  --font-space-mono: 'Space Mono', monospace;
+
+  --button-outline: rgba(255, 255, 255, 0.1);
+  --elevate-1: rgba(255, 255, 255, 0.04);
+  --elevate-2: rgba(255, 255, 255, 0.09);
+
+  --background: 0 0% 0%;
+  --foreground: 0 0% 100%;
+  --card: 0 0% 4%;
+  --card-foreground: 0 0% 100%;
+  --card-border: 47 100% 43%;
+  --popover: 0 0% 4%;
+  --popover-foreground: 0 0% 100%;
+  --popover-border: 0 0% 15%;
+  --primary: 47 100% 50%;
+  --primary-foreground: 0 0% 0%;
+  --primary-border: 47 100% 43%;
+  --secondary: 0 0% 6%;
+  --secondary-foreground: 0 0% 80%;
+  --secondary-border: 0 0% 15%;
+  --muted: 0 0% 8%;
+  --muted-foreground: 0 0% 63%;
+  --accent: 47 100% 50%;
+  --accent-foreground: 0 0% 0%;
+  --destructive: 0 84% 60%;
+  --destructive-foreground: 0 0% 100%;
+  --border: 0 0% 12%;
+  --input: 0 0% 15%;
+  --ring: 47 100% 50%;
+
+  --sidebar: 0 0% 3%;
+  --sidebar-foreground: 0 0% 90%;
+  --sidebar-border: 0 0% 10%;
+  --sidebar-primary: 47 100% 50%;
+  --sidebar-primary-foreground: 0 0% 0%;
+  --sidebar-accent: 0 0% 8%;
+  --sidebar-accent-foreground: 0 0% 90%;
+  --sidebar-ring: 47 100% 50%;
+
+  --chart-1: 47 100% 50%;
+  --chart-2: 47 100% 40%;
+  --chart-3: 47 100% 30%;
+  --chart-4: 0 0% 20%;
+  --chart-5: 0 0% 30%;
+
+  --radius: 0.5rem;
 }
 
-* {
-  box-sizing: border-box;
-  padding: 0;
-  margin: 0;
+.light {
+  --button-outline: rgba(0, 0, 0, 0.1);
+  --elevate-1: rgba(0, 0, 0, 0.03);
+  --elevate-2: rgba(0, 0, 0, 0.08);
+
+  --background: 0 0% 99%;
+  --foreground: 0 0% 7%;
+  --card: 0 0% 100%;
+  --card-foreground: 0 0% 7%;
+  --card-border: 47 100% 35%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 0 0% 7%;
+  --popover-border: 0 0% 88%;
+  --primary: 47 100% 42%;
+  --primary-foreground: 0 0% 5%;
+  --primary-border: 47 100% 35%;
+  --secondary: 0 0% 96%;
+  --secondary-foreground: 0 0% 20%;
+  --secondary-border: 0 0% 88%;
+  --muted: 0 0% 94%;
+  --muted-foreground: 0 0% 40%;
+  --accent: 47 100% 42%;
+  --accent-foreground: 0 0% 5%;
+  --border: 0 0% 88%;
+  --input: 0 0% 90%;
+  --ring: 47 100% 42%;
 }
 
-html,
-body {
-  max-width: 100vw;
-  overflow-x: hidden;
-  font-family: 'Inter', system-ui, sans-serif;
+.dark {
+  --button-outline: rgba(255, 255, 255, 0.1);
+  --elevate-1: rgba(255, 255, 255, 0.04);
+  --elevate-2: rgba(255, 255, 255, 0.09);
+
+  --background: 0 0% 0%;
+  --foreground: 0 0% 100%;
+  --card: 0 0% 4%;
+  --card-foreground: 0 0% 100%;
+  --card-border: 47 100% 43%;
+  --popover: 0 0% 4%;
+  --popover-foreground: 0 0% 100%;
+  --popover-border: 0 0% 15%;
+  --primary: 47 100% 50%;
+  --primary-foreground: 0 0% 0%;
+  --primary-border: 47 100% 43%;
+  --secondary: 0 0% 6%;
+  --secondary-foreground: 0 0% 80%;
+  --secondary-border: 0 0% 15%;
+  --muted: 0 0% 8%;
+  --muted-foreground: 0 0% 63%;
+  --accent: 47 100% 50%;
+  --accent-foreground: 0 0% 0%;
+  --border: 0 0% 12%;
+  --input: 0 0% 15%;
+  --ring: 47 100% 50%;
+
+  --sidebar: 0 0% 3%;
+  --sidebar-foreground: 0 0% 90%;
+  --sidebar-border: 0 0% 10%;
+  --sidebar-primary: 47 100% 50%;
+  --sidebar-primary-foreground: 0 0% 0%;
+  --sidebar-accent: 0 0% 8%;
+  --sidebar-accent-foreground: 0 0% 90%;
+  --sidebar-ring: 47 100% 50%;
+
+  --chart-1: 47 100% 50%;
+  --chart-2: 47 100% 40%;
+  --chart-3: 47 100% 30%;
+  --chart-4: 0 0% 20%;
+  --chart-5: 0 0% 30%;
+}
+
+@layer base {
+  * {
+    border-color: hsl(var(--border));
+  }
+}
+
+html {
   scroll-behavior: smooth;
+  background-color: hsl(var(--background));
+  color: hsl(var(--foreground));
 }
 
 body {
-  color: rgb(var(--foreground-rgb));
-  background: radial-gradient(ellipse at top, rgba(139, 92, 246, 0.1) 0%, transparent 50%),
-              radial-gradient(ellipse at bottom, rgba(59, 130, 246, 0.1) 0%, transparent 50%),
-              linear-gradient(to bottom, rgb(var(--background-start-rgb)), rgb(var(--background-end-rgb)));
+  @apply font-sans antialiased overflow-x-hidden;
   min-height: 100vh;
+  background-color: hsl(var(--background));
+  color: hsl(var(--foreground));
+}
+
+body.tau-marketing {
+  cursor: none;
+}
+
+@media (pointer: coarse) {
+  body.tau-marketing {
+    cursor: auto;
+  }
 }
 
 a {
@@ -42,208 +160,54 @@ a {
   text-decoration: none;
 }
 
-/* Custom scrollbar */
+::selection {
+  background-color: hsl(var(--primary) / 0.3);
+  color: hsl(var(--primary));
+}
+
 ::-webkit-scrollbar {
   width: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  background: rgba(30, 41, 59, 0.3);
+  background: hsl(var(--muted));
 }
 
 ::-webkit-scrollbar-thumb {
-  background: linear-gradient(180deg, rgba(139, 92, 246, 0.8), rgba(59, 130, 246, 0.8));
+  background: hsl(var(--primary) / 0.5);
   border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(180deg, rgba(139, 92, 246, 1), rgba(59, 130, 246, 1));
+  background: hsl(var(--primary) / 0.8);
 }
 
-/* Enhanced TauOS gradient text */
-.tau-gradient {
-  background: linear-gradient(135deg, 
-    rgb(var(--tau-purple)) 0%, 
-    rgb(var(--tau-blue)) 25%, 
-    rgb(var(--tau-cyan)) 50%, 
-    rgb(var(--tau-pink)) 75%, 
-    rgb(var(--tau-purple)) 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  background-size: 200% 200%;
-  animation: gradient-shift 3s ease-in-out infinite;
-}
-
-@keyframes gradient-shift {
-  0%, 100% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-}
-
-/* Enhanced TauOS glow effect */
-.tau-glow {
-  box-shadow: 0 0 30px rgba(139, 92, 246, 0.4),
-              0 0 60px rgba(59, 130, 246, 0.2);
-  transition: all 0.3s ease;
-}
-
-.tau-glow:hover {
-  box-shadow: 0 0 40px rgba(139, 92, 246, 0.6),
-              0 0 80px rgba(59, 130, 246, 0.3);
-  transform: translateY(-2px);
-}
-
-/* Enhanced glassmorphism effect */
-.glass {
-  background: rgba(30, 41, 59, 0.6);
-  backdrop-filter: blur(20px);
-  border: 1px solid rgba(139, 92, 246, 0.2);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-}
-
-.glass-strong {
-  background: rgba(15, 23, 42, 0.8);
-  backdrop-filter: blur(30px);
-  border: 1px solid rgba(139, 92, 246, 0.3);
-  box-shadow: 0 16px 64px rgba(0, 0, 0, 0.4);
-}
-
-/* Enhanced button animations */
-.btn-tau {
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  position: relative;
-  overflow: hidden;
-  background: linear-gradient(135deg, rgba(139, 92, 246, 0.9), rgba(59, 130, 246, 0.9));
-  border: 1px solid rgba(139, 92, 246, 0.3);
-}
-
-.btn-tau::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
-  transition: left 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.btn-tau:hover::before {
-  left: 100%;
-}
-
-.btn-tau:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 10px 30px rgba(139, 92, 246, 0.4);
-}
-
-/* Floating animation */
-@keyframes float {
-  0%, 100% { transform: translateY(0px); }
-  50% { transform: translateY(-10px); }
-}
-
-.float {
-  animation: float 3s ease-in-out infinite;
-}
-
-/* Pulse animation */
-@keyframes pulse-glow {
-  0%, 100% { 
-    box-shadow: 0 0 20px rgba(139, 92, 246, 0.4);
+@layer utilities {
+  .hover-elevate,
+  .active-elevate-2 {
+    position: relative;
+    z-index: 0;
   }
-  50% { 
-    box-shadow: 0 0 40px rgba(139, 92, 246, 0.8);
+
+  .hover-elevate::after,
+  .active-elevate-2::after {
+    content: "";
+    pointer-events: none;
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    z-index: 999;
+  }
+
+  .hover-elevate:not(.no-default-hover-elevate):not(:disabled):hover::after {
+    background-color: var(--elevate-1);
+  }
+
+  .active-elevate-2:not(.no-default-active-elevate):not(:disabled):active::after {
+    background-color: var(--elevate-2);
   }
 }
 
-.pulse-glow {
-  animation: pulse-glow 2s ease-in-out infinite;
+.tau-glass {
+  @apply bg-white/5 backdrop-blur-md border border-white/10;
 }
-
-/* Text reveal animation */
-@keyframes text-reveal {
-  0% { 
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  100% { 
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.text-reveal {
-  animation: text-reveal 0.8s ease-out forwards;
-}
-
-/* Gradient border */
-.gradient-border {
-  position: relative;
-  background: linear-gradient(135deg, rgba(139, 92, 246, 0.2), rgba(59, 130, 246, 0.2));
-  border-radius: 12px;
-  padding: 1px;
-}
-
-.gradient-border::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border-radius: 12px;
-  padding: 1px;
-  background: linear-gradient(135deg, rgba(139, 92, 246, 0.5), rgba(59, 130, 246, 0.5));
-  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-  mask-composite: exclude;
-}
-
-/* Code font for technical elements */
-.code-font {
-  font-family: 'JetBrains Mono', monospace;
-}
-
-/* Responsive text sizing */
-.text-responsive {
-  font-size: clamp(2rem, 5vw, 4rem);
-  line-height: 1.1;
-}
-
-.text-responsive-lg {
-  font-size: clamp(3rem, 8vw, 6rem);
-  line-height: 1.05;
-}
-
-/* Enhanced focus states */
-.focus-tau:focus {
-  outline: 2px solid rgba(139, 92, 246, 0.5);
-  outline-offset: 2px;
-}
-
-/* Loading spinner */
-@keyframes spin {
-  to { transform: rotate(360deg); }
-}
-
-.spin {
-  animation: spin 1s linear infinite;
-}
-
-/* Parallax effect */
-.parallax {
-  transform: translateZ(0);
-  will-change: transform;
-}
-
-/* Smooth transitions for all interactive elements */
-* {
-  transition: color 0.2s ease, background-color 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
-}
-
-/* Hide scrollbar for carousel */
-.scrollbar-hide {
-  -ms-overflow-style: none;  /* Internet Explorer 10+ */
-  scrollbar-width: none;  /* Firefox */
-}
-
-.scrollbar-hide::-webkit-scrollbar {
-  display: none;  /* Safari and Chrome */
-} 

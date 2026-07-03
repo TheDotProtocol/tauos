@@ -1,5 +1,6 @@
 'use client';
 
+import AppShell from '@/components/apps/AppShell';
 import { motion } from 'framer-motion';
 import {
   Shield, Lock, Eye, Fingerprint, Key, Database, Users, Globe,
@@ -10,48 +11,11 @@ import Link from 'next/link';
 
 export default function TauIDPage() {
   return (
-    <div className="min-h-screen bg-black text-white">
-      {/* Header */}
-      <header className="bg-gray-900/50 backdrop-blur-xl border-b border-gray-800 sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            <div className="flex items-center space-x-4">
-              <img src="/brand/tauos-logo.svg" alt="TauOS" className="h-8 w-auto" />
-              <span className="text-xl font-bold text-white">Tau OS</span>
-            </div>
-            <nav className="hidden md:flex items-center space-x-8">
-              <a href="/" className="text-gray-300 hover:text-white transition-colors">Home</a>
-              <a href="/about" className="text-gray-300 hover:text-white transition-colors">About</a>
-              <a href="/developers" className="text-gray-300 hover:text-white transition-colors">Developers</a>
-              <a href="/governance" className="text-gray-300 hover:text-white transition-colors">Governance</a>
-            </nav>
-          </div>
-        </div>
-      </header>
-
-      {/* Hero Section */}
-      <section className="py-20 bg-gradient-to-b from-gray-900 to-black">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            className="text-center mb-16"
-          >
-            <h1 className="text-5xl md:text-7xl font-bold mb-6">
-              <span className="bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">
-                TauID
-              </span>
-            </h1>
-            <p className="text-xl md:text-2xl text-gray-300 max-w-4xl mx-auto leading-relaxed">
-              Your <span className="text-yellow-400 font-semibold">secure digital identity</span>. Zero-knowledge authentication, biometric security, and complete privacy protection.
-              <br />
-              <span className="text-lg text-gray-400">Zero Data Access • 100% Encrypted • Biometric Security</span>
-            </p>
-          </motion.div>
-        </div>
-      </section>
-
+    <AppShell
+      title="Tau ID"
+      subtitle="Your sovereign identity across the TAU CORE ecosystem."
+      variant="marketing"
+    >
       {/* Privacy-First Identity Section */}
       <section className="py-20 bg-black">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -93,7 +57,7 @@ export default function TauIDPage() {
               {
                 icon: Globe,
                 title: "Universal Identity",
-                description: "One secure identity that works across all TauOS applications and services."
+                description: "One secure identity that works across all Tau OS applications and services."
               }
             ].map((feature, index) => (
               <motion.div
@@ -151,7 +115,7 @@ export default function TauIDPage() {
               {
                 step: "3",
                 title: "Secure Access",
-                description: "Use your identity across all TauOS apps with complete privacy and security protection.",
+                description: "Use your identity across all Tau OS apps with complete privacy and security protection.",
                 icon: Key
               }
             ].map((step, index) => (
@@ -226,7 +190,7 @@ export default function TauIDPage() {
               {
                 icon: Globe,
                 title: "Cross-Platform",
-                description: "Use your identity across all TauOS applications and services with seamless, secure authentication."
+                description: "Use your identity across all Tau OS applications and services with seamless, secure authentication."
               }
             ].map((feature, index) => (
               <motion.div
@@ -263,7 +227,7 @@ export default function TauIDPage() {
               </span>
             </h2>
             <p className="text-xl text-gray-300 max-w-3xl mx-auto">
-              Secure your digital life across all TauOS applications and services.
+              Secure your digital life across all Tau OS applications and services.
             </p>
           </motion.div>
 
@@ -353,19 +317,6 @@ export default function TauIDPage() {
           </motion.div>
         </div>
       </section>
-
-      {/* Footer */}
-      <footer className="bg-gray-900/50 border-t border-gray-800 py-12">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <div className="flex items-center justify-center space-x-4 mb-4">
-              <img src="/brand/tauos-logo.svg" alt="TauOS" className="h-8 w-auto" />
-              <span className="text-xl font-bold text-white">Tau OS</span>
-            </div>
-            <p className="text-gray-400">© 2025 Tau Foundation & Tau LLC. All rights reserved.</p>
-          </div>
-        </div>
-      </footer>
-    </div>
+    </AppShell>
   );
 }

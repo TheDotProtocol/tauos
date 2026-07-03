@@ -7,6 +7,7 @@ const TauOSCrossPlatform = require('./cross-platform');
 const TauOSSecurityVerification = require('./security-verification');
 const TauOSOTAUpdateSystem = require('./ota-update-system');
 const TauOSProductionConfig = require('./production-config');
+const TauOSInstaller = require('./os-installer');
 
 // Keep a global reference of the window object
 let mainWindow;
@@ -16,6 +17,7 @@ let crossPlatform;
 let securityVerification;
 let otaUpdateSystem;
 let productionConfig;
+let osInstaller;
 
 function createWindow() {
   // Create the browser window
@@ -77,6 +79,9 @@ app.whenReady().then(async () => {
   
   // Initialize OTA update system
   otaUpdateSystem = new TauOSOTAUpdateSystem();
+
+  // Initialize OS installer (USB / ISO)
+  osInstaller = new TauOSInstaller(__dirname);
   
   // Create main window
   createWindow();
@@ -118,26 +123,47 @@ app.on('activate', () => {
 // IPC handlers for installer functionality
 ipcMain.handle('install-tauos', async (event, options) => {
   try {
+    const mode = options?.mode || 'apps';
+    if (mode === 'os' || mode === 'usb') {
+      const isoCheck = osInstaller.verifyIso();
+      if (!isoCheck.valid) {
+        return { success: false, error: isoCheck.reason };
+      }
+      const result = await osInstaller.writeIsoToUsb(isoCheck.path, options.driveId, (p) => {
+        event.sender.send('install-progress', p);
+      });
+      return { success: true, mode: 'os', ...result };
+    }
+
     const installPath = options.installPath || path.join(process.env.USERPROFILE || process.env.HOME, 'TauOS');
-    
-    // Create installation directory
     if (!fs.existsSync(installPath)) {
       fs.mkdirSync(installPath, { recursive: true });
     }
-
-    // Copy application files
-    await copyAppFiles(installPath);
-    
-    // Create desktop shortcuts
+    await osInstaller.installAppsLocally(installPath, (p) => {
+      event.sender.send('install-progress', p);
+    });
     await createDesktopShortcuts(installPath);
-    
-    // Start TauOS services
     await startTauOSServices(installPath);
-    
-    return { success: true, installPath };
+    return { success: true, installPath, mode: 'apps' };
   } catch (error) {
     console.error('Installation error:', error);
     return { success: false, error: error.message };
+  }
+});
+
+ipcMain.handle('get-os-install-info', async () => {
+  try {
+    return { success: true, ...osInstaller.getInstallMode(), iso: osInstaller.verifyIso() };
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
+});
+
+ipcMain.handle('list-usb-drives', async () => {
+  try {
+    return { success: true, drives: osInstaller.listUsbDrives() };
+  } catch (error) {
+    return { success: false, error: error.message, drives: [] };
   }
 });
 

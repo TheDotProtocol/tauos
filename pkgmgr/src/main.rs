@@ -1,31 +1,37 @@
-use gtk4::prelude::*;
-use gtk4::{Application, ApplicationWindow, Box, Label, CssProvider, StyleContext};
+use clap::{Parser, Subcommand};
+use std::path::PathBuf;
+use tau_pkg::PackageManager;
 
-fn main() {
-    let app = Application::builder()
-        .application_id("org.tauos.pkgmgr")
-        .build();
-    
-    app.connect_activate(|app| {
-        let window = ApplicationWindow::new();
-        window.set_application(Some(app));
-        window.set_title(Some("TauOS Package Manager"));
-        window.set_default_size(400, 300);
-        
-        let container = Box::new(gtk4::Orientation::Vertical, 20);
-        container.set_margin_start(40);
-        container.set_margin_end(40);
-        container.set_margin_top(40);
-        container.set_margin_bottom(40);
-        container.add_css_class("background");
-        
-        let label = Label::new(Some("TauOS Package Manager"));
-        label.add_css_class("titlebar-title");
-        container.append(&label);
-        
-        window.set_child(Some(&container));
-        window.show();
-    });
-    
-    app.run();
-} 
+#[derive(Parser)]
+#[command(name = "tau-pkg", about = "TauOS Package Manager", version)]
+struct Cli {
+    #[arg(long, default_value = "/")]
+    root: PathBuf,
+    #[command(subcommand)]
+    command: Commands,
+}
+
+#[derive(Subcommand)]
+enum Commands {
+    Install { package: String },
+    Remove { package: String },
+}
+
+fn main() -> anyhow::Result<()> {
+    env_logger::init();
+    let cli = Cli::parse();
+    let mut pm = PackageManager::new(cli.root)?;
+
+    match cli.command {
+        Commands::Install { package } => {
+            pm.install_package(&package)?;
+            println!("Installed {package}");
+        }
+        Commands::Remove { package } => {
+            pm.remove_package(&package)?;
+            println!("Removed {package}");
+        }
+    }
+
+    Ok(())
+}

@@ -27,14 +27,14 @@ export async function POST(request: NextRequest) {
   try {
     // Get token from Authorization header
     const authHeader = request.headers.get('authorization');
-    let userId = '00000000-0000-0000-0000-000000000001'; // Default to user ID for testing
+    let userId = 1; // Default to user ID 1 for testing
     
     if (authHeader && authHeader.startsWith('Bearer ')) {
       try {
         const token = authHeader.substring(7);
         const jwtSecret = process.env.JWT_SECRET_TAUMAIL || 'tauos-taumail-jwt-secret-2025-launch-a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6';
         const decoded = jwt.verify(token, jwtSecret) as any;
-        userId = decoded.userId || '00000000-0000-0000-0000-000000000001';
+        userId = decoded.userId || 1;
       } catch (error) {
         console.log('JWT verification failed, using default user ID');
       }
@@ -80,14 +80,14 @@ export async function PUT(request: NextRequest) {
   try {
     // Get token from Authorization header
     const authHeader = request.headers.get('authorization');
-    let userId = '00000000-0000-0000-0000-000000000001'; // Default to user ID for testing
+    let userId = 1; // Default to user ID 1 for testing
     
     if (authHeader && authHeader.startsWith('Bearer ')) {
       try {
         const token = authHeader.substring(7);
         const jwtSecret = process.env.JWT_SECRET_TAUMAIL || 'tauos-taumail-jwt-secret-2025-launch-a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6';
         const decoded = jwt.verify(token, jwtSecret) as any;
-        userId = decoded.userId || '00000000-0000-0000-0000-000000000001';
+        userId = decoded.userId || 1;
       } catch (error) {
         console.log('JWT verification failed, using default user ID');
       }

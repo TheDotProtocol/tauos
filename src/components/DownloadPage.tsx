@@ -1,5 +1,6 @@
 'use client';
 
+import AppShell from '@/components/apps/AppShell';
 import Link from 'next/link';
 import { useEffect, useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
@@ -67,7 +68,7 @@ function ArtifactRow({
         <div className="flex items-center gap-3">
           <Icon className="w-5 h-5 text-gray-500" />
           <div>
-            <p className="text-gray-400 font-medium">{artifact.label}</p>
+            <p className="text-muted-foreground font-medium">{artifact.label}</p>
             <p className="text-xs text-gray-500">{artifact.description}</p>
           </div>
         </div>
@@ -87,15 +88,15 @@ function ArtifactRow({
       }`}
     >
       <div className="flex items-center gap-3 min-w-0">
-        <Icon className={`w-5 h-5 shrink-0 ${highlighted ? 'text-purple-400' : 'text-gray-400'}`} />
+        <Icon className={`w-5 h-5 shrink-0 ${highlighted ? 'text-purple-400' : 'text-muted-foreground'}`} />
         <div className="min-w-0">
           <p className="text-white font-medium truncate">{artifact.label}</p>
-          <p className="text-xs text-gray-400">
+          <p className="text-xs text-muted-foreground">
             {formatBytes(artifact.size)} · {artifact.arch.toUpperCase()} · {artifact.kind}
           </p>
         </div>
       </div>
-      <Download className="w-5 h-5 text-gray-400 group-hover:text-purple-400 shrink-0 ml-2" />
+      <Download className="w-5 h-5 text-muted-foreground group-hover:text-purple-400 shrink-0 ml-2" />
     </a>
   );
 }
@@ -154,30 +155,12 @@ export default function DownloadPage() {
   const DetectedIcon = detected ? platformIcon(detected.platform) : Monitor;
 
   return (
-    <div className="min-h-screen bg-gray-950">
-      <div className="bg-gray-900/50 backdrop-blur-xl border-b border-gray-800">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            <div className="flex items-center space-x-4">
-              <img src="/brand/tauos-logo.svg" alt="TauOS" className="w-8 h-8" />
-              <div>
-                <h1 className="text-xl font-bold text-white">TauOS</h1>
-                <p className="text-sm text-gray-400">Download</p>
-              </div>
-            </div>
-            <div className="flex items-center space-x-4">
-              <Link href="/beta" className="text-sm text-amber-400 hover:text-amber-300 font-medium">
-                Beta 1.0 info →
-              </Link>
-              <span className="text-sm text-gray-300">v{manifest?.version ?? '1.0.0-beta.1'}</span>
-              <div className="w-2 h-2 bg-amber-500 rounded-full animate-pulse" />
-              <span className="text-sm text-amber-400">Beta</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <AppShell
+      title="Download TauOS"
+      subtitle="Bootable ISO and platform installers with SHA256 verification."
+      variant="marketing"
+    >
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-10">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -189,9 +172,9 @@ export default function DownloadPage() {
               TauOS
             </span>
           </h1>
-          <p className="text-xl text-gray-400 mb-4 max-w-3xl mx-auto">
+          <p className="text-xl text-muted-foreground mb-4 max-w-3xl mx-auto">
             Bootable desktop ISO for PCs, plus platform installers to create a USB boot drive.
-            <Link href="/beta" className="block mt-2 text-amber-400 hover:text-amber-300 text-base">
+            <Link href="/beta" className="block mt-2 text-primary hover:text-amber-300 text-base">
               Read Beta 1.0 scope, known issues, and install steps →
             </Link>
           </p>
@@ -223,7 +206,7 @@ export default function DownloadPage() {
               </div>
               <div>
                 <h2 className="text-2xl font-bold text-white">Recommended for your system</h2>
-                <p className="text-gray-400">
+                <p className="text-muted-foreground">
                   {detected ? detected.label : 'Detecting platform…'}
                 </p>
               </div>
@@ -282,7 +265,7 @@ export default function DownloadPage() {
               </div>
               <div>
                 <h3 className="text-xl font-bold text-white">Bootable TauOS Desktop ISO</h3>
-                <p className="text-gray-400 text-sm mt-1">
+                <p className="text-muted-foreground text-sm mt-1">
                   {iso.description} — write to USB with Balena Etcher, Rufus, or dd. x86_64 PCs
                   (Intel/AMD).
                 </p>
@@ -308,7 +291,7 @@ export default function DownloadPage() {
           className="bg-gray-900/30 backdrop-blur-sm border border-gray-800 rounded-xl p-8 mb-12"
         >
           <h3 className="text-xl font-bold text-white mb-2">All downloads</h3>
-          <p className="text-gray-400 text-sm mb-6">
+          <p className="text-muted-foreground text-sm mb-6">
             Mac Intel vs Apple Silicon, Windows x64 vs ARM, and Linux packages — pick the build that
             matches your machine.
           </p>
@@ -369,7 +352,7 @@ export default function DownloadPage() {
                 <Icon className="w-6 h-6 text-white" />
               </div>
               <h3 className="text-lg font-semibold text-white mb-2">{title}</h3>
-              <p className="text-gray-400 text-sm">{desc}</p>
+              <p className="text-muted-foreground text-sm">{desc}</p>
             </div>
           ))}
         </motion.div>
@@ -379,10 +362,10 @@ export default function DownloadPage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.5 }}
-          className="bg-gray-900/30 border border-gray-800 rounded-xl p-8"
+          className="bg-card border border-border rounded-xl p-8"
         >
           <h3 className="text-xl font-bold text-white mb-4">Installation paths</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm text-gray-400">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm text-muted-foreground">
             <div>
               <p className="text-white font-semibold mb-2">Path A — Bootable ISO (PC install)</p>
               <ol className="list-decimal list-inside space-y-1">
@@ -402,6 +385,6 @@ export default function DownloadPage() {
           </div>
         </motion.div>
       </div>
-    </div>
+    </AppShell>
   );
 }

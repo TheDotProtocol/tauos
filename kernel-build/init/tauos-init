@@ -1,0 +1,61 @@
+#!/bin/sh
+# TauOS early userspace init (initramfs) — live ISO + disk install
+set -e
+
+mount -t proc proc /proc
+mount -t sysfs sys /sys
+mount -t devtmpfs dev /dev 2>/dev/null || mount -t tmpfs devtmpfs /dev
+mkdir -p /dev/pts /dev/shm /newroot /mnt /live /mnt/iso /mnt/overlay /mnt/work /mnt/merged
+mount -t devpts devpts /dev/pts 2>/dev/null || true
+mount -t tmpfs tmpfs /dev/shm 2>/dev/null || true
+
+# Find optical/USB ISO volume
+ISO_DEV=""
+for dev in /dev/sr0 /dev/sr1 /dev/sdb /dev/sdc /dev/sdd; do
+  if [ -b "$dev" ]; then
+    mkdir -p /mnt/iso
+    if mount -t iso9660 -o ro "$dev" /mnt/iso 2>/dev/null; then
+      if [ -f /mnt/iso/live/filesystem.squashfs ]; then
+        ISO_DEV="$dev"
+        break
+      fi
+      umount /mnt/iso 2>/dev/null || true
+    fi
+  fi
+done
+
+if [ -n "$ISO_DEV" ] && [ -f /mnt/iso/live/filesystem.squashfs ]; then
+  mount -t squashfs -o ro /mnt/iso/live/filesystem.squashfs /newroot
+
+  mkdir -p /mnt/overlay /mnt/work /mnt/merged
+  if mount -t overlay overlay -o lowerdir=/newroot,upperdir=/mnt/overlay,workdir=/mnt/work /mnt/merged 2>/dev/null; then
+    LIVE_ROOT=/mnt/merged
+  else
+    LIVE_ROOT=/newroot
+    mount --bind /newroot /mnt/merged
+    LIVE_ROOT=/mnt/merged
+  fi
+
+  # Copy live kernel artifacts for disk installer
+  mkdir -p "$LIVE_ROOT/usr/share/tauos/artifacts"
+  cp /mnt/iso/boot/vmlinuz "$LIVE_ROOT/usr/share/tauos/artifacts/vmlinuz" 2>/dev/null || true
+  cp /mnt/iso/boot/initrd.img "$LIVE_ROOT/usr/share/tauos/artifacts/initrd.img" 2>/dev/null || true
+  cp /mnt/iso/live/filesystem.squashfs "$LIVE_ROOT/usr/share/tauos/artifacts/filesystem.squashfs" 2>/dev/null || true
+
+  mount --move /proc "$LIVE_ROOT/proc"
+  mount --move /sys "$LIVE_ROOT/sys"
+  mount --move /dev "$LIVE_ROOT/dev"
+
+  if grep -q tauos.install /proc/cmdline 2>/dev/null; then
+    export TAUOS_LIVE=1
+    export TAUOS_ARTIFACTS=/usr/share/tauos/artifacts
+    exec switch_root "$LIVE_ROOT" /usr/bin/tauos-install
+  fi
+
+  exec switch_root "$LIVE_ROOT" /sbin/init
+fi
+
+echo "TauOS: could not find live filesystem on ISO."
+echo "Available block devices:"
+ls -la /dev/sr* /dev/sd* 2>/dev/null || true
+exec /bin/sh

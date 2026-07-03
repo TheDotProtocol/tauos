@@ -10,43 +10,38 @@ interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
 
 const Input = React.forwardRef<HTMLInputElement, InputProps>(
   ({ className, label, error, icon, variant = "default", ...props }, ref) => {
-    const baseClasses = "w-full px-4 py-3 text-sm transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed";
-    
+    const baseClasses =
+      "w-full px-4 py-3 text-sm transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background disabled:opacity-50 disabled:cursor-not-allowed";
+
     const variants = {
-      default: "bg-tau-dark-700 border border-tau-dark-600 text-white placeholder-gray-400 focus:border-tau-primary focus:ring-tau-primary/50 rounded-lg",
-      glass: "bg-tau-glass-light backdrop-blur-md border border-tau-glass-medium text-white placeholder-gray-300 focus:border-tau-primary focus:ring-tau-primary/50 rounded-glass",
+      default:
+        "bg-muted border border-border text-foreground placeholder:text-muted-foreground focus:border-primary rounded-md",
+      glass:
+        "bg-white/5 backdrop-blur-md border border-white/10 text-foreground placeholder:text-muted-foreground focus:border-primary rounded-md",
     };
 
     return (
       <div className="space-y-2">
-        {label && (
-          <label className="block text-sm font-medium text-gray-300">
-            {label}
-          </label>
-        )}
+        {label ? (
+          <label className="block text-sm font-medium text-muted-foreground">{label}</label>
+        ) : null}
         <div className="relative">
-          {icon && (
-            <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
-              {icon}
-            </div>
-          )}
+          {icon ? (
+            <div className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">{icon}</div>
+          ) : null}
           <input
             ref={ref}
             className={cn(
               baseClasses,
               variants[variant],
               icon && "pl-10",
-              error && "border-error focus:border-error focus:ring-error/50",
+              error && "border-destructive focus:border-destructive focus:ring-destructive/50",
               className
             )}
             {...props}
           />
         </div>
-        {error && (
-          <p className="text-sm text-error">
-            {error}
-          </p>
-        )}
+        {error ? <p className="text-sm text-destructive">{error}</p> : null}
       </div>
     );
   }
@@ -54,4 +49,4 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
 
 Input.displayName = "Input";
 
-export { Input }; 
+export { Input };

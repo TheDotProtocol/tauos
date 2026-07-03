@@ -1,0 +1,40 @@
+[package]
+name = "tau-session"
+version = "0.1.0"
+edition = "2021"
+authors = ["Tau OS Team"]
+description = "User session and login manager for Tau OS"
+license = "MIT"
+
+[dependencies]
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+toml = "0.8"
+bcrypt = "0.15"
+uuid = { version = "1.0", features = ["v4"] }
+chrono = { version = "0.4", features = ["serde"] }
+ctrlc = "3.4"
+tempfile = "3.8"
+
+[dev-dependencies]
+tempfile = "3.8"
+
+[[bin]]
+name = "tau-session"
+path = "src/main.rs"
+
+[[bin]]
+name = "tau-login"
+path = "src/bin/login.rs"
+
+[[bin]]
+name = "tau-greeter"
+path = "src/bin/greeter.rs"
+
+[[bin]]
+name = "tau-lock"
+path = "src/bin/lock.rs"
+
+[[bin]]
+name = "tau-auth"
+path = "src/bin/auth.rs" 

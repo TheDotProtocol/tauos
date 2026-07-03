@@ -1,5 +1,6 @@
 'use client';
 
+import MarketingPageShell from '@/components/marketing/MarketingPageShell';
 import { motion } from 'framer-motion';
 import {
   HelpCircle, Search, Mail, MessageCircle, Book, FileText, Users, Globe,
@@ -9,48 +10,10 @@ import {
 
 export default function HelpPage() {
   return (
-    <div className="min-h-screen bg-black text-white">
-      {/* Header */}
-      <header className="bg-gray-900/50 backdrop-blur-xl border-b border-gray-800 sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            <div className="flex items-center space-x-4">
-              <img src="/brand/tauos-logo.svg" alt="TauCore™" className="h-8 w-auto" />
-              <span className="text-xl font-bold text-white">Tau OS</span>
-            </div>
-            <nav className="hidden md:flex items-center space-x-8">
-              <a href="/" className="text-gray-300 hover:text-white transition-colors">Home</a>
-              <a href="/about" className="text-gray-300 hover:text-white transition-colors">About</a>
-              <a href="/developers" className="text-gray-300 hover:text-white transition-colors">Developers</a>
-              <a href="/governance" className="text-gray-300 hover:text-white transition-colors">Governance</a>
-            </nav>
-          </div>
-        </div>
-      </header>
-
-      {/* Hero Section */}
-      <section className="py-20 bg-gradient-to-b from-gray-900 to-black">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            className="text-center mb-16"
-          >
-            <h1 className="text-5xl md:text-7xl font-bold mb-6">
-              <span className="bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">
-                Help Center
-              </span>
-            </h1>
-            <p className="text-xl md:text-2xl text-gray-300 max-w-4xl mx-auto leading-relaxed">
-              Get help with <span className="text-yellow-400 font-semibold">TauCore™, TauMail, TauCloud</span> and all our privacy-first applications.
-              <br />
-              Find answers, guides, and support resources.
-            </p>
-          </motion.div>
-        </div>
-      </section>
-
+    <MarketingPageShell
+      title="Help Center"
+      subtitle="Guides and answers for Tau OS and TAU CORE apps."
+    >
       {/* Quick Help Section */}
       <section className="py-20 bg-black">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -77,7 +40,7 @@ export default function HelpPage() {
               {
                 icon: Download,
                 title: "Installation",
-                description: "Download and install TauCore™ on your system",
+                description: "Download and install TAU CORE™ on your system",
                 link: "/#downloads"
               },
               {
@@ -142,24 +105,24 @@ export default function HelpPage() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             {[
               {
-                question: "How do I install TauCore™?",
-                answer: "Download the installer for your platform from our downloads page. Run the installer and follow the setup wizard to install TauCore™ with all applications."
+                question: "How do I install TAU CORE™?",
+                answer: "Download the installer for your platform from our downloads page. Run the installer and follow the setup wizard to install TAU CORE™ with all applications."
               },
               {
-                question: "Is TauCore™ free to use?",
-                answer: "Yes, TauCore™ is completely free and open-source. We believe privacy should be accessible to everyone, not just those who can afford it."
+                question: "Is TAU CORE™ free to use?",
+                answer: "Yes, TAU CORE™ is completely free and open-source. We believe privacy should be accessible to everyone, not just those who can afford it."
               },
               {
                 question: "How do I create a @tauos.org email?",
-                answer: "Visit our TauMail page, click 'Get TauCore™ Email', and register with your desired username. Your @tauos.org email will be ready immediately."
+                answer: "Visit our TauMail page, click 'Get TAU CORE™ Email', and register with your desired username. Your @tauos.org email will be ready immediately."
               },
               {
                 question: "Is my data really private?",
                 answer: "Absolutely. We use end-to-end encryption, zero-telemetry architecture, and open-source code. Your data never leaves your control."
               },
               {
-                question: "Can I use TauCore™ on my existing computer?",
-                answer: "Yes! TauCore™ can be installed alongside Windows, macOS, or Linux. You can also run it in a virtual machine or as a live system."
+                question: "Can I use TAU CORE™ on my existing computer?",
+                answer: "Yes! TAU CORE™ can be installed alongside Windows, macOS, or Linux. You can also run it in a virtual machine or as a live system."
               },
               {
                 question: "How do I get support?",
@@ -269,7 +232,7 @@ export default function HelpPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
             {[
               "Installation Guide - Step-by-step installation instructions",
-              "User Manual - Complete guide to using TauCore™ applications",
+              "User Manual - Complete guide to using TAU CORE™ applications",
               "Security Guide - Best practices for privacy and security",
               "Troubleshooting - Common issues and solutions",
               "API Documentation - For developers and integrations",
@@ -316,7 +279,7 @@ export default function HelpPage() {
                 <div>
                   <h3 className="text-xl font-bold text-white mb-4">General Support</h3>
                   <p className="text-gray-300 mb-2">Email: <a href="mailto:support@tauos.org" className="text-yellow-400 hover:text-yellow-300">support@tauos.org</a></p>
-                  <p className="text-gray-300 mb-2">Phone: +1 1800 TauCore™</p>
+                  <p className="text-gray-300 mb-2">Phone: +1 1800 TAU CORE™</p>
                   <p className="text-gray-300">Response time: 24 hours</p>
                 </div>
                 <div>
@@ -338,19 +301,6 @@ export default function HelpPage() {
           </motion.div>
         </div>
       </section>
-
-      {/* Footer */}
-      <footer className="bg-gray-900/50 border-t border-gray-800 py-12">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <div className="flex items-center justify-center space-x-4 mb-4">
-              <img src="/brand/tauos-logo.svg" alt="TauCore™" className="h-8 w-auto" />
-              <span className="text-xl font-bold text-white">Tau OS</span>
-            </div>
-            <p className="text-gray-400">© 2025 Tau Foundation & Tau LLC. All rights reserved.</p>
-          </div>
-        </div>
-      </footer>
-    </div>
+    </MarketingPageShell>
   );
 }

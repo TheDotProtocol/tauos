@@ -410,6 +410,15 @@ impl Interpreter {
     }
 
     fn call_function(&mut self, name: String, arguments: Vec<Value>) -> Result<Value, String> {
+        if name == "print" {
+            for (i, arg) in arguments.iter().enumerate() {
+                if i > 0 { print!(" "); }
+                print!("{}", self.value_to_string(arg.clone()));
+            }
+            println!();
+            return Ok(Value::Null);
+        }
+
         let function = self.functions.get(&name)
             .ok_or_else(|| format!("Undefined function: {}", name))?
             .clone();

@@ -1,5 +1,6 @@
 'use client';
 
+import MarketingPageShell from '@/components/marketing/MarketingPageShell';
 import { motion } from 'framer-motion';
 import {
   Cookie, Shield, Lock, Eye, Users, Globe, Mail, Phone, MapPin,
@@ -9,25 +10,10 @@ import {
 
 export default function CookiesPolicyPage() {
   return (
-    <div className="min-h-screen bg-black text-white">
-      {/* Header */}
-      <header className="bg-gray-900/50 backdrop-blur-xl border-b border-gray-800 sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            <div className="flex items-center space-x-4">
-              <img src="/brand/tauos-logo.svg" alt="TauCore™" className="h-8 w-auto" />
-              <span className="text-xl font-bold text-white">Tau OS</span>
-            </div>
-            <nav className="hidden md:flex items-center space-x-8">
-              <a href="/" className="text-gray-300 hover:text-white transition-colors">Home</a>
-              <a href="/about" className="text-gray-300 hover:text-white transition-colors">About</a>
-              <a href="/developers" className="text-gray-300 hover:text-white transition-colors">Developers</a>
-              <a href="/governance" className="text-gray-300 hover:text-white transition-colors">Governance</a>
-            </nav>
-          </div>
-        </div>
-      </header>
-
+    <MarketingPageShell
+      title="Cookie Policy"
+      subtitle="How we use cookies across TAU CORE properties."
+    >
       {/* Hero Section */}
       <section className="py-20 bg-gradient-to-b from-gray-900 to-black">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -66,7 +52,7 @@ export default function CookiesPolicyPage() {
               </span>
             </h2>
             <p className="text-xl text-gray-300 max-w-4xl mx-auto leading-relaxed">
-              TauCore™ uses only essential cookies for security and functionality. We do not use tracking cookies, analytics cookies, or any cookies that compromise your privacy.
+              TAU CORE™ uses only essential cookies for security and functionality. We do not use tracking cookies, analytics cookies, or any cookies that compromise your privacy.
             </p>
           </motion.div>
         </div>
@@ -255,7 +241,7 @@ export default function CookiesPolicyPage() {
                 <div>
                   <h3 className="text-xl font-bold text-white mb-4">Privacy Team</h3>
                   <p className="text-gray-300 mb-2">Email: <a href="mailto:privacy@tauos.org" className="text-yellow-400 hover:text-yellow-300">privacy@tauos.org</a></p>
-                  <p className="text-gray-300 mb-2">Phone: +1 1800 TauCore™</p>
+                  <p className="text-gray-300 mb-2">Phone: +1 1800 TAU CORE™</p>
                   <p className="text-gray-300">Address: 2261 Market St, San Francisco, CA 94114</p>
                 </div>
                 <div>
@@ -269,19 +255,6 @@ export default function CookiesPolicyPage() {
           </motion.div>
         </div>
       </section>
-
-      {/* Footer */}
-      <footer className="bg-gray-900/50 border-t border-gray-800 py-12">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <div className="flex items-center justify-center space-x-4 mb-4">
-              <img src="/brand/tauos-logo.svg" alt="TauCore™" className="h-8 w-auto" />
-              <span className="text-xl font-bold text-white">Tau OS</span>
-            </div>
-            <p className="text-gray-400">© 2025 Tau Foundation & Tau LLC. All rights reserved.</p>
-          </div>
-        </div>
-      </footer>
-    </div>
+    </MarketingPageShell>
   );
 }

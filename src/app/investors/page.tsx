@@ -1,5 +1,6 @@
 'use client';
 
+import MarketingPageShell from '@/components/marketing/MarketingPageShell';
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { 
@@ -72,7 +73,7 @@ export default function InvestorsPage() {
 
   // Executive TL;DR - Key highlights
   const executiveTLDR = {
-    tagline: "Tomorrow's Intelligence, Today - Powered by TauOS.",
+    tagline: "Tomorrow's Intelligence, Today - Powered by Tau OS.",
     keyPoints: [
       "Raise: $1.5M Seed Round — extends runway ~18 months to key milestones.",
       "Target: IPO (NASDAQ/NYSE) 2029–2030; $1B+ IPO target.",
@@ -132,25 +133,10 @@ export default function InvestorsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-black text-white">
-      {/* Header */}
-      <header className="bg-gray-900/50 backdrop-blur-xl border-b border-gray-800 sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            <div className="flex items-center space-x-4">
-              <img src="/brand/tauos-logo.svg" alt="TauOS" className="h-8 w-auto" />
-              <span className="text-xl font-bold text-white">TauOS</span>
-            </div>
-            <nav className="hidden md:flex items-center space-x-8">
-              <a href="/" className="text-gray-300 hover:text-white transition-colors">Home</a>
-              <a href="/about" className="text-gray-300 hover:text-white transition-colors">About</a>
-              <a href="/developers" className="text-gray-300 hover:text-white transition-colors">Developers</a>
-              <a href="/investors" className="text-yellow-400 font-semibold">Investors</a>
-            </nav>
-          </div>
-        </div>
-      </header>
-
+    <MarketingPageShell
+      title="Investors"
+      subtitle="Tau Core Inc. — building the TAU CORE platform."
+    >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {/* Hero Section */}
         <div className="text-center mb-16">
@@ -159,7 +145,7 @@ export default function InvestorsPage() {
             animate={{ opacity: 1, y: 0 }}
             className="text-5xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-yellow-400 via-orange-500 to-red-500 bg-clip-text text-transparent"
           >
-            TauOS Investor Hub
+            Tau OS Investor Hub
           </motion.h1>
           <motion.p 
             initial={{ opacity: 0, y: 20 }}
@@ -167,7 +153,7 @@ export default function InvestorsPage() {
             transition={{ delay: 0.2 }}
             className="text-xl text-gray-300 mb-8"
           >
-            Tomorrow's Intelligence, Today - Powered by TauOS.
+            Tomorrow's Intelligence, Today - Powered by Tau OS.
           </motion.p>
         </div>
 
@@ -220,9 +206,9 @@ export default function InvestorsPage() {
             transition={{ delay: 0.5 }}
             className="bg-gray-900 rounded-xl p-8"
           >
-            <h3 className="text-2xl font-bold mb-4 text-green-400">The Solution: TauOS</h3>
+            <h3 className="text-2xl font-bold mb-4 text-green-400">The Solution: Tau OS</h3>
             <p className="text-gray-300 mb-4">
-              TauOS is the world's first <strong>AI-native, privacy-first hybrid OS</strong> across devices and cloud.
+              Tau OS is the world's first <strong>AI-native, privacy-first hybrid OS</strong> across devices and cloud.
             </p>
             <div className="space-y-2">
               <div className="flex items-center space-x-2">
@@ -376,7 +362,7 @@ export default function InvestorsPage() {
           <h2 className="text-3xl font-bold mb-6 text-white text-center">Download Investor Materials</h2>
           <div className="grid md:grid-cols-3 gap-6">
             <a 
-              href="/TauOS_Investor_Deck.pdf" 
+              href="/Tau OS_Investor_Deck.pdf" 
               download
               className="bg-white text-black px-6 py-4 rounded-lg font-semibold hover:bg-gray-100 transition-colors flex items-center justify-center space-x-2"
             >
@@ -384,7 +370,7 @@ export default function InvestorsPage() {
               <span>Investor Deck (PDF)</span>
             </a>
             <a 
-              href="/TauOS_Financial_Model.xlsx" 
+              href="/Tau OS_Financial_Model.xlsx" 
               download
               className="bg-white text-black px-6 py-4 rounded-lg font-semibold hover:bg-gray-100 transition-colors flex items-center justify-center space-x-2"
             >
@@ -392,7 +378,7 @@ export default function InvestorsPage() {
               <span>Financial Model (Excel)</span>
             </a>
             <a 
-              href="/TauOS_Investor_Snapshot.pdf" 
+              href="/Tau OS_Investor_Snapshot.pdf" 
               download
               className="bg-white text-black px-6 py-4 rounded-lg font-semibold hover:bg-gray-100 transition-colors flex items-center justify-center space-x-2"
             >
@@ -441,11 +427,11 @@ export default function InvestorsPage() {
         >
           <div className="flex items-center justify-center space-x-2 mb-4">
             <MapPin className="w-5 h-5 text-gray-400" />
-            <span className="text-gray-400">AR Holdings Group Corporation — Tau Foundation / Tau LLC</span>
+            <span className="text-gray-400">AR Holdings Group Corporation — Tau Core Inc. / Tau Core Inc.</span>
           </div>
           <p className="text-gray-500">2126 Market Street, San Francisco, CA 94114, USA</p>
         </motion.div>
       </div>
-    </div>
+    </MarketingPageShell>
   );
 }

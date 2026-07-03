@@ -2,8 +2,14 @@
 resolver = "2"
 members = [
     "core/tau-upd",
+    "core/tauservice",
+    "core/tau-session",
+    "core/tau-powerd",
+    "core/tau-inputd",
+    "core/tau-displaysvc",
+    "developerhub/tauscript",
     "gui/demo",
-    "gui/dock", 
+    "gui/dock",
     "gui/launcher",
     "gui/settings",
     "gui/splash",
@@ -37,4 +43,4 @@ env_logger = "0.10"
 clap = { version = "4.0", features = ["derive"] }
 indicatif = "0.17"
 console = "0.15"
-colored = "2.0" 
+colored = "2.0"

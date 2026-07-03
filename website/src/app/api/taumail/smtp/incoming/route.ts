@@ -1,28 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { Pool } from 'pg';
-import nodemailer from 'nodemailer';
 
 // Database connection
 const pool = new Pool({
-  connectionString: process.env.DATABASE_URL || 'postgresql://postgres.tviqcormikopltejomkc:Ak1233%40%405@aws-0-ap-southeast-1.pooler.supabase.com:5432/postgres?sslmode=disable',
-  ssl: { rejectUnauthorized: false }
+  connectionString: process.env.DATABASE_URL,
+  ssl: process.env.DATABASE_URL?.includes('localhost') ? false : { rejectUnauthorized: false }
 });
-
-// SMTP Configuration for Vultr server
-const smtpConfig = {
-  host: '136.244.83.147', // Your Vultr server IP
-  port: 587,
-  secure: false, // Use STARTTLS
-  auth: {
-    user: 'admin@tauos.org',
-    pass: 'Ak1233@@5'
-  },
-  tls: {
-    rejectUnauthorized: false
-  }
-};
-
-const transporter = nodemailer.createTransporter(smtpConfig);
 
 export async function POST(request: NextRequest) {
   try {

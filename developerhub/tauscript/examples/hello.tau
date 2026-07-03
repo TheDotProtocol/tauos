@@ -1,0 +1,13 @@
+// TauScript example — compatible with the Rust interpreter
+function greet(name) {
+    return "Hello, " + name + "! Welcome to TauOS.";
+}
+
+function main() {
+    let message = greet("TauOS User");
+    print(message);
+    let version = "1.0.0";
+    print("TauOS version: " + version);
+}
+
+main();

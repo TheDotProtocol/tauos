@@ -117,7 +117,8 @@ impl Parser {
         } else if self.match_token(&[TokenType::Return]) {
             self.return_statement()
         } else if self.match_token(&[TokenType::LeftBrace]) {
-            Ok(Statement::Expression(Expression::Literal(Value::Null))) // Block statement
+            let body = self.block()?;
+            Ok(Statement::Block(body))
         } else {
             self.expression_statement()
         }

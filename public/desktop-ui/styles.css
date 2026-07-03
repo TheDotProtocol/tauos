@@ -1,4 +1,6 @@
-/* TauOS Desktop UI - Hybrid Design */
+/* TauOS Desktop UI — aligned with new-website/design-system/tauos-tokens.css */
+@import url('/tauos-tokens.css');
+
 * {
     margin: 0;
     padding: 0;
@@ -6,9 +8,9 @@
 }
 
 body {
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%);
-    color: #ffffff;
+    font-family: var(--tau-font-body, 'Kode Mono', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif);
+    background: var(--tau-bg-primary, #000000);
+    color: var(--tau-text-primary, #ffffff);
     overflow: hidden;
     height: 100vh;
 }

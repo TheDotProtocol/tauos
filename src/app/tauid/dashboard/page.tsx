@@ -1,5 +1,6 @@
 'use client';
 
+import DashboardShell from '@/components/apps/DashboardShell';
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Shield, User, Mail, Settings, LogOut, Key, Fingerprint, Eye, EyeOff, Plus, Trash2 } from 'lucide-react';
@@ -83,44 +84,20 @@ export default function TauIDDashboard() {
     window.location.href = '/tauid';
   };
 
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-black text-white flex items-center justify-center">
-        <div className="text-center">
-          <Shield className="w-16 h-16 text-yellow-400 mx-auto mb-4 animate-spin" />
-          <p className="text-gray-400">Loading your identity...</p>
-        </div>
-      </div>
-    );
-  }
+  
 
   return (
-    <div className="min-h-screen bg-black text-white">
-      {/* Header */}
-      <header className="border-b border-gray-800">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-6">
-            <Link href="/" className="flex items-center space-x-2">
-              <Shield className="w-8 h-8 text-yellow-400" />
-              <span className="text-2xl font-bold">TauOS</span>
-            </Link>
-            <div className="flex items-center space-x-4">
-              <span className="text-gray-300">Welcome, {user?.full_name || user?.username}</span>
-              <button
-                onClick={handleLogout}
-                className="flex items-center space-x-2 text-gray-300 hover:text-red-400 transition-colors"
-              >
-                <LogOut className="w-4 h-4" />
-                <span>Logout</span>
-              </button>
-            </div>
-          </div>
-        </div>
-      </header>
-
+    <DashboardShell
+      title="Tau ID"
+      subtitle="Manage your sovereign digital identity."
+      userLabel={user?.full_name || user?.username || user?.email}
+      onLogout={handleLogout}
+      loading={isLoading}
+      
+    >
+      
       {/* Main Content */}
-      <main className="max-w-6xl mx-auto px-4 py-8">
-        <motion.div
+      <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
@@ -268,7 +245,6 @@ export default function TauIDDashboard() {
             </div>
           )}
         </motion.div>
-      </main>
-    </div>
+    </DashboardShell>
   );
 }

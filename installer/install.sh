@@ -8,11 +8,21 @@ set -e
 # Configuration
 TAU_VERSION="1.0.0"
 TAU_ARCH=$(uname -m)
+[[ "$TAU_ARCH" == "aarch64" ]] && TAU_ARCH="arm64"
+[[ "$TAU_ARCH" == "x86_64" ]] && TAU_ARCH="x86_64"
 TAU_INSTALL_ROOT="/"
 TAU_BOOT_PARTITION=""
 TAU_ROOT_PARTITION=""
 TAU_SWAP_PARTITION=""
 TAU_EFI_PARTITION=""
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+TAUOS_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+ARTIFACTS_DIR="${TAUOS_ARTIFACTS:-$TAUOS_ROOT/release-files}"
+# When running from live ISO, artifacts are staged in the image
+if [[ -d /usr/share/tauos/artifacts ]] && [[ -z "${TAUOS_ARTIFACTS:-}" ]]; then
+  ARTIFACTS_DIR="/usr/share/tauos/artifacts"
+fi
+BUILD_DIR="$TAUOS_ROOT/build/tauos-$TAU_ARCH"
 
 # Colors for output
 RED='\033[0;31m'
@@ -38,7 +48,29 @@ log_error() {
     echo -e "${RED}[ERROR]${NC} $1"
 }
 
-# Check if running as root
+# Prompt for production password on disk install (beta)
+prompt_install_password() {
+    if [[ -n "${TAUOS_INSTALL_PASSWORD:-}" ]]; then
+        return 0
+    fi
+    log_info "TauOS Beta — create password for user 'tau'"
+    while true; do
+        read -s -p "Enter new password: " TAUOS_INSTALL_PASSWORD
+        echo
+        read -s -p "Confirm password: " TAUOS_INSTALL_PASSWORD_CONFIRM
+        echo
+        if [[ ${#TAUOS_INSTALL_PASSWORD} -lt 8 ]]; then
+            log_warning "Password must be at least 8 characters"
+            continue
+        fi
+        if [[ "$TAUOS_INSTALL_PASSWORD" == "$TAUOS_INSTALL_PASSWORD_CONFIRM" ]]; then
+            break
+        fi
+        log_warning "Passwords do not match — try again"
+    done
+    export TAUOS_INSTALL_PASSWORD
+}
+
 check_root() {
     if [[ $EUID -ne 0 ]]; then
         log_error "This script must be run as root"
@@ -76,22 +108,28 @@ check_requirements() {
 
 # Detect and configure partitions
 detect_partitions() {
+    if [[ -n "${TAUOS_ROOT_PARTITION:-}" ]]; then
+        log_info "Using preset root partition: $TAUOS_ROOT_PARTITION"
+        [[ -b "$TAUOS_ROOT_PARTITION" ]] || { log_error "Invalid: $TAUOS_ROOT_PARTITION"; exit 1; }
+        return 0
+    fi
+
     log_info "Detecting available partitions..."
     
     # List available disks
     echo "Available disks:"
-    lsblk -d -o NAME,SIZE,MODEL
+    lsblk -d -o NAME,SIZE,MODEL 2>/dev/null || ls /dev/sd* /dev/vd* 2>/dev/null || true
     
     echo ""
     echo "Available partitions:"
-    lsblk -o NAME,SIZE,TYPE,MOUNTPOINT
+    lsblk -o NAME,SIZE,TYPE,MOUNTPOINT 2>/dev/null || true
     
     # Prompt for partition selection
     echo ""
-    read -p "Enter root partition (e.g., /dev/sda2): " TAU_ROOT_PARTITION
-    read -p "Enter boot partition (e.g., /dev/sda1) [optional]: " TAU_BOOT_PARTITION
-    read -p "Enter EFI partition (e.g., /dev/sda1) [optional]: " TAU_EFI_PARTITION
-    read -p "Enter swap partition (e.g., /dev/sda3) [optional]: " TAU_SWAP_PARTITION
+    read -p "Enter root partition (e.g., /dev/vda2): " TAU_ROOT_PARTITION
+    read -p "Enter boot partition (e.g., /dev/vda1) [optional]: " TAU_BOOT_PARTITION
+    read -p "Enter EFI partition (e.g., /dev/vda1) [optional]: " TAU_EFI_PARTITION
+    read -p "Enter swap partition (e.g., /dev/vda3) [optional]: " TAU_SWAP_PARTITION
     
     # Validate partitions
     if [[ -z "$TAU_ROOT_PARTITION" ]]; then
@@ -171,42 +209,60 @@ install_base_system() {
     # Create necessary directories
     mkdir -p /mnt/tau/{bin,boot,dev,etc,home,lib,lib64,media,mnt,opt,proc,root,run,sbin,srv,sys,tmp,usr,var}
     
-    # Copy kernel and initramfs
-    if [[ -f "tauos-kernel-$TAU_ARCH" ]]; then
-        cp "tauos-kernel-$TAU_ARCH" /mnt/tau/boot/vmlinuz-tauos
+    # Copy kernel and initramfs (from release-files or build output)
+    local kernel_src=""
+    local initrd_src=""
+    local rootfs_tar=""
+
+    for k in "$ARTIFACTS_DIR/tauos-kernel-$TAU_ARCH" "$BUILD_DIR/boot/vmlinuz" "$TAUOS_ROOT/kernel-build/vmlinuz-production"; do
+        if [[ -f "$k" ]] && ! file "$k" | grep -qi "shell script"; then kernel_src="$k"; break; fi
+    done
+    for i in "$ARTIFACTS_DIR/tauos-initramfs-$TAU_ARCH.img" "$BUILD_DIR/boot/initrd.img" "$TAUOS_ROOT/kernel-build/initrd-production.img"; do
+        if [[ -f "$i" ]]; then initrd_src="$i"; break; fi
+    done
+    for t in "$ARTIFACTS_DIR/tauos-core-$TAU_ARCH.tar.gz" "$TAUOS_ROOT/release-files/tauos-core-$TAU_ARCH.tar.gz"; do
+        if [[ -f "$t" ]]; then rootfs_tar="$t"; break; fi
+    done
+
+    if [[ -z "$kernel_src" ]]; then
+        log_error "Kernel not found. Run: $TAUOS_ROOT/scripts/build-tauos.sh"
+        exit 1
+    fi
+
+    mkdir -p /mnt/tau/boot
+    cp "$kernel_src" /mnt/tau/boot/vmlinuz-tauos
+    if [[ -n "$initrd_src" ]]; then
+        cp "$initrd_src" /mnt/tau/boot/initramfs-tauos.img
+    fi
+
+    if [[ -n "$rootfs_tar" ]]; then
+        log_info "Extracting rootfs from $rootfs_tar"
+        tar -xzf "$rootfs_tar" -C /mnt/tau/
+    elif [[ -f "$ARTIFACTS_DIR/filesystem.squashfs" ]]; then
+        log_info "Extracting rootfs from squashfs (live ISO)"
+        unsquashfs -f -d /mnt/tau "$ARTIFACTS_DIR/filesystem.squashfs"
+    elif [[ -f /usr/share/tauos/artifacts/filesystem.squashfs ]]; then
+        log_info "Extracting rootfs from live artifacts"
+        unsquashfs -f -d /mnt/tau /usr/share/tauos/artifacts/filesystem.squashfs
+    else
+        log_error "Rootfs not found. Run: $TAUOS_ROOT/scripts/build-tauos.sh"
+        exit 1
     fi
     
-    if [[ -f "tauos-initramfs-$TAU_ARCH.img" ]]; then
-        cp "tauos-initramfs-$TAU_ARCH.img" /mnt/tau/boot/initramfs-tauos.img
+    # Install Tau OS binaries from cargo build output
+    mkdir -p /mnt/tau/usr/bin /mnt/tau/opt/tauos/bin
+    for bin in tau-pkg tau-service tauscript; do
+        if [[ -f "$TAUOS_ROOT/target/release/$bin" ]]; then
+            cp "$TAUOS_ROOT/target/release/$bin" /mnt/tau/opt/tauos/bin/
+            ln -sf /opt/tauos/bin/$bin /mnt/tau/usr/bin/$bin 2>/dev/null || true
+        fi
+    done
+
+    # Optional legacy paths (skip if missing)
+    if [[ -d "$TAUOS_ROOT/tauos/etc/tau" ]]; then
+        mkdir -p /mnt/tau/etc/tau
+        cp -r "$TAUOS_ROOT/tauos/etc/tau/"* /mnt/tau/etc/tau/ 2>/dev/null || true
     fi
-    
-    # Install core system files
-    tar -xzf "tauos-core-$TAU_ARCH.tar.gz" -C /mnt/tau/
-    
-    # Install Tau OS specific files
-    mkdir -p /mnt/tau/etc/tau
-    cp -r tauos/etc/tau/* /mnt/tau/etc/tau/
-    
-    # Install systemd units
-    mkdir -p /mnt/tau/etc/systemd/system
-    cp -r tauos/core/*.service /mnt/tau/etc/systemd/system/
-    
-    # Install GUI components
-    mkdir -p /mnt/tau/usr/bin
-    cp -r tauos/gui/*/target/release/* /mnt/tau/usr/bin/
-    
-    # Install package manager
-    cp tauos/pkgmgr/target/release/tau-pkg /mnt/tau/usr/bin/
-    
-    # Install TauStore
-    cp -r tauos/taustore/backend/target/release/taustore-backend /mnt/tau/usr/bin/
-    cp -r tauos/taustore/frontend/target/release/taustore-frontend /mnt/tau/usr/bin/
-    
-    # Install sandboxd
-    cp tauos/sandboxd/sandboxd /mnt/tau/usr/bin/
-    
-    # Install Flatpak integration
-    cp tauos/flatpak-integration/flatpakd /mnt/tau/usr/bin/
     
     log_success "Base system installed successfully"
 }
@@ -214,9 +270,14 @@ install_base_system() {
 # Configure bootloader
 configure_bootloader() {
     log_info "Configuring bootloader..."
-    
-    # Install GRUB
-    grub-install --root-directory=/mnt/tau --target="$TAU_ARCH"-efi --efi-directory=/mnt/tau/efi --bootloader-id=tauos
+
+    mkdir -p /mnt/tau/boot/grub /mnt/tau/efi/EFI/tauos 2>/dev/null || true
+
+    if [[ -d /mnt/tau/efi ]] || [[ -d /sys/firmware/efi ]]; then
+        grub-install --root-directory=/mnt/tau --target=x86_64-efi --efi-directory=/mnt/tau/efi --bootloader-id=TauOS --recheck 2>/dev/null || \
+        grub-install --root-directory=/mnt/tau --target=x86_64-efi --efi-directory=/mnt/tau/efi --bootloader-id=TauOS || true
+    fi
+    grub-install --root-directory=/mnt/tau --target=i386-pc "$TAU_ROOT_PARTITION" 2>/dev/null || true
     
     # Generate GRUB configuration
     cat > /mnt/tau/etc/default/grub << EOF
@@ -265,54 +326,37 @@ configure_system() {
     # Set hostname
     echo "tauos" > /mnt/tau/etc/hostname
     
-    # Configure network
-    cat > /mnt/tau/etc/systemd/network/20-wired.network << EOF
-[Match]
-Name=en*
-
-[Network]
-DHCP=yes
-EOF
-    
-    # Configure locale
-    echo "en_US.UTF-8 UTF-8" > /mnt/tau/etc/locale.gen
-    echo "LANG=en_US.UTF-8" > /mnt/tau/etc/locale.conf
-    
-    # Configure timezone
-    ln -sf /usr/share/zoneinfo/UTC /mnt/tau/etc/localtime
-    
     # Configure fstab
+    local root_uuid boot_uuid efi_uuid swap_uuid
+    root_uuid=$(blkid -s UUID -o value "$TAU_ROOT_PARTITION")
     cat > /mnt/tau/etc/fstab << EOF
-# /etc/fstab: static file system information
-#
-# <file system> <mount point>   <type>  <options>       <dump>  <pass>
-$(blkid "$TAU_ROOT_PARTITION" | awk '{print $2}' | sed 's/"/\/\t\t\t\t0\t1/')
+# TauOS — generated by installer
+UUID=$root_uuid  /       ext4  defaults,noatime  0 1
 EOF
-    
     if [[ -n "$TAU_BOOT_PARTITION" ]]; then
-        echo "$(blkid "$TAU_BOOT_PARTITION" | awk '{print $2}' | sed 's/"/\/boot\t\t\t\t0\t2/')" >> /mnt/tau/etc/fstab
+        boot_uuid=$(blkid -s UUID -o value "$TAU_BOOT_PARTITION")
+        echo "UUID=$boot_uuid  /boot  ext4  defaults  0 2" >> /mnt/tau/etc/fstab
     fi
-    
     if [[ -n "$TAU_EFI_PARTITION" ]]; then
-        echo "$(blkid "$TAU_EFI_PARTITION" | awk '{print $2}' | sed 's/"/\/efi\t\t\t\t0\t2/')" >> /mnt/tau/etc/fstab
+        efi_uuid=$(blkid -s UUID -o value "$TAU_EFI_PARTITION")
+        echo "UUID=$efi_uuid  /efi   vfat  umask=0077  0 2" >> /mnt/tau/etc/fstab
     fi
-    
     if [[ -n "$TAU_SWAP_PARTITION" ]]; then
-        echo "$(blkid "$TAU_SWAP_PARTITION" | awk '{print $2}' | sed 's/"/swap\t\t\t\t0\t0/')" >> /mnt/tau/etc/fstab
+        swap_uuid=$(blkid -s UUID -o value "$TAU_SWAP_PARTITION")
+        echo "UUID=$swap_uuid  none   swap  sw  0 0" >> /mnt/tau/etc/fstab
     fi
-    
-    # Enable systemd services
-    chroot /mnt/tau systemctl enable systemd-networkd
-    chroot /mnt/tau systemctl enable systemd-resolved
-    chroot /mnt/tau systemctl enable tau-session
-    chroot /mnt/tau systemctl enable tau-service
-    chroot /mnt/tau systemctl enable tau-upd
-    chroot /mnt/tau systemctl enable sandboxd
-    chroot /mnt/tau systemctl enable flatpakd
-    
-    # Create default user
-    chroot /mnt/tau useradd -m -G wheel -s /bin/bash tau
-    echo "tau:tauos" | chroot /mnt/tau chpasswd
+
+    # Enable corporate desktop services (NetworkManager + TauOS UI)
+    chroot /mnt/tau systemctl enable NetworkManager.service 2>/dev/null || true
+    chroot /mnt/tau systemctl enable systemd-timesyncd.service 2>/dev/null || true
+    chroot /mnt/tau systemctl enable ssh.service 2>/dev/null || true
+    chroot /mnt/tau systemctl enable seatd.service 2>/dev/null || true
+    chroot /mnt/tau systemctl enable tauos-desktop.service 2>/dev/null || true
+    chroot /mnt/tau systemctl set-default graphical.target 2>/dev/null || true
+
+    # Create default user if missing
+    chroot /mnt/tau id tau &>/dev/null || chroot /mnt/tau useradd -m -G sudo,audio,video,plugdev,render,input -s /bin/bash tau
+    echo "tau:${TAUOS_INSTALL_PASSWORD}" | chroot /mnt/tau chpasswd
     
     log_success "System configured successfully"
 }
@@ -320,25 +364,20 @@ EOF
 # Install additional packages
 install_packages() {
     log_info "Installing additional packages..."
-    
-    # Install core applications
-    chroot /mnt/tau tau-pkg install tau-editor
-    chroot /mnt/tau tau-pkg install tau-terminal
-    chroot /mnt/tau tau-pkg install tau-browser
-    chroot /mnt/tau tau-pkg install tau-media-player
-    
-    # Install development tools
-    chroot /mnt/tau tau-pkg install tau-sdk
-    
-    log_success "Additional packages installed successfully"
+    if chroot /mnt/tau command -v tau-pkg >/dev/null 2>&1; then
+        chroot /mnt/tau tau-pkg install tau-editor 2>/dev/null || log_warning "tau-pkg offline — skipping app bundles"
+    else
+        log_warning "tau-pkg not present — desktop UI already included in base image"
+    fi
+    log_success "Package step completed"
 }
 
 # Finalize installation
 finalize_installation() {
     log_info "Finalizing installation..."
     
-    # Set root password
-    echo "root:tauos" | chroot /mnt/tau chpasswd
+    # Live ISO uses password tau/tauos — force change on first boot after disk install
+    chroot /mnt/tau chage -d 0 tau 2>/dev/null || true
     
     # Configure sudo
     echo "tau ALL=(ALL) NOPASSWD: ALL" > /mnt/tau/etc/sudoers.d/tau
@@ -349,8 +388,11 @@ finalize_installation() {
     chroot /mnt/tau chmod 644 /etc/fstab
     chroot /mnt/tau chmod 600 /etc/sudoers.d/tau
     
-    # Generate initramfs
-    chroot /mnt/tau dracut -f /boot/initramfs-tauos.img
+    # Generate initramfs for installed system
+    if chroot /mnt/tau command -v update-initramfs >/dev/null 2>&1; then
+        chroot /mnt/tau update-initramfs -c -k all 2>/dev/null || \
+        chroot /mnt/tau update-initramfs -u -k all 2>/dev/null || log_warning "initramfs update skipped"
+    fi
     
     log_success "Installation finalized successfully"
 }
@@ -378,6 +420,7 @@ main() {
     
     check_root
     check_requirements
+    prompt_install_password
     detect_partitions
     format_partitions
     mount_partitions
@@ -388,9 +431,8 @@ main() {
     finalize_installation
     cleanup
     
-    log_success "Tau OS installation completed successfully!"
-    log_info "You can now reboot your system to start using Tau OS"
-    log_info "Default login: tau / tauos"
+    log_success "TauOS Beta installation completed successfully!"
+    log_info "Reboot and log in as user: tau (with the password you set)"
 }
 
 # Run main function

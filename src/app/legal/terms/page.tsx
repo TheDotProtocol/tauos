@@ -1,5 +1,6 @@
 'use client';
 
+import MarketingPageShell from '@/components/marketing/MarketingPageShell';
 import { motion } from 'framer-motion';
 import {
   FileText, Scale, Shield, Users, Globe, Mail, Phone, MapPin,
@@ -9,25 +10,10 @@ import {
 
 export default function TermsOfServicePage() {
   return (
-    <div className="min-h-screen bg-black text-white">
-      {/* Header */}
-      <header className="bg-gray-900/50 backdrop-blur-xl border-b border-gray-800 sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            <div className="flex items-center space-x-4">
-              <img src="/brand/tauos-logo.svg" alt="TauCore™" className="h-8 w-auto" />
-              <span className="text-xl font-bold text-white">Tau OS</span>
-            </div>
-            <nav className="hidden md:flex items-center space-x-8">
-              <a href="/" className="text-gray-300 hover:text-white transition-colors">Home</a>
-              <a href="/about" className="text-gray-300 hover:text-white transition-colors">About</a>
-              <a href="/developers" className="text-gray-300 hover:text-white transition-colors">Developers</a>
-              <a href="/governance" className="text-gray-300 hover:text-white transition-colors">Governance</a>
-            </nav>
-          </div>
-        </div>
-      </header>
-
+    <MarketingPageShell
+      title="Terms of Service"
+      subtitle="Terms governing use of Tau Core Inc. products."
+    >
       {/* Hero Section */}
       <section className="py-20 bg-gradient-to-b from-gray-900 to-black">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -68,7 +54,7 @@ export default function TermsOfServicePage() {
               </span>
             </h2>
             <p className="text-xl text-gray-300 max-w-4xl mx-auto leading-relaxed">
-              By accessing or using TauCore™ services, you agree to be bound by these Terms of Service ("Terms"). If you disagree with any part of these terms, you may not access our services.
+              By accessing or using TAU CORE™ services, you agree to be bound by these Terms of Service ("Terms"). If you disagree with any part of these terms, you may not access our services.
             </p>
           </motion.div>
         </div>
@@ -91,13 +77,13 @@ export default function TermsOfServicePage() {
               </span>
             </h2>
             <p className="text-xl text-gray-300 max-w-3xl mx-auto">
-              TauCore™ provides a privacy-first operating system and ecosystem including:
+              TAU CORE™ provides a privacy-first operating system and ecosystem including:
             </p>
           </motion.div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {[
-              "TauCore™ Desktop and Mobile operating systems",
+              "TAU CORE™ Desktop and Mobile operating systems",
               "TauMail - Private email service",
               "TauCloud - Encrypted cloud storage",
               "TauID - Decentralized identity management",
@@ -245,7 +231,7 @@ export default function TermsOfServicePage() {
               </span>
             </h2>
             <p className="text-xl text-gray-300 max-w-3xl mx-auto">
-              To the maximum extent permitted by law, TauCore™ shall not be liable for any indirect, incidental, special, consequential, or punitive damages resulting from your use of our services.
+              To the maximum extent permitted by law, TAU CORE™ shall not be liable for any indirect, incidental, special, consequential, or punitive damages resulting from your use of our services.
             </p>
           </motion.div>
         </div>
@@ -322,7 +308,7 @@ export default function TermsOfServicePage() {
                 <div>
                   <h3 className="text-xl font-bold text-white mb-4">Legal Team</h3>
                   <p className="text-gray-300 mb-2">Email: <a href="mailto:legal@tauos.org" className="text-yellow-400 hover:text-yellow-300">legal@tauos.org</a></p>
-                  <p className="text-gray-300 mb-2">Phone: +1 1800 TauCore™</p>
+                  <p className="text-gray-300 mb-2">Phone: +1 1800 TAU CORE™</p>
                   <p className="text-gray-300">Address: 2261 Market St, San Francisco, CA 94114</p>
                 </div>
                 <div>
@@ -336,19 +322,6 @@ export default function TermsOfServicePage() {
           </motion.div>
         </div>
       </section>
-
-      {/* Footer */}
-      <footer className="bg-gray-900/50 border-t border-gray-800 py-12">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <div className="flex items-center justify-center space-x-4 mb-4">
-              <img src="/brand/tauos-logo.svg" alt="TauCore™" className="h-8 w-auto" />
-              <span className="text-xl font-bold text-white">Tau OS</span>
-            </div>
-            <p className="text-gray-400">© 2025 Tau Foundation & Tau LLC. All rights reserved.</p>
-          </div>
-        </div>
-      </footer>
-    </div>
+    </MarketingPageShell>
   );
 }

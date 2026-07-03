@@ -1,5 +1,7 @@
 'use client';
 
+import DashboardShell from '@/components/apps/DashboardShell';
+import TauMailSubNav from '@/components/apps/TauMailSubNav';
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { 
@@ -84,52 +86,19 @@ export default function TauMailCompose() {
     window.location.href = '/taumail';
   };
 
-  if (!isLoggedIn) {
-    return (
-      <div className="min-h-screen bg-black text-white flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-yellow-400 mx-auto mb-4"></div>
-          <p className="text-gray-400">Loading...</p>
-        </div>
-      </div>
-    );
-  }
+  
 
   return (
-    <div className="min-h-screen bg-black text-white">
-      {/* Header */}
-      <header className="bg-gray-900/50 backdrop-blur-xl border-b border-gray-800">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            <div className="flex items-center space-x-4">
-              <Link href="/taumail/dashboard" className="flex items-center space-x-2">
-                <ChevronLeft className="w-5 h-5 text-gray-400 hover:text-white" />
-                <img src="/brand/tauos-logo.svg" alt="TauOS" className="w-8 h-8" />
-                <div>
-                  <h1 className="text-xl font-bold text-white">TauMail</h1>
-                  <p className="text-sm text-gray-400">Compose Email</p>
-                </div>
-              </Link>
-            </div>
-            <div className="flex items-center space-x-4">
-              <div className="flex items-center space-x-2 text-sm text-gray-300">
-                <User className="w-4 h-4" />
-                <span>{user?.email}</span>
-              </div>
-              <button
-                onClick={handleLogout}
-                className="flex items-center space-x-2 text-gray-400 hover:text-white transition-colors"
-              >
-                <LogOut className="w-4 h-4" />
-                <span>Logout</span>
-              </button>
-            </div>
-          </div>
-        </div>
-      </header>
-
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Compose Header */}
+    <DashboardShell
+      title="Tau Mail"
+      subtitle="Compose message"
+      userLabel={user?.email}
+      onLogout={handleLogout}
+      loading={!isLoggedIn}
+      
+    >
+      <TauMailSubNav />
+      {/* Compose Header */}
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center space-x-4">
             <div className="w-12 h-12 bg-gradient-to-r from-green-500 to-emerald-500 rounded-xl flex items-center justify-center">
@@ -343,7 +312,6 @@ export default function TauMailCompose() {
             </div>
           </div>
         </motion.div>
-      </div>
-    </div>
+    </DashboardShell>
   );
 }

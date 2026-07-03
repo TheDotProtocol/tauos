@@ -2,8 +2,8 @@
 
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import Header from '@/components/layout/Header';
-import Sidebar from '@/components/layout/Sidebar';
+import Header from '@/components/layout/header';
+import Sidebar from '@/components/layout/sidebar';
 import StatsCard from '@/components/dashboard/StatsCard';
 import RepositoryCard from '@/components/dashboard/RepositoryCard';
 import { 

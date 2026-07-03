@@ -1,5 +1,6 @@
 'use client';
 
+import MarketingPageShell from '@/components/marketing/MarketingPageShell';
 import { motion } from 'framer-motion';
 import { 
   Shield, 
@@ -21,83 +22,10 @@ import {
 
 export default function LegalPage() {
   return (
-    <div className="min-h-screen bg-black text-white">
-      {/* Animated Background */}
-      <div className="fixed inset-0 -z-10">
-        <div className="absolute inset-0 bg-gradient-to-br from-black via-gray-900 to-black" />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(139,92,246,0.15),transparent_50%)]" />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom,rgba(59,130,246,0.1),transparent_50%)]" />
-      </div>
-
-      {/* Navigation */}
-      <nav className="fixed top-0 w-full z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-20">
-            <motion.div 
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              className="flex items-center space-x-4"
-            >
-              <a href="/" className="flex items-center space-x-3">
-                <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-blue-500 rounded-xl flex items-center justify-center shadow-lg">
-                  <span className="text-white font-bold text-xl">τ</span>
-                </div>
-                <span className="text-2xl font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
-                  TauCore™
-                </span>
-              </a>
-            </motion.div>
-
-            <motion.div 
-              initial={{ opacity: 0, y: -20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="hidden md:flex items-center space-x-8"
-            >
-              {[
-                { href: '/', label: 'Home' },
-                { href: '/governance', label: 'Governance' },
-                { href: '/careers', label: 'Careers' },
-                { href: '/legal', label: 'Legal', active: true },
-                { href: 'https://mail.tauos.org', label: 'TauMail', external: true },
-                { href: 'https://cloud.tauos.org', label: 'TauCloud', external: true }
-              ].map((item) => (
-                <a
-                  key={item.label}
-                  href={item.href}
-                  target={item.external ? '_blank' : undefined}
-                  rel={item.external ? 'noopener noreferrer' : undefined}
-                  className={`transition-all duration-300 hover:scale-105 focus-tau ${
-                    item.active ? 'text-purple-400' : 'text-gray-300 hover:text-white'
-                  }`}
-                >
-                  {item.label}
-                </a>
-              ))}
-            </motion.div>
-          </div>
-        </div>
-      </nav>
-
-      {/* Hero Section */}
-      <section className="pt-32 pb-16 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto text-center">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            className="space-y-8"
-          >
-            <h1 className="text-5xl md:text-6xl font-bold mb-6">
-              <span className="text-white">Legal &</span>
-              <br />
-              <span className="tau-gradient">Compliance</span>
-            </h1>
-            <p className="text-xl md:text-2xl text-gray-300 max-w-4xl mx-auto leading-relaxed">
-              Transparency and legal compliance are core to our mission. Here's everything you need to know about our legal framework.
-            </p>
-          </motion.div>
-        </div>
-      </section>
+    <MarketingPageShell
+      title="Legal & Compliance"
+      subtitle="Transparency and legal compliance are core to our mission at Tau Core Inc."
+    >
 
       {/* Company Information */}
       <section className="py-16 px-4 sm:px-6 lg:px-8">
@@ -111,7 +39,7 @@ export default function LegalPage() {
           >
             <h2 className="text-4xl font-bold mb-6">Company Information</h2>
             <p className="text-xl text-gray-300 max-w-3xl mx-auto">
-              TauCore™ is developed and maintained by The Tau Foundation, a privacy-first technology company.
+              TAU CORE™ is developed and maintained by Tau Core Inc., a privacy-first technology company.
             </p>
           </motion.div>
 
@@ -124,13 +52,13 @@ export default function LegalPage() {
               className="space-y-8"
             >
               <div className="glass-strong p-8 rounded-2xl">
-                <h3 className="text-2xl font-bold mb-6 text-purple-400">The Tau Foundation</h3>
+                <h3 className="text-2xl font-bold mb-6 text-purple-400">Tau Core Inc.</h3>
                 <div className="space-y-4">
                   <div className="flex items-start space-x-3">
                     <Building className="w-5 h-5 text-purple-400 mt-1" />
                     <div>
                       <h4 className="font-semibold text-white">Company Name</h4>
-                      <p className="text-gray-300 text-sm">The Tau Foundation</p>
+                      <p className="text-gray-300 text-sm">Tau Core Inc.</p>
                     </div>
                   </div>
                   <div className="flex items-start space-x-3">
@@ -168,7 +96,7 @@ export default function LegalPage() {
               <div className="glass-strong p-8 rounded-2xl">
                 <h3 className="text-2xl font-bold mb-6 text-blue-400">Our Mission</h3>
                 <p className="text-gray-300 leading-relaxed mb-6">
-                  The Tau Foundation is committed to building privacy-first technology that puts users back in control of their digital lives. 
+                  Tau Core Inc. is committed to building privacy-first technology that puts users back in control of their digital lives. 
                   We believe privacy is a fundamental human right that should be protected by default.
                 </p>
                 <div className="space-y-3">
@@ -203,7 +131,7 @@ export default function LegalPage() {
           >
             <h2 className="text-4xl font-bold mb-6">Licensing</h2>
             <p className="text-xl text-gray-300 max-w-3xl mx-auto">
-              TauCore™ uses an open-core licensing model that balances openness with sustainability.
+              TAU CORE™ uses an open-core licensing model that balances openness with sustainability.
             </p>
           </motion.div>
 
@@ -219,7 +147,7 @@ export default function LegalPage() {
                 icon: GitBranch,
                 title: "Applications",
                 license: "MIT License",
-                description: "Most TauCore™ applications are licensed under MIT for broad adoption and compatibility."
+                description: "Most TAU CORE™ applications are licensed under MIT for broad adoption and compatibility."
               },
               {
                 icon: Shield,
@@ -374,7 +302,7 @@ export default function LegalPage() {
               },
               {
                 title: "Limitation of Liability",
-                description: "TauCore™ is provided 'as is' without warranties. We are not liable for damages arising from use of our software or services.",
+                description: "TAU CORE™ is provided 'as is' without warranties. We are not liable for damages arising from use of our software or services.",
                 icon: AlertTriangle,
                 color: "text-yellow-400"
               },
@@ -439,7 +367,7 @@ export default function LegalPage() {
               {
                 title: "General Support",
                 email: "support@tauos.org",
-                description: "For general questions about TauCore™ and our services"
+                description: "For general questions about TAU CORE™ and our services"
               }
             ].map((contact, index) => (
               <motion.div
@@ -501,6 +429,6 @@ export default function LegalPage() {
           </motion.div>
         </div>
       </section>
-    </div>
+    </MarketingPageShell>
   );
-} 
+}

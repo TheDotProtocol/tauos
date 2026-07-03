@@ -1,5 +1,6 @@
 'use client';
 
+import MarketingPageShell from '@/components/marketing/MarketingPageShell';
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { 
@@ -150,12 +151,12 @@ export default function TauAIPage() {
         setResponse(data.message);
       } else {
         setTranscript('Heya Tau, how are you doing today?');
-        setResponse('Heya! I\'m doing absolutely fantastic, thanks for asking! 🤖✨ I\'m here and ready to help you with anything - whether it\'s managing your TauOS apps, telling you a terrible joke, or just having a great conversation! What can I do for you today?');
+        setResponse('Heya! I\'m doing absolutely fantastic, thanks for asking! 🤖✨ I\'m here and ready to help you with anything - whether it\'s managing your Tau OS apps, telling you a terrible joke, or just having a great conversation! What can I do for you today?');
       }
     } catch (error) {
       console.error('TauAI API Error:', error);
       setTranscript('Heya Tau, how are you doing today?');
-      setResponse('Heya! I\'m doing absolutely fantastic, thanks for asking! 🤖✨ I\'m here and ready to help you with anything - whether it\'s managing your TauOS apps, telling you a terrible joke, or just having a great conversation! What can I do for you today?');
+      setResponse('Heya! I\'m doing absolutely fantastic, thanks for asking! 🤖✨ I\'m here and ready to help you with anything - whether it\'s managing your Tau OS apps, telling you a terrible joke, or just having a great conversation! What can I do for you today?');
     } finally {
       setIsListening(false);
     }
@@ -163,41 +164,19 @@ export default function TauAIPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-black text-white flex items-center justify-center">
-        <motion.div
-          initial={{ opacity: 0, scale: 0.8 }}
-          animate={{ opacity: 1, scale: 1 }}
-          className="text-center"
-        >
-          <div className="w-20 h-20 mx-auto mb-8 relative">
-            <div className="w-full h-full bg-gradient-to-r from-yellow-400 to-orange-500 rounded-2xl flex items-center justify-center">
-              <Sparkles className="w-10 h-10 text-black" />
-            </div>
-            <motion.div
-              animate={{ rotate: 360 }}
-              transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-              className="absolute inset-0 border-4 border-yellow-400/30 border-t-yellow-400 rounded-2xl"
-            />
-          </div>
-          <h1 className="text-4xl font-bold mb-4 bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">
-            TauAI
-          </h1>
-          <p className="text-gray-400 mb-8">Initializing AI System...</p>
-          <div className="w-64 h-1 bg-gray-800 rounded-full overflow-hidden">
-            <motion.div
-              initial={{ width: 0 }}
-              animate={{ width: "100%" }}
-              transition={{ duration: 2, ease: "easeInOut" }}
-              className="h-full bg-gradient-to-r from-yellow-400 to-orange-500"
-            />
-          </div>
-        </motion.div>
-      </div>
+      <MarketingPageShell title="Tau AI" subtitle="On-device intelligence that serves you — not advertisers." hero={false}>
+        <div className="flex items-center justify-center min-h-[50vh] px-6">
+          <motion.div initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} className="text-center">
+            <Sparkles className="w-12 h-12 text-primary mx-auto mb-4" />
+            <p className="text-muted-foreground">Initializing AI system…</p>
+          </motion.div>
+        </div>
+      </MarketingPageShell>
     );
   }
 
   return (
-    <div className="min-h-screen bg-black text-white">
+    <MarketingPageShell title="Tau AI" subtitle="On-device intelligence that serves you — not advertisers." hero={false}>
       {/* Hero Section */}
       <div className="relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-yellow-400/10 via-orange-500/5 to-transparent"></div>
@@ -441,12 +420,12 @@ export default function TauAIPage() {
           >
             <h2 className="text-4xl font-bold mb-4 text-white">Ready to Experience the Future?</h2>
             <p className="text-xl text-gray-300 mb-8 max-w-3xl mx-auto">
-              Download TauOS today and be among the first to experience privacy-native AI computing.
+              Download Tau OS today and be among the first to experience privacy-native AI computing.
             </p>
             <div className="flex flex-wrap justify-center gap-4">
               <button className="flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-yellow-400 to-orange-500 text-black rounded-lg font-semibold text-lg hover:shadow-lg hover:shadow-yellow-400/25 transition-all duration-200">
                 <Download className="w-5 h-5" />
-                Download TauOS Desktop
+                Download Tau OS Desktop
               </button>
               <button className="flex items-center gap-2 px-8 py-4 border border-yellow-400 text-yellow-400 rounded-lg font-semibold text-lg hover:bg-yellow-400 hover:text-black transition-all duration-200">
                 <Play className="w-5 h-5" />
@@ -456,6 +435,6 @@ export default function TauAIPage() {
           </motion.div>
         </div>
       </div>
-    </div>
+    </MarketingPageShell>
   );
 }

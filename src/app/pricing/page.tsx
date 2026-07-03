@@ -1,5 +1,6 @@
 'use client';
 
+import MarketingPageShell from '@/components/marketing/MarketingPageShell';
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { 
@@ -134,12 +135,15 @@ export default function PricingPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-black text-white">
+    <MarketingPageShell
+      title="Pricing"
+      subtitle="Simple, transparent plans for the TAU CORE ecosystem."
+    >
       <header className="bg-gray-900/50 backdrop-blur-xl border-b border-gray-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center space-x-4">
-              <img src="/brand/tauos-logo.svg" alt="TauOS" className="w-10 h-10" />
+              <img src="/brand/tauos-logo.svg" alt="Tau OS" className="w-10 h-10" />
               <div>
                 <h1 className="text-xl font-bold text-white">Pricing</h1>
                 <p className="text-sm text-gray-400">Choose the right plan for your needs</p>
@@ -347,7 +351,7 @@ export default function PricingPage() {
           <div className="p-8 bg-gradient-to-r from-gray-900/50 to-gray-800/30 border border-gray-800 rounded-2xl">
             <h2 className="text-3xl font-bold text-white mb-4">Ready to Get Started?</h2>
             <p className="text-gray-400 mb-6 max-w-2xl mx-auto">
-              Join thousands of organizations that trust TauOS for their privacy and security needs.
+              Join thousands of organizations that trust Tau OS for their privacy and security needs.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <button className="bg-gradient-to-r from-yellow-400 to-orange-500 text-black px-8 py-3 rounded-lg font-semibold hover:shadow-lg hover:shadow-yellow-400/25 transition-all duration-200">
@@ -360,6 +364,6 @@ export default function PricingPage() {
           </div>
         </motion.div>
       </div>
-    </div>
+    </MarketingPageShell>
   );
 }

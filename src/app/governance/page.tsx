@@ -1,5 +1,6 @@
 'use client';
 
+import MarketingPageShell from '@/components/marketing/MarketingPageShell';
 import { motion } from 'framer-motion';
 import {
   Building, Users, Shield, Eye, Heart, Target, Zap, Globe,
@@ -11,49 +12,11 @@ import {
 
 export default function GovernancePage() {
   return (
-    <div className="min-h-screen bg-black text-white">
-      {/* Header */}
-      <header className="bg-gray-900/50 backdrop-blur-xl border-b border-gray-800 sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            <div className="flex items-center space-x-4">
-              <img src="/brand/tauos-logo.svg" alt="TauOS" className="h-8 w-auto" />
-              <span className="text-xl font-bold text-white">Tau OS</span>
-            </div>
-            <nav className="hidden md:flex items-center space-x-8">
-              <a href="/" className="text-gray-300 hover:text-white transition-colors">Home</a>
-              <a href="/about" className="text-gray-300 hover:text-white transition-colors">About</a>
-              <a href="/developers" className="text-gray-300 hover:text-white transition-colors">Developers</a>
-              <a href="/governance" className="text-yellow-400 font-semibold">Governance</a>
-            </nav>
-          </div>
-        </div>
-      </header>
-
-      {/* Hero Section */}
-      <section className="py-20 bg-gradient-to-b from-gray-900 to-black">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            className="text-center mb-16"
-          >
-            <h1 className="text-5xl md:text-7xl font-bold mb-6">
-              <span className="bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">
-                Governance
-              </span>
-            </h1>
-            <p className="text-xl md:text-2xl text-gray-300 max-w-4xl mx-auto leading-relaxed">
-              The Tau Project is built on <span className="text-yellow-400 font-semibold">trust, transparency, and independence</span>.
-              <br />
-              To ensure long-term sustainability and openness, governance is split between <span className="text-yellow-400 font-semibold">The Tau Foundation</span> and <span className="text-yellow-400 font-semibold">Tau LLC</span>.
-            </p>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* The Tau Foundation Section */}
+    <MarketingPageShell
+      title="Governance"
+      subtitle="How Tau Core Inc. stewards the TAU CORE ecosystem."
+    >
+      {/* Tau Core Inc. Section */}
       <section className="py-20 bg-black">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
@@ -66,11 +29,11 @@ export default function GovernancePage() {
             <h2 className="text-4xl md:text-5xl font-bold mb-6">
               <Building className="w-12 h-12 text-yellow-400 mx-auto mb-4" />
               <span className="bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">
-                The Tau Foundation
+                Tau Core Inc.
               </span>
             </h2>
             <p className="text-xl text-gray-300 max-w-3xl mx-auto">
-              The Tau Foundation is a <span className="text-yellow-400 font-semibold">non-profit entity</span>, modeled after the Linux Foundation, that safeguards the vision of Tau OS.
+              Tau Core Inc. is a <span className="text-yellow-400 font-semibold">non-profit entity</span>, modeled after the Linux Foundation, that safeguards the vision of Tau OS.
             </p>
           </motion.div>
 
@@ -126,7 +89,7 @@ export default function GovernancePage() {
         </div>
       </section>
 
-      {/* Tau LLC Section */}
+      {/* Tau Core Inc. Section */}
       <section className="py-20 bg-gradient-to-b from-black to-gray-900">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
@@ -139,11 +102,11 @@ export default function GovernancePage() {
             <h2 className="text-4xl md:text-5xl font-bold mb-6">
               <Code className="w-12 h-12 text-yellow-400 mx-auto mb-4" />
               <span className="bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">
-                Tau LLC
+                Tau Core Inc.
               </span>
             </h2>
             <p className="text-xl text-gray-300 max-w-3xl mx-auto mb-8">
-              Tau LLC is the <span className="text-yellow-400 font-semibold">for-profit arm</span> that builds commercial value while maintaining community alignment.
+              Tau Core Inc. is the <span className="text-yellow-400 font-semibold">for-profit arm</span> that builds commercial value while maintaining community alignment.
             </p>
           </motion.div>
 
@@ -188,7 +151,7 @@ export default function GovernancePage() {
             className="text-center mt-12"
           >
             <p className="text-lg text-gray-300 max-w-3xl mx-auto">
-              Tau LLC operates <span className="text-yellow-400 font-semibold">under the oversight of the Tau Foundation</span> to maintain alignment with community principles.
+              Tau Core Inc. operates <span className="text-yellow-400 font-semibold">under the oversight of the Tau Core Inc.</span> to maintain alignment with community principles.
             </p>
           </motion.div>
         </div>
@@ -269,7 +232,7 @@ export default function GovernancePage() {
             {[
               "All governance documents, Data Protection Addendum (DPA), and Sub-processor Lists are public.",
               "Foundation meetings are documented and published openly.",
-              "Tau Foundation ensures Tau OS is legally incorporated, transparent, and accountable to its users."
+              "Tau Core Inc. ensures Tau OS is legally incorporated, transparent, and accountable to its users."
             ].map((item, index) => (
               <motion.div
                 key={index}
@@ -378,19 +341,6 @@ export default function GovernancePage() {
           </motion.div>
         </div>
       </section>
-
-      {/* Footer */}
-      <footer className="bg-gray-900/50 border-t border-gray-800 py-12">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <div className="flex items-center justify-center space-x-4 mb-4">
-              <img src="/brand/tauos-logo.svg" alt="TauOS" className="h-8 w-auto" />
-              <span className="text-xl font-bold text-white">Tau OS</span>
-            </div>
-            <p className="text-gray-400">© 2025 Tau Foundation & Tau LLC. All rights reserved.</p>
-          </div>
-        </div>
-      </footer>
-    </div>
+    </MarketingPageShell>
   );
-} 
+}

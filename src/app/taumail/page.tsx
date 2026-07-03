@@ -9,6 +9,7 @@ import {
   Monitor, Laptop, Smartphone as Mobile, Download
 } from 'lucide-react';
 import Link from 'next/link';
+import AppShell from '@/components/apps/AppShell';
 
 export default function TauMailLanding() {
   const [showRegistration, setShowRegistration] = useState(false);
@@ -136,27 +137,13 @@ export default function TauMailLanding() {
   };
 
   return (
-    <div className="min-h-screen bg-black text-white">
-      {/* Header */}
-      <header className="bg-gray-900/50 backdrop-blur-xl border-b border-gray-800 sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            <div className="flex items-center space-x-4">
-              <img src="/brand/tauos-logo.svg" alt="TauOS" className="h-8 w-auto" />
-              <span className="text-xl font-bold text-white">Tau OS</span>
-                </div>
-            <nav className="hidden md:flex items-center space-x-8">
-              <a href="/" className="text-gray-300 hover:text-white transition-colors">Home</a>
-              <a href="/about" className="text-gray-300 hover:text-white transition-colors">About</a>
-              <a href="/developers" className="text-gray-300 hover:text-white transition-colors">Developers</a>
-              <a href="/governance" className="text-gray-300 hover:text-white transition-colors">Governance</a>
-            </nav>
-          </div>
-        </div>
-      </header>
-
+    <AppShell
+      title="Tau Mail"
+      subtitle="Private email with zero tracking. Built for @tauos.org and taumail.org addresses."
+      variant="marketing"
+    >
       {/* Hero Section */}
-      <section className="py-20 bg-gradient-to-b from-gray-900 to-black">
+      <section className="py-12 md:py-20 bg-gradient-to-b from-[#050505] to-black border-b border-white/5">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <motion.div
               initial={{ opacity: 0, y: 30 }}
@@ -165,7 +152,7 @@ export default function TauMailLanding() {
             className="text-center mb-16"
           >
             <h1 className="text-5xl md:text-7xl font-bold mb-6">
-              <span className="bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-[#FFF0B3] via-primary to-[#FFD700] bg-clip-text text-transparent">
                 TauMail
               </span>
             </h1>
@@ -457,51 +444,6 @@ export default function TauMailLanding() {
         </div>
       )}
 
-      {/* Footer */}
-      <footer className="bg-gray-900/50 border-t border-gray-800 py-12 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-            <div>
-              <h3 className="text-lg font-semibold text-white mb-4">Legal</h3>
-              <ul className="space-y-2">
-                <li><Link href="/legal/privacy" className="text-gray-400 hover:text-white">Privacy Policy</Link></li>
-                <li><Link href="/legal/terms" className="text-gray-400 hover:text-white">Terms of Service</Link></li>
-                <li><Link href="/legal/dpa" className="text-gray-400 hover:text-white">Data Protection</Link></li>
-                <li><Link href="/legal/cookies" className="text-gray-400 hover:text-white">Cookies Policy</Link></li>
-                <li><Link href="/legal/acceptable-use" className="text-gray-400 hover:text-white">Acceptable Use</Link></li>
-              </ul>
-            </div>
-            <div>
-              <h3 className="text-lg font-semibold text-white mb-4">Support</h3>
-              <ul className="space-y-2">
-                <li><Link href="/help" className="text-gray-400 hover:text-white">Help Center</Link></li>
-                <li><Link href="/contact" className="text-gray-400 hover:text-white">Contact Us</Link></li>
-                <li><Link href="/status" className="text-gray-400 hover:text-white">Status</Link></li>
-              </ul>
-              </div>
-            <div>
-              <h3 className="text-lg font-semibold text-white mb-4">Company</h3>
-              <ul className="space-y-2">
-                <li><Link href="/about" className="text-gray-400 hover:text-white">About</Link></li>
-                <li><Link href="/press" className="text-gray-400 hover:text-white">Press</Link></li>
-                <li><Link href="/careers" className="text-gray-400 hover:text-white">Careers</Link></li>
-              </ul>
-            </div>
-            <div>
-              <h3 className="text-lg font-semibold text-white mb-4">Community</h3>
-              <ul className="space-y-2">
-                <li><Link href="/blog" className="text-gray-400 hover:text-white">Blog</Link></li>
-                <li><Link href="https://github.com/tauos" className="text-gray-400 hover:text-white">GitHub</Link></li>
-                <li><Link href="https://x.com/tauos" className="text-gray-400 hover:text-white">Twitter</Link></li>
-                <li><Link href="https://mastodon.social/@tauos" className="text-gray-400 hover:text-white">Mastodon</Link></li>
-              </ul>
-            </div>
-          </div>
-          <div className="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
-            <p>&copy; 2025 TauOS. All rights reserved. Privacy-first computing.</p>
-          </div>
-        </div>
-      </footer>
-    </div>
+    </AppShell>
   );
 } 

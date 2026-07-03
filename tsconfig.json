@@ -29,12 +29,14 @@
   "include": [
     "next-env.d.ts",
     ".next/types/**/*.ts",
-    "**/*.ts",
-    "**/*.tsx"
+    "src/**/*.ts",
+    "src/**/*.tsx"
   ],
   "exclude": [
     "node_modules",
     "tauos-mobile",
-    "developerhub/frontend"
+    "developerhub/frontend",
+    "website",
+    "tau-components"
   ]
 }

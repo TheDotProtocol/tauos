@@ -1,5 +1,6 @@
 'use client';
 
+import MarketingPageShell from '@/components/marketing/MarketingPageShell';
 import { motion } from 'framer-motion';
 import {
   Code, Github, Bug, FileText, Palette, Users, Globe, Shield,
@@ -10,60 +11,10 @@ import {
 
 export default function DevelopersPage() {
   return (
-    <div className="min-h-screen bg-black text-white">
-      {/* Header */}
-      <header className="bg-gray-900/50 backdrop-blur-xl border-b border-gray-800 sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            <div className="flex items-center space-x-4">
-              <img src="/brand/tauos-logo.svg" alt="TauOS" className="h-8 w-auto" />
-              <span className="text-xl font-bold text-white">Tau OS</span>
-            </div>
-            <nav className="hidden md:flex items-center space-x-8">
-              <a href="/" className="text-gray-300 hover:text-white transition-colors">Home</a>
-              <a href="/about" className="text-gray-300 hover:text-white transition-colors">About</a>
-              <a href="/developers" className="text-yellow-400 font-semibold">Developers</a>
-            </nav>
-          </div>
-        </div>
-      </header>
-
-      {/* Hero Section */}
-      <section className="py-20 bg-gradient-to-b from-gray-900 to-black">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            className="text-center mb-16"
-          >
-            <h1 className="text-5xl md:text-7xl font-bold mb-6">
-              <span className="bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">
-                Developers
-              </span>
-            </h1>
-            <p className="text-xl md:text-2xl text-gray-300 max-w-4xl mx-auto leading-relaxed">
-              Welcome to the <span className="text-yellow-400 font-semibold">Tau OS developer hub</span>.
-              <br />
-              This is where builders, hackers, researchers, and curious minds come together to shape the future of a sovereign operating system.
-            </p>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.2 }}
-            className="text-center"
-          >
-            <p className="text-lg text-gray-400 max-w-3xl mx-auto mb-8">
-              Tau OS is <span className="text-yellow-400 font-semibold">open, modular, and community-driven</span>. 
-              Whether you're into kernel-level systems programming, app development, or building privacy-first cloud services, 
-              there's a place for you here.
-            </p>
-          </motion.div>
-        </div>
-      </section>
-
+    <MarketingPageShell
+      title="Developers"
+      subtitle="Build on Tau OS with SDKs, APIs, and open documentation."
+    >
       {/* Philosophy Section */}
       <section className="py-20 bg-black">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -102,7 +53,7 @@ export default function DevelopersPage() {
               {
                 icon: Users,
                 title: "Collaboration",
-                description: "Like the Linux Foundation, The Tau Foundation provides governance, while Tau LLC drives commercial adoption."
+                description: "Like the Linux Foundation, Tau Core Inc. provides governance, while Tau Core Inc. drives commercial adoption."
               }
             ].map((item, index) => (
               <motion.div
@@ -297,8 +248,8 @@ export default function DevelopersPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
             {[
               "No corporate gatekeepers.",
-              "Open governance model under The Tau Foundation.",
-              "Commercialization opportunities through Tau LLC.",
+              "Open governance model under Tau Core Inc..",
+              "Commercialization opportunities through Tau Core Inc..",
               "A real chance to shape the future of operating systems."
             ].map((item, index) => (
               <motion.div
@@ -330,19 +281,6 @@ export default function DevelopersPage() {
           </motion.div>
         </div>
       </section>
-
-      {/* Footer */}
-      <footer className="bg-gray-900/50 border-t border-gray-800 py-12">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <div className="flex items-center justify-center space-x-4 mb-4">
-              <img src="/brand/tauos-logo.svg" alt="TauOS" className="h-8 w-auto" />
-              <span className="text-xl font-bold text-white">Tau OS</span>
-            </div>
-            <p className="text-gray-400">© 2025 Tau Foundation & Tau LLC. All rights reserved.</p>
-          </div>
-        </div>
-      </footer>
-    </div>
+    </MarketingPageShell>
   );
 }

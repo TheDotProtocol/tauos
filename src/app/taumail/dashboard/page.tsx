@@ -1,4 +1,7 @@
 'use client';
+
+import DashboardShell from '@/components/apps/DashboardShell';
+import TauMailSubNav from '@/components/apps/TauMailSubNav';
 // Force rebuild - Database tables created, backend working, ready for testing - v3
 
 import React, { useState, useEffect } from 'react';
@@ -238,51 +241,19 @@ export default function TauMailDashboard() {
     }
   ];
 
-  if (!isLoggedIn) {
-    return (
-      <div className="min-h-screen bg-black text-white flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-yellow-400 mx-auto mb-4"></div>
-          <p className="text-gray-400">Loading...</p>
-        </div>
-      </div>
-    );
-  }
+  
 
   return (
-    <div className="min-h-screen bg-black text-white">
-      {/* Header */}
-      <header className="bg-gray-900/50 backdrop-blur-xl border-b border-gray-800">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            <div className="flex items-center space-x-4">
-              <Link href="/" className="flex items-center space-x-2">
-                <img src="/brand/tauos-logo.svg" alt="TauOS" className="w-10 h-10" />
-                <div>
-                  <h1 className="text-xl font-bold text-white">TauMail</h1>
-                  <p className="text-sm text-gray-400">Private Email Platform</p>
-                </div>
-              </Link>
-            </div>
-            <div className="flex items-center space-x-4">
-              <div className="flex items-center space-x-2 text-sm text-gray-300">
-                <User className="w-4 h-4" />
-                <span>{user?.email}</span>
-              </div>
-              <button
-                onClick={handleLogout}
-                className="flex items-center space-x-2 text-gray-400 hover:text-white transition-colors"
-              >
-                <LogOut className="w-4 h-4" />
-                <span>Logout</span>
-              </button>
-            </div>
-          </div>
-        </div>
-      </header>
-
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Stats Overview */}
+    <DashboardShell
+      title="Tau Mail"
+      subtitle="Private email dashboard — Tau Core Inc."
+      userLabel={user?.email}
+      onLogout={handleLogout}
+      loading={!isLoggedIn}
+      
+    >
+      <TauMailSubNav />
+      {/* Stats Overview */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
@@ -530,7 +501,6 @@ export default function TauMailDashboard() {
             </motion.div>
           </div>
         </div>
-      </div>
 
       {/* Compose Email Modal */}
       {showComposeModal && (
@@ -695,6 +665,6 @@ export default function TauMailDashboard() {
           </motion.div>
         </div>
       )}
-    </div>
+    </DashboardShell>
   );
 }

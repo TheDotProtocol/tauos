@@ -1,11 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { unifiedPool, testDatabaseConnection, ensureIncomingEmailsTable } from '@/lib/database';
+import { Pool } from 'pg';
+
+// Database connection - production ready with enhanced error handling
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL || 'postgresql://postgres.tviqcormikopltejomkc:Ak1233%40%405@aws-0-ap-southeast-1.pooler.supabase.com:5432/postgres?sslmode=disable',
+  max: 20,
+  idleTimeoutMillis: 30000,
+  connectionTimeoutMillis: 2000,
+});
 
 export async function POST(request: NextRequest) {
   try {
-    // Ensure incoming_emails table exists using unified connection
-    await ensureIncomingEmailsTable();
-
     // Parse the incoming email data from SendGrid webhook
     const emailData = await request.json();
     
@@ -29,33 +34,15 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
     }
 
-    // Extract the recipient email address
-    let recipientEmail = Array.isArray(to) ? to[0] : to;
+    // Extract the recipient username from the email address
+    // Assuming format: username@tauos.org
+    const recipientEmail = Array.isArray(to) ? to[0] : to;
+    const recipientUsername = recipientEmail.split('@')[0];
     
-    // Clean email format - handle ALL possible formats
-    // Remove quotes first
-    recipientEmail = recipientEmail.replace(/"/g, '').trim();
-    
-    // If contains angle brackets, extract the email from them
-    if (recipientEmail.includes('<') && recipientEmail.includes('>')) {
-      const match = recipientEmail.match(/<([^>]+)>/);
-      if (match) {
-        recipientEmail = match[1];
-      }
-    }
-    
-    console.log('🔧 Cleaned email format:', recipientEmail);
-    
-    console.log('🔍 Looking for user with email:', recipientEmail);
-    console.log('🔧 Email parsing fix deployed - testing angle bracket format - FINAL VERSION');
-    
-    // Test database connection and verify we're using the unified database
-    await testDatabaseConnection();
-    
-    // Find the user by email address (more reliable than username)
-    const userResult = await unifiedPool.query(
-      'SELECT id, username, email FROM users WHERE email = $1',
-      [recipientEmail]
+    // Find the user by username
+    const userResult = await pool.query(
+      'SELECT id, username, email FROM users WHERE username = $1 OR email = $2',
+      [recipientUsername, recipientEmail]
     );
 
     if (userResult.rows.length === 0) {
@@ -72,7 +59,7 @@ export async function POST(request: NextRequest) {
                    false;
 
     // Save incoming email to database
-    const result = await unifiedPool.query(
+    const result = await pool.query(
       `INSERT INTO incoming_emails (
         user_id, 
         from_email, 
@@ -102,15 +89,6 @@ export async function POST(request: NextRequest) {
     );
 
     console.log('✅ Incoming email saved:', result.rows[0]);
-    console.log('🔍 Database connection test - checking if table exists...');
-    
-    // Test if we can query the table directly
-    try {
-      const testQuery = await unifiedPool.query('SELECT COUNT(*) as count FROM incoming_emails');
-      console.log('🔍 Table exists, total emails:', testQuery.rows[0].count);
-    } catch (error) {
-      console.log('🔍 Table query failed:', error.message);
-    }
 
     return NextResponse.json({
       success: true,

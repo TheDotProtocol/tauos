@@ -1,0 +1,16 @@
+# Exclude large OS build artifacts from Vercel deploy (host ISO on GitHub Releases / R2)
+release-files/
+build/
+kernel-build/
+*.iso
+public/downloads/*.iso
+public/downloads/*.dmg
+public/downloads/*.exe
+public/downloads/*.deb
+public/downloads/*.AppImage
+os-code/
+developerhub/
+newebsite/
+tauos-mobile/
+apps/
+.git/

@@ -1,5 +1,6 @@
 'use client';
 
+import MarketingPageShell from '@/components/marketing/MarketingPageShell';
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { 
@@ -45,73 +46,64 @@ export default function DesktopPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-black text-white flex items-center justify-center">
+      <MarketingPageShell
+        title="Tau OS Desktop"
+        subtitle="Privacy-first desktop operating system from Tau Core Inc."
+        hero={false}
+      >
+        <div className="flex items-center justify-center min-h-[50vh] px-6">
         <motion.div
           initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 1, scale: 1 }}
           className="text-center"
         >
           <div className="w-20 h-20 mx-auto mb-8 relative">
-            <div className="w-full h-full bg-gradient-to-r from-yellow-400 to-orange-500 rounded-2xl flex items-center justify-center">
-              <Monitor className="w-10 h-10 text-black" />
+            <div className="w-full h-full bg-primary/20 rounded-2xl flex items-center justify-center">
+              <Monitor className="w-10 h-10 text-primary" />
             </div>
             <motion.div
               animate={{ rotate: 360 }}
               transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-              className="absolute inset-0 border-4 border-yellow-400/30 border-t-yellow-400 rounded-2xl"
+              className="absolute inset-0 border-4 border-primary/30 border-t-primary rounded-2xl"
             />
           </div>
-          <h1 className="text-4xl font-bold mb-4 bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">
-            TauOS Desktop
-          </h1>
-          <p className="text-gray-400 mb-8">Loading Desktop Interface...</p>
-          <div className="w-64 h-1 bg-gray-800 rounded-full overflow-hidden">
+          <h1 className="text-4xl font-bold mb-4 text-white">Tau OS Desktop</h1>
+          <p className="text-muted-foreground mb-8">Loading desktop interface…</p>
+          <div className="w-64 h-1 bg-muted rounded-full overflow-hidden mx-auto">
             <motion.div
               initial={{ width: 0 }}
               animate={{ width: "100%" }}
               transition={{ duration: 2, ease: "easeInOut" }}
-              className="h-full bg-gradient-to-r from-yellow-400 to-orange-500"
+              className="h-full bg-primary"
             />
           </div>
         </motion.div>
-      </div>
+        </div>
+      </MarketingPageShell>
     );
   }
 
   return (
-    <div className="min-h-screen bg-black text-white">
-      {/* Header */}
-      <div className="bg-black/80 backdrop-blur-xl border-b border-white/10 px-4 py-4">
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <div className="flex items-center space-x-4">
-            <div className="w-8 h-8 bg-gradient-to-r from-yellow-400 to-orange-500 rounded flex items-center justify-center">
-              <Monitor className="w-5 h-5 text-black" />
-            </div>
-            <div>
-              <h1 className="text-2xl font-bold bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">
-                TauOS Desktop
-              </h1>
-              <p className="text-sm text-gray-400">Privacy-Native AI Operating System</p>
-            </div>
-          </div>
-          <div className="flex items-center space-x-4">
-            <button
-              onClick={() => setShowDemo(!showDemo)}
-              className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-yellow-400 to-orange-500 text-black rounded-lg font-semibold hover:shadow-lg hover:shadow-yellow-400/25 transition-all duration-200"
-            >
-              <Play className="w-4 h-4" />
-              {showDemo ? 'Hide Demo' : 'Try Desktop UI'}
-            </button>
-            <button className="flex items-center gap-2 px-6 py-3 border border-yellow-400 text-yellow-400 rounded-lg font-semibold hover:bg-yellow-400 hover:text-black transition-all duration-200">
-              <Download className="w-4 h-4" />
-              Download
-            </button>
-          </div>
+    <MarketingPageShell
+      title="Tau OS Desktop"
+      subtitle="Privacy-first desktop operating system from Tau Core Inc."
+      hero={false}
+    >
+      <div className="container mx-auto px-6 py-8">
+        <div className="flex flex-wrap items-center justify-end gap-3 mb-8">
+          <button
+            type="button"
+            onClick={() => setShowDemo(!showDemo)}
+            className="flex items-center gap-2 px-6 py-3 bg-primary text-primary-foreground font-semibold hover:bg-primary/90"
+          >
+            <Play className="w-4 h-4" />
+            {showDemo ? 'Hide Demo' : 'Try Desktop UI'}
+          </button>
+          <a href="/download" className="flex items-center gap-2 px-6 py-3 border border-primary text-primary font-semibold hover:bg-primary/10">
+            <Download className="w-4 h-4" />
+            Download
+          </a>
         </div>
-      </div>
-
-      {/* Content */}
-      <div className="max-w-7xl mx-auto p-8">
         {!showDemo ? (
           // Landing content
           <div className="space-y-12">
@@ -122,7 +114,7 @@ export default function DesktopPage() {
               className="text-center"
             >
               <h2 className="text-5xl font-bold mb-6 bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">
-                Experience TauOS Desktop
+                Experience Tau OS Desktop
               </h2>
               <p className="text-xl text-gray-300 mb-8 max-w-3xl mx-auto">
                 The world's first privacy-native AI operating system. Experience seamless integration 
@@ -174,7 +166,7 @@ export default function DesktopPage() {
                 </div>
                 <h3 className="text-xl font-bold mb-3 text-white">Seamless Integration</h3>
                 <p className="text-gray-400">
-                  All TauOS services integrated: Mail, Cloud, ID, Store, Browser, and more.
+                  All Tau OS services integrated: Mail, Cloud, ID, Store, Browser, and more.
                 </p>
               </div>
             </motion.div>
@@ -195,12 +187,12 @@ export default function DesktopPage() {
               <iframe
                 src="/desktop-ui/index.html"
                 className="w-full h-full border-0"
-                title="TauOS Desktop UI Demo"
+                title="Tau OS Desktop UI Demo"
               />
             </div>
           </motion.div>
         )}
       </div>
-    </div>
+    </MarketingPageShell>
   );
 }

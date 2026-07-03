@@ -1,6 +1,7 @@
 'use client';
 // TauCloud - The Ultimate File Storage System - v1.0
 
+import AppShell from '@/components/apps/AppShell';
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { 
@@ -108,37 +109,29 @@ export default function TauCloudLanding() {
   }
 
   return (
-    <div className="min-h-screen bg-black text-white">
-      {/* Header */}
-      <header className="bg-gray-900/50 backdrop-blur-xl border-b border-gray-800">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            <Link href="/" className="flex items-center space-x-2">
-              <img src="/brand/tauos-logo.svg" alt="TauOS" className="w-10 h-10" />
-              <div>
-                <h1 className="text-xl font-bold text-white">TauCloud</h1>
-                <p className="text-sm text-gray-400">Ultimate File Storage</p>
-              </div>
-            </Link>
-            <div className="flex items-center space-x-4">
-              <button
-                onClick={() => setShowLogin(true)}
-                className="px-4 py-2 text-gray-300 hover:text-white transition-colors"
-              >
-                Sign In
-              </button>
-              <button
-                onClick={() => setShowRegister(true)}
-                className="px-6 py-2 bg-gradient-to-r from-yellow-400 to-orange-500 text-black rounded-lg font-semibold hover:shadow-lg hover:shadow-yellow-400/25 transition-all duration-200"
-              >
-                Get Started
-              </button>
-            </div>
-          </div>
-        </div>
-      </header>
+    <AppShell
+      title="Tau Cloud"
+      subtitle="Zero-knowledge encrypted storage — part of the TAU CORE ecosystem."
+      variant="marketing"
+    >
 
-      {/* Hero Section */}
+      {/* Auth shortcuts — header actions live in hero CTAs */}
+      <div className="flex justify-end gap-3 px-4 sm:px-6 lg:px-8 -mt-4 mb-4 max-w-7xl mx-auto">
+        <button
+          type="button"
+          onClick={() => setShowLogin(true)}
+          className="text-sm text-muted-foreground hover:text-primary transition-colors"
+        >
+          Sign in
+        </button>
+        <button
+          type="button"
+          onClick={() => setShowRegister(true)}
+          className="text-sm bg-primary text-primary-foreground px-4 py-2 font-semibold hover:bg-primary/90"
+        >
+          Get started
+        </button>
+      </div>
       <section className="relative py-20 overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-blue-900/20 via-purple-900/20 to-pink-900/20"></div>
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -491,23 +484,6 @@ export default function TauCloudLanding() {
         </div>
       )}
 
-      {/* Footer */}
-      <footer className="bg-gray-900/50 border-t border-gray-800 py-12">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <div className="flex items-center justify-center space-x-2 mb-4">
-              <img src="/brand/tauos-logo.svg" alt="TauOS" className="w-8 h-8" />
-              <span className="text-xl font-bold text-white">TauCloud</span>
-            </div>
-            <p className="text-gray-400 mb-4">
-              Part of the TauOS ecosystem - The future of computing
-            </p>
-            <p className="text-sm text-gray-500">
-              © 2025 TauOS. All rights reserved. Privacy-first, security-focused, user-centric.
-            </p>
-          </div>
-        </div>
-      </footer>
-    </div>
+    </AppShell>
   );
 }

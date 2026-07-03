@@ -10,7 +10,6 @@ import {
   Activity, Settings, Calendar, Clock, LogOut, User, X, AlertTriangle
 } from 'lucide-react';
 import Link from 'next/link';
-import { taumailApi } from '@/config/taumail-api';
 
 export default function TauMailDashboard() {
   const [activeTab, setActiveTab] = useState('inbox');
@@ -47,24 +46,32 @@ export default function TauMailDashboard() {
 
   const loadEmails = async () => {
     try {
-      console.log('📧 Loading emails with new API...');
-      const data = await taumailApi.getInbox();
+      const token = localStorage.getItem('tauos_token');
+      if (!token) {
+        console.log('No token found, skipping inbox load');
+        return;
+      }
       
-      if (data.success && data.emails) {
+      const response = await fetch('/api/taumail/emails/inbox', {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
         // Map API response to frontend format
-        const mappedEmails = data.emails.map(email => ({
+        const mappedEmails = (data.emails || []).map(email => ({
           id: email.id,
-          from: email.from_email || 'Unknown',
+          from: email.display_name || email.sender_name || email.from_email || 'Unknown',
           subject: email.subject || 'No Subject',
-          preview: email.body_text ? email.body_text.substring(0, 100) + '...' : 'No preview',
+          preview: email.body ? email.body.substring(0, 100) + '...' : 'No preview',
           time: email.received_at ? new Date(email.received_at).toLocaleString() : 'Unknown time',
           unread: !email.is_read,
-          starred: email.is_starred || false
+          starred: false
         }));
         setEmails(mappedEmails);
-        console.log('✅ Loaded', mappedEmails.length, 'emails from new API');
       } else {
-        console.log('⚠️ No emails from API, using fallback');
         // If no inbox endpoint, create some sample emails for demo
         setEmails([
           {

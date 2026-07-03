@@ -60,11 +60,11 @@ export default function DemoPage() {
               <div className="space-y-4">
                 <h3 className="text-lg font-medium text-white">Variants</h3>
                 <div className="space-y-3">
-                  <Button variant="primary">Primary Button</Button>
+                  <Button variant="default">Primary Button</Button>
                   <Button variant="secondary">Secondary Button</Button>
                   <Button variant="ghost">Ghost Button</Button>
-                  <Button variant="glass">Glass Button</Button>
-                  <Button variant="danger">Danger Button</Button>
+                  <Button variant="outline">Outline Button</Button>
+                  <Button variant="destructive">Danger Button</Button>
                 </div>
               </div>
               
@@ -84,7 +84,8 @@ export default function DemoPage() {
                     Loading Button
                   </Button>
                   <Button disabled>Disabled Button</Button>
-                  <Button icon={<Plus className="w-4 h-4" />}>
+                  <Button>
+                    <Plus className="w-4 h-4 mr-2 inline" />
                     With Icon
                   </Button>
                 </div>

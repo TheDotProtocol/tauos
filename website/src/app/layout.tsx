@@ -1,6 +1,5 @@
 import type { Metadata } from 'next'
 import './globals.css'
-import OTAScript from '@/components/OTAScript'
 
 export const metadata: Metadata = {
   title: 'TauCore™ - Sovereign Privacy First OS',
@@ -85,7 +84,6 @@ export default function RootLayout({
       </head>
       <body className="antialiased">
         {children}
-        <OTAScript />
       </body>
     </html>
   )

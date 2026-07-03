@@ -22,6 +22,7 @@ pub enum TokenType {
     Else,
     While,
     For,
+    In,
     Return,
     True,
     False,
@@ -121,6 +122,8 @@ impl Lexer {
         keywords.insert("else".to_string(), TokenType::Else);
         keywords.insert("while".to_string(), TokenType::While);
         keywords.insert("for".to_string(), TokenType::For);
+        keywords.insert("in".to_string(), TokenType::In);
+        keywords.insert("fn".to_string(), TokenType::Function);
         keywords.insert("return".to_string(), TokenType::Return);
         keywords.insert("true".to_string(), TokenType::Bool(true));
         keywords.insert("false".to_string(), TokenType::Bool(false));

@@ -1,5 +1,6 @@
 'use client';
 
+import MarketingPageShell from '@/components/marketing/MarketingPageShell';
 import { motion } from 'framer-motion';
 import {
   Newspaper, Download, Mail, ExternalLink, Calendar, Users, Globe, Award,
@@ -8,48 +9,10 @@ import {
 
 export default function PressPage() {
   return (
-    <div className="min-h-screen bg-black text-white">
-      {/* Header */}
-      <header className="bg-gray-900/50 backdrop-blur-xl border-b border-gray-800 sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            <div className="flex items-center space-x-4">
-              <img src="/brand/tauos-logo.svg" alt="TauOS" className="h-8 w-auto" />
-              <span className="text-xl font-bold text-white">Tau OS</span>
-            </div>
-            <nav className="hidden md:flex items-center space-x-8">
-              <a href="/" className="text-gray-300 hover:text-white transition-colors">Home</a>
-              <a href="/about" className="text-gray-300 hover:text-white transition-colors">About</a>
-              <a href="/developers" className="text-gray-300 hover:text-white transition-colors">Developers</a>
-              <a href="/governance" className="text-gray-300 hover:text-white transition-colors">Governance</a>
-            </nav>
-          </div>
-        </div>
-      </header>
-
-      {/* Hero Section */}
-      <section className="py-20 bg-gradient-to-b from-gray-900 to-black">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            className="text-center mb-16"
-          >
-            <h1 className="text-5xl md:text-7xl font-bold mb-6">
-              <span className="bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">
-                Press Center
-              </span>
-            </h1>
-            <p className="text-xl md:text-2xl text-gray-300 max-w-4xl mx-auto leading-relaxed">
-              Media resources, press releases, and information for <span className="text-yellow-400 font-semibold">journalists and media professionals</span>.
-              <br />
-              Stay updated on TauOS developments and announcements.
-            </p>
-          </motion.div>
-        </div>
-      </section>
-
+    <MarketingPageShell
+      title="Press"
+      subtitle="News, media assets, and announcements from Tau Core Inc."
+    >
       {/* Press Kit Section */}
       <section className="py-20 bg-black">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -143,27 +106,27 @@ export default function PressPage() {
           <div className="space-y-8">
             {[
               {
-                title: "TauOS Launches World's First Privacy-First Operating System",
+                title: "Tau OS Launches World's First Privacy-First Operating System",
                 date: "September 11, 2025",
-                summary: "TauOS officially launches with complete email, cloud, and identity services, offering users a truly private computing experience.",
+                summary: "Tau OS officially launches with complete email, cloud, and identity services, offering users a truly private computing experience.",
                 category: "Product Launch"
               },
               {
-                title: "Tau Foundation Announces Open Source Governance Model",
+                title: "Tau Core Inc. Announces Open Source Governance Model",
                 date: "August 15, 2025",
-                summary: "The Tau Foundation reveals its governance structure, ensuring community-driven development and transparent decision-making.",
+                summary: "Tau Core Inc. reveals its governance structure, ensuring community-driven development and transparent decision-making.",
                 category: "Governance"
               },
               {
-                title: "TauOS Partners with Leading Privacy Organizations",
+                title: "Tau OS Partners with Leading Privacy Organizations",
                 date: "July 20, 2025",
                 summary: "Strategic partnerships with privacy advocacy groups to promote digital rights and user sovereignty.",
                 category: "Partnerships"
               },
               {
-                title: "TauOS Achieves 99.9% Uptime in Beta Testing",
+                title: "Tau OS Achieves 99.9% Uptime in Beta Testing",
                 date: "June 10, 2025",
-                summary: "Comprehensive beta testing shows exceptional reliability and performance across all TauOS services.",
+                summary: "Comprehensive beta testing shows exceptional reliability and performance across all Tau OS services.",
                 category: "Performance"
               }
             ].map((release, index) => (
@@ -209,7 +172,7 @@ export default function PressPage() {
               </span>
             </h2>
             <p className="text-xl text-gray-300 max-w-3xl mx-auto">
-              What the media is saying about TauOS and the privacy-first computing movement.
+              What the media is saying about Tau OS and the privacy-first computing movement.
             </p>
           </motion.div>
 
@@ -217,7 +180,7 @@ export default function PressPage() {
             {[
               {
                 outlet: "TechCrunch",
-                title: "TauOS Challenges Big Tech with Privacy-First OS",
+                title: "Tau OS Challenges Big Tech with Privacy-First OS",
                 date: "September 10, 2025",
                 excerpt: "A new operating system that puts privacy first could be the answer to growing concerns about data surveillance."
               },
@@ -225,13 +188,13 @@ export default function PressPage() {
                 outlet: "Wired",
                 title: "The Operating System That Refuses to Spy on You",
                 date: "September 8, 2025",
-                excerpt: "TauOS represents a fundamental shift in how we think about computing and digital privacy."
+                excerpt: "Tau OS represents a fundamental shift in how we think about computing and digital privacy."
               },
               {
                 outlet: "Ars Technica",
-                title: "TauOS: A Complete Privacy-First Computing Platform",
+                title: "Tau OS: A Complete Privacy-First Computing Platform",
                 date: "September 5, 2025",
-                excerpt: "From email to cloud storage, TauOS offers a complete alternative to surveillance capitalism."
+                excerpt: "From email to cloud storage, Tau OS offers a complete alternative to surveillance capitalism."
               }
             ].map((article, index) => (
               <motion.div
@@ -323,9 +286,9 @@ export default function PressPage() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <div>
                   <h3 className="text-xl font-bold text-white mb-4">Press Office</h3>
-                  <p className="text-gray-300 mb-2">Tau Foundation & Tau LLC</p>
+                  <p className="text-gray-300 mb-2">Tau Core Inc. & Tau Core Inc.</p>
                   <p className="text-gray-300 mb-2">2261 Market St, San Francisco, CA 94114</p>
-                  <p className="text-gray-300 mb-2">Phone: +1 1800 TauOS</p>
+                  <p className="text-gray-300 mb-2">Phone: +1 1800 Tau OS</p>
                 </div>
                 <div>
                   <h3 className="text-xl font-bold text-white mb-4">International</h3>
@@ -346,19 +309,6 @@ export default function PressPage() {
           </motion.div>
         </div>
       </section>
-
-      {/* Footer */}
-      <footer className="bg-gray-900/50 border-t border-gray-800 py-12">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <div className="flex items-center justify-center space-x-4 mb-4">
-              <img src="/brand/tauos-logo.svg" alt="TauOS" className="h-8 w-auto" />
-              <span className="text-xl font-bold text-white">Tau OS</span>
-            </div>
-            <p className="text-gray-400">© 2025 Tau Foundation & Tau LLC. All rights reserved.</p>
-          </div>
-        </div>
-      </footer>
-    </div>
+    </MarketingPageShell>
   );
 }

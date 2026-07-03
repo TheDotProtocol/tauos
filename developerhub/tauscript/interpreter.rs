@@ -66,6 +66,7 @@ pub enum Statement {
         return_type: Option<String>,
     },
     Print(Expression),
+    Block(Vec<Statement>),
 }
 
 #[derive(Debug, Clone, PartialEq)]
@@ -221,6 +222,12 @@ impl Interpreter {
             Statement::Print(expr) => {
                 let value = self.evaluate_expression(expr)?;
                 println!("{}", self.value_to_string(value));
+                Ok(Value::Null)
+            }
+            Statement::Block(body) => {
+                for stmt in body {
+                    self.execute_statement(stmt)?;
+                }
                 Ok(Value::Null)
             }
         }
@@ -410,6 +417,16 @@ impl Interpreter {
     }
 
     fn call_function(&mut self, name: String, arguments: Vec<Value>) -> Result<Value, String> {
+        // Built-in functions
+        if name == "print" {
+            for (i, arg) in arguments.iter().enumerate() {
+                if i > 0 { print!(" "); }
+                print!("{}", self.value_to_string(arg.clone()));
+            }
+            println!();
+            return Ok(Value::Null);
+        }
+
         let function = self.functions.get(&name)
             .ok_or_else(|| format!("Undefined function: {}", name))?
             .clone();

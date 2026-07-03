@@ -317,7 +317,8 @@
                     </div>
                 </div>
 
-                <button id="start-install" class="install-button">Start Installation</button>
+                <button id="start-install-os" class="install-button">Install TauOS to USB (Bootable OS)</button>
+                <button id="start-install-apps" class="install-button" style="background: linear-gradient(45deg, #667eea, #764ba2);">Install TauOS Apps Only</button>
             </div>
 
             <!-- Requirements Screen -->
@@ -326,6 +327,13 @@
                 <div class="system-info" id="system-info">
                     <h3>Checking your system...</h3>
                     <p>Please wait while we verify compatibility.</p>
+                </div>
+                <div class="system-info hidden" id="usb-select-panel">
+                    <h3>Select USB Drive (8GB+ required)</h3>
+                    <p style="font-size:0.9rem;opacity:0.85;margin-bottom:1rem;">All data on the selected drive will be erased.</p>
+                    <select id="usb-drive-select" style="width:100%;padding:0.75rem;border-radius:8px;border:none;font-size:1rem;">
+                        <option value="">— Select USB drive —</option>
+                    </select>
                 </div>
                 <button id="continue-install" class="install-button" disabled>Continue Installation</button>
             </div>
@@ -389,6 +397,16 @@
         
         let currentStep = 'welcome';
         let systemInfo = {};
+        let installMode = 'os'; // 'os' = USB bootable install, 'apps' = local apps
+
+        ipcRenderer.on('install-progress', (_, data) => {
+            const progressFill = document.getElementById('progress-fill');
+            const statusText = document.getElementById('status-text');
+            const installStep = document.getElementById('install-step');
+            if (progressFill) progressFill.style.width = (data.progress || 0) + '%';
+            if (statusText) statusText.textContent = data.message || '';
+            if (installStep) installStep.textContent = data.message || '';
+        });
 
         // Step management
         function showStep(step) {
@@ -419,7 +437,14 @@
         }
 
         // Event listeners
-        document.getElementById('start-install').addEventListener('click', async () => {
+        document.getElementById('start-install-os').addEventListener('click', async () => {
+            installMode = 'os';
+            showStep('requirements');
+            await checkSystemRequirements();
+        });
+
+        document.getElementById('start-install-apps').addEventListener('click', async () => {
+            installMode = 'apps';
             showStep('requirements');
             await checkSystemRequirements();
         });
@@ -482,23 +507,48 @@ TauOS is production-ready with enterprise-grade security!`;
         async function checkSystemRequirements() {
             try {
                 systemInfo = await ipcRenderer.invoke('check-system-requirements');
-                
+                const osInfo = await ipcRenderer.invoke('get-os-install-info');
+
                 const systemInfoDiv = document.getElementById('system-info');
+                const usbPanel = document.getElementById('usb-select-panel');
+                const usbSelect = document.getElementById('usb-drive-select');
+
+                let isoStatus = osInfo.success && osInfo.iso?.valid
+                    ? '<span style="color:#4ade80;">✓ Bootable ISO ready</span>'
+                    : '<span style="color:#ff6b6b;">✗ ISO missing — run ./scripts/build-tauos.sh --docker</span>';
+
                 systemInfoDiv.innerHTML = `
                     <h3>System Information</h3>
                     <p><strong>Operating System:</strong> ${systemInfo.os}</p>
                     <p><strong>Architecture:</strong> ${systemInfo.arch}</p>
-                    <p><strong>Node.js Version:</strong> ${systemInfo.nodeVersion}</p>
-                    <p><strong>Memory Usage:</strong> ${Math.round(systemInfo.memory.heapUsed / 1024 / 1024)} MB</p>
-                    <p><strong>Status:</strong> <span style="color: #4ade80;">✓ Compatible</span></p>
+                    <p><strong>Install Mode:</strong> ${installMode === 'os' ? 'Bootable OS (USB)' : 'Local Apps'}</p>
+                    <p><strong>TauOS ISO:</strong> ${isoStatus}</p>
                 `;
-                
-                document.getElementById('continue-install').disabled = false;
+
+                if (installMode === 'os') {
+                    usbPanel.classList.remove('hidden');
+                    const drives = await ipcRenderer.invoke('list-usb-drives');
+                    usbSelect.innerHTML = '<option value="">— Select USB drive —</option>';
+                    if (drives.success && drives.drives.length) {
+                        drives.drives.forEach(d => {
+                            const opt = document.createElement('option');
+                            opt.value = d.id;
+                            opt.textContent = `${d.id} — ${d.label}`;
+                            usbSelect.appendChild(opt);
+                        });
+                    } else {
+                        usbSelect.innerHTML += '<option disabled>No USB drives detected — insert a 8GB+ drive</option>';
+                    }
+                    document.getElementById('continue-install').disabled = !osInfo.iso?.valid;
+                } else {
+                    usbPanel.classList.add('hidden');
+                    document.getElementById('continue-install').disabled = false;
+                }
             } catch (error) {
                 console.error('System check failed:', error);
                 document.getElementById('system-info').innerHTML = `
                     <h3>System Check Failed</h3>
-                    <p style="color: #ff6b6b;">Unable to verify system requirements. Installation may not work properly.</p>
+                    <p style="color: #ff6b6b;">${error.message}</p>
                 `;
             }
         }
@@ -508,40 +558,35 @@ TauOS is production-ready with enterprise-grade security!`;
             const progressFill = document.getElementById('progress-fill');
             const statusText = document.getElementById('status-text');
             const installStep = document.getElementById('install-step');
-            
-            const steps = [
-                { text: 'Creating installation directory...', progress: 10 },
-                { text: 'Copying application files...', progress: 30 },
-                { text: 'Installing TauMail...', progress: 50 },
-                { text: 'Installing TauCloud...', progress: 60 },
-                { text: 'Installing TauID...', progress: 70 },
-                { text: 'Installing TauStore...', progress: 80 },
-                { text: 'Installing TauBrowser...', progress: 85 },
-                { text: 'Installing Desktop UI...', progress: 90 },
-                { text: 'Creating shortcuts...', progress: 95 },
-                { text: 'Finalizing installation...', progress: 100 }
-            ];
-            
-            for (let i = 0; i < steps.length; i++) {
-                const step = steps[i];
-                statusText.textContent = step.text;
-                installStep.textContent = `Step ${i + 1} of ${steps.length}: ${step.text}`;
-                progressFill.style.width = step.progress + '%';
-                
-                // Simulate installation time
-                await new Promise(resolve => setTimeout(resolve, 500));
-            }
-            
-            // Complete installation
+
+            progressFill.style.width = '5%';
+            statusText.textContent = installMode === 'os'
+                ? 'Preparing bootable USB drive...'
+                : 'Installing TauOS applications...';
+
             try {
-                const result = await ipcRenderer.invoke('install-tauos', {
-                    installPath: process.env.USERPROFILE || process.env.HOME + '/TauOS'
-                });
-                
+                const options = {
+                    mode: installMode,
+                    installPath: (process.env.HOME || process.env.USERPROFILE || '') + '/TauOS',
+                    driveId: document.getElementById('usb-drive-select')?.value || null
+                };
+
+                if (installMode === 'os' && !options.driveId) {
+                    statusText.textContent = 'Please select a USB drive.';
+                    return;
+                }
+
+                const result = await ipcRenderer.invoke('install-tauos', options);
+
                 if (result.success) {
+                    progressFill.style.width = '100%';
+                    if (installMode === 'os') {
+                        statusText.textContent = 'USB boot drive ready! Reboot and boot from USB to run TauOS.';
+                    }
                     showStep('complete');
                 } else {
                     statusText.textContent = 'Installation failed: ' + result.error;
+                    installStep.textContent = result.error;
                 }
             } catch (error) {
                 statusText.textContent = 'Installation failed: ' + error.message;

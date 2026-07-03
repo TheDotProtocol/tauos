@@ -1,5 +1,6 @@
 'use client';
 
+import AppShell from '@/components/apps/AppShell';
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { 
@@ -136,129 +137,11 @@ export default function TauBrowserLanding() {
   };
 
   return (
-    <div className="min-h-screen bg-black text-white">
-      {/* Header */}
-      <header className="bg-gray-900/50 backdrop-blur-xl border-b border-gray-800 sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            <div className="flex items-center space-x-4">
-              <img src="/brand/tauos-logo.svg" alt="TauOS" className="h-8 w-auto" />
-              <span className="text-xl font-bold text-white">Tau OS</span>
-            </div>
-            <nav className="hidden md:flex items-center space-x-8">
-              <a href="/" className="text-gray-300 hover:text-white transition-colors">Home</a>
-              <a href="/about" className="text-gray-300 hover:text-white transition-colors">About</a>
-              <a href="/developers" className="text-gray-300 hover:text-white transition-colors">Developers</a>
-              <a href="/governance" className="text-gray-300 hover:text-white transition-colors">Governance</a>
-            </nav>
-          </div>
-        </div>
-      </header>
-
-      {/* Hero Section */}
-      <section className="py-20 bg-gradient-to-b from-gray-900 to-black">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            className="text-center mb-16"
-          >
-            <h1 className="text-5xl md:text-7xl font-bold mb-6">
-              <span className="bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">
-                TauBrowser
-              </span>
-            </h1>
-            <p className="text-xl md:text-2xl text-gray-300 max-w-4xl mx-auto leading-relaxed">
-              The <span className="text-yellow-400 font-semibold">privacy-first web browser</span>.
-              <br />
-              Browse the internet without being tracked, monitored, or having your data collected.
-            </p>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.2 }}
-            className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-16"
-          >
-            <button
-              onClick={() => setShowRegistration(true)}
-              className="bg-gradient-to-r from-yellow-400 to-orange-500 text-black px-8 py-4 rounded-xl font-semibold text-lg hover:shadow-lg hover:shadow-yellow-400/25 transition-all duration-200 flex items-center"
-            >
-              Get Started Free
-              <ArrowRight className="w-5 h-5 ml-2" />
-            </button>
-            <button
-              onClick={() => setShowLogin(true)}
-              className="border border-gray-600 text-white px-8 py-4 rounded-xl font-semibold text-lg hover:bg-gray-800/50 transition-all duration-200"
-            >
-              Sign In
-            </button>
-          </motion.div>
-
-          {/* Download Section */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.4 }}
-            className="text-center mb-16"
-          >
-            <h2 className="text-3xl font-bold text-white mb-8">Download TauBrowser</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto">
-              {downloadOptions.map((option, index) => (
-                <motion.div
-                  key={index}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.8, delay: 0.5 + index * 0.1 }}
-                  className="p-6 bg-gray-900/30 backdrop-blur-sm border border-gray-800 rounded-2xl hover:border-yellow-400/30 transition-all duration-300"
-                >
-                  <div className="w-12 h-12 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-xl flex items-center justify-center mx-auto mb-4">
-                    <option.icon className="w-6 h-6 text-black" />
-                  </div>
-                  <h3 className="text-lg font-bold text-white mb-2">{option.title}</h3>
-                  <p className="text-sm text-gray-400 mb-4">{option.description}</p>
-                  <button
-                    className={`w-full py-2 px-4 rounded-lg font-semibold transition-all duration-200 ${
-                      option.comingSoon
-                        ? 'bg-gray-700 text-gray-400 cursor-not-allowed'
-                        : 'bg-gradient-to-r from-yellow-400 to-orange-500 text-black hover:shadow-lg hover:shadow-yellow-400/25'
-                    }`}
-                    disabled={option.comingSoon}
-                  >
-                    {option.comingSoon ? 'Coming Soon' : 'Download'}
-                  </button>
-                </motion.div>
-              ))}
-            </div>
-            <p className="text-gray-400 mt-6 text-sm">
-              Desktop apps will be available via OTA updates. Web version available now.
-            </p>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.6 }}
-            className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto"
-          >
-            <div className="text-center">
-              <div className="text-3xl font-bold text-yellow-400 mb-2">Zero</div>
-              <div className="text-gray-400">Tracking</div>
-            </div>
-            <div className="text-center">
-              <div className="text-3xl font-bold text-yellow-400 mb-2">100%</div>
-              <div className="text-gray-400">Private</div>
-            </div>
-            <div className="text-center">
-              <div className="text-3xl font-bold text-yellow-400 mb-2">Fast</div>
-              <div className="text-gray-400">Browsing</div>
-            </div>
-          </motion.div>
-        </div>
-      </section>
-
+    <AppShell
+      title="Tau Browser"
+      subtitle="Privacy-first browsing built into the TAU CORE stack."
+      variant="marketing"
+    >
       {/* Features Section */}
       <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gray-900/30">
         <div className="max-w-7xl mx-auto">
@@ -516,52 +399,6 @@ export default function TauBrowserLanding() {
           </motion.div>
         </div>
       )}
-
-      {/* Footer */}
-      <footer className="bg-gray-900/50 border-t border-gray-800 py-12 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-            <div>
-              <h3 className="text-lg font-semibold text-white mb-4">Legal</h3>
-              <ul className="space-y-2">
-                <li><Link href="/legal/privacy" className="text-gray-400 hover:text-white">Privacy Policy</Link></li>
-                <li><Link href="/legal/terms" className="text-gray-400 hover:text-white">Terms of Service</Link></li>
-                <li><Link href="/legal/dpa" className="text-gray-400 hover:text-white">Data Protection</Link></li>
-                <li><Link href="/legal/cookies" className="text-gray-400 hover:text-white">Cookies Policy</Link></li>
-                <li><Link href="/legal/acceptable-use" className="text-gray-400 hover:text-white">Acceptable Use</Link></li>
-              </ul>
-            </div>
-            <div>
-              <h3 className="text-lg font-semibold text-white mb-4">Support</h3>
-              <ul className="space-y-2">
-                <li><Link href="/help" className="text-gray-400 hover:text-white">Help Center</Link></li>
-                <li><Link href="/contact" className="text-gray-400 hover:text-white">Contact Us</Link></li>
-                <li><Link href="/status" className="text-gray-400 hover:text-white">Status</Link></li>
-              </ul>
-            </div>
-            <div>
-              <h3 className="text-lg font-semibold text-white mb-4">Company</h3>
-              <ul className="space-y-2">
-                <li><Link href="/about" className="text-gray-400 hover:text-white">About</Link></li>
-                <li><Link href="/press" className="text-gray-400 hover:text-white">Press</Link></li>
-                <li><Link href="/careers" className="text-gray-400 hover:text-white">Careers</Link></li>
-              </ul>
-            </div>
-            <div>
-              <h3 className="text-lg font-semibold text-white mb-4">Community</h3>
-              <ul className="space-y-2">
-                <li><Link href="/blog" className="text-gray-400 hover:text-white">Blog</Link></li>
-                <li><Link href="https://github.com/tauos" className="text-gray-400 hover:text-white">GitHub</Link></li>
-                <li><Link href="https://x.com/tauos" className="text-gray-400 hover:text-white">Twitter</Link></li>
-                <li><Link href="https://mastodon.social/@tauos" className="text-gray-400 hover:text-white">Mastodon</Link></li>
-              </ul>
-            </div>
-          </div>
-          <div className="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
-            <p>&copy; 2025 TauOS. All rights reserved. Privacy-first computing.</p>
-          </div>
-        </div>
-      </footer>
-    </div>
+    </AppShell>
   );
 }

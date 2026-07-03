@@ -1,5 +1,6 @@
 'use client';
 
+import DashboardShell from '@/components/apps/DashboardShell';
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { 
@@ -113,52 +114,18 @@ export default function TauBrowserDashboard() {
     lastUpdate: '2 minutes ago'
   };
 
-  if (!isLoggedIn) {
-    return (
-      <div className="min-h-screen bg-black text-white flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-cyan-400 mx-auto mb-4"></div>
-          <p className="text-gray-400">Loading...</p>
-        </div>
-      </div>
-    );
-  }
+  
 
   return (
-    <div className="min-h-screen bg-black text-white">
-      <header className="bg-gray-900/50 backdrop-blur-xl border-b border-gray-800">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            <div className="flex items-center space-x-4">
-              <Link href="/" className="flex items-center space-x-2">
-                <div className="w-10 h-10 bg-gradient-to-r from-cyan-500 to-blue-500 rounded-xl flex items-center justify-center">
-                  <Globe className="w-6 h-6 text-white" />
-                </div>
-                <div>
-                  <h1 className="text-xl font-bold text-white">TauBrowser</h1>
-                  <p className="text-sm text-gray-400">Privacy-First Browser</p>
-                </div>
-              </Link>
-            </div>
-            <div className="flex items-center space-x-4">
-              <div className="flex items-center space-x-2 text-sm text-gray-300">
-                <Users className="w-4 h-4" />
-                <span>{user?.email}</span>
-              </div>
-              <button
-                onClick={handleLogout}
-                className="flex items-center space-x-2 text-gray-400 hover:text-white transition-colors"
-              >
-                <LogOut className="w-4 h-4" />
-                <span>Logout</span>
-              </button>
-            </div>
-          </div>
-        </div>
-      </header>
-
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Navigation Tabs */}
+    <DashboardShell
+      title="Tau Browser"
+      subtitle="Privacy-first browsing."
+      userLabel={user?.email}
+      onLogout={handleLogout}
+      loading={!isLoggedIn}
+      fullWidth
+    >
+{/* Navigation Tabs */}
         <div className="flex space-x-1 mb-8 bg-gray-900/30 p-1 rounded-xl">
           {[
             { id: 'browser', label: 'Browser', icon: Globe },
@@ -515,7 +482,6 @@ export default function TauBrowserDashboard() {
             </div>
           </div>
         )}
-      </div>
-    </div>
+    </DashboardShell>
   );
 }

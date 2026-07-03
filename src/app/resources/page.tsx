@@ -1,5 +1,6 @@
 'use client';
 
+import MarketingPageShell from '@/components/marketing/MarketingPageShell';
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { 
@@ -45,8 +46,8 @@ export default function ResourceCenter() {
   const documents = [
     {
       id: 'developer-guide',
-      title: 'TauOS Developer Guide',
-      description: 'Complete guide for developers building on TauOS platform',
+      title: 'Tau OS Developer Guide',
+      description: 'Complete guide for developers building on Tau OS platform',
       category: 'developer',
       type: 'PDF',
       size: '2.4 MB',
@@ -56,12 +57,12 @@ export default function ResourceCenter() {
       icon: Code,
       color: 'text-blue-400',
       bg: 'bg-blue-500/20',
-      downloadUrl: '/downloads/TauOS_Developer_Guide.pdf'
+      downloadUrl: '/downloads/Tau OS_Developer_Guide.pdf'
     },
     {
       id: 'api-guide',
       title: 'API Documentation',
-      description: 'Comprehensive API reference for all TauOS services',
+      description: 'Comprehensive API reference for all Tau OS services',
       category: 'api',
       type: 'PDF',
       size: '1.8 MB',
@@ -71,7 +72,7 @@ export default function ResourceCenter() {
       icon: Database,
       color: 'text-green-400',
       bg: 'bg-green-500/20',
-      downloadUrl: '/downloads/TauOS_API_Guide.pdf'
+      downloadUrl: '/downloads/Tau OS_API_Guide.pdf'
     },
     {
       id: 'soc-audit',
@@ -86,12 +87,12 @@ export default function ResourceCenter() {
       icon: Shield,
       color: 'text-red-400',
       bg: 'bg-red-500/20',
-      downloadUrl: '/downloads/TauOS_SOC_Audit_Report.pdf'
+      downloadUrl: '/downloads/Tau OS_SOC_Audit_Report.pdf'
     },
     {
       id: 'swot-analysis',
       title: 'SWOT Analysis',
-      description: 'Strategic analysis of TauOS market position and opportunities',
+      description: 'Strategic analysis of Tau OS market position and opportunities',
       category: 'business',
       type: 'Excel',
       size: '1.1 MB',
@@ -101,7 +102,7 @@ export default function ResourceCenter() {
       icon: Users,
       color: 'text-purple-400',
       bg: 'bg-purple-500/20',
-      downloadUrl: '/downloads/TauOS_SWOT_Analysis.xlsx'
+      downloadUrl: '/downloads/Tau OS_SWOT_Analysis.xlsx'
     },
     {
       id: 'system-architecture',
@@ -116,12 +117,12 @@ export default function ResourceCenter() {
       icon: Server,
       color: 'text-orange-400',
       bg: 'bg-orange-500/20',
-      downloadUrl: '/downloads/TauOS_System_Architecture.pdf'
+      downloadUrl: '/downloads/Tau OS_System_Architecture.pdf'
     },
     {
       id: 'contributor-guide',
       title: 'Contributor Guidelines',
-      description: 'How to contribute to TauOS open source project',
+      description: 'How to contribute to Tau OS open source project',
       category: 'developer',
       type: 'PDF',
       size: '1.5 MB',
@@ -131,12 +132,12 @@ export default function ResourceCenter() {
       icon: Users,
       color: 'text-cyan-400',
       bg: 'bg-cyan-500/20',
-      downloadUrl: '/downloads/TauOS_Contributor_Guide.pdf'
+      downloadUrl: '/downloads/Tau OS_Contributor_Guide.pdf'
     },
     {
       id: 'privacy-whitepaper',
       title: 'Privacy Whitepaper',
-      description: 'Deep dive into TauOS privacy-first architecture',
+      description: 'Deep dive into Tau OS privacy-first architecture',
       category: 'security',
       type: 'PDF',
       size: '2.8 MB',
@@ -146,12 +147,12 @@ export default function ResourceCenter() {
       icon: Lock,
       color: 'text-indigo-400',
       bg: 'bg-indigo-500/20',
-      downloadUrl: '/downloads/TauOS_Privacy_Whitepaper.pdf'
+      downloadUrl: '/downloads/Tau OS_Privacy_Whitepaper.pdf'
     },
     {
       id: 'mobile-development',
       title: 'Mobile Development Guide',
-      description: 'Building mobile applications for TauOS platform',
+      description: 'Building mobile applications for Tau OS platform',
       category: 'developer',
       type: 'PDF',
       size: '2.2 MB',
@@ -161,7 +162,7 @@ export default function ResourceCenter() {
       icon: Smartphone,
       color: 'text-pink-400',
       bg: 'bg-pink-500/20',
-      downloadUrl: '/downloads/TauOS_Mobile_Development.pdf'
+      downloadUrl: '/downloads/Tau OS_Mobile_Development.pdf'
     }
   ];
 
@@ -199,25 +200,10 @@ export default function ResourceCenter() {
   };
 
   return (
-    <div className="min-h-screen bg-black text-white">
-      {/* Header */}
-      <header className="bg-gray-900/50 backdrop-blur-xl border-b border-gray-800 sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            <div className="flex items-center space-x-4">
-              <img src="/brand/tauos-logo.svg" alt="TauOS" className="h-8 w-auto" />
-              <span className="text-xl font-bold text-white">TauOS Resource Center</span>
-            </div>
-            <nav className="hidden md:flex items-center space-x-8">
-              <a href="/" className="text-gray-300 hover:text-white transition-colors">Home</a>
-              <a href="/about" className="text-gray-300 hover:text-white transition-colors">About</a>
-              <a href="/developers" className="text-gray-300 hover:text-white transition-colors">Developers</a>
-              <a href="/resources" className="text-yellow-400 font-semibold">Resources</a>
-            </nav>
-          </div>
-        </div>
-      </header>
-
+    <MarketingPageShell
+      title="Resources"
+      subtitle="Documentation, downloads, and learning materials."
+    >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {/* Hero Section */}
         <motion.div
@@ -230,7 +216,7 @@ export default function ResourceCenter() {
           </h1>
           <p className="text-xl text-gray-300 mb-8 max-w-3xl mx-auto">
             Comprehensive documentation, guides, and resources for developers, 
-            businesses, and contributors building on the TauOS platform.
+            businesses, and contributors building on the Tau OS platform.
           </p>
         </motion.div>
 
@@ -411,6 +397,6 @@ export default function ResourceCenter() {
           </div>
         </motion.div>
       </div>
-    </div>
+    </MarketingPageShell>
   );
 }

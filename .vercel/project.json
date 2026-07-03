@@ -1,1 +1,16 @@
-{"projectId":"prj_KDFL35aq3r0b79rIOGtI8A3CHtto","orgId":"team_elOPSGwPnkJq3bkgX2Fw1z4w","projectName":"tauos"}
+{
+  "projectId": "prj_8tIn0QJTsOkmKIKep1n5ofOzGKxy",
+  "orgId": "team_elOPSGwPnkJq3bkgX2Fw1z4w",
+  "projectName": "tauos",
+  "settings": {
+    "createdAt": 1758781037142,
+    "framework": "nextjs",
+    "devCommand": null,
+    "installCommand": "npm install",
+    "buildCommand": "npm run build",
+    "outputDirectory": ".next",
+    "rootDirectory": null,
+    "directoryListing": false,
+    "nodeVersion": "22.x"
+  }
+}

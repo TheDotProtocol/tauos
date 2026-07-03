@@ -1,5 +1,6 @@
 'use client';
 
+import MarketingPageShell from '@/components/marketing/MarketingPageShell';
 import { motion } from 'framer-motion';
 import {
   Mail, Phone, MapPin, MessageCircle, Users, Globe, Building, Clock,
@@ -8,48 +9,10 @@ import {
 
 export default function ContactPage() {
   return (
-    <div className="min-h-screen bg-black text-white">
-      {/* Header */}
-      <header className="bg-gray-900/50 backdrop-blur-xl border-b border-gray-800 sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            <div className="flex items-center space-x-4">
-              <img src="/brand/tauos-logo.svg" alt="TauOS" className="h-8 w-auto" />
-              <span className="text-xl font-bold text-white">Tau OS</span>
-            </div>
-            <nav className="hidden md:flex items-center space-x-8">
-              <a href="/" className="text-gray-300 hover:text-white transition-colors">Home</a>
-              <a href="/about" className="text-gray-300 hover:text-white transition-colors">About</a>
-              <a href="/developers" className="text-gray-300 hover:text-white transition-colors">Developers</a>
-              <a href="/governance" className="text-gray-300 hover:text-white transition-colors">Governance</a>
-            </nav>
-          </div>
-        </div>
-      </header>
-
-      {/* Hero Section */}
-      <section className="py-20 bg-gradient-to-b from-gray-900 to-black">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            className="text-center mb-16"
-          >
-            <h1 className="text-5xl md:text-7xl font-bold mb-6">
-              <span className="bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">
-                Contact Us
-              </span>
-            </h1>
-            <p className="text-xl md:text-2xl text-gray-300 max-w-4xl mx-auto leading-relaxed">
-              Get in touch with our team for <span className="text-yellow-400 font-semibold">support, partnerships, or general inquiries</span>.
-              <br />
-              We're here to help and would love to hear from you.
-            </p>
-          </motion.div>
-        </div>
-      </section>
-
+    <MarketingPageShell
+      title="Contact"
+      subtitle="Reach Tau Core Inc. — support, partnerships, and press."
+    >
       {/* Contact Methods Section */}
       <section className="py-20 bg-black">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -76,14 +39,14 @@ export default function ContactPage() {
               {
                 icon: Mail,
                 title: "General Inquiries",
-                description: "Questions about TauOS, partnerships, or general information",
+                description: "Questions about Tau OS, partnerships, or general information",
                 contact: "hello@tauos.org",
                 responseTime: "24 hours"
               },
               {
                 icon: Users,
                 title: "Support",
-                description: "Technical support and help with TauOS services",
+                description: "Technical support and help with Tau OS services",
                 contact: "support@tauos.org",
                 responseTime: "24 hours"
               },
@@ -150,7 +113,7 @@ export default function ContactPage() {
               {
                 city: "San Francisco, USA",
                 address: "2261 Market St, San Francisco, CA 94114",
-                phone: "+1 1800 TauOS",
+                phone: "+1 1800 Tau OS",
                 email: "hello@tauos.org",
                 description: "Our headquarters and main development center"
               },
@@ -219,7 +182,7 @@ export default function ContactPage() {
               },
               {
                 question: "Do you offer phone support?",
-                answer: "Yes, we offer phone support during business hours. Call +1 1800 TauOS for general inquiries or +60 178446206 for Asia-Pacific support."
+                answer: "Yes, we offer phone support during business hours. Call +1 1800 Tau OS for general inquiries or +60 178446206 for Asia-Pacific support."
               },
               {
                 question: "Can I visit your offices?",
@@ -227,7 +190,7 @@ export default function ContactPage() {
               },
               {
                 question: "Do you have a community forum?",
-                answer: "Yes, we have an active community forum where users can get help, share ideas, and connect with other TauOS users worldwide."
+                answer: "Yes, we have an active community forum where users can get help, share ideas, and connect with other Tau OS users worldwide."
               },
               {
                 question: "How can I report a security issue?",
@@ -335,19 +298,6 @@ export default function ContactPage() {
           </motion.div>
         </div>
       </section>
-
-      {/* Footer */}
-      <footer className="bg-gray-900/50 border-t border-gray-800 py-12">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <div className="flex items-center justify-center space-x-4 mb-4">
-              <img src="/brand/tauos-logo.svg" alt="TauOS" className="h-8 w-auto" />
-              <span className="text-xl font-bold text-white">Tau OS</span>
-            </div>
-            <p className="text-gray-400">© 2025 Tau Foundation & Tau LLC. All rights reserved.</p>
-          </div>
-        </div>
-      </footer>
-    </div>
+    </MarketingPageShell>
   );
 }

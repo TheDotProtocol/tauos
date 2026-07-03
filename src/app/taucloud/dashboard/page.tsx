@@ -1,4 +1,6 @@
 'use client';
+
+import DashboardShell from '@/components/apps/DashboardShell';
 // TauCloud Dashboard - Ultimate File Storage System - v1.0
 
 import React, { useState, useEffect, useRef } from 'react';
@@ -271,79 +273,19 @@ export default function TauCloudDashboard() {
     }
   });
 
-  if (!isLoggedIn) {
-    return (
-      <div className="min-h-screen bg-black text-white flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-yellow-400 mx-auto mb-4"></div>
-          <p className="text-gray-400">Loading...</p>
-        </div>
-      </div>
-    );
-  }
+  
 
   return (
-    <div className="min-h-screen bg-black text-white">
-      {/* Header */}
-      <header className="bg-gray-900/50 backdrop-blur-xl border-b border-gray-800">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            <div className="flex items-center space-x-4">
-              <Link href="/" className="flex items-center space-x-2">
-                <img src="/brand/tauos-logo.svg" alt="TauOS" className="w-10 h-10" />
-                <div>
-                  <h1 className="text-xl font-bold text-white">TauCloud</h1>
-                  <p className="text-sm text-gray-400">Ultimate File Storage</p>
-                </div>
-              </Link>
-            </div>
-            
-            <div className="flex items-center space-x-4">
-              {/* Sync Status */}
-              <div className="flex items-center space-x-2">
-                {syncStatus === 'syncing' ? (
-                  <RefreshCw className="w-4 h-4 text-yellow-400 animate-spin" />
-                ) : syncStatus === 'synced' ? (
-                  <CheckCircle2 className="w-4 h-4 text-green-400" />
-                ) : (
-                  <AlertTriangle className="w-4 h-4 text-red-400" />
-                )}
-                <span className="text-sm text-gray-300">
-                  {syncStatus === 'syncing' ? 'Syncing...' : 
-                   syncStatus === 'synced' ? 'Synced' : 'Sync Error'}
-                </span>
-              </div>
-
-              {/* Online Status */}
-              <div className="flex items-center space-x-2">
-                {isOnline ? (
-                  <Wifi className="w-4 h-4 text-green-400" />
-                ) : (
-                  <WifiOff className="w-4 h-4 text-red-400" />
-                )}
-                <span className="text-sm text-gray-300">
-                  {isOnline ? 'Online' : 'Offline'}
-                </span>
-              </div>
-
-              <div className="flex items-center space-x-2 text-sm text-gray-300">
-                <User className="w-4 h-4" />
-                <span>{user?.email}</span>
-              </div>
-              <button
-                onClick={handleLogout}
-                className="flex items-center space-x-2 text-gray-400 hover:text-white transition-colors"
-              >
-                <LogOut className="w-4 h-4" />
-                <span>Logout</span>
-              </button>
-            </div>
-          </div>
-        </div>
-      </header>
-
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Storage Overview */}
+    <DashboardShell
+      title="Tau Cloud"
+      subtitle="Your encrypted files — zero-knowledge storage."
+      userLabel={user?.email}
+      onLogout={handleLogout}
+      loading={!isLoggedIn}
+      fullWidth
+    >
+      
+      {/* Storage Overview */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
@@ -695,7 +637,6 @@ export default function TauCloudDashboard() {
             </motion.div>
           </div>
         </div>
-      </div>
 
       {/* Upload Modal */}
       {showUploadModal && (
@@ -778,6 +719,6 @@ export default function TauCloudDashboard() {
           </motion.div>
         </div>
       )}
-    </div>
+    </DashboardShell>
   );
 }

@@ -1,5 +1,8 @@
+'use client';
+
 import React from 'react';
 import Link from 'next/link';
+import MarketingPageShell from '@/components/marketing/MarketingPageShell';
 import { 
   BookOpenIcon, 
   DocumentTextIcon, 
@@ -138,72 +141,51 @@ const documentationSections = [
 
 export default function DocumentationHub() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
-      {/* Header */}
-      <div className="bg-white shadow-sm border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="text-center">
-            <h1 className="text-4xl font-bold text-gray-900 mb-4">
-              TauOS Documentation Hub
-            </h1>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Complete documentation for TauOS - the world's first privacy-first, AI-native operating system. 
-              Find everything you need to get started, develop, and deploy TauOS solutions.
-            </p>
-          </div>
-        </div>
-      </div>
-
-      {/* Quick Links */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="bg-blue-50 rounded-lg p-6 mb-8">
-          <h2 className="text-2xl font-semibold text-blue-900 mb-4">Quick Start</h2>
+    <MarketingPageShell
+      title="Documentation"
+      subtitle="Guides for Tau OS and the TAU CORE ecosystem from Tau Core Inc."
+    >
+      <div className="container mx-auto px-6 py-12">
+        <div className="rounded-xl border border-primary/30 bg-primary/5 p-6 mb-8">
+          <h2 className="text-2xl font-semibold text-white mb-4">Quick Start</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <Link href="/docs/installation" className="bg-white rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow">
-              <h3 className="font-semibold text-gray-900">Installation</h3>
-              <p className="text-sm text-gray-600">Get TauOS running on your device</p>
+            <Link href="/download" className="bg-card border border-border rounded-lg p-4 hover:border-primary/40 transition-colors">
+              <h3 className="font-semibold text-white">Installation</h3>
+              <p className="text-sm text-muted-foreground">Get Tau OS running on your device</p>
             </Link>
-            <Link href="/docs/quick-start" className="bg-white rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow">
-              <h3 className="font-semibold text-gray-900">Quick Start</h3>
-              <p className="text-sm text-gray-600">5-minute setup guide</p>
+            <Link href="/beta" className="bg-card border border-border rounded-lg p-4 hover:border-primary/40 transition-colors">
+              <h3 className="font-semibold text-white">Beta Program</h3>
+              <p className="text-sm text-muted-foreground">Join the Tau OS beta</p>
             </Link>
-            <Link href="/docs/faq" className="bg-white rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow">
-              <h3 className="font-semibold text-gray-900">FAQ</h3>
-              <p className="text-sm text-gray-600">Common questions answered</p>
+            <Link href="/help" className="bg-card border border-border rounded-lg p-4 hover:border-primary/40 transition-colors">
+              <h3 className="font-semibold text-white">Help Center</h3>
+              <p className="text-sm text-muted-foreground">Common questions answered</p>
             </Link>
           </div>
         </div>
 
-        {/* Documentation Sections */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {documentationSections.map((section, index) => (
-            <div key={index} className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow">
+            <div key={index} className="bg-card border border-border rounded-xl p-6 hover:border-primary/30 transition-colors">
               <div className="flex items-center mb-4">
                 <div className={`p-3 rounded-lg ${section.color} mr-4`}>
                   <section.icon className="h-6 w-6 text-white" />
                 </div>
                 <div>
-                  <h2 className="text-xl font-semibold text-gray-900">{section.title}</h2>
-                  <p className="text-sm text-gray-600">{section.description}</p>
+                  <h2 className="text-xl font-semibold text-white">{section.title}</h2>
+                  <p className="text-sm text-muted-foreground">{section.description}</p>
                 </div>
               </div>
-              
+
               <div className="space-y-3">
                 {section.links.map((link, linkIndex) => (
                   <Link
                     key={linkIndex}
                     href={link.href}
-                    className="block p-3 rounded-lg hover:bg-gray-50 transition-colors"
+                    className="block p-3 rounded-lg hover:bg-white/5 transition-colors border border-transparent hover:border-white/10"
                   >
-                    <div className="flex justify-between items-start">
-                      <div>
-                        <h3 className="font-medium text-gray-900">{link.name}</h3>
-                        <p className="text-sm text-gray-600">{link.description}</p>
-                      </div>
-                      <svg className="h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                      </svg>
-                    </div>
+                    <h3 className="font-medium text-white">{link.name}</h3>
+                    <p className="text-sm text-muted-foreground">{link.description}</p>
                   </Link>
                 ))}
               </div>
@@ -211,63 +193,21 @@ export default function DocumentationHub() {
           ))}
         </div>
 
-        {/* Additional Resources */}
-        <div className="mt-12 bg-gray-50 rounded-lg p-8">
-          <h2 className="text-2xl font-semibold text-gray-900 mb-6">Additional Resources</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <div className="text-center">
-              <div className="bg-blue-100 rounded-full p-4 w-16 h-16 mx-auto mb-4 flex items-center justify-center">
-                <BookOpenIcon className="h-8 w-8 text-blue-600" />
-              </div>
-              <h3 className="font-semibold text-gray-900 mb-2">Video Tutorials</h3>
-              <p className="text-sm text-gray-600">Step-by-step video guides</p>
-            </div>
-            <div className="text-center">
-              <div className="bg-green-100 rounded-full p-4 w-16 h-16 mx-auto mb-4 flex items-center justify-center">
-                <UserGroupIcon className="h-8 w-8 text-green-600" />
-              </div>
-              <h3 className="font-semibold text-gray-900 mb-2">Community</h3>
-              <p className="text-sm text-gray-600">Join our user community</p>
-            </div>
-            <div className="text-center">
-              <div className="bg-purple-100 rounded-full p-4 w-16 h-16 mx-auto mb-4 flex items-center justify-center">
-                <CodeBracketIcon className="h-8 w-8 text-purple-600" />
-              </div>
-              <h3 className="font-semibold text-gray-900 mb-2">GitHub</h3>
-              <p className="text-sm text-gray-600">Open source repositories</p>
-            </div>
-            <div className="text-center">
-              <div className="bg-orange-100 rounded-full p-4 w-16 h-16 mx-auto mb-4 flex items-center justify-center">
-                <QuestionMarkCircleIcon className="h-8 w-8 text-orange-600" />
-              </div>
-              <h3 className="font-semibold text-gray-900 mb-2">Support</h3>
-              <p className="text-sm text-gray-600">Get help when you need it</p>
-            </div>
-          </div>
-        </div>
-
-        {/* Footer CTA */}
-        <div className="mt-12 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg p-8 text-white text-center">
-          <h2 className="text-2xl font-bold mb-4">Ready to Get Started?</h2>
-          <p className="text-lg mb-6 opacity-90">
-            Download TauOS today and experience the future of privacy-first computing.
+        <div className="mt-12 rounded-xl border border-white/10 bg-white/5 p-8 text-center">
+          <h2 className="text-2xl font-bold text-white mb-4">Ready to get started?</h2>
+          <p className="text-muted-foreground mb-6">
+            Download Tau OS and experience privacy-first computing from Tau Core Inc.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link 
-              href="/download" 
-              className="bg-white text-blue-600 px-6 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors"
-            >
-              Download TauOS
+            <Link href="/download" className="bg-primary text-primary-foreground px-6 py-3 font-semibold hover:bg-primary/90">
+              Download Tau OS
             </Link>
-            <Link 
-              href="/contact" 
-              className="border-2 border-white text-white px-6 py-3 rounded-lg font-semibold hover:bg-white hover:text-blue-600 transition-colors"
-            >
+            <Link href="/contact" className="border border-primary text-primary px-6 py-3 font-semibold hover:bg-primary/10">
               Contact Us
             </Link>
           </div>
         </div>
       </div>
-    </div>
+    </MarketingPageShell>
   );
 }

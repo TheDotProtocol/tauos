@@ -1,4 +1,6 @@
 'use client';
+
+import DashboardShell from '@/components/apps/DashboardShell';
 // TauCloud Settings - User Preferences & Account Management - v1.0
 
 import React, { useState, useEffect } from 'react';
@@ -155,55 +157,23 @@ export default function TauCloudSettings() {
     { id: 'notifications', label: 'Notifications', icon: Bell }
   ];
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-black text-white flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-yellow-400 mx-auto mb-4"></div>
-          <p className="text-gray-400">Loading settings...</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (!user) {
-    return (
-      <div className="min-h-screen bg-black text-white flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-yellow-400 mx-auto mb-4"></div>
-          <p className="text-gray-400">Loading...</p>
-        </div>
-      </div>
-    );
-  }
+  const handleLogout = () => {
+    localStorage.removeItem('tauos_user');
+    localStorage.removeItem('tauos_token');
+    window.location.href = '/taucloud';
+  };
 
   return (
-    <div className="min-h-screen bg-black text-white">
-      {/* Header */}
-      <header className="bg-gray-900/50 backdrop-blur-xl border-b border-gray-800">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            <div className="flex items-center space-x-4">
-              <Link href="/taucloud/dashboard" className="flex items-center space-x-2">
-                <img src="/brand/tauos-logo.svg" alt="TauOS" className="w-10 h-10" />
-                <div>
-                  <h1 className="text-xl font-bold text-white">TauCloud</h1>
-                  <p className="text-sm text-gray-400">Settings</p>
-                </div>
-              </Link>
-            </div>
-            
-            <div className="flex items-center space-x-4">
-              <div className="flex items-center space-x-2 text-sm text-gray-300">
-                <span>{user.email}</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </header>
-
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+    <DashboardShell
+      title="Tau Cloud"
+      subtitle="Cloud settings"
+      userLabel={user?.email}
+      onLogout={handleLogout}
+      loading={loading || !user}
+      fullWidth
+    >
+      
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
           {/* Sidebar */}
           <div className="lg:col-span-1">
             <nav className="space-y-2">
@@ -625,7 +595,6 @@ export default function TauCloudSettings() {
             </motion.div>
           </div>
         </div>
-      </div>
-    </div>
+    </DashboardShell>
   );
 }

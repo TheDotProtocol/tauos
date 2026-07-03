@@ -27,6 +27,13 @@
       "!node_modules/**/*",
       "!dist/**/*"
     ],
+    "extraResources": [
+      {
+        "from": "resources/",
+        "to": "resources/",
+        "filter": ["**/*"]
+      }
+    ],
     "win": {
       "target": "nsis",
       "icon": "assets/icon.ico",

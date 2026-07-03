@@ -1,0 +1,40 @@
+# TauOS build environment — corporate desktop ISO (x86_64)
+FROM debian:bookworm-slim
+
+ENV DEBIAN_FRONTEND=noninteractive
+ENV TAUOS_ARCH=x86_64
+ENV TAUOS_VERSION=1.0.0
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    bc \
+    bison \
+    flex \
+    libssl-dev \
+    libelf-dev \
+    libncurses-dev \
+    file \
+    rsync \
+    cpio \
+    gzip \
+    xorriso \
+    grub-pc-bin \
+    grub-efi-amd64-bin \
+    mtools \
+    wget \
+    curl \
+    ca-certificates \
+    squashfs-tools \
+    debootstrap \
+    qemu-utils \
+    pkg-config \
+    python3 \
+    && rm -rf /var/lib/apt/lists/*
+
+# Rust toolchain for optional TauOS userland binaries
+RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+ENV PATH="/root/.cargo/bin:${PATH}"
+
+WORKDIR /tauos
+
+CMD ["/tauos/scripts/build-tauos-native.sh"]
