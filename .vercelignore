@@ -14,3 +14,11 @@ newebsite/
 tauos-mobile/
 /apps/
 .git/
+
+# Always include Next.js app source for deploy
+!src
+!src/**
+!public/brand
+!public/brand/**
+!public/downloads/manifest.json
+!public/tauos-tokens.css
