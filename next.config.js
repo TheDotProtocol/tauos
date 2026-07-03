@@ -17,6 +17,15 @@ const nextConfig = {
       },
     ]
   },
+  async redirects() {
+    return [
+      {
+        source: '/dashboard',
+        destination: '/taumail/dashboard',
+        permanent: false,
+      },
+    ];
+  },
   // Disable static optimization for dynamic API routes
   async rewrites() {
     return [
