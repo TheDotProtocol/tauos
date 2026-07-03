@@ -1,24 +1,18 @@
-# Exclude large OS build artifacts from Vercel deploy (host ISO on GitHub Releases / R2)
-release-files/
-build/
-kernel-build/
-*.iso
-public/downloads/*.iso
-public/downloads/*.dmg
-public/downloads/*.exe
-public/downloads/*.deb
-public/downloads/*.AppImage
-os-code/
-developerhub/
-newebsite/
-tauos-mobile/
-/apps/
-.git/
-
-# Always include Next.js app source for deploy
-!src
-!src/**
-!public/brand
-!public/brand/**
-!public/downloads/manifest.json
-!public/tauos-tokens.css
+# Deploy only the root Next.js app (~96k tracked files in this monorepo).
+# Whitelist approach: Vercel's ignore matcher is unreliable with negation-only rules.
+/*
+!/package.json
+!/package-lock.json
+!/next.config.js
+!/vercel.json
+!/tsconfig.json
+!/tailwind.config.ts
+!/tailwind.config.js
+!/postcss.config.js
+!/next-env.d.ts
+!/components.json
+!/.vercelignore
+!/src
+!/src/**
+!/public
+!/public/**
