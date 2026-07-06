@@ -13,6 +13,8 @@
 !/.vercelignore
 !/src
 !/src/**/*
+!/scripts
+!/scripts/**/*
 !/public
 !/public/**/*
 # Large tracked binaries — host via GitHub Releases, not Vercel
