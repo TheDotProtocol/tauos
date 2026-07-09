@@ -12,34 +12,31 @@ import {
   RefreshCw, ChevronLeft
 } from 'lucide-react';
 import Link from 'next/link';
+import TauMailDemoBanner from '@/components/apps/TauMailDemoBanner';
+import { useTauMailSession } from '@/hooks/useTauMailSession';
+import { getDemoSent, isDemoSession } from '@/lib/taumail-demo';
 
 export default function TauMailSent() {
-  const [user, setUser] = useState(null);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const { user, isLoggedIn, isDemo, logout } = useTauMailSession();
   const [sentEmails, setSentEmails] = useState([]);
   const [loading, setLoading] = useState(false);
   const [selectedEmail, setSelectedEmail] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
 
-  // Check if user is logged in and load sent emails
   useEffect(() => {
-    const storedUser = localStorage.getItem('tauos_user');
-    const storedToken = localStorage.getItem('tauos_token');
-    
-    if (storedUser && storedToken) {
-      setUser(JSON.parse(storedUser));
-      setIsLoggedIn(true);
-      loadSentEmails();
-    } else {
-      // Redirect to landing page if not logged in
-      window.location.href = '/taumail';
-    }
-  }, []);
+    if (isLoggedIn) loadSentEmails();
+  }, [isLoggedIn, isDemo]);
 
   const loadSentEmails = async () => {
     setLoading(true);
     try {
       const token = localStorage.getItem('tauos_token');
+
+      if (isDemoSession(token)) {
+        setSentEmails(getDemoSent());
+        return;
+      }
+
       const response = await fetch('/api/taumail/emails/sent', {
         headers: {
           'Authorization': `Bearer ${token}`
@@ -61,13 +58,7 @@ export default function TauMailSent() {
     }
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem('tauos_user');
-    localStorage.removeItem('tauos_token');
-    window.location.href = '/taumail';
-  };
-
-  const filteredEmails = sentEmails.filter(email => 
+  const filteredEmails = sentEmails.filter(email =>
     email.subject?.toLowerCase().includes(searchQuery.toLowerCase()) ||
     email.recipient_email?.toLowerCase().includes(searchQuery.toLowerCase()) ||
     email.body?.toLowerCase().includes(searchQuery.toLowerCase())
@@ -80,11 +71,12 @@ export default function TauMailSent() {
       title="Tau Mail"
       subtitle="Sent mail"
       userLabel={user?.email}
-      onLogout={handleLogout}
+      onLogout={logout}
       loading={!isLoggedIn}
       
     >
       <TauMailSubNav />
+      {isDemo && <TauMailDemoBanner />}
       {/* Sent Items Header */}
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center space-x-4">

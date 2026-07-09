@@ -12,34 +12,34 @@ import {
   RefreshCw, ChevronLeft
 } from 'lucide-react';
 import Link from 'next/link';
+import TauMailDemoBanner from '@/components/apps/TauMailDemoBanner';
+import { useTauMailSession } from '@/hooks/useTauMailSession';
+import { isDemoSession, mapDemoInboxForList } from '@/lib/taumail-demo';
 
 export default function TauMailInbox() {
-  const [user, setUser] = useState(null);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const { user, isLoggedIn, isDemo, logout } = useTauMailSession();
   const [emails, setEmails] = useState([]);
   const [loading, setLoading] = useState(false);
   const [selectedEmail, setSelectedEmail] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
 
-  // Check if user is logged in and load emails
+  // Load emails once session is ready
   useEffect(() => {
-    const storedUser = localStorage.getItem('tauos_user');
-    const storedToken = localStorage.getItem('tauos_token');
-    
-    if (storedUser && storedToken) {
-      setUser(JSON.parse(storedUser));
-      setIsLoggedIn(true);
+    if (isLoggedIn) {
       loadEmails();
-    } else {
-      // Redirect to landing page if not logged in
-      window.location.href = '/taumail';
     }
-  }, []);
+  }, [isLoggedIn, isDemo]);
 
   const loadEmails = async () => {
     setLoading(true);
     try {
       const token = localStorage.getItem('tauos_token');
+
+      if (isDemoSession(token)) {
+        setEmails(mapDemoInboxForList());
+        return;
+      }
+
       const response = await fetch('/api/taumail/emails/inbox', {
         headers: {
           'Authorization': `Bearer ${token}`
@@ -110,13 +110,14 @@ export default function TauMailInbox() {
     }
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem('tauos_user');
-    localStorage.removeItem('tauos_token');
-    window.location.href = '/taumail';
-  };
+  const markAsRead = async (emailId: number) => {
+    if (isDemo) {
+      setEmails((prev) =>
+        prev.map((email) => (email.id === emailId ? { ...email, unread: false } : email))
+      );
+      return;
+    }
 
-  const markAsRead = async (emailId) => {
     try {
       const token = localStorage.getItem('tauos_token');
       const response = await fetch('/api/taumail/emails/mark-read', {
@@ -153,11 +154,12 @@ export default function TauMailInbox() {
       title="Tau Mail"
       subtitle="Inbox"
       userLabel={user?.email}
-      onLogout={handleLogout}
+      onLogout={logout}
       loading={!isLoggedIn}
       
     >
       <TauMailSubNav />
+      {isDemo && <TauMailDemoBanner />}
       {/* Inbox Header */}
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center space-x-4">
@@ -312,7 +314,9 @@ export default function TauMailInbox() {
               </div>
 
               <div className="border-t border-gray-800 pt-4">
-                <p className="text-gray-300 leading-relaxed">{selectedEmail.preview}</p>
+                <p className="text-gray-300 leading-relaxed whitespace-pre-wrap">
+                  {selectedEmail.body || selectedEmail.preview}
+                </p>
               </div>
 
               <div className="flex space-x-3 pt-4">

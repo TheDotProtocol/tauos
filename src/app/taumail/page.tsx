@@ -1,19 +1,46 @@
 'use client';
-// Force rebuild - Backend URL updated to production Vercel deployment
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { 
   Mail, Shield, Lock, Eye, CheckCircle, AlertCircle, 
   ArrowRight, Users, Globe, Zap, Star, ArrowLeft,
-  Monitor, Laptop, Smartphone as Mobile, Download
+  Monitor, Laptop, Smartphone as Mobile, Download, Server
 } from 'lucide-react';
 import Link from 'next/link';
 import AppShell from '@/components/apps/AppShell';
+import { DEFAULT_MAIL_DOMAIN } from '@/config/mail-domains';
+import {
+  DEMO_CREDENTIALS,
+  isDemoLogin,
+  isDemoModeEnabled,
+  startDemoSession,
+} from '@/lib/taumail-demo';
+
+type MailDomainOption = {
+  domain: string;
+  label: string;
+  organization: string;
+  mxHost: string;
+  comingSoon?: boolean;
+};
+
+type ServerStatus = {
+  ok: boolean;
+  transport: string;
+  host?: string;
+  port?: number;
+  error?: string;
+  domains?: string[];
+  node?: string;
+};
 
 export default function TauMailLanding() {
   const [showRegistration, setShowRegistration] = useState(false);
   const [showLogin, setShowLogin] = useState(false);
+  const [domains, setDomains] = useState<MailDomainOption[]>([]);
+  const [selectedDomain, setSelectedDomain] = useState<string>(DEFAULT_MAIL_DOMAIN);
+  const [serverStatus, setServerStatus] = useState<ServerStatus | null>(null);
   const [registrationData, setRegistrationData] = useState({
     email: '',
     password: '',
@@ -24,6 +51,23 @@ export default function TauMailLanding() {
     email: '',
     password: ''
   });
+
+  useEffect(() => {
+    fetch('/api/taumail/domains')
+      .then((r) => r.json())
+      .then((data) => {
+        if (data.domains?.length) {
+          setDomains(data.domains);
+          setSelectedDomain(data.defaultDomain || DEFAULT_MAIL_DOMAIN);
+        }
+      })
+      .catch(() => {});
+
+    fetch('/api/taumail/server/status')
+      .then((r) => r.json())
+      .then(setServerStatus)
+      .catch(() => setServerStatus({ ok: false, transport: 'unknown', error: 'Unreachable' }));
+  }, []);
 
   const features = [
     {
@@ -79,7 +123,12 @@ export default function TauMailLanding() {
     }
   ];
 
-  const handleRegistration = async (e) => {
+  const handleDemoPreview = () => {
+    startDemoSession();
+    window.location.href = '/taumail/inbox';
+  };
+
+  const handleRegistration = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
         const response = await fetch('/api/taumail/auth/register', {
@@ -89,7 +138,8 @@ export default function TauMailLanding() {
         },
         body: JSON.stringify({
           ...registrationData,
-          email: `${registrationData.username}@tauos.org`
+          domain: selectedDomain,
+          email: `${registrationData.username}@${selectedDomain}`
         })
       });
       const result = await response.json();
@@ -109,8 +159,15 @@ export default function TauMailLanding() {
     }
   };
 
-  const handleLogin = async (e) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (isDemoLogin(loginData.email, loginData.password)) {
+      startDemoSession();
+      window.location.href = '/taumail/inbox';
+      return;
+    }
+
     try {
         const response = await fetch('/api/taumail/auth/login', {
         method: 'POST',
@@ -139,17 +196,54 @@ export default function TauMailLanding() {
   return (
     <AppShell
       title="Tau Mail"
-      subtitle="Private email with zero tracking. Built for @tauos.org and taumail.org addresses."
+      subtitle="Private email on the TAU CORE™ phone mail node — 5 hosted domains, zero tracking."
       variant="marketing"
     >
+      {/* Auth bar — always visible (no motion) so CTAs never stay hidden at opacity:0 */}
+      <div className="sticky top-16 z-40 border-b border-yellow-400/20 bg-black/95 backdrop-blur-md">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-col sm:flex-row gap-3 justify-center items-center">
+          {isDemoModeEnabled() && (
+            <button
+              type="button"
+              onClick={handleDemoPreview}
+              className="w-full sm:w-auto bg-gradient-to-r from-yellow-400 to-orange-500 text-black px-6 py-3 rounded-xl font-semibold hover:shadow-lg hover:shadow-yellow-400/25 transition-all flex items-center justify-center gap-2"
+            >
+              Preview email UI
+              <ArrowRight className="w-4 h-4" />
+            </button>
+          )}
+          <button
+            type="button"
+            onClick={() => setShowRegistration(true)}
+            className="w-full sm:w-auto bg-gradient-to-r from-yellow-400 to-orange-500 text-black px-6 py-3 rounded-xl font-semibold hover:shadow-lg hover:shadow-yellow-400/25 transition-all"
+          >
+            Create your email
+          </button>
+          <button
+            type="button"
+            onClick={() => setShowLogin(true)}
+            className="w-full sm:w-auto border border-gray-500 text-white px-6 py-3 rounded-xl font-semibold hover:bg-gray-800/50 transition-all"
+          >
+            Sign In
+          </button>
+        </div>
+        {isDemoModeEnabled() && (
+          <p className="text-center text-xs text-gray-500 pb-3 px-4">
+            Dev preview:{' '}
+            <span className="font-mono text-yellow-400/80">{DEMO_CREDENTIALS.email}</span>
+            {' / '}
+            <span className="font-mono text-yellow-400/80">{DEMO_CREDENTIALS.password}</span>
+          </p>
+        )}
+      </div>
+
       {/* Hero Section */}
       <section className="py-12 md:py-20 bg-gradient-to-b from-[#050505] to-black border-b border-white/5">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <motion.div
-              initial={{ opacity: 0, y: 30 }}
+              initial={false}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8 }}
-            className="text-center mb-16"
+              className="text-center mb-16"
           >
             <h1 className="text-5xl md:text-7xl font-bold mb-6">
               <span className="bg-gradient-to-r from-[#FFF0B3] via-primary to-[#FFD700] bg-clip-text text-transparent">
@@ -159,46 +253,37 @@ export default function TauMailLanding() {
             <p className="text-xl md:text-2xl text-gray-300 max-w-4xl mx-auto leading-relaxed">
               Private email that puts you in control. <span className="text-yellow-400 font-semibold">End-to-end encryption, zero tracking, and complete privacy by design</span>.
               <br />
-              <span className="text-lg text-gray-400">@tauos.org Email • 100% Encrypted • Zero Data Access</span>
+              <span className="text-lg text-gray-400">5 hosted domains • Phone mail server • Zero data access</span>
             </p>
-          </motion.div>
 
-          <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.8, delay: 0.2 }}
-            className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-16"
-          >
-            <button
-              onClick={() => setShowRegistration(true)}
-              className="bg-gradient-to-r from-yellow-400 to-orange-500 text-black px-8 py-4 rounded-xl font-semibold text-lg hover:shadow-lg hover:shadow-yellow-400/25 transition-all duration-200 flex items-center"
-            >
-              Get @tauos.org Email
-              <ArrowRight className="w-5 h-5 ml-2" />
-            </button>
-            <button
-              onClick={() => setShowLogin(true)}
-              className="border border-gray-600 text-white px-8 py-4 rounded-xl font-semibold text-lg hover:bg-gray-800/50 transition-all duration-200"
-            >
-              Sign In
-            </button>
+            {serverStatus && (
+              <div
+                className="mt-6 inline-flex items-center gap-2 px-4 py-2 rounded-full border text-sm"
+                style={{
+                  borderColor: serverStatus.ok ? 'rgba(34,197,94,0.4)' : 'rgba(239,68,68,0.4)',
+                  backgroundColor: serverStatus.ok ? 'rgba(34,197,94,0.1)' : 'rgba(239,68,68,0.1)',
+                }}
+              >
+                <Server className={`w-4 h-4 ${serverStatus.ok ? 'text-green-400' : 'text-red-400'}`} />
+                <span className={serverStatus.ok ? 'text-green-300' : 'text-red-300'}>
+                  Mail node: {serverStatus.ok ? 'online' : 'offline'}
+                  {serverStatus.host && ` (${serverStatus.transport} @ ${serverStatus.host}:${serverStatus.port})`}
+                </span>
+              </div>
+            )}
           </motion.div>
 
           {/* Download Section */}
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={false}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.4 }}
-            className="text-center mb-16"
+            className="text-center mb-16 mt-8"
           >
             <h2 className="text-3xl font-bold text-white mb-8">Download TauMail</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto">
               {downloadOptions.map((option, index) => (
-                <motion.div
+                <div
                   key={index}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.8, delay: 0.5 + index * 0.1 }}
                   className="p-6 bg-gray-900/30 backdrop-blur-sm border border-gray-800 rounded-2xl hover:border-yellow-400/30 transition-all duration-300"
                 >
                   <div className="w-12 h-12 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-xl flex items-center justify-center mx-auto mb-4">
@@ -216,7 +301,7 @@ export default function TauMailLanding() {
                   >
                     {option.comingSoon ? 'Coming Soon' : 'Download'}
                 </button>
-              </motion.div>
+              </div>
               ))}
           </div>
             <p className="text-gray-400 mt-6 text-sm">
@@ -225,9 +310,8 @@ export default function TauMailLanding() {
           </motion.div>
 
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={false}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.6 }}
             className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto"
           >
             <div className="text-center">
@@ -246,13 +330,42 @@ export default function TauMailLanding() {
         </div>
       </section>
 
+      {/* Hosted Domains */}
+      <section className="py-12 px-4 sm:px-6 lg:px-8 border-b border-white/5">
+        <div className="max-w-5xl mx-auto">
+          <h2 className="text-2xl font-bold text-white text-center mb-8">Hosted domains</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {(domains.length ? domains : [{ domain: 'tauos.org', label: 'Tau OS', organization: 'Tau Core Inc.', mxHost: 'mail.tauos.org' }]).map((d) => (
+              <div
+                key={d.domain}
+                className={`p-4 bg-gray-900/40 border rounded-xl transition-colors ${
+                  d.comingSoon ? 'border-gray-800/80 opacity-75' : 'border-gray-800 hover:border-yellow-400/30'
+                }`}
+              >
+                <div className="flex items-center justify-between gap-2">
+                  <div className="text-yellow-400 font-mono text-sm">@{d.domain}</div>
+                  {d.comingSoon && (
+                    <span className="text-[10px] uppercase tracking-wide px-2 py-0.5 rounded-full bg-gray-800 text-gray-400">
+                      Coming soon
+                    </span>
+                  )}
+                </div>
+                <div className="text-white font-semibold mt-1">{d.label}</div>
+                <div className="text-gray-500 text-xs mt-1">{d.organization}</div>
+                <div className="text-gray-600 text-xs mt-2">MX: {d.mxHost}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* Features Section */}
       <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gray-900/30">
         <div className="max-w-7xl mx-auto">
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={false}
             whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
+            viewport={{ once: true }}
             className="text-center mb-16"
           >
             <h2 className="text-4xl font-bold text-white mb-6">
@@ -265,11 +378,8 @@ export default function TauMailLanding() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {features.map((feature, index) => (
-              <motion.div
+              <div
                 key={index}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, delay: index * 0.1 }}
                 className="p-6 bg-gray-900/30 backdrop-blur-sm border border-gray-800 rounded-2xl hover:border-yellow-400/30 transition-all duration-300"
               >
                 <div className="w-12 h-12 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-xl flex items-center justify-center mb-4">
@@ -277,7 +387,7 @@ export default function TauMailLanding() {
                 </div>
                 <h3 className="text-xl font-bold text-white mb-3">{feature.title}</h3>
                 <p className="text-gray-400">{feature.description}</p>
-              </motion.div>
+              </div>
             ))}
           </div>
         </div>
@@ -285,14 +395,12 @@ export default function TauMailLanding() {
 
       {/* Registration Modal */}
       {showRegistration && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-              <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-[100]">
+              <div
             className="bg-gray-900 border border-gray-800 rounded-2xl p-8 w-full max-w-md"
           >
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-bold text-white">Get Your @tauos.org Email</h2>
+              <h2 className="text-2xl font-bold text-white">Create your email</h2>
               <button
                 onClick={() => setShowRegistration(false)}
                 className="text-gray-400 hover:text-white"
@@ -302,6 +410,23 @@ export default function TauMailLanding() {
             </div>
             
             <form onSubmit={handleRegistration} className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">
+                  Domain
+                </label>
+                <select
+                  value={selectedDomain}
+                  onChange={(e) => setSelectedDomain(e.target.value)}
+                  className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white focus:outline-none focus:border-yellow-400"
+                >
+                  {(domains.length ? domains.filter((d) => !d.comingSoon) : [{ domain: DEFAULT_MAIL_DOMAIN, label: 'Tau OS' }]).map((d) => (
+                    <option key={d.domain} value={d.domain}>
+                      @{d.domain} — {d.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
               <div>
                 <label className="block text-sm font-medium text-gray-300 mb-2">
                   Username
@@ -315,8 +440,8 @@ export default function TauMailLanding() {
                     placeholder="yourname"
                     required
                   />
-                  <div className="px-4 py-3 bg-gray-700 border border-l-0 border-gray-700 rounded-r-lg text-gray-300">
-                    @tauos.org
+                  <div className="px-4 py-3 bg-gray-700 border border-l-0 border-gray-700 rounded-r-lg text-gray-300 whitespace-nowrap">
+                    @{selectedDomain}
                   </div>
                 </div>
               </div>
@@ -369,16 +494,14 @@ export default function TauMailLanding() {
                 Sign in
               </button>
             </p>
-          </motion.div>
+          </div>
         </div>
       )}
 
       {/* Login Modal */}
       {showLogin && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-[100]">
+          <div
             className="bg-gray-900 border border-gray-800 rounded-2xl p-8 w-full max-w-md"
           >
             <div className="flex items-center justify-between mb-6">
@@ -401,7 +524,7 @@ export default function TauMailLanding() {
                   value={loginData.email}
                   onChange={(e) => setLoginData({...loginData, email: e.target.value})}
                   className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-yellow-400"
-                  placeholder="yourname@tauos.org"
+                  placeholder="demo@tauos.org"
                   required
                 />
               </div>
@@ -427,6 +550,12 @@ export default function TauMailLanding() {
                 Sign In
               </button>
             </form>
+
+            {isDemoModeEnabled() && (
+              <p className="text-center text-xs text-gray-500 mt-3">
+                Dev preview: {DEMO_CREDENTIALS.email} / {DEMO_CREDENTIALS.password}
+              </p>
+            )}
             
             <p className="text-center text-sm text-gray-400 mt-4">
               Don't have an account?{' '}
@@ -440,7 +569,7 @@ export default function TauMailLanding() {
                 Create one
                 </button>
             </p>
-          </motion.div>
+          </div>
         </div>
       )}
 

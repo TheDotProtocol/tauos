@@ -13,11 +13,17 @@ import {
   Activity, Settings, Calendar, Clock, LogOut, User, X, AlertTriangle
 } from 'lucide-react';
 import Link from 'next/link';
+import TauMailDemoBanner from '@/components/apps/TauMailDemoBanner';
+import { useTauMailSession } from '@/hooks/useTauMailSession';
+import {
+  getDemoSent,
+  isDemoSession,
+  mapDemoInboxForList,
+} from '@/lib/taumail-demo';
 
 export default function TauMailDashboard() {
+  const { user, isLoggedIn, isDemo, logout } = useTauMailSession();
   const [activeTab, setActiveTab] = useState('inbox');
-  const [user, setUser] = useState(null);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [showComposeModal, setShowComposeModal] = useState(false);
   const [composeData, setComposeData] = useState({
     to: '',
@@ -31,27 +37,20 @@ export default function TauMailDashboard() {
   const [loading, setLoading] = useState(false);
   const [selectedEmail, setSelectedEmail] = useState(null);
 
-  // Check if user is logged in and load emails
   useEffect(() => {
-    const storedUser = localStorage.getItem('tauos_user');
-    const storedToken = localStorage.getItem('tauos_token');
-    
-    if (storedUser && storedToken) {
-      setUser(JSON.parse(storedUser));
-      setIsLoggedIn(true);
+    if (isLoggedIn) {
       loadEmails();
       loadSentEmails();
-    } else {
-      // Redirect to landing page if not logged in
-      window.location.href = '/taumail';
     }
-  }, []);
+  }, [isLoggedIn, isDemo]);
 
   const loadEmails = async () => {
     try {
       const token = localStorage.getItem('tauos_token');
-      if (!token) {
-        console.log('No token found, skipping inbox load');
+      if (!token) return;
+
+      if (isDemoSession(token)) {
+        setEmails(mapDemoInboxForList());
         return;
       }
       
@@ -114,17 +113,13 @@ export default function TauMailDashboard() {
     }
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem('tauos_user');
-    localStorage.removeItem('tauos_token');
-    window.location.href = '/taumail';
-  };
-
   const loadSentEmails = async () => {
     try {
       const token = localStorage.getItem('tauos_token');
-      if (!token) {
-        console.log('No token found, skipping sent emails load');
+      if (!token) return;
+
+      if (isDemoSession(token)) {
+        setSentEmails(getDemoSent());
         return;
       }
       
@@ -153,6 +148,15 @@ export default function TauMailDashboard() {
     
     try {
       const token = localStorage.getItem('tauos_token');
+
+      if (isDemoSession(token)) {
+        alert('✅ Preview mode — compose is UI-only in demo.');
+        setComposeData({ to: '', cc: '', bcc: '', subject: '', text: '' });
+        setShowComposeModal(false);
+        setLoading(false);
+        return;
+      }
+
       const response = await fetch('/api/taumail/emails/send', {
         method: 'POST',
         headers: {
@@ -162,7 +166,9 @@ export default function TauMailDashboard() {
         body: JSON.stringify({
           to: composeData.to,
           subject: composeData.subject,
-          text: composeData.text
+          body: composeData.text,
+          cc: composeData.cc || undefined,
+          bcc: composeData.bcc || undefined,
         })
       });
 
@@ -248,11 +254,12 @@ export default function TauMailDashboard() {
       title="Tau Mail"
       subtitle="Private email dashboard — Tau Core Inc."
       userLabel={user?.email}
-      onLogout={handleLogout}
+      onLogout={logout}
       loading={!isLoggedIn}
       
     >
       <TauMailSubNav />
+      {isDemo && <TauMailDemoBanner />}
       {/* Stats Overview */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
           <motion.div 

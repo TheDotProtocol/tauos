@@ -6,7 +6,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "mail:server": "node scripts/phone-mail-server/index.mjs",
+    "mail:setup": "node scripts/setup-mail-domains.mjs"
   },
   "dependencies": {
     "@heroicons/react": "^2.2.0",
@@ -16,6 +18,7 @@
     "@sendgrid/mail": "^8.1.6",
     "@types/bcryptjs": "^2.4.6",
     "@types/jsonwebtoken": "^9.0.10",
+    "autoprefixer": "^10.4.0",
     "bcrypt": "^6.0.0",
     "bcryptjs": "^3.0.3",
     "class-variance-authority": "^0.7.1",
@@ -25,15 +28,16 @@
     "framer-motion": "^12.23.12",
     "jsonwebtoken": "^9.0.3",
     "lucide-react": "^0.292.0",
+    "mailparser": "^3.9.14",
     "next": "^14.2.31",
     "nodemailer": "^7.0.5",
     "pg": "^8.16.3",
+    "postcss": "^8.4.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "smtp-server": "^3.19.2",
     "tailwind-merge": "^3.3.1",
     "tailwindcss": "^3.3.0",
-    "postcss": "^8.4.0",
-    "autoprefixer": "^10.4.0",
     "typescript": "^5.0.0",
     "uuid": "^13.0.0"
   },

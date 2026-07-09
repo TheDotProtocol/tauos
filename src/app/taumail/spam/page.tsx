@@ -12,34 +12,31 @@ import {
   RefreshCw, ChevronLeft, AlertTriangle
 } from 'lucide-react';
 import Link from 'next/link';
+import TauMailDemoBanner from '@/components/apps/TauMailDemoBanner';
+import { useTauMailSession } from '@/hooks/useTauMailSession';
+import { getDemoSpam, isDemoSession } from '@/lib/taumail-demo';
 
 export default function TauMailSpam() {
-  const [user, setUser] = useState(null);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const { user, isLoggedIn, isDemo, logout } = useTauMailSession();
   const [emails, setEmails] = useState([]);
   const [loading, setLoading] = useState(false);
   const [selectedEmail, setSelectedEmail] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
 
-  // Check if user is logged in and load emails
   useEffect(() => {
-    const storedUser = localStorage.getItem('tauos_user');
-    const storedToken = localStorage.getItem('tauos_token');
-    
-    if (storedUser && storedToken) {
-      setUser(JSON.parse(storedUser));
-      setIsLoggedIn(true);
-      loadSpamEmails();
-    } else {
-      // Redirect to landing page if not logged in
-      window.location.href = '/taumail';
-    }
-  }, []);
+    if (isLoggedIn) loadSpamEmails();
+  }, [isLoggedIn, isDemo]);
 
   const loadSpamEmails = async () => {
     setLoading(true);
     try {
       const token = localStorage.getItem('tauos_token');
+
+      if (isDemoSession(token)) {
+        setEmails(getDemoSpam());
+        return;
+      }
+
       const response = await fetch('/api/taumail/emails/spam', {
         headers: {
           'Authorization': `Bearer ${token}`
@@ -61,11 +58,7 @@ export default function TauMailSpam() {
     }
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem('tauos_user');
-    localStorage.removeItem('tauos_token');
-    window.location.href = '/taumail';
-  };
+  const handleLogout = () => logout();
 
   const filteredEmails = emails.filter(email => 
     email.from.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -85,6 +78,7 @@ export default function TauMailSpam() {
       
     >
       <TauMailSubNav />
+      {isDemo && <TauMailDemoBanner />}
       <div className="bg-gray-900/30 backdrop-blur-sm border border-gray-800 rounded-xl overflow-hidden">
           {/* Navigation */}
           <div className="border-b border-gray-800 bg-gray-800/50 px-6 py-4">

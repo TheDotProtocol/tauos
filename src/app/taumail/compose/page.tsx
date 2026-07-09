@@ -13,10 +13,12 @@ import {
   AlignLeft, AlignCenter, AlignRight, List
 } from 'lucide-react';
 import Link from 'next/link';
+import TauMailDemoBanner from '@/components/apps/TauMailDemoBanner';
+import { useTauMailSession } from '@/hooks/useTauMailSession';
+import { isDemoSession } from '@/lib/taumail-demo';
 
 export default function TauMailCompose() {
-  const [user, setUser] = useState(null);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const { user, isLoggedIn, isDemo, logout } = useTauMailSession();
   const [composeData, setComposeData] = useState({
     to: '',
     cc: '',
@@ -28,26 +30,20 @@ export default function TauMailCompose() {
   const [showCC, setShowCC] = useState(false);
   const [showBCC, setShowBCC] = useState(false);
 
-  // Check if user is logged in
-  useEffect(() => {
-    const storedUser = localStorage.getItem('tauos_user');
-    const storedToken = localStorage.getItem('tauos_token');
-    
-    if (storedUser && storedToken) {
-      setUser(JSON.parse(storedUser));
-      setIsLoggedIn(true);
-    } else {
-      // Redirect to landing page if not logged in
-      window.location.href = '/taumail';
-    }
-  }, []);
-
-  const handleComposeEmail = async (e) => {
+  const handleComposeEmail = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     
     try {
       const token = localStorage.getItem('tauos_token');
+
+      if (isDemoSession(token)) {
+        alert('✅ Preview mode — message saved locally (not sent).\n\nOpen Sent or Inbox to continue exploring the UI.');
+        setComposeData({ to: '', cc: '', bcc: '', subject: '', text: '' });
+        setLoading(false);
+        return;
+      }
+
       const response = await fetch('/api/taumail/emails/send', {
         method: 'POST',
         headers: {
@@ -80,11 +76,7 @@ export default function TauMailCompose() {
     }
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem('tauos_user');
-    localStorage.removeItem('tauos_token');
-    window.location.href = '/taumail';
-  };
+  const handleLogout = () => logout();
 
   
 
@@ -98,6 +90,7 @@ export default function TauMailCompose() {
       
     >
       <TauMailSubNav />
+      {isDemo && <TauMailDemoBanner />}
       {/* Compose Header */}
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center space-x-4">

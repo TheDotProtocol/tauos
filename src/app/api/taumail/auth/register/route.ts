@@ -3,6 +3,12 @@ import { NextRequest, NextResponse } from 'next/server';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { trackMetrics } from '../../../middleware/metrics';
+import {
+  DEFAULT_MAIL_DOMAIN,
+  isAllowedMailDomain,
+  isRegisterableMailDomain,
+  parseEmailAddress,
+} from '@/config/mail-domains';
 
 // Database connection - production ready with enhanced error handling
 
@@ -71,10 +77,37 @@ export async function POST(request: NextRequest) {
       }, { status: 429 });
     }
 
-    const { email, password, username, fullName } = await request.json();
+    const { email, password, username, fullName, domain: domainInput } = await request.json();
+
+    const sanitizedUsername = username?.toLowerCase().trim();
+    const sanitizedFullName = fullName?.trim();
+    const resolvedDomain = (domainInput || DEFAULT_MAIL_DOMAIN).toLowerCase().trim();
+    const sanitizedEmail =
+      email?.includes('@')
+        ? email.toLowerCase().trim()
+        : `${sanitizedUsername}@${resolvedDomain}`;
+
+    if (!isRegisterableMailDomain(resolvedDomain)) {
+      return NextResponse.json(
+        { error: `Registration is not yet open for @${resolvedDomain}` },
+        { status: 400 }
+      );
+    }
+
+    if (!isAllowedMailDomain(resolvedDomain)) {
+      return NextResponse.json({ error: 'Mail domain is not supported' }, { status: 400 });
+    }
+
+    const parsed = parseEmailAddress(sanitizedEmail);
+    if (!parsed || parsed.domain !== resolvedDomain) {
+      return NextResponse.json(
+        { error: `Email must use @${resolvedDomain}` },
+        { status: 400 }
+      );
+    }
 
     // Input validation
-    const validationErrors = validateInput(email, password, username, fullName);
+    const validationErrors = validateInput(sanitizedEmail, password, sanitizedUsername, sanitizedFullName);
     if (validationErrors.length > 0) {
       return NextResponse.json({ 
         error: 'Validation failed', 
@@ -82,10 +115,7 @@ export async function POST(request: NextRequest) {
       }, { status: 400 });
     }
 
-    // Sanitize inputs
-    const sanitizedEmail = email.toLowerCase().trim();
-    const sanitizedUsername = username.toLowerCase().trim();
-    const sanitizedFullName = fullName.trim();
+    // Sanitize inputs (username/fullName already sanitized above)
 
     // Check if user already exists
     const existingUser = await getPool().query(
@@ -104,7 +134,7 @@ export async function POST(request: NextRequest) {
     // Get default organization ID
     const orgResult = await getPool().query(
       'SELECT id FROM organizations WHERE domain = $1 LIMIT 1',
-      ['tauos.org']
+      [resolvedDomain]
     );
     
     if (orgResult.rows.length === 0) {

@@ -12,34 +12,28 @@ import {
   RefreshCw, ChevronLeft, Edit, Save
 } from 'lucide-react';
 import Link from 'next/link';
+import TauMailDemoBanner from '@/components/apps/TauMailDemoBanner';
+import { useTauMailSession } from '@/hooks/useTauMailSession';
+import { getDemoDrafts, isDemoSession } from '@/lib/taumail-demo';
 
 export default function TauMailDrafts() {
-  const [user, setUser] = useState(null);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const { user, isLoggedIn, isDemo, logout } = useTauMailSession();
   const [drafts, setDrafts] = useState([]);
   const [loading, setLoading] = useState(false);
   const [selectedDraft, setSelectedDraft] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
 
-  // Check if user is logged in and load drafts
   useEffect(() => {
-    const storedUser = localStorage.getItem('tauos_user');
-    const storedToken = localStorage.getItem('tauos_token');
-    
-    if (storedUser && storedToken) {
-      setUser(JSON.parse(storedUser));
-      setIsLoggedIn(true);
-      loadDrafts();
-    } else {
-      // Redirect to landing page if not logged in
-      window.location.href = '/taumail';
-    }
-  }, []);
+    if (isLoggedIn) loadDrafts();
+  }, [isLoggedIn, isDemo]);
 
   const loadDrafts = async () => {
     setLoading(true);
     try {
-      // For now, load from localStorage (in a real app, this would be from the backend)
+      if (isDemoSession(localStorage.getItem('tauos_token'))) {
+        setDrafts(getDemoDrafts());
+        return;
+      }
       const savedDrafts = localStorage.getItem('tauos_drafts');
       if (savedDrafts) {
         setDrafts(JSON.parse(savedDrafts));
@@ -72,11 +66,7 @@ export default function TauMailDrafts() {
     }
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem('tauos_user');
-    localStorage.removeItem('tauos_token');
-    window.location.href = '/taumail';
-  };
+  const handleLogout = () => logout();
 
   const handleEditDraft = (draft) => {
     // Navigate to compose with draft data
@@ -115,6 +105,7 @@ export default function TauMailDrafts() {
       
     >
       <TauMailSubNav />
+      {isDemo && <TauMailDemoBanner />}
       {/* Drafts Header */}
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center space-x-4">

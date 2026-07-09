@@ -12,34 +12,28 @@ import {
   RefreshCw, ChevronLeft, RotateCcw, Trash
 } from 'lucide-react';
 import Link from 'next/link';
+import TauMailDemoBanner from '@/components/apps/TauMailDemoBanner';
+import { useTauMailSession } from '@/hooks/useTauMailSession';
+import { getDemoTrash, isDemoSession } from '@/lib/taumail-demo';
 
 export default function TauMailTrash() {
-  const [user, setUser] = useState(null);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const { user, isLoggedIn, isDemo, logout } = useTauMailSession();
   const [trashEmails, setTrashEmails] = useState([]);
   const [loading, setLoading] = useState(false);
   const [selectedEmail, setSelectedEmail] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
 
-  // Check if user is logged in and load trash emails
   useEffect(() => {
-    const storedUser = localStorage.getItem('tauos_user');
-    const storedToken = localStorage.getItem('tauos_token');
-    
-    if (storedUser && storedToken) {
-      setUser(JSON.parse(storedUser));
-      setIsLoggedIn(true);
-      loadTrashEmails();
-    } else {
-      // Redirect to landing page if not logged in
-      window.location.href = '/taumail';
-    }
-  }, []);
+    if (isLoggedIn) loadTrashEmails();
+  }, [isLoggedIn, isDemo]);
 
   const loadTrashEmails = async () => {
     setLoading(true);
     try {
-      // For now, load from localStorage (in a real app, this would be from the backend)
+      if (isDemoSession(localStorage.getItem('tauos_token'))) {
+        setTrashEmails(getDemoTrash());
+        return;
+      }
       const savedTrash = localStorage.getItem('tauos_trash');
       if (savedTrash) {
         setTrashEmails(JSON.parse(savedTrash));
@@ -76,11 +70,7 @@ export default function TauMailTrash() {
     }
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem('tauos_user');
-    localStorage.removeItem('tauos_token');
-    window.location.href = '/taumail';
-  };
+  const handleLogout = () => logout();
 
   const handleRestoreEmail = (emailId) => {
     const updatedTrash = trashEmails.filter(email => email.id !== emailId);
@@ -122,6 +112,7 @@ export default function TauMailTrash() {
       
     >
       <TauMailSubNav />
+      {isDemo && <TauMailDemoBanner />}
       {/* Trash Header */}
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center space-x-4">
