@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
+import MarketingPageShell from '@/components/marketing/MarketingPageShell';
 import { Activity, Database, Server, AlertTriangle, CheckCircle, Clock, Cpu, HardDrive, Globe } from 'lucide-react';
 
 interface AppMetrics {
@@ -93,52 +94,53 @@ export default function MonitoringPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-900 flex items-center justify-center">
-        <div className="text-center">
-          <Activity className="w-12 h-12 text-blue-500 animate-pulse mx-auto mb-4" />
-          <p className="text-gray-300">Loading monitoring data...</p>
+      <MarketingPageShell title="Platform Monitoring" subtitle="Live health metrics for TAU CORE™ services." hero={false}>
+        <div className="flex min-h-[50vh] items-center justify-center">
+          <div className="text-center">
+            <Activity className="w-12 h-12 text-yellow-400 animate-pulse mx-auto mb-4" />
+            <p className="text-gray-300">Loading monitoring data...</p>
+          </div>
         </div>
-      </div>
+      </MarketingPageShell>
     );
   }
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gray-900 flex items-center justify-center">
-        <div className="text-center">
-          <AlertTriangle className="w-12 h-12 text-red-500 mx-auto mb-4" />
-          <p className="text-red-300">Error: {error}</p>
+      <MarketingPageShell title="Platform Monitoring" subtitle="Live health metrics for TAU CORE™ services." hero={false}>
+        <div className="flex min-h-[50vh] items-center justify-center">
+          <div className="text-center">
+            <AlertTriangle className="w-12 h-12 text-red-500 mx-auto mb-4" />
+            <p className="text-red-300">Error: {error}</p>
+          </div>
         </div>
-      </div>
+      </MarketingPageShell>
     );
   }
 
   if (!health) return null;
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white">
-      {/* Header */}
-      <div className="bg-gray-800 border-b border-gray-700">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            <div className="flex items-center">
-              <Activity className="w-8 h-8 text-blue-500 mr-3" />
-              <h1 className="text-2xl font-bold">TauCore™ System Monitoring</h1>
+    <MarketingPageShell title="Platform Monitoring" subtitle="Live health metrics for TAU CORE™ services." hero={false}>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="mb-8 flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-gray-800 bg-gray-900/30 p-4">
+          <div className="flex items-center gap-3">
+            <Activity className="w-8 h-8 text-yellow-400" />
+            <div>
+              <h2 className="text-lg font-semibold text-white">System status</h2>
+              <p className="text-sm text-gray-400">Refreshes every 5 seconds</p>
             </div>
-            <div className="flex items-center space-x-4">
-              <div className={`flex items-center ${getStatusColor(health.status)}`}>
-                {getStatusIcon(health.status)}
-                <span className="ml-2 font-medium capitalize">{health.status}</span>
-              </div>
-              <div className="text-sm text-gray-400">
-                Last updated: {new Date().toLocaleTimeString()}
-              </div>
+          </div>
+          <div className="flex items-center gap-4">
+            <div className={`flex items-center ${getStatusColor(health.status)}`}>
+              {getStatusIcon(health.status)}
+              <span className="ml-2 font-medium capitalize">{health.status}</span>
+            </div>
+            <div className="text-sm text-gray-400">
+              Last updated: {new Date().toLocaleTimeString()}
             </div>
           </div>
         </div>
-      </div>
-
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* System Overview */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -322,6 +324,6 @@ export default function MonitoringPage() {
           </div>
         </motion.div>
       </div>
-    </div>
+    </MarketingPageShell>
   );
 }

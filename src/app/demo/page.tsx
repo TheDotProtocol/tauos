@@ -2,6 +2,8 @@
 
 import React, { useState } from "react";
 import { motion } from "framer-motion";
+import MarketingPageShell from "@/components/marketing/MarketingPageShell";
+import Logo from "@/components/marketing/Logo";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
@@ -32,21 +34,12 @@ export default function DemoPage() {
   };
 
   return (
-    <div className="min-h-screen bg-tau-dark-900 p-8">
-      <div className="max-w-6xl mx-auto">
-        {/* Header */}
-        <motion.div
-          className="text-center mb-12"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-        >
-          <div className="w-20 h-20 bg-tau-gradient rounded-2xl flex items-center justify-center mx-auto mb-6">
-            <span className="text-tau-dark-900 font-bold text-3xl">τ</span>
-          </div>
-          <h1 className="text-4xl font-bold text-white mb-4">TauOS UI Components</h1>
-          <p className="text-gray-400 text-lg">World-class design system for privacy-first applications</p>
-        </motion.div>
-
+    <MarketingPageShell
+      title="UI Components"
+      subtitle="TAU CORE™ design system preview for buttons, inputs, cards, and patterns."
+      hero={false}
+    >
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {/* Buttons Section */}
         <motion.section
           className="mb-12"
@@ -182,10 +175,8 @@ export default function DemoPage() {
           <Card className="p-6">
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center space-x-3">
-                <div className="w-8 h-8 bg-tau-gradient rounded-lg flex items-center justify-center">
-                  <span className="text-tau-dark-900 font-bold">τ</span>
-                </div>
-                <h3 className="text-xl font-semibold text-white">TauMail</h3>
+                <Logo showWordmark={false} href={null} size="sm" />
+                <h3 className="text-xl font-semibold text-white">Tau Mail</h3>
               </div>
               <Button variant="primary" icon={<Plus className="w-4 h-4" />}>
                 Compose
@@ -194,8 +185,8 @@ export default function DemoPage() {
             
             <div className="space-y-3">
               {/* Email Item */}
-              <div className="flex items-center space-x-4 p-4 bg-tau-dark-700 rounded-lg hover:bg-tau-dark-600 transition-colors">
-                <Star className="w-4 h-4 text-tau-primary" />
+              <div className="flex items-center space-x-4 p-4 bg-gray-900/50 border border-gray-800 rounded-lg hover:border-yellow-400/30 transition-colors">
+                <Star className="w-4 h-4 text-yellow-400" />
                 <div className="flex-1">
                   <div className="flex items-center justify-between mb-1">
                     <span className="text-white font-medium">john.doe@company.com</span>
@@ -205,17 +196,17 @@ export default function DemoPage() {
                   <p className="text-gray-400 text-sm">Hi team, I wanted to share our progress on the Q4 objectives...</p>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <button className="p-1 hover:bg-tau-dark-600 rounded-full transition-colors">
+                  <button className="p-1 hover:bg-gray-800 rounded-full transition-colors">
                     <Archive className="w-4 h-4 text-gray-400" />
                   </button>
-                  <button className="p-1 hover:bg-tau-dark-600 rounded-full transition-colors">
+                  <button className="p-1 hover:bg-gray-800 rounded-full transition-colors">
                     <Trash2 className="w-4 h-4 text-gray-400" />
                   </button>
                 </div>
               </div>
               
               {/* Email Item */}
-              <div className="flex items-center space-x-4 p-4 bg-tau-dark-700 rounded-lg hover:bg-tau-dark-600 transition-colors">
+              <div className="flex items-center space-x-4 p-4 bg-gray-900/50 border border-gray-800 rounded-lg hover:border-yellow-400/30 transition-colors">
                 <Star className="w-4 h-4 text-gray-400" />
                 <div className="flex-1">
                   <div className="flex items-center justify-between mb-1">
@@ -226,10 +217,10 @@ export default function DemoPage() {
                   <p className="text-gray-400 text-sm">Welcome to your new privacy-first email experience...</p>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <button className="p-1 hover:bg-tau-dark-600 rounded-full transition-colors">
+                  <button className="p-1 hover:bg-gray-800 rounded-full transition-colors">
                     <Archive className="w-4 h-4 text-gray-400" />
                   </button>
-                  <button className="p-1 hover:bg-tau-dark-600 rounded-full transition-colors">
+                  <button className="p-1 hover:bg-gray-800 rounded-full transition-colors">
                     <Trash2 className="w-4 h-4 text-gray-400" />
                   </button>
                 </div>
@@ -249,7 +240,7 @@ export default function DemoPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <Card variant="glass">
               <div className="flex items-center space-x-3 mb-4">
-                <Shield className="w-6 h-6 text-tau-primary" />
+                <Shield className="w-6 h-6 text-yellow-400" />
                 <h3 className="text-lg font-semibold text-white">End-to-End Encryption</h3>
               </div>
               <p className="text-gray-400">All emails are encrypted by default, ensuring your privacy is protected.</p>
@@ -257,7 +248,7 @@ export default function DemoPage() {
             
             <Card variant="glass">
               <div className="flex items-center space-x-3 mb-4">
-                <Lock className="w-6 h-6 text-tau-primary" />
+                <Lock className="w-6 h-6 text-yellow-400" />
                 <h3 className="text-lg font-semibold text-white">Zero Tracking</h3>
               </div>
               <p className="text-gray-400">No telemetry, no tracking, no compromises. Your data stays yours.</p>
@@ -288,6 +279,6 @@ export default function DemoPage() {
           </Card>
         </motion.section>
       </div>
-    </div>
+    </MarketingPageShell>
   );
-} 
+}

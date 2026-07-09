@@ -1,74 +1,72 @@
-import React from 'react';
-import Link from 'next/link';
+'use client';
+
+import MarketingPageShell from '@/components/marketing/MarketingPageShell';
+import { motion } from 'framer-motion';
 import { Shield, Database, Lock, Eye } from 'lucide-react';
 
-export default function DataProtection() {
+export default function DataProtectionPage() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
-      <header className="bg-black/20 backdrop-blur-md border-b border-white/10">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-6">
-            <Link href="/" className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-xl">τ</span>
-              </div>
-              <span className="text-white text-xl font-bold">TauCore™</span>
-            </Link>
-          </div>
-        </div>
-      </header>
-
-      <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="bg-white/5 backdrop-blur-md rounded-2xl border border-white/10 p-8">
-          <div className="flex items-center space-x-3 mb-8">
-            <Shield className="w-8 h-8 text-purple-400" />
-            <h1 className="text-4xl font-bold text-white">Data Protection Addendum</h1>
-          </div>
-          
-          <div className="space-y-8">
+    <MarketingPageShell
+      title="Data Protection Addendum"
+      subtitle="How Tau Core Inc. processes data under GDPR and enterprise agreements."
+    >
+      <section className="py-16 bg-black">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="p-8 md:p-10 bg-gray-900/30 backdrop-blur-sm border border-gray-800 rounded-2xl space-y-10"
+          >
             <section>
-              <h2 className="text-2xl font-semibold text-white mb-4 flex items-center">
-                <Database className="w-6 h-6 text-purple-400 mr-3" />
+              <h2 className="text-2xl font-semibold text-white mb-4 flex items-center gap-3">
+                <Database className="w-6 h-6 text-yellow-400" />
                 GDPR Compliance
               </h2>
-              <p className="text-white/80 leading-relaxed">
-                TauCore™ is fully compliant with the General Data Protection Regulation (GDPR). We implement 
-                privacy by design principles and provide you with complete control over your personal data.
+              <p className="text-gray-300 leading-relaxed">
+                TAU CORE™ is built with privacy by design. Tau Core Inc. implements GDPR-aligned
+                controls and gives users meaningful control over personal data across Mail, Cloud,
+                and Identity services.
               </p>
             </section>
 
             <section>
-              <h2 className="text-2xl font-semibold text-white mb-4 flex items-center">
-                <Lock className="w-6 h-6 text-purple-400 mr-3" />
+              <h2 className="text-2xl font-semibold text-white mb-4 flex items-center gap-3">
+                <Lock className="w-6 h-6 text-yellow-400" />
                 Data Processing
               </h2>
-              <p className="text-white/80 leading-relaxed">
-                We process your data only for the purposes of providing our services. All data is encrypted 
-                in transit and at rest, and we never share your personal information with third parties.
+              <p className="text-gray-300 leading-relaxed">
+                We process data only to deliver the services you request. Data is encrypted in
+                transit and at rest. We do not sell personal information to third parties.
               </p>
             </section>
 
             <section>
-              <h2 className="text-2xl font-semibold text-white mb-4 flex items-center">
-                <Eye className="w-6 h-6 text-purple-400 mr-3" />
+              <h2 className="text-2xl font-semibold text-white mb-4 flex items-center gap-3">
+                <Eye className="w-6 h-6 text-yellow-400" />
                 Your Rights
               </h2>
-              <p className="text-white/80 leading-relaxed">
-                Under GDPR, you have the right to access, rectify, erase, restrict, port, and object to 
-                the processing of your personal data. Contact us at privacy@tauos.org to exercise these rights.
+              <p className="text-gray-300 leading-relaxed">
+                You may request access, correction, deletion, restriction, portability, or objection
+                to processing. Contact{' '}
+                <a href="mailto:privacy@tauos.org" className="text-yellow-400 hover:underline">
+                  privacy@tauos.org
+                </a>{' '}
+                to exercise these rights.
               </p>
             </section>
-          </div>
-        </div>
-      </main>
 
-      <footer className="bg-black/20 backdrop-blur-md border-t border-white/10 mt-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-          <div className="text-center">
-            <p className="text-white/60 text-sm">© 2025 TauCore™. All rights reserved.</p>
-          </div>
+            <section className="pt-4 border-t border-gray-800">
+              <div className="flex items-start gap-3">
+                <Shield className="w-5 h-5 text-yellow-400 mt-0.5 shrink-0" />
+                <p className="text-sm text-gray-400">
+                  © 2026 Tau Foundation &amp; Tau LLC, a Unit of AR Holdings Group Corporation.
+                  All Rights Reserved.
+                </p>
+              </div>
+            </section>
+          </motion.div>
         </div>
-      </footer>
-    </div>
+      </section>
+    </MarketingPageShell>
   );
 }

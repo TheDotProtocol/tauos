@@ -1,5 +1,6 @@
 'use client';
 
+import MarketingPageShell from '@/components/marketing/MarketingPageShell';
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { 
@@ -278,33 +279,11 @@ export default function SecurityDashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-black text-white">
-      {/* Header */}
-      <header className="bg-gray-900/50 backdrop-blur-xl border-b border-gray-800">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            <div className="flex items-center space-x-4">
-              <img src="/brand/tauos-logo.svg" alt="TauOS" className="w-10 h-10" />
-              <div>
-                <h1 className="text-xl font-bold text-white">TauOS Security</h1>
-                <p className="text-sm text-gray-400">Compliance & Risk Management</p>
-              </div>
-            </div>
-            <div className="flex items-center space-x-4">
-              <button className="p-2 text-gray-400 hover:text-white transition-colors">
-                <Bell className="w-5 h-5" />
-              </button>
-              <button className="p-2 text-gray-400 hover:text-white transition-colors">
-                <Settings className="w-5 h-5" />
-              </button>
-              <div className="w-8 h-8 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full flex items-center justify-center">
-                <User className="w-4 h-4 text-black" />
-              </div>
-            </div>
-          </div>
-        </div>
-      </header>
-
+    <MarketingPageShell
+      title="Enterprise Security"
+      subtitle="Compliance, threat monitoring, and audit controls for TAU CORE™ deployments."
+      hero={false}
+    >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Security Overview Stats */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
@@ -734,6 +713,6 @@ export default function SecurityDashboard() {
           )}
         </div>
       </div>
-    </div>
+    </MarketingPageShell>
   );
 }

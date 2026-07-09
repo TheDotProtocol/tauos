@@ -1,8 +1,10 @@
 'use client';
-// TauCloud Shared File Viewer - v1.0
 
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
+import AppShell from '@/components/apps/AppShell';
+import { Button } from '@/components/ui/button';
+import Link from 'next/link';
 import { 
   Download, Share2, Eye, Lock, Clock, User, File, 
   FileImage, FileVideo, Music, FileText,
@@ -105,41 +107,42 @@ export default function SharedFileViewer({ params }) {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-black text-white flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-yellow-400 mx-auto mb-4"></div>
-          <p className="text-gray-400">Loading shared file...</p>
+      <AppShell title="Tau Cloud" subtitle="Shared file">
+        <div className="flex min-h-[50vh] items-center justify-center">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-yellow-400 mx-auto mb-4" />
+            <p className="text-gray-400">Loading shared file...</p>
+          </div>
         </div>
-      </div>
+      </AppShell>
     );
   }
 
   if (error) {
     return (
-      <div className="min-h-screen bg-black text-white flex items-center justify-center">
-        <div className="text-center">
-          <AlertCircle className="w-16 h-16 text-red-400 mx-auto mb-4" />
-          <h1 className="text-2xl font-bold text-white mb-2">File Not Available</h1>
-          <p className="text-gray-400 mb-6">{error}</p>
-          <button
-            onClick={() => window.location.href = '/taucloud'}
-            className="px-6 py-3 bg-gradient-to-r from-yellow-400 to-orange-500 text-black rounded-lg font-semibold hover:shadow-lg hover:shadow-yellow-400/25 transition-all duration-200"
-          >
-            Go to TauCloud
-          </button>
+      <AppShell title="Tau Cloud" subtitle="Shared file">
+        <div className="flex min-h-[50vh] items-center justify-center">
+          <div className="text-center">
+            <AlertCircle className="w-16 h-16 text-red-400 mx-auto mb-4" />
+            <h1 className="text-2xl font-bold text-white mb-2">File Not Available</h1>
+            <p className="text-gray-400 mb-6">{error}</p>
+            <Button asChild>
+              <Link href="/taucloud">Go to Tau Cloud</Link>
+            </Button>
+          </div>
         </div>
-      </div>
+      </AppShell>
     );
   }
 
   if (passwordRequired) {
     return (
-      <div className="min-h-screen bg-black text-white flex items-center justify-center">
-        <div className="max-w-md w-full mx-4">
+      <AppShell title="Tau Cloud" subtitle="Password protected share">
+        <div className="flex min-h-[50vh] items-center justify-center px-4">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="bg-gray-900 border border-gray-800 rounded-2xl p-8"
+            className="w-full max-w-md bg-gray-900/30 border border-gray-800 rounded-2xl p-8"
           >
             <div className="text-center mb-8">
               <Lock className="w-16 h-16 text-yellow-400 mx-auto mb-4" />
@@ -165,52 +168,34 @@ export default function SharedFileViewer({ params }) {
                 )}
               </div>
 
-              <button
-                type="submit"
-                className="w-full bg-gradient-to-r from-yellow-400 to-orange-500 text-black font-bold py-3 px-6 rounded-lg hover:shadow-lg hover:shadow-yellow-400/25 transition-all duration-200"
-              >
+              <Button type="submit" className="w-full">
                 Access File
-              </button>
+              </Button>
             </form>
           </motion.div>
         </div>
-      </div>
+      </AppShell>
     );
   }
 
   const FileIcon = getFileIcon(file.mimeType);
 
   return (
-    <div className="min-h-screen bg-black text-white">
-      {/* Header */}
-      <header className="bg-gray-900/50 backdrop-blur-xl border-b border-gray-800">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            <div className="flex items-center space-x-2">
-              <img src="/brand/tauos-logo.svg" alt="TauOS" className="w-8 h-8" />
-              <span className="text-xl font-bold text-white">TauCloud</span>
-            </div>
-            <div className="flex items-center space-x-4">
-              <button
-                onClick={copyShareLink}
-                className="flex items-center space-x-2 px-4 py-2 bg-gray-800 text-white rounded-lg hover:bg-gray-700 transition-colors"
-              >
-                <Copy className="w-4 h-4" />
-                <span>Copy Link</span>
-              </button>
-              <a
-                href="/taucloud"
-                className="flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-yellow-400 to-orange-500 text-black rounded-lg font-semibold hover:shadow-lg hover:shadow-yellow-400/25 transition-all duration-200"
-              >
-                <ExternalLink className="w-4 h-4" />
-                <span>Go to TauCloud</span>
-              </a>
-            </div>
-          </div>
+    <AppShell title="Tau Cloud" subtitle="Shared file">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="mb-6 flex flex-wrap items-center justify-end gap-3">
+          <Button variant="outline" onClick={copyShareLink}>
+            <Copy className="w-4 h-4 mr-2" />
+            Copy Link
+          </Button>
+          <Button asChild>
+            <Link href="/taucloud">
+              <ExternalLink className="w-4 h-4 mr-2" />
+              Go to Tau Cloud
+            </Link>
+          </Button>
         </div>
-      </header>
 
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -271,15 +256,14 @@ export default function SharedFileViewer({ params }) {
 
           {/* Actions */}
           <div className="flex flex-col sm:flex-row gap-4">
-            <button className="flex-1 flex items-center justify-center space-x-2 px-6 py-4 bg-gradient-to-r from-yellow-400 to-orange-500 text-black rounded-xl font-bold hover:shadow-lg hover:shadow-yellow-400/25 transition-all duration-200">
-              <Download className="w-5 h-5" />
-              <span>Download File</span>
-            </button>
-            
-            <button className="flex-1 flex items-center justify-center space-x-2 px-6 py-4 bg-gray-800 text-white rounded-xl hover:bg-gray-700 transition-colors">
-              <Share2 className="w-5 h-5" />
-              <span>Share Again</span>
-            </button>
+            <Button className="flex-1">
+              <Download className="w-5 h-5 mr-2" />
+              Download File
+            </Button>
+            <Button variant="outline" className="flex-1">
+              <Share2 className="w-5 h-5 mr-2" />
+              Share Again
+            </Button>
           </div>
 
           {/* Security Notice */}
@@ -297,6 +281,6 @@ export default function SharedFileViewer({ params }) {
           </div>
         </motion.div>
       </div>
-    </div>
+    </AppShell>
   );
 }
