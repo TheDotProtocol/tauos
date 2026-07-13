@@ -33,7 +33,7 @@ npm run talk:setup
 | POST | `/api/tautalk/auth/register` | Public |
 | GET/POST | `/api/tautalk/conversations` | Bearer |
 | GET/POST | `/api/tautalk/messages?conversationId=` | Bearer |
-| GET/PUT | `/api/tautalk/keys` | Bearer |
+| GET/PUT | `/api/tautalk/identity` | Bearer |
 
 ## Encryption model
 
