@@ -1,7 +1,7 @@
-import { getPool, getJwtSecret } from '@/lib/db-pool';
+import { getPool } from '@/lib/db-pool';
 import { NextRequest, NextResponse } from 'next/server';
 import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
+import { issueSsoToken } from '@/lib/tau-auth';
 
 // Database connection - production ready
 
@@ -36,23 +36,23 @@ export async function POST(request: NextRequest) {
 
     const user = result.rows[0];
 
-    // Generate JWT token
-    const jwtSecret = getJwtSecret('tauid');
-    const token = jwt.sign(
-      { userId: user.id, email: user.email, username: user.username, app: 'tauid' },
-      jwtSecret,
-      { expiresIn: '24h' }
-    );
+    const token = issueSsoToken({
+      id: user.id,
+      email: user.email,
+      username: user.username,
+      fullName: user.full_name,
+    });
 
     return NextResponse.json({
       message: 'Registration successful',
       token,
+      sso: true,
       user: {
         id: user.id,
         username: user.username,
         email: user.email,
-        fullName: user.full_name
-      }
+        fullName: user.full_name,
+      },
     });
 
   } catch (error) {

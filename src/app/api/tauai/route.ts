@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { runAiChat } from '@/lib/ai-gateway';
 
-// TauAI Command Processing
+// TauAI — keyword fallback when gateway unavailable
 const processCommand = (message: string) => {
   const lowerMessage = message.toLowerCase();
   
@@ -76,14 +77,41 @@ const processCommand = (message: string) => {
 
 export async function POST(request: NextRequest) {
   try {
-    const { message, userId } = await request.json();
+    const { message, userId, messages, provider, model, privacyMode } = await request.json();
 
-    if (!message) {
+    if (!message && !messages?.length) {
       return NextResponse.json({ error: 'No message provided' }, { status: 400 });
     }
 
-    // Process the command and generate response
-    const response = processCommand(message);
+    // Prefer multi-model gateway (Phase 0)
+    try {
+      const chatMessages =
+        messages ??
+        [{ role: 'user' as const, content: String(message) }];
+
+      const gateway = await runAiChat({
+        messages: chatMessages,
+        provider: provider ?? 'auto',
+        model,
+        privacyMode,
+      });
+
+      if (gateway.provider !== 'fallback' || process.env.AI_ALLOW_KEYWORD_FALLBACK !== 'false') {
+        return NextResponse.json({
+          message: gateway.message,
+          type: 'ai',
+          provider: gateway.provider,
+          model: gateway.model,
+          timestamp: new Date().toISOString(),
+          status: 'success',
+          userId: userId || 'anonymous',
+        });
+      }
+    } catch (gatewayErr) {
+      console.warn('[tauai] gateway fallback:', gatewayErr);
+    }
+
+    const response = processCommand(String(message));
     
     const result = {
       ...response,

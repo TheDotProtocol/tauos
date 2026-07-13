@@ -15,6 +15,19 @@ export default function DevelopersPage() {
       title="Developers"
       subtitle="Build on Tau OS with SDKs, APIs, and open documentation."
     >
+      <section className="py-8 bg-gradient-to-r from-yellow-500/10 to-orange-500/10 border-b border-gray-800">
+        <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <p className="text-gray-300">
+            <span className="text-yellow-400 font-semibold">TauStudio IDE</span> — write and run TauScript in the browser.
+          </p>
+          <a
+            href="/developers/ide"
+            className="px-5 py-2.5 bg-yellow-500 text-black font-semibold rounded-lg hover:bg-yellow-400 transition-colors"
+          >
+            Open IDE →
+          </a>
+        </div>
+      </section>
       {/* Philosophy Section */}
       <section className="py-20 bg-black">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

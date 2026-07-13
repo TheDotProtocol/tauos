@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "next lint",
     "mail:server": "node scripts/phone-mail-server/index.mjs",
-    "mail:setup": "node scripts/setup-mail-domains.mjs"
+    "mail:setup": "node scripts/setup-mail-domains.mjs",
+    "storage:setup": "node scripts/setup-supabase-storage.mjs"
   },
   "dependencies": {
     "@heroicons/react": "^2.2.0",

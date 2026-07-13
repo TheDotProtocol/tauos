@@ -28,7 +28,12 @@ export default function TauIDLogin() {
       const data = await response.json();
 
       if (response.ok) {
-        if (data.token) localStorage.setItem('tauos_token', data.token);
+        if (data.token) {
+          localStorage.setItem('tauos_token', data.token);
+          if (data.user) {
+            localStorage.setItem('tauos_user', JSON.stringify(data.user));
+          }
+        }
         setMessage('Login successful! Redirecting...');
         setTimeout(() => {
           window.location.href = '/tauid/dashboard';
