@@ -47,9 +47,10 @@ export async function uploadObject(
   contentType: string
 ): Promise<{ path: string }> {
   const path = objectPath.replace(/^\/+/, '');
+  const encodedPath = path.split('/').map(encodeURIComponent).join('/');
   const bytes = data instanceof Uint8Array ? data : new Uint8Array(data);
   const res = await fetch(
-    `${storageBase(cfg)}/object/${encodeURIComponent(cfg.bucket)}/${path}`,
+    `${storageBase(cfg)}/object/${encodeURIComponent(cfg.bucket)}/${encodedPath}`,
     {
       method: 'POST',
       headers: {
@@ -72,8 +73,9 @@ export async function deleteObject(
   objectPath: string
 ): Promise<void> {
   const path = objectPath.replace(/^\/+/, '');
+  const encodedPath = path.split('/').map(encodeURIComponent).join('/');
   const res = await fetch(
-    `${storageBase(cfg)}/object/${encodeURIComponent(cfg.bucket)}/${path}`,
+    `${storageBase(cfg)}/object/${encodeURIComponent(cfg.bucket)}/${encodedPath}`,
     {
       method: 'DELETE',
       headers: { Authorization: `Bearer ${cfg.serviceKey}` },
@@ -90,8 +92,9 @@ export async function createSignedDownloadUrl(
   expiresIn = 3600
 ): Promise<string> {
   const path = objectPath.replace(/^\/+/, '');
+  const encodedPath = path.split('/').map(encodeURIComponent).join('/');
   const res = await fetch(
-    `${storageBase(cfg)}/object/sign/${encodeURIComponent(cfg.bucket)}/${path}`,
+    `${storageBase(cfg)}/object/sign/${encodeURIComponent(cfg.bucket)}/${encodedPath}`,
     {
       method: 'POST',
       headers: {

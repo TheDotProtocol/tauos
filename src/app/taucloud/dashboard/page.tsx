@@ -32,6 +32,8 @@ export default function TauCloudDashboard() {
   const [showUploadModal, setShowUploadModal] = useState(false);
   const [showCreateFolderModal, setShowCreateFolderModal] = useState(false);
   const [showShareModal, setShowShareModal] = useState(false);
+  const [shareLink, setShareLink] = useState('');
+  const [shareFileName, setShareFileName] = useState('');
   const [dragOver, setDragOver] = useState(false);
   const [uploadProgress, setUploadProgress] = useState({});
   const [storageInfo, setStorageInfo] = useState({
@@ -55,7 +57,6 @@ export default function TauCloudDashboard() {
       setIsLoggedIn(true);
       loadFiles();
       loadStorageInfo();
-      loadRecentActivity();
     } else {
       window.location.href = '/taucloud';
     }
@@ -84,41 +85,12 @@ export default function TauCloudDashboard() {
       
       if (response.ok) {
         const data = await response.json();
-        setFiles(data.files || []);
+        const nextFiles = data.files || [];
+        setFiles(nextFiles);
+        loadRecentActivity(nextFiles);
       } else {
-        // Demo data for development
-        setFiles([
-          {
-            id: 1,
-            original_name: 'Project Presentation.pdf',
-            filename: 'project-presentation.pdf',
-            file_size: 2048576,
-            mime_type: 'application/pdf',
-            created_at: new Date().toISOString(),
-            is_public: false,
-            download_count: 0
-          },
-          {
-            id: 2,
-            original_name: 'Team Photo.jpg',
-            filename: 'team-photo.jpg',
-            file_size: 1024000,
-            mime_type: 'image/jpeg',
-            created_at: new Date(Date.now() - 86400000).toISOString(),
-            is_public: true,
-            download_count: 5
-          },
-          {
-            id: 3,
-            original_name: 'Meeting Recording.mp4',
-            filename: 'meeting-recording.mp4',
-            file_size: 52428800,
-            mime_type: 'video/mp4',
-            created_at: new Date(Date.now() - 172800000).toISOString(),
-            is_public: false,
-            download_count: 2
-          }
-        ]);
+        setFiles([]);
+        loadRecentActivity([]);
       }
     } catch (error) {
       console.error('Error loading files:', error);
@@ -145,14 +117,15 @@ export default function TauCloudDashboard() {
     }
   };
 
-  const loadRecentActivity = () => {
-    // Demo recent activity
-    setRecentActivity([
-      { id: 1, action: 'uploaded', file: 'Project Presentation.pdf', time: '2 minutes ago', user: 'You' },
-      { id: 2, action: 'shared', file: 'Team Photo.jpg', time: '1 hour ago', user: 'You' },
-      { id: 3, action: 'downloaded', file: 'Meeting Recording.mp4', time: '3 hours ago', user: 'John Doe' },
-      { id: 4, action: 'created', file: 'New Folder', time: '1 day ago', user: 'You' }
-    ]);
+  const loadRecentActivity = (fileList = files) => {
+    const activity = fileList.slice(0, 5).map((file, index) => ({
+      id: file.id || index,
+      action: 'uploaded',
+      file: file.original_name,
+      time: formatDate(file.uploaded_at),
+      user: 'You',
+    }));
+    setRecentActivity(activity);
   };
 
   const handleLogout = () => {
@@ -182,6 +155,9 @@ export default function TauCloudDashboard() {
           setUploadProgress(prev => ({ ...prev, [file.name]: 100 }));
           await loadFiles();
           await loadStorageInfo();
+        } else {
+          const err = await response.json().catch(() => ({}));
+          alert(err.error || `Upload failed: ${file.name}`);
         }
       } catch (error) {
         console.error('Upload error:', error);
@@ -191,6 +167,75 @@ export default function TauCloudDashboard() {
     setLoading(false);
     setSyncStatus('synced');
     setShowUploadModal(false);
+  };
+
+  const handleDownload = async (fileId) => {
+    try {
+      const token = localStorage.getItem('tauos_token');
+      const response = await fetch(`/api/taucloud/files/download?id=${encodeURIComponent(fileId)}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await response.json();
+      if (response.ok && data.url) {
+        window.open(data.url, '_blank');
+      } else {
+        alert(data.error || 'Download failed');
+      }
+    } catch (error) {
+      console.error('Download error:', error);
+      alert('Download failed');
+    }
+  };
+
+  const handleDelete = async (fileId, fileName) => {
+    if (!confirm(`Delete "${fileName}"? This cannot be undone.`)) return;
+    try {
+      const token = localStorage.getItem('tauos_token');
+      const response = await fetch(`/api/taucloud/files/delete?id=${encodeURIComponent(fileId)}`, {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (response.ok) {
+        await loadFiles();
+        await loadStorageInfo();
+      } else {
+        const data = await response.json().catch(() => ({}));
+        alert(data.error || 'Delete failed');
+      }
+    } catch (error) {
+      console.error('Delete error:', error);
+      alert('Delete failed');
+    }
+  };
+
+  const handleShare = async (fileId, fileName) => {
+    try {
+      const token = localStorage.getItem('tauos_token');
+      const response = await fetch('/api/taucloud/files/share', {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ fileId }),
+      });
+      const data = await response.json();
+      if (response.ok && data.share) {
+        setShareLink(data.share.fullUrl || `${window.location.origin}${data.share.url}`);
+        setShareFileName(fileName);
+        setShowShareModal(true);
+        await loadFiles();
+      } else {
+        alert(data.error || 'Share failed');
+      }
+    } catch (error) {
+      console.error('Share error:', error);
+      alert('Share failed');
+    }
+  };
+
+  const copyShareLink = () => {
+    navigator.clipboard.writeText(shareLink);
   };
 
   const handleDragOver = (e) => {
@@ -255,8 +300,8 @@ export default function TauCloudDashboard() {
         bVal = b.file_size;
         break;
       case 'date':
-        aVal = new Date(a.created_at);
-        bVal = new Date(b.created_at);
+        aVal = new Date(a.uploaded_at);
+        bVal = new Date(b.uploaded_at);
         break;
       case 'type':
         aVal = a.mime_type;
@@ -346,7 +391,7 @@ export default function TauCloudDashboard() {
               <div>
                 <p className="text-sm text-gray-400">Shared Files</p>
                 <p className="text-2xl font-bold text-white">
-                  {files.filter(f => f.is_public).length}
+                  {files.filter(f => f.is_shared).length}
                 </p>
               </div>
               <div className="w-12 h-12 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-xl flex items-center justify-center">
@@ -367,18 +412,16 @@ export default function TauCloudDashboard() {
           >
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-400">Downloads</p>
-                <p className="text-2xl font-bold text-white">
-                  {files.reduce((sum, f) => sum + f.download_count, 0)}
-                </p>
+                <p className="text-sm text-gray-400">Sync Status</p>
+                <p className="text-2xl font-bold text-white capitalize">{syncStatus}</p>
               </div>
               <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-500 rounded-xl flex items-center justify-center">
-                <Download className="w-6 h-6 text-white" />
+                {isOnline ? <Wifi className="w-6 h-6 text-white" /> : <WifiOff className="w-6 h-6 text-white" />}
               </div>
             </div>
             <div className="mt-4 flex items-center text-sm text-gray-400">
               <Activity className="w-4 h-4 mr-1" />
-              <span>This month</span>
+              <span>{isOnline ? 'Online' : 'Offline'}</span>
             </div>
           </motion.div>
         </div>
@@ -523,20 +566,32 @@ export default function TauCloudDashboard() {
                                 {formatFileSize(file.file_size)}
                               </p>
                               <p className="text-xs text-gray-500">
-                                {formatDate(file.created_at)}
+                                {formatDate(file.uploaded_at)}
                               </p>
                             </div>
                             
                             <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
                               <div className="flex space-x-1">
-                                <button className="p-1 bg-gray-700 rounded hover:bg-gray-600">
-                                  <Eye className="w-3 h-3 text-white" />
+                                <button
+                                  onClick={(e) => { e.stopPropagation(); handleDownload(file.id); }}
+                                  className="p-1 bg-gray-700 rounded hover:bg-gray-600"
+                                  title="Download"
+                                >
+                                  <Download className="w-3 h-3 text-white" />
                                 </button>
-                                <button className="p-1 bg-gray-700 rounded hover:bg-gray-600">
+                                <button
+                                  onClick={(e) => { e.stopPropagation(); handleShare(file.id, file.original_name); }}
+                                  className="p-1 bg-gray-700 rounded hover:bg-gray-600"
+                                  title="Share"
+                                >
                                   <Share2 className="w-3 h-3 text-white" />
                                 </button>
-                                <button className="p-1 bg-gray-700 rounded hover:bg-gray-600">
-                                  <MoreVertical className="w-3 h-3 text-white" />
+                                <button
+                                  onClick={(e) => { e.stopPropagation(); handleDelete(file.id, file.original_name); }}
+                                  className="p-1 bg-gray-700 rounded hover:bg-red-600"
+                                  title="Delete"
+                                >
+                                  <Trash2 className="w-3 h-3 text-white" />
                                 </button>
                               </div>
                             </div>
@@ -551,15 +606,33 @@ export default function TauCloudDashboard() {
                                 {file.original_name}
                               </h4>
                               <p className="text-xs text-gray-400">
-                                {formatFileSize(file.file_size)} • {formatDate(file.created_at)}
+                                {formatFileSize(file.file_size)} • {formatDate(file.uploaded_at)}
                               </p>
                             </div>
                             <div className="flex items-center space-x-2">
-                              {file.is_public && (
+                              {file.is_shared && (
                                 <Globe className="w-4 h-4 text-green-400" />
                               )}
-                              <button className="p-1 text-gray-400 hover:text-white">
-                                <MoreVertical className="w-4 h-4" />
+                              <button
+                                onClick={() => handleDownload(file.id)}
+                                className="p-1 text-gray-400 hover:text-white"
+                                title="Download"
+                              >
+                                <Download className="w-4 h-4" />
+                              </button>
+                              <button
+                                onClick={() => handleShare(file.id, file.original_name)}
+                                className="p-1 text-gray-400 hover:text-white"
+                                title="Share"
+                              >
+                                <Share2 className="w-4 h-4" />
+                              </button>
+                              <button
+                                onClick={() => handleDelete(file.id, file.original_name)}
+                                className="p-1 text-gray-400 hover:text-red-400"
+                                title="Delete"
+                              >
+                                <Trash2 className="w-4 h-4" />
                               </button>
                             </div>
                           </>
@@ -679,6 +752,41 @@ export default function TauCloudDashboard() {
                 </button>
               </div>
             </div>
+          </motion.div>
+        </div>
+      )}
+
+      {/* Share Modal */}
+      {showShareModal && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="bg-gray-900 border border-gray-800 rounded-2xl p-6 w-full max-w-md"
+          >
+            <div className="text-center mb-6">
+              <h2 className="text-2xl font-bold text-white mb-2">Share Link Created</h2>
+              <p className="text-gray-400">{shareFileName}</p>
+            </div>
+            <div className="flex gap-2 mb-4">
+              <input
+                readOnly
+                value={shareLink}
+                className="flex-1 px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white text-sm"
+              />
+              <button
+                onClick={copyShareLink}
+                className="px-4 py-2 bg-yellow-400 text-black rounded-lg font-semibold hover:bg-yellow-300"
+              >
+                <Copy className="w-4 h-4" />
+              </button>
+            </div>
+            <button
+              onClick={() => setShowShareModal(false)}
+              className="w-full px-4 py-2 bg-gray-700 text-white rounded-lg hover:bg-gray-600"
+            >
+              Done
+            </button>
           </motion.div>
         </div>
       )}

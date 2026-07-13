@@ -2,7 +2,7 @@ import jwt from 'jsonwebtoken';
 import { getJwtSecret } from '@/lib/db-pool';
 
 export type TauTokenPayload = {
-  userId: number;
+  userId: number | string;
   email: string;
   username: string;
   app?: string;
@@ -23,7 +23,7 @@ export function getSsoSecret(): string {
 }
 
 export function issueSsoToken(user: {
-  id: number;
+  id: number | string;
   email: string;
   username: string;
   fullName?: string;
