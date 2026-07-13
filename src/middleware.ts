@@ -1,15 +1,40 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
-const DEVELOPER_HOSTS = ['developer.tauos.org', 'developer.localhost:3000'];
+type HostRoute = {
+  hosts: string[];
+  basePath: string;
+};
+
+const HOST_ROUTES: HostRoute[] = [
+  {
+    hosts: ['developer.tauos.org', 'developer.localhost'],
+    basePath: '/developers',
+  },
+  {
+    hosts: [
+      'browser.tauos.org',
+      'browser.localhost',
+      'taubrowser.com',
+      'www.taubrowser.com',
+    ],
+    basePath: '/taubrowser',
+  },
+];
+
+function matchHostRoute(hostHeader: string | null): HostRoute | null {
+  const host = (hostHeader ?? '').split(':')[0].toLowerCase();
+  for (const route of HOST_ROUTES) {
+    if (route.hosts.some((h) => host === h.split(':')[0])) {
+      return route;
+    }
+  }
+  return null;
+}
 
 export function middleware(request: NextRequest) {
-  const host = (request.headers.get('host') ?? '').split(':')[0];
-  const isDeveloperHost = DEVELOPER_HOSTS.some(
-    (h) => host === h.split(':')[0] || request.headers.get('host') === h
-  );
-
-  if (!isDeveloperHost) {
+  const route = matchHostRoute(request.headers.get('host'));
+  if (!route) {
     return NextResponse.next();
   }
 
@@ -17,12 +42,12 @@ export function middleware(request: NextRequest) {
   const path = url.pathname;
 
   if (path === '/' || path === '') {
-    url.pathname = '/developers';
+    url.pathname = route.basePath;
     return NextResponse.rewrite(url);
   }
 
-  if (!path.startsWith('/developers') && !path.startsWith('/api')) {
-    url.pathname = `/developers${path.startsWith('/') ? path : `/${path}`}`;
+  if (!path.startsWith(route.basePath) && !path.startsWith('/api')) {
+    url.pathname = `${route.basePath}${path.startsWith('/') ? path : `/${path}`}`;
     return NextResponse.rewrite(url);
   }
 

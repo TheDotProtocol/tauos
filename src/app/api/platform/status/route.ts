@@ -33,12 +33,24 @@ export async function GET() {
       ide: '/developers/ide',
       subdomain: 'developer.tauos.org',
     },
+    taucloud: {
+      ok: storage.ok,
+      endpoint: '/taucloud',
+    },
+    taubrowser: {
+      ok: true,
+      portal: '/taubrowser',
+      subdomains: ['browser.tauos.org', 'taubrowser.com'],
+      sync: '/api/taubrowser/sync',
+      blocklist: '/api/taubrowser/privacy/blocklist',
+      downloads: '/api/taubrowser/downloads',
+    },
   };
 
   const ok = database.ok && mail.ok;
 
   return NextResponse.json({
-    phase: 0,
+    phase: 2,
     ok,
     checks,
     timestamp: new Date().toISOString(),

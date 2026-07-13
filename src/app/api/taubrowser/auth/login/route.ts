@@ -1,10 +1,7 @@
-import { getPool, getJwtSecret } from '@/lib/db-pool';
+import { getPool } from '@/lib/db-pool';
 import { NextRequest, NextResponse } from 'next/server';
 import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
-
-// Database connection - production ready
-
+import { issueSsoToken } from '@/lib/tau-auth';
 
 export async function POST(request: NextRequest) {
   try {
@@ -14,10 +11,12 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Email and password are required' }, { status: 400 });
     }
 
-    // Query user from database
+    const sanitizedEmail = email.toLowerCase().trim();
+
     const result = await getPool().query(
-      'SELECT id, username, email, password_hash, full_name, is_active FROM users WHERE email = $1',
-      [email]
+      `SELECT id, username, email, password_hash, full_name, is_active
+       FROM users WHERE email = $1`,
+      [sanitizedEmail]
     );
 
     if (result.rows.length === 0) {
@@ -30,37 +29,34 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Account is deactivated' }, { status: 401 });
     }
 
-    // Verify password
     const isValidPassword = await bcrypt.compare(password, user.password_hash);
     if (!isValidPassword) {
       return NextResponse.json({ error: 'Invalid credentials' }, { status: 401 });
     }
 
-    // Update last login
     await getPool().query(
-      'UPDATE users SET last_login = CURRENT_TIMESTAMP WHERE id = $1',
+      'UPDATE users SET last_login_at = CURRENT_TIMESTAMP WHERE id = $1',
       [user.id]
     );
 
-    // Generate JWT token
-    const jwtSecret = getJwtSecret('taubrowser');
-    const token = jwt.sign(
-      { userId: user.id, email: user.email, username: user.username, app: 'taubrowser' },
-      jwtSecret,
-      { expiresIn: '24h' }
-    );
+    const token = issueSsoToken({
+      id: user.id,
+      email: user.email,
+      username: user.username,
+      fullName: user.full_name,
+    });
 
     return NextResponse.json({
       message: 'Login successful',
       token,
+      sso: true,
       user: {
         id: user.id,
         username: user.username,
         email: user.email,
-        fullName: user.full_name
-      }
+        fullName: user.full_name,
+      },
     });
-
   } catch (error) {
     console.error('TauBrowser Login Error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });

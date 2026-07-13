@@ -1,7 +1,7 @@
 'use client';
 
 import AppShell from '@/components/apps/AppShell';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { 
   Globe, Shield, Lock, Eye, CheckCircle, AlertCircle, 
@@ -11,9 +11,19 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 
+const PLATFORM_ICONS = {
+  windows: Monitor,
+  macos: Laptop,
+  'macos-arm': Laptop,
+  linux: Globe,
+  android: Mobile,
+  ios: Smartphone,
+};
+
 export default function TauBrowserLanding() {
   const [showRegistration, setShowRegistration] = useState(false);
   const [showLogin, setShowLogin] = useState(false);
+  const [downloads, setDownloads] = useState(null);
   const [registrationData, setRegistrationData] = useState({
     email: '',
     password: '',
@@ -48,36 +58,14 @@ export default function TauBrowserLanding() {
     }
   ];
 
-  const downloadOptions = [
-    {
-      icon: Monitor,
-      title: "Windows",
-      description: "Windows 10/11 (64-bit)",
-      downloadUrl: "#",
-      comingSoon: true
-    },
-    {
-      icon: Laptop,
-      title: "macOS",
-      description: "macOS 10.15+ (Intel & Apple Silicon)",
-      downloadUrl: "#",
-      comingSoon: true
-    },
-    {
-      icon: Globe,
-      title: "Linux",
-      description: "Ubuntu, Debian, Fedora, Arch",
-      downloadUrl: "#",
-      comingSoon: true
-    },
-    {
-      icon: Mobile,
-      title: "Mobile",
-      description: "iOS & Android (Coming Soon)",
-      downloadUrl: "#",
-      comingSoon: true
-    }
-  ];
+  const downloadOptions = downloads?.all ?? [];
+
+  useEffect(() => {
+    fetch('/api/taubrowser/downloads')
+      .then((r) => r.json())
+      .then((data) => setDownloads(data))
+      .catch(() => {});
+  }, []);
 
   const handleRegistration = async (e) => {
     e.preventDefault();
@@ -142,6 +130,80 @@ export default function TauBrowserLanding() {
       subtitle="Privacy-first browsing built into the TAU CORE stack."
       variant="marketing"
     >
+      {/* Hero + Downloads */}
+      <section className="py-16 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto text-center">
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
+            <h1 className="text-4xl sm:text-5xl font-bold text-white mb-4">
+              Truly Private Browsing
+            </h1>
+            <p className="text-xl text-gray-300 max-w-2xl mx-auto mb-8">
+              If Safari says private, Tau Browser is the definition. Zero telemetry, built-in ad &amp; tracker blocking, encrypted sync across your devices.
+            </p>
+            <div className="flex flex-wrap justify-center gap-4 mb-12">
+              <button
+                onClick={() => setShowRegistration(true)}
+                className="px-8 py-3 bg-gradient-to-r from-yellow-400 to-orange-500 text-black rounded-lg font-semibold hover:shadow-lg hover:shadow-yellow-400/25"
+              >
+                Create Free Account
+              </button>
+              <button
+                onClick={() => setShowLogin(true)}
+                className="px-8 py-3 bg-gray-800 text-white rounded-lg hover:bg-gray-700"
+              >
+                Sign In
+              </button>
+            </div>
+          </motion.div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 text-left">
+            {(downloadOptions.length ? downloadOptions : [
+              { id: 'windows', label: 'Windows', description: 'Loading...', url: '#', available: false },
+            ]).map((opt, index) => {
+              const Icon = PLATFORM_ICONS[opt.id] ?? Globe;
+              const isRecommended = downloads?.recommended?.id === opt.id;
+              return (
+                <motion.a
+                  key={opt.id}
+                  href={opt.available ? opt.url : '#'}
+                  target={opt.available ? '_blank' : undefined}
+                  rel="noopener noreferrer"
+                  initial={{ opacity: 0, y: 16 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.05 }}
+                  className={`p-6 rounded-2xl border backdrop-blur-sm transition-all ${
+                    isRecommended
+                      ? 'border-yellow-400/50 bg-yellow-400/5'
+                      : 'border-gray-800 bg-gray-900/30 hover:border-gray-600'
+                  } ${!opt.available ? 'opacity-60 pointer-events-none' : ''}`}
+                >
+                  <div className="flex items-start gap-4">
+                    <div className="w-12 h-12 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-xl flex items-center justify-center shrink-0">
+                      <Icon className="w-6 h-6 text-black" />
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <h3 className="text-lg font-bold text-white">{opt.label}</h3>
+                        {isRecommended && (
+                          <span className="text-xs px-2 py-0.5 bg-yellow-400/20 text-yellow-300 rounded-full">Recommended</span>
+                        )}
+                      </div>
+                      <p className="text-sm text-gray-400 mt-1">{opt.description}</p>
+                      <p className="text-xs text-gray-500 mt-2">
+                        {opt.available ? `Download ${opt.format ?? ''} · v${opt.version ?? '1.0'}` : 'Coming soon'}
+                      </p>
+                    </div>
+                  </div>
+                </motion.a>
+              );
+            })}
+          </div>
+          <p className="text-sm text-gray-500 mt-6">
+            Also at <strong className="text-gray-400">browser.tauos.org</strong> and <strong className="text-gray-400">taubrowser.com</strong>
+          </p>
+        </div>
+      </section>
+
       {/* Features Section */}
       <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gray-900/30">
         <div className="max-w-7xl mx-auto">

@@ -1,44 +1,66 @@
 'use client';
 
 import DashboardShell from '@/components/apps/DashboardShell';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
-import { 
-  Globe, Shield, Lock, Eye, CheckCircle, AlertCircle, 
-  ArrowRight, Users, Zap, Star, ArrowLeft, Search,
-  Download, Filter, Settings, Heart, BarChart3, Activity,
-  Home, RefreshCw, ArrowLeft as BackArrow, ArrowRight as ForwardArrow,
-  Bookmark, History, Menu, X, Plus, LogOut
+import {
+  Shield, Download, Bookmark, History, Settings, LogOut,
+  Trash2, RefreshCw, Globe, Lock, Eye, Zap, ExternalLink, Plus
 } from 'lucide-react';
 import Link from 'next/link';
 
+function authHeaders() {
+  const token = localStorage.getItem('tauos_token');
+  return { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' };
+}
+
 export default function TauBrowserDashboard() {
-  const [activeTab, setActiveTab] = useState('browser');
   const [user, setUser] = useState(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [currentUrl, setCurrentUrl] = useState('https://www.tauos.org');
-  const [urlInput, setUrlInput] = useState('https://www.tauos.org');
-  const [browserHistory, setBrowserHistory] = useState(['https://www.tauos.org']);
-  const [historyIndex, setHistoryIndex] = useState(0);
-  const [bookmarks, setBookmarks] = useState([
-    { id: 1, title: 'TauOS Home', url: 'https://www.tauos.org', favicon: '🏠' },
-    { id: 2, title: 'TauMail', url: 'https://www.tauos.org/taumail', favicon: '📧' },
-    { id: 3, title: 'TauCloud', url: 'https://www.tauos.org/taucloud', favicon: '☁️' }
-  ]);
+  const [activeTab, setActiveTab] = useState('overview');
+  const [loading, setLoading] = useState(true);
+  const [bookmarks, setBookmarks] = useState([]);
+  const [history, setHistory] = useState([]);
+  const [settings, setSettings] = useState(null);
+  const [privacy, setPrivacy] = useState(null);
+  const [downloads, setDownloads] = useState(null);
+  const [newBookmark, setNewBookmark] = useState({ title: '', url: '' });
 
-  // Check if user is logged in
+  const loadData = useCallback(async () => {
+    setLoading(true);
+    try {
+      const [syncRes, dlRes] = await Promise.all([
+        fetch('/api/taubrowser/sync', { headers: authHeaders() }),
+        fetch('/api/taubrowser/downloads'),
+      ]);
+      if (syncRes.ok) {
+        const data = await syncRes.json();
+        setBookmarks(data.bookmarks ?? []);
+        setHistory(data.history ?? []);
+        setSettings(data.settings);
+        setPrivacy(data.privacy);
+      }
+      if (dlRes.ok) {
+        setDownloads(await dlRes.json());
+      }
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
   useEffect(() => {
     const storedUser = localStorage.getItem('tauos_user');
     const storedToken = localStorage.getItem('tauos_token');
-    
     if (storedUser && storedToken) {
       setUser(JSON.parse(storedUser));
       setIsLoggedIn(true);
+      loadData();
     } else {
-      // Redirect to landing page if not logged in
       window.location.href = '/taubrowser';
     }
-  }, []);
+  }, [loadData]);
 
   const handleLogout = () => {
     localStorage.removeItem('tauos_user');
@@ -46,442 +68,254 @@ export default function TauBrowserDashboard() {
     window.location.href = '/taubrowser';
   };
 
-  const handleUrlSubmit = (e) => {
+  const toggleSetting = async (key) => {
+    const next = { ...settings, [key]: !settings[key] };
+    setSettings(next);
+    await fetch('/api/taubrowser/settings', {
+      method: 'PUT',
+      headers: authHeaders(),
+      body: JSON.stringify({ [key]: next[key] }),
+    });
+  };
+
+  const addBookmark = async (e) => {
     e.preventDefault();
-    let url = urlInput.trim();
-    
-    // Add protocol if missing
-    if (!url.startsWith('http://') && !url.startsWith('https://')) {
-      if (url.includes('.')) {
-        url = 'https://' + url;
-      } else {
-        // Treat as search query
-        url = `https://duckduckgo.com/?q=${encodeURIComponent(url)}`;
-      }
-    }
-    
-    setCurrentUrl(url);
-    setUrlInput(url);
-    
-    // Add to history
-    const newHistory = browserHistory.slice(0, historyIndex + 1);
-    newHistory.push(url);
-    setBrowserHistory(newHistory);
-    setHistoryIndex(newHistory.length - 1);
-  };
-
-  const handleBack = () => {
-    if (historyIndex > 0) {
-      const newIndex = historyIndex - 1;
-      setHistoryIndex(newIndex);
-      setCurrentUrl(browserHistory[newIndex]);
-      setUrlInput(browserHistory[newIndex]);
+    if (!newBookmark.title || !newBookmark.url) return;
+    const res = await fetch('/api/taubrowser/bookmarks', {
+      method: 'POST',
+      headers: authHeaders(),
+      body: JSON.stringify(newBookmark),
+    });
+    if (res.ok) {
+      setNewBookmark({ title: '', url: '' });
+      loadData();
     }
   };
 
-  const handleForward = () => {
-    if (historyIndex < browserHistory.length - 1) {
-      const newIndex = historyIndex + 1;
-      setHistoryIndex(newIndex);
-      setCurrentUrl(browserHistory[newIndex]);
-      setUrlInput(browserHistory[newIndex]);
-    }
+  const removeBookmark = async (id) => {
+    await fetch(`/api/taubrowser/bookmarks?id=${id}`, {
+      method: 'DELETE',
+      headers: authHeaders(),
+    });
+    loadData();
   };
 
-  const handleRefresh = () => {
-    // Force refresh by updating the URL slightly
-    setCurrentUrl(currentUrl + (currentUrl.includes('?') ? '&' : '?') + 't=' + Date.now());
+  const clearHistory = async () => {
+    if (!confirm('Clear all synced browsing history?')) return;
+    await fetch('/api/taubrowser/history', { method: 'DELETE', headers: authHeaders() });
+    loadData();
   };
 
-  const addBookmark = () => {
-    const title = prompt('Enter bookmark title:');
-    if (title) {
-      const newBookmark = {
-        id: Date.now(),
-        title: title,
-        url: currentUrl,
-        favicon: '🔖'
-      };
-      setBookmarks([...bookmarks, newBookmark]);
-    }
+  const formatBytes = (n) => {
+    if (!n) return '0 B';
+    const k = 1024;
+    const sizes = ['B', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(n) / Math.log(k));
+    return `${parseFloat((n / Math.pow(k, i)).toFixed(1))} ${sizes[i]}`;
   };
 
-  const browserMetrics = {
-    blockedAds: 1247,
-    blockedTrackers: 2341,
-    privacyScore: 100,
-    dataSaved: '2.3MB',
-    lastUpdate: '2 minutes ago'
-  };
-
-  
+  const tabs = [
+    { id: 'overview', label: 'Overview', icon: Shield },
+    { id: 'bookmarks', label: 'Bookmarks', icon: Bookmark },
+    { id: 'history', label: 'History', icon: History },
+    { id: 'settings', label: 'Privacy', icon: Settings },
+    { id: 'download', label: 'Download App', icon: Download },
+  ];
 
   return (
     <DashboardShell
       title="Tau Browser"
-      subtitle="Privacy-first browsing."
+      subtitle="Account sync & privacy dashboard — install the native app to browse."
       userLabel={user?.email}
       onLogout={handleLogout}
-      loading={!isLoggedIn}
+      loading={!isLoggedIn || loading}
       fullWidth
     >
-{/* Navigation Tabs */}
-        <div className="flex space-x-1 mb-8 bg-gray-900/30 p-1 rounded-xl">
-          {[
-            { id: 'browser', label: 'Browser', icon: Globe },
-            { id: 'bookmarks', label: 'Bookmarks', icon: Bookmark },
-            { id: 'history', label: 'History', icon: History },
-            { id: 'privacy', label: 'Privacy', icon: Shield },
-            { id: 'settings', label: 'Settings', icon: Settings }
-          ].map((tab) => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
-              className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-all duration-200 ${
-                activeTab === tab.id
-                  ? 'bg-gradient-to-r from-cyan-500 to-blue-500 text-white'
-                  : 'text-gray-400 hover:text-white hover:bg-gray-800/50'
-              }`}
+      {/* Native app CTA */}
+      <div className="mb-8 p-6 rounded-2xl border border-yellow-400/30 bg-yellow-400/5">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <h2 className="text-xl font-bold text-white flex items-center gap-2">
+              <Globe className="w-5 h-5 text-yellow-400" />
+              Install Tau Browser
+            </h2>
+            <p className="text-gray-400 mt-1">
+              Real private browsing happens in the native app — ad blocking, tracker protection, and zero telemetry.
+            </p>
+          </div>
+          {downloads?.recommended?.available && (
+            <a
+              href={downloads.recommended.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-yellow-400 to-orange-500 text-black rounded-lg font-semibold shrink-0"
             >
-              <tab.icon className="w-4 h-4" />
-              <span>{tab.label}</span>
-            </button>
+              <Download className="w-5 h-5" />
+              Download for {downloads.recommended.label}
+            </a>
+          )}
+        </div>
+      </div>
+
+      {/* Tabs */}
+      <div className="flex flex-wrap gap-2 mb-8">
+        {tabs.map((tab) => (
+          <button
+            key={tab.id}
+            onClick={() => setActiveTab(tab.id)}
+            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+              activeTab === tab.id
+                ? 'bg-yellow-400 text-black'
+                : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
+            }`}
+          >
+            <tab.icon className="w-4 h-4" />
+            {tab.label}
+          </button>
+        ))}
+        <button onClick={loadData} className="ml-auto p-2 text-gray-400 hover:text-white" title="Refresh">
+          <RefreshCw className="w-4 h-4" />
+        </button>
+      </div>
+
+      {activeTab === 'overview' && privacy && (
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+          {[
+            { label: 'Ads Blocked', value: privacy.blockedAds, icon: Shield, color: 'from-green-500 to-emerald-500' },
+            { label: 'Trackers Blocked', value: privacy.blockedTrackers, icon: Eye, color: 'from-blue-500 to-cyan-500' },
+            { label: 'Requests Blocked', value: privacy.blockedRequests, icon: Lock, color: 'from-purple-500 to-pink-500' },
+            { label: 'Data Saved', value: formatBytes(privacy.dataSavedBytes), icon: Zap, color: 'from-yellow-400 to-orange-500' },
+          ].map((stat) => (
+            <motion.div
+              key={stat.label}
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="p-6 bg-gray-900/30 border border-gray-800 rounded-2xl"
+            >
+              <div className={`w-10 h-10 rounded-lg bg-gradient-to-r ${stat.color} flex items-center justify-center mb-3`}>
+                <stat.icon className="w-5 h-5 text-white" />
+              </div>
+              <p className="text-2xl font-bold text-white">{stat.value}</p>
+              <p className="text-sm text-gray-400">{stat.label}</p>
+            </motion.div>
           ))}
         </div>
+      )}
 
-        {/* Browser Tab */}
-        {activeTab === 'browser' && (
-          <div className="space-y-6">
-            {/* Browser Toolbar */}
-            <div className="bg-gray-900/30 backdrop-blur-sm border border-gray-800 rounded-2xl p-4">
-              <div className="flex items-center space-x-4">
-                <div className="flex items-center space-x-2">
-                  <button
-                    onClick={handleBack}
-                    disabled={historyIndex === 0}
-                    className="p-2 text-gray-400 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    <BackArrow className="w-5 h-5" />
-                  </button>
-                  <button
-                    onClick={handleForward}
-                    disabled={historyIndex === browserHistory.length - 1}
-                    className="p-2 text-gray-400 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    <ForwardArrow className="w-5 h-5" />
-                  </button>
-                  <button
-                    onClick={handleRefresh}
-                    className="p-2 text-gray-400 hover:text-white"
-                  >
-                    <RefreshCw className="w-5 h-5" />
-                  </button>
+      {activeTab === 'bookmarks' && (
+        <div className="space-y-4">
+          <form onSubmit={addBookmark} className="flex flex-col sm:flex-row gap-2">
+            <input
+              placeholder="Title"
+              value={newBookmark.title}
+              onChange={(e) => setNewBookmark({ ...newBookmark, title: e.target.value })}
+              className="flex-1 px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white"
+            />
+            <input
+              placeholder="https://..."
+              value={newBookmark.url}
+              onChange={(e) => setNewBookmark({ ...newBookmark, url: e.target.value })}
+              className="flex-1 px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white"
+            />
+            <button type="submit" className="px-4 py-2 bg-yellow-400 text-black rounded-lg font-semibold flex items-center gap-1">
+              <Plus className="w-4 h-4" /> Add
+            </button>
+          </form>
+          {bookmarks.length === 0 ? (
+            <p className="text-gray-500 py-8 text-center">No bookmarks synced yet. Add some or sync from the native app.</p>
+          ) : (
+            bookmarks.map((b) => (
+              <div key={b.id} className="flex items-center justify-between p-4 bg-gray-900/30 border border-gray-800 rounded-xl">
+                <div>
+                  <p className="font-medium text-white">{b.title}</p>
+                  <a href={b.url} target="_blank" rel="noopener noreferrer" className="text-sm text-cyan-400 hover:underline">{b.url}</a>
                 </div>
-                
-                <form onSubmit={handleUrlSubmit} className="flex-1 flex items-center space-x-2">
-                  <input
-                    type="text"
-                    value={urlInput}
-                    onChange={(e) => setUrlInput(e.target.value)}
-                    className="flex-1 px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-cyan-400"
-                    placeholder="Search or enter URL..."
-                  />
-                  <button
-                    type="submit"
-                    className="px-4 py-2 bg-gradient-to-r from-cyan-500 to-blue-500 text-white rounded-lg font-semibold hover:shadow-lg hover:shadow-cyan-500/25 transition-all duration-200"
-                  >
-                    Go
-                  </button>
-                </form>
-                
-                <div className="flex items-center space-x-2">
-                  <button
-                    onClick={addBookmark}
-                    className="p-2 text-gray-400 hover:text-white"
-                    title="Add Bookmark"
-                  >
-                    <Plus className="w-5 h-5" />
-                  </button>
-                  <button className="p-2 text-gray-400 hover:text-white">
-                    <Menu className="w-5 h-5" />
-                  </button>
-                </div>
+                <button onClick={() => removeBookmark(b.id)} className="p-2 text-gray-400 hover:text-red-400">
+                  <Trash2 className="w-4 h-4" />
+                </button>
               </div>
-            </div>
+            ))
+          )}
+        </div>
+      )}
 
-            {/* Browser Content */}
-            <div className="bg-gray-900/30 backdrop-blur-sm border border-gray-800 rounded-2xl overflow-hidden">
-              <div className="h-96 bg-white">
-                <iframe
-                  src={currentUrl}
-                  className="w-full h-full border-0"
-                  sandbox="allow-same-origin allow-scripts allow-forms allow-popups allow-popups-to-escape-sandbox"
-                  style={{
-                    // Fix X-Frame issues by allowing the iframe to load
-                    pointerEvents: 'auto'
-                  }}
-                  onError={(e) => {
-                    console.log('Iframe load error:', e);
-                    // Fallback content
-                    const target = e.target as HTMLIFrameElement;
-                    if (target) {
-                      target.style.display = 'none';
-                    }
-                  }}
-                />
-              </div>
-            </div>
-
-            {/* Privacy Stats */}
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-              <motion.div 
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5 }}
-                className="bg-gray-900/30 backdrop-blur-sm border border-gray-800 rounded-xl p-4"
-              >
-                <div className="flex items-center justify-between mb-2">
-                  <Shield className="w-6 h-6 text-green-400" />
-                  <span className="text-2xl font-bold text-green-400">{browserMetrics.blockedAds}</span>
-                </div>
-                <h3 className="text-sm font-semibold text-white">Ads Blocked</h3>
-                <p className="text-gray-400 text-xs">This session</p>
-              </motion.div>
-
-              <motion.div 
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: 0.1 }}
-                className="bg-gray-900/30 backdrop-blur-sm border border-gray-800 rounded-xl p-4"
-              >
-                <div className="flex items-center justify-between mb-2">
-                  <Eye className="w-6 h-6 text-blue-400" />
-                  <span className="text-2xl font-bold text-blue-400">{browserMetrics.blockedTrackers}</span>
-                </div>
-                <h3 className="text-sm font-semibold text-white">Trackers Blocked</h3>
-                <p className="text-gray-400 text-xs">This session</p>
-              </motion.div>
-
-              <motion.div 
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: 0.2 }}
-                className="bg-gray-900/30 backdrop-blur-sm border border-gray-800 rounded-xl p-4"
-              >
-                <div className="flex items-center justify-between mb-2">
-                  <CheckCircle className="w-6 h-6 text-purple-400" />
-                  <span className="text-2xl font-bold text-purple-400">{browserMetrics.privacyScore}%</span>
-                </div>
-                <h3 className="text-sm font-semibold text-white">Privacy Score</h3>
-                <p className="text-gray-400 text-xs">Current page</p>
-              </motion.div>
-
-              <motion.div 
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: 0.3 }}
-                className="bg-gray-900/30 backdrop-blur-sm border border-gray-800 rounded-xl p-4"
-              >
-                <div className="flex items-center justify-between mb-2">
-                  <Zap className="w-6 h-6 text-yellow-400" />
-                  <span className="text-2xl font-bold text-yellow-400">{browserMetrics.dataSaved}</span>
-                </div>
-                <h3 className="text-sm font-semibold text-white">Data Saved</h3>
-                <p className="text-gray-400 text-xs">This session</p>
-              </motion.div>
-            </div>
+      {activeTab === 'history' && (
+        <div>
+          <div className="flex justify-end mb-4">
+            <button onClick={clearHistory} className="text-sm text-red-400 hover:text-red-300 flex items-center gap-1">
+              <Trash2 className="w-4 h-4" /> Clear history
+            </button>
           </div>
-        )}
+          {history.length === 0 ? (
+            <p className="text-gray-500 py-8 text-center">No history synced yet.</p>
+          ) : (
+            history.map((h) => (
+              <div key={h.id} className="flex items-center justify-between p-3 border-b border-gray-800">
+                <div>
+                  <p className="text-white text-sm">{h.title || h.url}</p>
+                  <p className="text-xs text-gray-500">{new Date(h.visited_at).toLocaleString()}</p>
+                </div>
+                <a href={h.url} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white">
+                  <ExternalLink className="w-4 h-4" />
+                </a>
+              </div>
+            ))
+          )}
+        </div>
+      )}
 
-        {/* Bookmarks Tab */}
-        {activeTab === 'bookmarks' && (
-          <div className="space-y-8">
-            <div className="flex items-center justify-between">
-              <h2 className="text-2xl font-bold text-white">Bookmarks</h2>
+      {activeTab === 'settings' && settings && (
+        <div className="space-y-3 max-w-lg">
+          {[
+            { key: 'block_ads', label: 'Block ads', desc: 'Block advertising networks and banners' },
+            { key: 'block_trackers', label: 'Block trackers', desc: 'Stop analytics and cross-site tracking' },
+            { key: 'fingerprint_protection', label: 'Fingerprint protection', desc: 'Reduce browser fingerprinting surface' },
+            { key: 'https_only', label: 'HTTPS only', desc: 'Upgrade connections to HTTPS when possible' },
+            { key: 'do_not_track', label: 'Do Not Track', desc: 'Send DNT header on every request' },
+            { key: 'clear_on_exit', label: 'Clear on exit', desc: 'Wipe session data when closing the browser' },
+          ].map((s) => (
+            <div key={s.key} className="flex items-center justify-between p-4 bg-gray-900/30 border border-gray-800 rounded-xl">
+              <div>
+                <p className="font-medium text-white">{s.label}</p>
+                <p className="text-xs text-gray-500">{s.desc}</p>
+              </div>
               <button
-                onClick={addBookmark}
-                className="flex items-center space-x-2 bg-gradient-to-r from-cyan-500 to-blue-500 text-white px-4 py-2 rounded-lg font-semibold hover:shadow-lg hover:shadow-cyan-500/25 transition-all duration-200"
+                onClick={() => toggleSetting(s.key)}
+                className={`w-12 h-6 rounded-full transition-colors ${settings[s.key] ? 'bg-yellow-400' : 'bg-gray-700'}`}
               >
-                <Plus className="w-4 h-4" />
-                <span>Add Bookmark</span>
+                <div className={`w-5 h-5 bg-white rounded-full transition-transform ${settings[s.key] ? 'translate-x-6' : 'translate-x-0.5'}`} />
               </button>
             </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {bookmarks.map((bookmark) => (
-                <motion.div
-                  key={bookmark.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5 }}
-                  className="bg-gray-900/30 backdrop-blur-sm border border-gray-800 rounded-xl p-4 hover:border-cyan-400/30 transition-all duration-300"
-                >
-                  <div className="flex items-center space-x-3 mb-3">
-                    <div className="text-2xl">{bookmark.favicon}</div>
-                    <div className="flex-1">
-                      <h3 className="text-white font-semibold truncate">{bookmark.title}</h3>
-                      <p className="text-gray-400 text-sm truncate">{bookmark.url}</p>
-                    </div>
-                  </div>
-                  <div className="flex space-x-2">
-                    <button
-                      onClick={() => {
-                        setCurrentUrl(bookmark.url);
-                        setUrlInput(bookmark.url);
-                        setActiveTab('browser');
-                      }}
-                      className="flex-1 bg-cyan-500 text-white py-2 rounded-lg text-sm font-semibold hover:bg-cyan-600 transition-colors"
-                    >
-                      Open
-                    </button>
-                    <button className="bg-gray-600 text-white py-2 px-3 rounded-lg text-sm font-semibold hover:bg-gray-500 transition-colors">
-                      <X className="w-4 h-4" />
-                    </button>
-                  </div>
-                </motion.div>
-              ))}
-            </div>
-          </div>
-        )}
+          ))}
+        </div>
+      )}
 
-        {/* History Tab */}
-        {activeTab === 'history' && (
-          <div className="space-y-8">
-            <h2 className="text-2xl font-bold text-white">Browsing History</h2>
-            <div className="bg-gray-900/30 backdrop-blur-sm border border-gray-800 rounded-xl p-6">
-              <div className="space-y-3">
-                {browserHistory.map((url, index) => (
-                  <div
-                    key={index}
-                    className="flex items-center justify-between p-3 bg-gray-800/50 rounded-lg hover:bg-gray-700/50 transition-colors"
-                  >
-                    <div className="flex items-center space-x-3">
-                      <Globe className="w-5 h-5 text-cyan-400" />
-                      <div>
-                        <p className="text-white font-medium">{url}</p>
-                        <p className="text-gray-400 text-sm">Visited {index === historyIndex ? 'now' : 'earlier'}</p>
-                      </div>
-                    </div>
-                    <button
-                      onClick={() => {
-                        setCurrentUrl(url);
-                        setUrlInput(url);
-                        setHistoryIndex(index);
-                        setActiveTab('browser');
-                      }}
-                      className="text-cyan-400 hover:text-cyan-300 text-sm font-semibold"
-                    >
-                      Visit
-                    </button>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        )}
+      {activeTab === 'download' && downloads && (
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          {downloads.all.map((opt) => (
+            <a
+              key={opt.id}
+              href={opt.available ? opt.url : '#'}
+              target={opt.available ? '_blank' : undefined}
+              rel="noopener noreferrer"
+              className={`p-6 rounded-2xl border border-gray-800 bg-gray-900/30 hover:border-gray-600 ${!opt.available ? 'opacity-50 pointer-events-none' : ''}`}
+            >
+              <h3 className="font-bold text-white">{opt.label}</h3>
+              <p className="text-sm text-gray-400 mt-1">{opt.description}</p>
+              <p className="text-xs text-yellow-400 mt-2">
+                {opt.available ? `Download ${opt.format}` : 'Coming soon'}
+              </p>
+            </a>
+          ))}
+        </div>
+      )}
 
-        {/* Privacy Tab */}
-        {activeTab === 'privacy' && (
-          <div className="space-y-8">
-            <h2 className="text-2xl font-bold text-white">Privacy Dashboard</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5 }}
-                className="bg-gray-900/30 backdrop-blur-sm border border-gray-800 rounded-xl p-6"
-              >
-                <h3 className="text-xl font-bold text-white mb-4">Protection Status</h3>
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <span className="text-gray-300">Ad Blocking</span>
-                    <div className="flex items-center space-x-2">
-                      <CheckCircle className="w-5 h-5 text-green-400" />
-                      <span className="text-green-400">Active</span>
-                    </div>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-gray-300">Tracker Blocking</span>
-                    <div className="flex items-center space-x-2">
-                      <CheckCircle className="w-5 h-5 text-green-400" />
-                      <span className="text-green-400">Active</span>
-                    </div>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-gray-300">Fingerprinting Protection</span>
-                    <div className="flex items-center space-x-2">
-                      <CheckCircle className="w-5 h-5 text-green-400" />
-                      <span className="text-green-400">Active</span>
-                    </div>
-                  </div>
-                </div>
-              </motion.div>
-
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: 0.1 }}
-                className="bg-gray-900/30 backdrop-blur-sm border border-gray-800 rounded-xl p-6"
-              >
-                <h3 className="text-xl font-bold text-white mb-4">Session Stats</h3>
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <span className="text-gray-300">Ads Blocked</span>
-                    <span className="text-white font-semibold">{browserMetrics.blockedAds}</span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-gray-300">Trackers Blocked</span>
-                    <span className="text-white font-semibold">{browserMetrics.blockedTrackers}</span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-gray-300">Data Saved</span>
-                    <span className="text-white font-semibold">{browserMetrics.dataSaved}</span>
-                  </div>
-                </div>
-              </motion.div>
-            </div>
-          </div>
-        )}
-
-        {/* Settings Tab */}
-        {activeTab === 'settings' && (
-          <div className="space-y-8">
-            <h2 className="text-2xl font-bold text-white">Browser Settings</h2>
-            <div className="bg-gray-900/30 backdrop-blur-sm border border-gray-800 rounded-xl p-6">
-              <div className="space-y-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h3 className="text-white font-semibold">Auto-block ads</h3>
-                    <p className="text-gray-400 text-sm">Automatically block advertisements</p>
-                  </div>
-                  <button className="bg-green-500 text-white px-4 py-2 rounded-lg text-sm font-semibold">
-                    Enabled
-                  </button>
-                </div>
-                
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h3 className="text-white font-semibold">Block trackers</h3>
-                    <p className="text-gray-400 text-sm">Prevent tracking scripts from running</p>
-                  </div>
-                  <button className="bg-green-500 text-white px-4 py-2 rounded-lg text-sm font-semibold">
-                    Enabled
-                  </button>
-                </div>
-                
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h3 className="text-white font-semibold">Clear browsing data</h3>
-                    <p className="text-gray-400 text-sm">Clear history, cookies, and cache</p>
-                  </div>
-                  <button className="bg-blue-500 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-blue-600">
-                    Clear
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
+      <div className="mt-12 pt-8 border-t border-gray-800 flex flex-wrap gap-4 text-sm text-gray-500">
+        <Link href="/taumail" className="hover:text-white">Tau Mail</Link>
+        <Link href="/taucloud" className="hover:text-white">Tau Cloud</Link>
+        <Link href="/tauid" className="hover:text-white">Tau ID</Link>
+        <Link href="/tauai" className="hover:text-white">Tau AI</Link>
+      </div>
     </DashboardShell>
   );
 }
