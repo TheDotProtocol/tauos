@@ -18,19 +18,34 @@ export type SendMailResult = {
 };
 
 function usePhoneSmtp(): boolean {
-  return (
-    process.env.MAIL_TRANSPORT === 'smtp' ||
-    process.env.PHONE_MAIL_SERVER === 'true' ||
-    Boolean(process.env.SMTP_HOST && !process.env.SENDGRID_API_KEY)
-  );
+  if (process.env.MAIL_TRANSPORT === 'smtp') return true;
+  if (process.env.MAIL_TRANSPORT === 'sendgrid') return false;
+  if (process.env.PHONE_MAIL_SERVER === 'true') return true;
+
+  // Production Vultr relay — prefer SMTP when fully configured
+  if (process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS) {
+    return true;
+  }
+
+  return Boolean(process.env.SMTP_HOST && !process.env.SENDGRID_API_KEY);
+}
+
+function getSmtpAuthUser(): string | undefined {
+  const user = process.env.SMTP_USER?.trim();
+  if (!user) return undefined;
+  if (user.includes('@')) return user;
+
+  // Postfix saslpasswd2 stores users as user@realm (e.g. taumail-relay@mail.tauos.org)
+  const realm = process.env.SMTP_REALM?.trim() || process.env.SMTP_AUTH_DOMAIN?.trim();
+  return realm ? `${user}@${realm}` : user;
 }
 
 function getSmtpTransport() {
   const host = process.env.SMTP_HOST || process.env.PHONE_SMTP_HOST || '127.0.0.1';
   const port = Number(process.env.SMTP_PORT || process.env.PHONE_SMTP_PORT || 2525);
   const secure = process.env.SMTP_SECURE === 'true';
-  const user = process.env.SMTP_USER;
-  const pass = process.env.SMTP_PASS;
+  const user = getSmtpAuthUser();
+  const pass = process.env.SMTP_PASS?.trim();
 
   return nodemailer.createTransport({
     host,

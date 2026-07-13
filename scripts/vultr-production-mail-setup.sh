@@ -34,15 +34,27 @@ apt-get install -y postfix postfix-pcre libsasl2-modules sasl2-bin \
 hostnamectl set-hostname "$HOSTNAME"
 
 # --- SASL for outbound relay (Vercel → :587) ---
-echo "$RELAY_PASS" | saslpasswd2 -c -p -u "$HOSTNAME" "$RELAY_USER"
-mkdir -p /etc/postfix/sasl
+# Use printf (not echo) — echo adds a newline that breaks SASL password checks
+printf '%s' "$RELAY_PASS" | saslpasswd2 -c -p -u "$HOSTNAME" "$RELAY_USER"
+mkdir -p /etc/postfix/sasl /etc/sasl2
 cat > /etc/postfix/sasl/smtpd.conf <<EOF
 pwcheck_method: auxprop
 auxprop_plugin: sasldb
 mech_list: PLAIN LOGIN
 EOF
+cp /etc/postfix/sasl/smtpd.conf /etc/sasl2/smtpd.conf
+chown root:sasl /etc/sasldb2 2>/dev/null || true
+chmod 640 /etc/sasldb2 2>/dev/null || true
+usermod -aG sasl postfix 2>/dev/null || true
 chmod 700 /etc/postfix/sasl
 postfix set-permissions
+
+# smtpd on :587 must read sasldb (copy into chroot as well)
+mkdir -p /var/spool/postfix/etc/sasl2
+cp /etc/sasldb2 /var/spool/postfix/etc/sasldb2
+cp /etc/sasl2/smtpd.conf /var/spool/postfix/etc/sasl2/smtpd.conf
+chown root:sasl /var/spool/postfix/etc/sasldb2
+chmod 640 /var/spool/postfix/etc/sasldb2
 
 DOMAIN_LIST=$(IFS=,; echo "${DOMAINS[*]}")
 
@@ -118,7 +130,7 @@ EOF
 # Ensure submission port 587 is enabled
 grep -q '^submission' /etc/postfix/master.cf || cat >> /etc/postfix/master.cf <<'EOF'
 
-submission inet n       -       y       -       -       smtpd
+submission inet n       -       n       -       -       smtpd
   -o syslog_name=postfix/submission
   -o smtpd_tls_security_level=encrypt
   -o smtpd_sasl_auth_enable=yes
@@ -153,6 +165,7 @@ MAIL_TRANSPORT=smtp
 SMTP_HOST=$(curl -4 -s ifconfig.me || hostname -I | awk '{print $1}')
 SMTP_PORT=587
 SMTP_USER=$RELAY_USER
+SMTP_REALM=$HOSTNAME
 SMTP_PASS=$RELAY_PASS
 SMTP_SECURE=false
 
