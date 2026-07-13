@@ -5,6 +5,7 @@
   "description": "Tau Browser — privacy-first cross-platform web browser",
   "scripts": {
     "dev": "tauri dev",
+    "dev:web": "npx --yes serve@14 . --listen 1420 --no-request-logging",
     "build": "tauri build",
     "build:debug": "tauri build --debug"
   },

@@ -14,6 +14,7 @@ import {
   Download,
   Menu,
   X,
+  MessageCircle,
 } from 'lucide-react';
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
@@ -24,6 +25,7 @@ const appLinks = [
   { href: '/tauid', label: 'Tau ID', icon: Fingerprint },
   { href: '/taustore', label: 'Tau Store', icon: Store },
   { href: '/taubrowser', label: 'Tau Browser', icon: Globe },
+  { href: '/tautalk', label: 'Tau Talk', icon: MessageCircle },
   { href: '/tauai', label: 'Tau AI', icon: Sparkles },
 ];
 

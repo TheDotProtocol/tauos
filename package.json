@@ -11,7 +11,8 @@
     "mail:setup": "node scripts/setup-mail-domains.mjs",
     "storage:setup": "node scripts/setup-supabase-storage.mjs",
     "cloud:setup": "node scripts/setup-taucloud-storage.mjs",
-    "browser:setup": "node scripts/setup-taubrowser-storage.mjs"
+    "browser:setup": "node scripts/setup-taubrowser-storage.mjs",
+    "talk:setup": "node scripts/setup-tautalk-storage.mjs"
   },
   "dependencies": {
     "@heroicons/react": "^2.2.0",

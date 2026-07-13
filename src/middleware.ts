@@ -20,6 +20,10 @@ const HOST_ROUTES: HostRoute[] = [
     ],
     basePath: '/taubrowser',
   },
+  {
+    hosts: ['talk.tauos.org', 'talk.localhost', 'tautalk.com', 'www.tautalk.com'],
+    basePath: '/tautalk',
+  },
 ];
 
 function matchHostRoute(hostHeader: string | null): HostRoute | null {

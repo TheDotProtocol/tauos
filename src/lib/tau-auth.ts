@@ -10,7 +10,7 @@ export type TauTokenPayload = {
   fullName?: string;
 };
 
-const VERIFY_SCOPES = ['tauid', 'taumail', 'taucloud', 'taubrowser', 'default'] as const;
+const VERIFY_SCOPES = ['tauid', 'taumail', 'taucloud', 'taubrowser', 'tautalk', 'default'] as const;
 
 /** Master SSO signing secret — Tau ID tokens work across all apps */
 export function getSsoSecret(): string {

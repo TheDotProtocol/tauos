@@ -45,12 +45,20 @@ export async function GET() {
       blocklist: '/api/taubrowser/privacy/blocklist',
       downloads: '/api/taubrowser/downloads',
     },
+    tautalk: {
+      ok: true,
+      portal: '/tautalk',
+      subdomains: ['talk.tauos.org', 'tautalk.com'],
+      messages: '/api/tautalk/messages',
+      conversations: '/api/tautalk/conversations',
+      encryption: 'client-side AES-GCM',
+    },
   };
 
   const ok = database.ok && mail.ok;
 
   return NextResponse.json({
-    phase: 2,
+    phase: 3,
     ok,
     checks,
     timestamp: new Date().toISOString(),

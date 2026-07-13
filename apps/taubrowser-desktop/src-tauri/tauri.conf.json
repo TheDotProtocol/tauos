@@ -5,8 +5,8 @@
   "identifier": "org.tauos.browser",
   "build": {
     "frontendDist": "..",
-    "devUrl": "../index.html",
-    "beforeDevCommand": "",
+    "devUrl": "http://localhost:1420",
+    "beforeDevCommand": "npm run dev:web",
     "beforeBuildCommand": ""
   },
   "app": {

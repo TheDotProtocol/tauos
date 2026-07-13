@@ -28,13 +28,14 @@ export function getPool(): Pool {
 }
 
 export function getJwtSecret(
-  scope: 'taumail' | 'taucloud' | 'tauid' | 'taubrowser' | 'default' = 'default'
+  scope: 'taumail' | 'taucloud' | 'tauid' | 'taubrowser' | 'tautalk' | 'default' = 'default'
 ): string {
   const byScope: Record<string, string | undefined> = {
     taumail: process.env.JWT_SECRET_TAUMAIL,
     taucloud: process.env.JWT_SECRET_TAUCLOUD ?? process.env.JWT_SECRET,
     tauid: process.env.JWT_SECRET_TAUID ?? process.env.JWT_SECRET,
     taubrowser: process.env.JWT_SECRET_TAUBROWSER ?? process.env.JWT_SECRET,
+    tautalk: process.env.JWT_SECRET_TAUTALK ?? process.env.JWT_SECRET,
     default: process.env.JWT_SECRET,
   };
   const secret = byScope[scope] ?? process.env.JWT_SECRET;
