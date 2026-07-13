@@ -5,6 +5,8 @@ description = "Tau Browser — privacy-first cross-platform web browser"
 authors = ["Tau Core Inc."]
 edition = "2021"
 
+[workspace]
+
 [lib]
 name = "taubrowser_lib"
 crate-type = ["staticlib", "cdylib", "rlib"]
