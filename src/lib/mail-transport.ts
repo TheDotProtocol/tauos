@@ -84,12 +84,24 @@ function getSmtpTransport() {
   });
 }
 
-export async function sendMail(input: SendMailInput): Promise<SendMailResult> {
+function sendGridErrorMessage(err: unknown): string {
+  if (err && typeof err === 'object' && 'response' in err) {
+    const body = (err as { response?: { body?: { errors?: Array<{ message?: string }> } } }).response?.body;
+    const messages = body?.errors?.map((e) => e.message).filter(Boolean);
+    if (messages?.length) return messages.join('; ');
+  }
+  return err instanceof Error ? err.message : 'SendGrid send failed';
+}
+
+function smtpConfigured(): boolean {
+  return Boolean(process.env.SMTP_HOST || process.env.PHONE_SMTP_HOST);
+}
+
+async function sendViaSmtp(input: SendMailInput): Promise<SendMailResult> {
   const fromHeader = input.from.name
     ? `"${input.from.name}" <${input.from.email}>`
     : input.from.email;
 
-  // Envelope sender must match SMTP-auth domain for relay deliverability (SPF alignment)
   const envelopeFrom =
     process.env.SMTP_ENVELOPE_FROM?.trim() ||
     process.env.MAIL_FROM?.trim() ||
@@ -99,59 +111,96 @@ export async function sendMail(input: SendMailInput): Promise<SendMailResult> {
   if (input.inReplyTo) headers['In-Reply-To'] = input.inReplyTo;
   if (input.references) headers['References'] = input.references;
 
-  if (usePhoneSmtp(input)) {
-    const transport = getSmtpTransport();
-    const info = await transport.sendMail({
-      from: fromHeader,
-      sender: envelopeFrom !== input.from.email ? envelopeFrom : undefined,
-      replyTo: input.replyTo || input.from.email,
-      to: input.to,
-      cc: input.cc,
-      bcc: input.bcc,
-      subject: input.subject,
-      text: input.text,
-      html: input.html,
-      headers,
-      envelope: {
-        from: envelopeFrom,
-        to: Array.isArray(input.to) ? input.to : [input.to],
-      },
-    });
+  const transport = getSmtpTransport();
+  const info = await transport.sendMail({
+    from: fromHeader,
+    sender: envelopeFrom !== input.from.email ? envelopeFrom : undefined,
+    replyTo: input.replyTo || input.from.email,
+    to: input.to,
+    cc: input.cc,
+    bcc: input.bcc,
+    subject: input.subject,
+    text: input.text,
+    html: input.html,
+    headers,
+    envelope: {
+      from: envelopeFrom,
+      to: Array.isArray(input.to) ? input.to : [input.to],
+    },
+  });
 
-    if (info.rejected?.length) {
-      throw new Error(`SMTP rejected recipients: ${info.rejected.join(', ')}`);
+  if (info.rejected?.length) {
+    throw new Error(`SMTP rejected recipients: ${info.rejected.join(', ')}`);
+  }
+
+  return {
+    messageId: info.messageId || `smtp-${Date.now()}`,
+    transport: 'smtp',
+    accepted: info.accepted,
+    rejected: info.rejected,
+    envelopeFrom,
+  };
+}
+
+async function sendViaSendGrid(input: SendMailInput): Promise<SendMailResult> {
+  const apiKey = process.env.SENDGRID_API_KEY?.trim();
+  if (!apiKey) throw new Error('SendGrid API key not configured');
+
+  sgMail.setApiKey(apiKey);
+
+  const fromEmail =
+    process.env.SENDGRID_FROM_EMAIL?.trim() ||
+    input.from.email;
+
+  const fromName =
+    process.env.SENDGRID_FROM_NAME?.trim() ||
+    input.from.name;
+
+  const [response] = await sgMail.send({
+    to: input.to,
+    from: { email: fromEmail, name: fromName },
+    subject: input.subject,
+    text: input.text,
+    html: input.html || input.text,
+    cc: input.cc,
+    bcc: input.bcc,
+    replyTo: input.replyTo || input.from.email,
+    headers: {
+      ...(input.inReplyTo ? { 'In-Reply-To': input.inReplyTo } : {}),
+      ...(input.references ? { References: input.references } : {}),
+    },
+  });
+
+  return {
+    messageId: response.headers['x-message-id'] || `sg-${Date.now()}`,
+    transport: 'sendgrid',
+    envelopeFrom: fromEmail,
+  };
+}
+
+export async function sendMail(input: SendMailInput): Promise<SendMailResult> {
+  const preferSendGrid = shouldUseSendGrid(input);
+
+  if (preferSendGrid && process.env.SENDGRID_API_KEY) {
+    try {
+      return await sendViaSendGrid(input);
+    } catch (err) {
+      const sgError = sendGridErrorMessage(err);
+      console.error('[mail-transport] SendGrid failed:', sgError);
+      if (smtpConfigured()) {
+        console.warn('[mail-transport] Falling back to SMTP after SendGrid failure');
+        return sendViaSmtp(input);
+      }
+      throw new Error(`SendGrid: ${sgError}`);
     }
+  }
 
-    return {
-      messageId: info.messageId || `smtp-${Date.now()}`,
-      transport: 'smtp',
-      accepted: info.accepted,
-      rejected: info.rejected,
-      envelopeFrom,
-    };
+  if (usePhoneSmtp(input)) {
+    return sendViaSmtp(input);
   }
 
   if (process.env.SENDGRID_API_KEY) {
-    sgMail.setApiKey(process.env.SENDGRID_API_KEY);
-    const [response] = await sgMail.send({
-      to: input.to,
-      from: { email: input.from.email, name: input.from.name },
-      subject: input.subject,
-      text: input.text,
-      html: input.html || input.text,
-      cc: input.cc,
-      bcc: input.bcc,
-      replyTo: input.replyTo || input.from.email,
-      headers: {
-        ...(input.inReplyTo ? { 'In-Reply-To': input.inReplyTo } : {}),
-        ...(input.references ? { References: input.references } : {}),
-      },
-    });
-    return {
-      messageId: response.headers['x-message-id'] || `sg-${Date.now()}`,
-      transport: 'sendgrid',
-      envelopeFrom: input.from.email,
-    };
+    return sendViaSendGrid(input);
   }
 
   if (isProductionDeploy()) {

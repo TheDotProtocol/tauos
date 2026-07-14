@@ -57,9 +57,12 @@ export async function POST(request: NextRequest) {
     });
 
     const external = isExternalRecipient(String(to).split(',')[0]?.trim() || '');
-    const deliverabilityHint = external
-      ? 'Message accepted by our mail server. External delivery (Gmail, etc.) requires SPF/DKIM/DMARC on tauos.org — check recipient spam folder if not received within 5 minutes.'
-      : undefined;
+    const deliverabilityHint =
+      external && transport === 'smtp'
+        ? 'Sent via backup SMTP relay. Gmail delivery may be delayed — check Spam/Promotions. For reliable external delivery, update SENDGRID_API_KEY in Vercel (current key returns Unauthorized).'
+        : external
+          ? 'Message accepted by our mail server. External delivery may take a few minutes — check recipient spam folder if not received.'
+          : undefined;
 
     const result = await getPool().query(
       `INSERT INTO sent_emails (user_id, recipient_email, subject, body, sent_at, smtp_status, message_id)

@@ -95,7 +95,8 @@ function TauMailComposeInner() {
         // Redirect to sent items
         window.location.href = '/taumail/sent';
       } else {
-        alert(`❌ Failed to send email:\n${result.error || 'Unknown error'}`);
+        const detail = result.details ? `\n\nDetails: ${result.details}` : '';
+        alert(`❌ Failed to send email:\n${result.error || 'Unknown error'}${detail}`);
       }
     } catch (error) {
       alert(`❌ Error sending email:\n${error.message}`);
