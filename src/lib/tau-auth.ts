@@ -66,5 +66,4 @@ export function verifyTauToken(token: string): TauTokenPayload | null {
   return null;
 }
 
-export const TAU_TOKEN_KEY = 'tauos_token';
-export const TAU_USER_KEY = 'tauos_user';
+export { TAU_TOKEN_KEY, TAU_USER_KEY } from '@/lib/tau-auth-constants';

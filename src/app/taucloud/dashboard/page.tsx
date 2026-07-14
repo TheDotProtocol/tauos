@@ -38,7 +38,7 @@ export default function TauCloudDashboard() {
   const [uploadProgress, setUploadProgress] = useState({});
   const [storageInfo, setStorageInfo] = useState({
     used: 0,
-    limit: 100 * 1024 * 1024 * 1024, // 100GB default
+    limit: 5 * 1024 * 1024 * 1024, // 5 GB beta quota
     usedPercent: 0
   });
   const [recentActivity, setRecentActivity] = useState([]);

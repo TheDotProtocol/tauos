@@ -7,26 +7,30 @@
   <link rel="stylesheet" href="src/styles.css" />
 </head>
 <body>
-  <header id="toolbar">
-    <div class="nav-group">
-      <button id="btn-back" title="Back">←</button>
-      <button id="btn-forward" title="Forward">→</button>
-      <button id="btn-reload" title="Reload">↻</button>
-      <button id="btn-home" title="Home">⌂</button>
+  <div id="chrome-top">
+    <header id="toolbar">
+      <div class="nav-group">
+        <button id="btn-back" title="Back">←</button>
+        <button id="btn-forward" title="Forward">→</button>
+        <button id="btn-reload" title="Reload">↻</button>
+        <button id="btn-home" title="Home">⌂</button>
+      </div>
+      <form id="url-form" class="url-bar">
+        <span id="lock-icon">🔒</span>
+        <input id="url-input" type="text" placeholder="Search or enter address" autocomplete="off" spellcheck="false" />
+      </form>
+      <div class="nav-group">
+        <button id="btn-bookmark" title="Bookmark">★</button>
+        <button id="btn-privacy" title="Privacy shield">🛡</button>
+        <span id="blocked-count" title="Blocked this session">0 blocked</span>
+      </div>
+    </header>
+    <div id="space-bar" aria-label="Spaces"></div>
+    <div id="tab-bar" aria-label="Tabs">
+      <button id="btn-new-tab" title="New tab">+</button>
     </div>
-    <form id="url-form" class="url-bar">
-      <span id="lock-icon">🔒</span>
-      <input id="url-input" type="text" placeholder="Search or enter address" autocomplete="off" spellcheck="false" />
-    </form>
-    <div class="nav-group">
-      <button id="btn-bookmark" title="Bookmark">★</button>
-      <button id="btn-privacy" title="Privacy shield">🛡</button>
-      <span id="blocked-count" title="Blocked this session">0 blocked</span>
-    </div>
-  </header>
-  <main id="webview-container">
-    <iframe id="browser-frame" sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox allow-downloads" src="https://www.tauos.org"></iframe>
-  </main>
+  </div>
+  <main id="webview-container" aria-hidden="true"></main>
   <footer id="status-bar">
     <span id="status-text">Tau Browser — Truly private. Zero telemetry.</span>
     <span id="sync-status"></span>

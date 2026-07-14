@@ -2,66 +2,30 @@ version: '3.8'
 
 services:
   prometheus:
-    image: prom/prometheus:latest
-    container_name: tauos-prometheus
+    image: prom/prometheus:v2.51.0
     ports:
-      - "9090:9090"
+      - '9090:9090'
     volumes:
-      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
-      - prometheus_data:/prometheus
-    command:
-      - '--config.file=/etc/prometheus/prometheus.yml'
-      - '--storage.tsdb.path=/prometheus'
-      - '--web.console.libraries=/etc/prometheus/console_libraries'
-      - '--web.console.templates=/etc/prometheus/consoles'
-      - '--storage.tsdb.retention.time=200h'
-      - '--web.enable-lifecycle'
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
     restart: unless-stopped
-    networks:
-      - tauos-monitoring
 
   grafana:
-    image: grafana/grafana:latest
-    container_name: tauos-grafana
+    image: grafana/grafana:10.4.0
     ports:
-      - "3001:3000"
-    volumes:
-      - grafana_data:/var/lib/grafana
-      - ./grafana/provisioning:/etc/grafana/provisioning
-      - ./grafana/dashboards:/var/lib/grafana/dashboards
+      - '3001:3000'
     environment:
-      - GF_SECURITY_ADMIN_USER=admin
-      - GF_SECURITY_ADMIN_PASSWORD=tauos2025
-      - GF_USERS_ALLOW_SIGN_UP=false
-      - GF_INSTALL_PLUGINS=grafana-clock-panel,grafana-simple-json-datasource
-    restart: unless-stopped
-    networks:
-      - tauos-monitoring
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: tauos-beta
+      GF_USERS_ALLOW_SIGN_UP: 'false'
+    volumes:
+      - ./grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./grafana/dashboards:/var/lib/grafana/dashboards:ro
     depends_on:
       - prometheus
-
-  node-exporter:
-    image: prom/node-exporter:latest
-    container_name: tauos-node-exporter
-    ports:
-      - "9100:9100"
-    volumes:
-      - /proc:/host/proc:ro
-      - /sys:/host/sys:ro
-      - /:/rootfs:ro
-    command:
-      - '--path.procfs=/host/proc'
-      - '--path.rootfs=/rootfs'
-      - '--path.sysfs=/host/sys'
-      - '--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)'
     restart: unless-stopped
-    networks:
-      - tauos-monitoring
 
-volumes:
-  prometheus_data:
-  grafana_data:
-
-networks:
-  tauos-monitoring:
-    driver: bridge
+  blackbox:
+    image: prom/blackbox-exporter:v0.25.0
+    ports:
+      - '9115:9115'
+    restart: unless-stopped

@@ -5,6 +5,7 @@ import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Shield, User, Mail, Settings, LogOut, Key, Fingerprint, Eye, EyeOff, Plus, Trash2 } from 'lucide-react';
 import Link from 'next/link';
+import { useTauSession } from '@/hooks/useTauSession';
 
 interface IdentityProfile {
   id: string;
@@ -15,6 +16,10 @@ interface IdentityProfile {
 }
 
 export default function TauIDDashboard() {
+  const { user: sessionUser, token, ready } = useTauSession({
+    requireAuth: true,
+    loginPath: '/tauid/login?redirect=/tauid/dashboard',
+  });
   const [user, setUser] = useState<any>(null);
   const [profiles, setProfiles] = useState<IdentityProfile[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -25,19 +30,13 @@ export default function TauIDDashboard() {
   });
 
   useEffect(() => {
-    const token = localStorage.getItem('tauos_token');
-    if (!token) {
-      window.location.href = '/tauid/login';
-      return;
-    }
-
-    // Load user data and profiles
+    if (!ready || !token) return;
     loadUserData();
-  }, []);
+  }, [ready, token]);
 
   const loadUserData = async () => {
+    if (!token) return;
     try {
-      const token = localStorage.getItem('tauos_token');
       const response = await fetch('/api/tauid/user/profile', {
         headers: {
           'Authorization': `Bearer ${token}`

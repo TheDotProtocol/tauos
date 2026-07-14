@@ -12,10 +12,10 @@ export default function TauTalkLanding() {
   const [loginData, setLoginData] = useState({ email: '', password: '' });
 
   const features = [
-    { icon: Lock, title: 'End-to-end encrypted', description: 'Messages encrypted on your device. Server never sees plaintext.' },
-    { icon: MessageCircle, title: 'WhatsApp-style chats', description: 'Direct messages and group chats with read receipts and typing sync.' },
-    { icon: Shield, title: 'Signal-grade privacy', description: 'No ads, no data mining, no phone number required — use your Tau ID.' },
-    { icon: Zap, title: 'Telegram-speed delivery', description: 'Fast message delivery with encrypted sync across devices.' },
+    { icon: Lock, title: 'End-to-end encrypted', description: 'Messages encrypted on your device with ECDH key agreement. Server stores ciphertext only.' },
+    { icon: MessageCircle, title: 'Direct & group chats', description: 'One-to-one and group conversations with read receipts — Public Beta.' },
+    { icon: Shield, title: 'Privacy-first', description: 'No ads, no data mining, no phone number required — use your Tau ID.' },
+    { icon: Zap, title: 'Live delivery', description: 'Server-sent events for near-instant message sync (voice/video post-beta).' },
   ];
 
   const handleRegister = async (e: React.FormEvent) => {
@@ -65,13 +65,13 @@ export default function TauTalkLanding() {
         <div className="max-w-4xl mx-auto text-center">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-green-500/10 border border-green-500/30 text-green-400 text-sm mb-6">
-              <Shield className="w-4 h-4" /> E2E Encrypted · Zero Telemetry
+              <Shield className="w-4 h-4" /> Public Beta · E2E Encrypted
             </div>
             <h1 className="text-4xl sm:text-5xl font-bold text-white mb-4">
               Message without being the product
             </h1>
             <p className="text-xl text-gray-300 mb-8 max-w-2xl mx-auto">
-              Tau Talk combines the best of WhatsApp, Telegram, and Signal — encrypted chats, groups, and voice/video calls — all tied to your Tau ID.
+              Tau Talk — encrypted direct and group chats tied to your Tau ID. Voice and video calls are on the post-beta roadmap.
             </p>
             <div className="flex flex-wrap justify-center gap-4">
               <button

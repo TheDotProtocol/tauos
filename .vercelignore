@@ -24,3 +24,5 @@
 /public/downloads/*.deb
 /public/downloads/*.AppImage
 /public/tauos-simple-20250730.iso
+/public/TauOS-Desktop.iso
+/public/**/*.iso

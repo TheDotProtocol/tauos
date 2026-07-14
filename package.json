@@ -1,6 +1,6 @@
 {
   "name": "tauos",
-  "version": "1.0.0-beta.1",
+  "version": "1.0.0-beta.2",
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -12,7 +12,10 @@
     "storage:setup": "node scripts/setup-supabase-storage.mjs",
     "cloud:setup": "node scripts/setup-taucloud-storage.mjs",
     "browser:setup": "node scripts/setup-taubrowser-storage.mjs",
-    "talk:setup": "node scripts/setup-tautalk-storage.mjs"
+    "talk:setup": "node scripts/setup-tautalk-storage.mjs",
+    "privacy:setup": "node scripts/setup-privacy-audit.mjs",
+    "test:e2e": "node scripts/e2e-smoke.mjs",
+    "monitoring:up": "docker compose -f monitoring/docker-compose.yml up -d"
   },
   "dependencies": {
     "@heroicons/react": "^2.2.0",

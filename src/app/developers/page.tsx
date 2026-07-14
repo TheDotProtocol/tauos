@@ -28,6 +28,28 @@ export default function DevelopersPage() {
           </a>
         </div>
       </section>
+      {/* TauScript examples gallery */}
+      <section className="py-16 bg-gray-950 border-b border-gray-800">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <h2 className="text-3xl font-bold text-white mb-2 text-center">TauScript examples</h2>
+          <p className="text-gray-400 text-center mb-10">Run these in the <a href="/developers/ide" className="text-yellow-400 hover:underline">browser IDE</a></p>
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {[
+              { title: 'Hello Tau', code: 'print("Hello from TauScript")' },
+              { title: 'Variables', code: 'let x = 42\nprint(x + 8)' },
+              { title: 'Loop', code: 'for i in 1..3 {\n  print("step " + i)\n}' },
+              { title: 'Function', code: 'fn greet(name) {\n  return "Hi " + name\n}\nprint(greet("dev"))' },
+              { title: 'Privacy check', code: 'print("No telemetry in TauScript runs")' },
+              { title: 'API ping', code: 'print("Use fetch from host app for HTTP")' },
+            ].map((ex) => (
+              <div key={ex.title} className="p-4 bg-gray-900/50 border border-gray-800 rounded-xl">
+                <h3 className="text-yellow-400 font-semibold mb-2">{ex.title}</h3>
+                <pre className="text-xs text-gray-300 font-mono whitespace-pre-wrap bg-black/40 p-3 rounded-lg">{ex.code}</pre>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
       {/* Philosophy Section */}
       <section className="py-20 bg-black">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

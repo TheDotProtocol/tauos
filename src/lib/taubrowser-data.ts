@@ -36,6 +36,23 @@ export async function ensureBrowserProfile(userId: string | number) {
     `INSERT INTO taubrowser_privacy_stats (user_id) VALUES ($1) ON CONFLICT (user_id) DO NOTHING`,
     [id]
   );
+  const spaces = await getPool().query(
+    `SELECT id FROM taubrowser_spaces WHERE user_id = $1 LIMIT 1`,
+    [id]
+  );
+  if (spaces.rows.length === 0) {
+    const space = await getPool().query(
+      `INSERT INTO taubrowser_spaces (user_id, name, color, icon, sort_order, homepage)
+       VALUES ($1, 'Personal', '#facc15', '🌐', 0, 'https://www.tauos.org')
+       RETURNING id`,
+      [id]
+    );
+    await getPool().query(
+      `INSERT INTO taubrowser_tabs (space_id, user_id, url, title, sort_order, is_active)
+       VALUES ($1, $2, 'https://www.tauos.org', 'New Tab', 0, true)`,
+      [space.rows[0].id, id]
+    );
+  }
 }
 
 export async function listBookmarks(userId: string | number) {
@@ -180,11 +197,208 @@ export async function incrementPrivacyStats(
 
 export async function syncAll(userId: string | number) {
   await ensureBrowserProfile(userId);
-  const [bookmarks, history, settings, privacy] = await Promise.all([
+  const [bookmarks, history, settings, privacy, spaces, tabs] = await Promise.all([
     listBookmarks(userId),
     listHistory(userId, 200),
     getSettings(userId),
     getPrivacyStats(userId),
+    listSpaces(userId),
+    listTabs(userId),
   ]);
-  return { bookmarks, history, settings, privacy };
+  return { bookmarks, history, settings, privacy, spaces, tabs };
+}
+
+export async function listSpaces(userId: string | number) {
+  await ensureBrowserProfile(userId);
+  const result = await getPool().query(
+    `SELECT id, name, color, icon, sort_order, homepage, created_at
+     FROM taubrowser_spaces WHERE user_id = $1 ORDER BY sort_order ASC, created_at ASC`,
+    [uid(userId)]
+  );
+  return result.rows;
+}
+
+export async function createSpace(
+  userId: string | number,
+  data: { name: string; color?: string; icon?: string; homepage?: string }
+) {
+  const id = uid(userId);
+  const count = await getPool().query(
+    `SELECT COUNT(*)::int AS c FROM taubrowser_spaces WHERE user_id = $1`,
+    [id]
+  );
+  const result = await getPool().query(
+    `INSERT INTO taubrowser_spaces (user_id, name, color, icon, sort_order, homepage)
+     VALUES ($1, $2, $3, $4, $5, $6)
+     RETURNING id, name, color, icon, sort_order, homepage, created_at`,
+    [
+      id,
+      data.name,
+      data.color ?? '#facc15',
+      data.icon ?? '🌐',
+      count.rows[0].c,
+      data.homepage ?? 'https://www.tauos.org',
+    ]
+  );
+  const spaceId = result.rows[0].id;
+  await getPool().query(
+    `INSERT INTO taubrowser_tabs (space_id, user_id, url, title, sort_order, is_active)
+     VALUES ($1, $2, $3, 'New Tab', 0, true)`,
+    [spaceId, id, data.homepage ?? 'https://www.tauos.org']
+  );
+  return result.rows[0];
+}
+
+export async function updateSpace(
+  userId: string | number,
+  spaceId: string,
+  patch: { name?: string; color?: string; icon?: string; homepage?: string; sort_order?: number }
+) {
+  const current = await getPool().query(
+    `SELECT * FROM taubrowser_spaces WHERE id = $1 AND user_id = $2`,
+    [spaceId, uid(userId)]
+  );
+  if (current.rows.length === 0) throw new Error('Space not found');
+  const row = current.rows[0];
+  const result = await getPool().query(
+    `UPDATE taubrowser_spaces SET
+       name = $3, color = $4, icon = $5, homepage = $6, sort_order = $7
+     WHERE id = $1 AND user_id = $2
+     RETURNING id, name, color, icon, sort_order, homepage, created_at`,
+    [
+      spaceId,
+      uid(userId),
+      patch.name ?? row.name,
+      patch.color ?? row.color,
+      patch.icon ?? row.icon,
+      patch.homepage ?? row.homepage,
+      patch.sort_order ?? row.sort_order,
+    ]
+  );
+  return result.rows[0];
+}
+
+export async function deleteSpace(userId: string | number, spaceId: string) {
+  const count = await getPool().query(
+    `SELECT COUNT(*)::int AS c FROM taubrowser_spaces WHERE user_id = $1`,
+    [uid(userId)]
+  );
+  if (count.rows[0].c <= 1) throw new Error('Cannot delete last space');
+  const result = await getPool().query(
+    `DELETE FROM taubrowser_spaces WHERE id = $1 AND user_id = $2 RETURNING id`,
+    [spaceId, uid(userId)]
+  );
+  if (result.rows.length === 0) throw new Error('Space not found');
+  return { id: spaceId };
+}
+
+export async function listTabs(userId: string | number, spaceId?: string) {
+  await ensureBrowserProfile(userId);
+  if (spaceId) {
+    const result = await getPool().query(
+      `SELECT id, space_id, url, title, sort_order, is_active, created_at
+       FROM taubrowser_tabs WHERE user_id = $1 AND space_id = $2
+       ORDER BY sort_order ASC, created_at ASC`,
+      [uid(userId), spaceId]
+    );
+    return result.rows;
+  }
+  const result = await getPool().query(
+    `SELECT id, space_id, url, title, sort_order, is_active, created_at
+     FROM taubrowser_tabs WHERE user_id = $1 ORDER BY sort_order ASC, created_at ASC`,
+    [uid(userId)]
+  );
+  return result.rows;
+}
+
+export async function createTab(
+  userId: string | number,
+  data: { space_id: string; url?: string; title?: string }
+) {
+  const id = uid(userId);
+  await getPool().query(
+    `UPDATE taubrowser_tabs SET is_active = false WHERE user_id = $1 AND space_id = $2`,
+    [id, data.space_id]
+  );
+  const count = await getPool().query(
+    `SELECT COUNT(*)::int AS c FROM taubrowser_tabs WHERE user_id = $1 AND space_id = $2`,
+    [id, data.space_id]
+  );
+  const result = await getPool().query(
+    `INSERT INTO taubrowser_tabs (space_id, user_id, url, title, sort_order, is_active)
+     VALUES ($1, $2, $3, $4, $5, true)
+     RETURNING id, space_id, url, title, sort_order, is_active, created_at`,
+    [
+      data.space_id,
+      id,
+      data.url ?? 'https://www.tauos.org',
+      data.title ?? 'New Tab',
+      count.rows[0].c,
+    ]
+  );
+  return result.rows[0];
+}
+
+export async function updateTab(
+  userId: string | number,
+  tabId: string,
+  patch: { url?: string; title?: string; is_active?: boolean; sort_order?: number }
+) {
+  const current = await getPool().query(
+    `SELECT * FROM taubrowser_tabs WHERE id = $1 AND user_id = $2`,
+    [tabId, uid(userId)]
+  );
+  if (current.rows.length === 0) throw new Error('Tab not found');
+  const row = current.rows[0];
+  if (patch.is_active) {
+    await getPool().query(
+      `UPDATE taubrowser_tabs SET is_active = false WHERE user_id = $1 AND space_id = $2`,
+      [uid(userId), row.space_id]
+    );
+  }
+  const result = await getPool().query(
+    `UPDATE taubrowser_tabs SET
+       url = $3, title = $4, is_active = $5, sort_order = $6
+     WHERE id = $1 AND user_id = $2
+     RETURNING id, space_id, url, title, sort_order, is_active, created_at`,
+    [
+      tabId,
+      uid(userId),
+      patch.url ?? row.url,
+      patch.title ?? row.title,
+      patch.is_active ?? row.is_active,
+      patch.sort_order ?? row.sort_order,
+    ]
+  );
+  return result.rows[0];
+}
+
+export async function deleteTab(userId: string | number, tabId: string) {
+  const tab = await getPool().query(
+    `SELECT space_id FROM taubrowser_tabs WHERE id = $1 AND user_id = $2`,
+    [tabId, uid(userId)]
+  );
+  if (tab.rows.length === 0) throw new Error('Tab not found');
+  const spaceId = tab.rows[0].space_id;
+  const count = await getPool().query(
+    `SELECT COUNT(*)::int AS c FROM taubrowser_tabs WHERE user_id = $1 AND space_id = $2`,
+    [uid(userId), spaceId]
+  );
+  if (count.rows[0].c <= 1) throw new Error('Cannot delete last tab in space');
+  await getPool().query(`DELETE FROM taubrowser_tabs WHERE id = $1 AND user_id = $2`, [
+    tabId,
+    uid(userId),
+  ]);
+  const active = await getPool().query(
+    `SELECT id FROM taubrowser_tabs WHERE user_id = $1 AND space_id = $2 AND is_active = true LIMIT 1`,
+    [uid(userId), spaceId]
+  );
+  if (active.rows.length === 0) {
+    await getPool().query(
+      `UPDATE taubrowser_tabs SET is_active = true
+       WHERE id = (SELECT id FROM taubrowser_tabs WHERE user_id = $1 AND space_id = $2 ORDER BY sort_order LIMIT 1)`,
+      [uid(userId), spaceId]
+    );
+  }
+  return { id: tabId };
 }

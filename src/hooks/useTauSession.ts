@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
-import { TAU_TOKEN_KEY, TAU_USER_KEY } from '@/lib/tau-auth';
+import { TAU_TOKEN_KEY, TAU_USER_KEY } from '@/lib/tau-auth-constants';
 
 export type TauSessionUser = {
   id: number;

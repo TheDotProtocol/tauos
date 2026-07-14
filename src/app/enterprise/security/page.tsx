@@ -1,7 +1,7 @@
 'use client';
 
 import MarketingPageShell from '@/components/marketing/MarketingPageShell';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { 
   Shield,
@@ -97,151 +97,67 @@ export default function SecurityDashboard() {
   const [activeTab, setActiveTab] = useState('overview');
   const [searchTerm, setSearchTerm] = useState('');
 
-  // Mock data for security overview
-  const securityMetrics = {
-    overallScore: 94,
-    complianceRate: 96,
-    activeThreats: 2,
-    lastScan: '2 hours ago',
-    devicesProtected: 1247,
-    policiesActive: 24
-  };
+  const [securityMetrics, setSecurityMetrics] = useState({
+    overallScore: 0,
+    complianceRate: 0,
+    activeThreats: 0,
+    lastScan: 'Live API',
+    devicesProtected: 0,
+    policiesActive: 0,
+  });
 
-  // Mock data for compliance frameworks
-  const complianceFrameworks = [
+  const [complianceFrameworks, setComplianceFrameworks] = useState([
     {
       id: '1',
       name: 'GDPR',
-      status: 'compliant',
-      score: 98,
-      lastAudit: '2025-01-10',
-      nextAudit: '2025-04-10',
-      requirements: 45,
-      met: 44,
-      pending: 1
-    },
-    {
-      id: '2',
-      name: 'SOC 2 Type II',
-      status: 'compliant',
-      score: 95,
-      lastAudit: '2024-12-15',
-      nextAudit: '2025-06-15',
-      requirements: 67,
-      met: 64,
-      pending: 3
-    },
-    {
-      id: '3',
-      name: 'ISO 27001',
       status: 'in_progress',
-      score: 87,
-      lastAudit: '2024-11-20',
-      nextAudit: '2025-05-20',
-      requirements: 114,
-      met: 99,
-      pending: 15
+      score: 0,
+      lastAudit: '—',
+      nextAudit: '—',
+      requirements: 6,
+      met: 0,
+      pending: 6,
     },
-    {
-      id: '4',
-      name: 'CCPA',
-      status: 'compliant',
-      score: 100,
-      lastAudit: '2025-01-05',
-      nextAudit: '2025-07-05',
-      requirements: 23,
-      met: 23,
-      pending: 0
-    }
-  ];
+  ]);
 
-  // Mock data for security events
-  const securityEvents = [
-    {
-      id: '1',
-      type: 'policy_violation',
-      severity: 'medium',
-      description: 'Unauthorized access attempt detected',
-      device: 'MacBook Pro - John Doe',
-      location: 'New York, NY',
-      timestamp: '10 minutes ago',
-      status: 'investigating',
-      risk: 'medium'
-    },
-    {
-      id: '2',
-      type: 'data_breach',
-      severity: 'high',
-      description: 'Suspicious data export activity',
-      device: 'iPhone 15 - Sarah Smith',
-      location: 'San Francisco, CA',
-      timestamp: '1 hour ago',
-      status: 'resolved',
-      risk: 'high'
-    },
-    {
-      id: '3',
-      type: 'malware_detected',
-      severity: 'critical',
-      description: 'Malware signature detected in file',
-      device: 'iPad Pro - Marketing Team',
-      location: 'Chicago, IL',
-      timestamp: '3 hours ago',
-      status: 'contained',
-      risk: 'critical'
-    },
-    {
-      id: '4',
-      type: 'compliance_check',
-      severity: 'low',
-      description: 'Routine compliance scan completed',
-      device: 'All Devices',
-      location: 'Global',
-      timestamp: '6 hours ago',
-      status: 'completed',
-      risk: 'low'
-    }
-  ];
+  useEffect(() => {
+    fetch('/api/enterprise/compliance-status')
+      .then((r) => r.json())
+      .then((data) => {
+        if (data.frameworks) setComplianceFrameworks(data.frameworks);
+        if (data.overallScore) {
+          setSecurityMetrics((m) => ({
+            ...m,
+            overallScore: data.overallScore,
+            complianceRate: Math.round((data.implementedControls / data.totalControls) * 100),
+          }));
+        }
+      })
+      .catch(() => {});
+  }, []);
 
-  // Mock data for audit trails
-  const auditTrails = [
-    {
-      id: '1',
-      action: 'Policy Updated',
-      user: 'admin@tauos.com',
-      resource: 'Privacy-Max Policy',
-      timestamp: '2025-01-15 14:30 UTC',
-      ip: '192.168.1.100',
-      status: 'success'
-    },
-    {
-      id: '2',
-      action: 'Device Enrolled',
-      user: 'john.doe@company.com',
-      resource: 'MacBook Pro - John Doe',
-      timestamp: '2025-01-15 13:45 UTC',
-      ip: '10.0.0.50',
-      status: 'success'
-    },
-    {
-      id: '3',
-      action: 'Security Scan',
-      user: 'system',
-      resource: 'All Devices',
-      timestamp: '2025-01-15 12:00 UTC',
-      ip: 'system',
-      status: 'success'
-    },
-    {
-      id: '4',
-      action: 'Policy Violation',
-      user: 'sarah.smith@company.com',
-      resource: 'iPhone 15 - Sarah Smith',
-      timestamp: '2025-01-15 11:30 UTC',
-      ip: '172.16.0.25',
-      status: 'warning'
-    }
-  ];
+  const securityEvents: Array<{
+    id: string;
+    type: string;
+    severity: string;
+    description: string;
+    device: string;
+    location: string;
+    timestamp: string;
+    status: string;
+    risk: string;
+  }> = [];
+
+  // Audit trails — populated from audit_log post-beta SIEM
+  const auditTrails: Array<{
+    id: string;
+    action: string;
+    user: string;
+    resource: string;
+    timestamp: string;
+    ip: string;
+    status: string;
+  }> = [];
 
   const getStatusColor = (status: string) => {
     switch (status) {

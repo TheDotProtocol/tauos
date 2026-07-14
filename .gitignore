@@ -9,6 +9,11 @@
 *secret*
 *password*
 *key*
+# Allow Next.js API route folders (not secret files)
+!src/app/api/**/password/
+!src/app/api/**/password/**
+!src/app/api/**/keys/
+!src/app/api/**/keys/**
 
 # Database files
 *.sql

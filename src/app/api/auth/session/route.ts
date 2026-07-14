@@ -15,7 +15,7 @@ export async function GET(request: NextRequest) {
   }
 
   const result = await getPool().query(
-    'SELECT id, username, email, full_name, is_active, last_login FROM users WHERE id = $1',
+    'SELECT id, username, email, full_name, is_active, last_login_at FROM users WHERE id = $1',
     [payload.userId]
   );
 
@@ -37,7 +37,7 @@ export async function GET(request: NextRequest) {
       username: user.username,
       email: user.email,
       fullName: user.full_name,
-      lastLogin: user.last_login,
+      lastLogin: user.last_login_at,
     },
   });
 }

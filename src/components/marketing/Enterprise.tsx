@@ -4,11 +4,11 @@ import { motion } from "framer-motion";
 import { ShieldCheck, Server, Key, FileBarChart2 } from "lucide-react";
 
 const compliances = [
-  { name: "SOC2 Type II", icon: ShieldCheck, desc: "Certified secure infrastructure" },
-  { name: "ISO 27001", icon: FileBarChart2, desc: "Global security standards met" },
-  { name: "GDPR Ready", icon: ShieldCheck, desc: "Built-in compliance tools" },
-  { name: "Zero Trust", icon: Key, desc: "Never trust, always verify" },
-  { name: "Audit Logs", icon: FileBarChart2, desc: "Immutable cryptographic ledgers" },
+  { name: "GDPR Aligned", icon: ShieldCheck, desc: "DSR export & erasure APIs live" },
+  { name: "DPA Available", icon: FileBarChart2, desc: "Standard processor terms at /legal/dpa" },
+  { name: "Audit Logs", icon: FileBarChart2, desc: "Immutable audit_log for DSR events" },
+  { name: "Zero Trust", icon: Key, desc: "Tau ID SSO across all apps" },
+  { name: "Certification Track", icon: Server, desc: "SOC 2 / ISO audits in progress — badges when earned" },
   { name: "Hybrid Arch", icon: Server, desc: "Deploy on-prem or cloud" },
 ];
 
@@ -25,7 +25,7 @@ export default function Enterprise() {
         >
           <h2 className="text-4xl md:text-6xl font-bold mb-6 tracking-tight">Enterprise-Ready. <span className="text-primary">Day One.</span></h2>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            Scale with confidence. Tau provides military-grade security out of the box.
+            GDPR-aligned controls today. Formal SOC 2 / ISO badges only after audits are earned.
           </p>
         </motion.div>
 

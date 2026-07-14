@@ -10,10 +10,10 @@ export type DownloadTarget = {
   available: boolean;
 };
 
-const VERSION = '1.0.0-beta.1';
+const VERSION = '1.0.0-beta.2';
 const RELEASE_BASE =
   process.env.TAUBROWSER_RELEASE_BASE ??
-  'https://github.com/TheDotProtocol/tauos/releases/download/taubrowser-v1.0.0-beta.1';
+  'https://github.com/TheDotProtocol/tauos/releases/download/taubrowser-v1.0.0-beta.2';
 
 /** Artifact URLs — populated by GitHub Actions release builds. */
 export const DOWNLOAD_TARGETS: DownloadTarget[] = [

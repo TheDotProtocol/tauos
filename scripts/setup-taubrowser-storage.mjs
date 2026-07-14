@@ -80,6 +80,41 @@ async function main() {
     'CREATE INDEX IF NOT EXISTS idx_taubrowser_history_user ON taubrowser_history(user_id, visited_at DESC)'
   );
 
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS taubrowser_spaces (
+      id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      name TEXT NOT NULL DEFAULT 'Personal',
+      color TEXT DEFAULT '#facc15',
+      icon TEXT DEFAULT '🌐',
+      sort_order INT DEFAULT 0,
+      homepage TEXT DEFAULT 'https://www.tauos.org',
+      created_at TIMESTAMPTZ DEFAULT NOW()
+    )
+  `);
+  console.log('  ✓ taubrowser_spaces');
+
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS taubrowser_tabs (
+      id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      space_id UUID NOT NULL REFERENCES taubrowser_spaces(id) ON DELETE CASCADE,
+      user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      url TEXT NOT NULL DEFAULT 'https://www.tauos.org',
+      title TEXT DEFAULT 'New Tab',
+      sort_order INT DEFAULT 0,
+      is_active BOOLEAN DEFAULT false,
+      created_at TIMESTAMPTZ DEFAULT NOW()
+    )
+  `);
+  console.log('  ✓ taubrowser_tabs');
+
+  await pool.query(
+    'CREATE INDEX IF NOT EXISTS idx_taubrowser_spaces_user ON taubrowser_spaces(user_id, sort_order)'
+  );
+  await pool.query(
+    'CREATE INDEX IF NOT EXISTS idx_taubrowser_tabs_space ON taubrowser_tabs(space_id, sort_order)'
+  );
+
   console.log('\n✅ Tau Browser schema ready');
   await pool.end();
 }

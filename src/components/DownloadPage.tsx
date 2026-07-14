@@ -27,6 +27,7 @@ import {
   type DownloadArtifact,
   type DetectedPlatform,
 } from '@/lib/downloads';
+import InstallWizard from '@/components/InstallWizard';
 
 async function enrichMacArch(detected: DetectedPlatform): Promise<DetectedPlatform> {
   if (detected.platform !== 'macos') return detected;
@@ -184,6 +185,8 @@ export default function DownloadPage() {
             </p>
           )}
         </motion.div>
+
+        <InstallWizard manifest={manifest} detected={detected} />
 
         {loadError && (
           <div className="mb-8 p-4 bg-red-500/10 border border-red-500/30 rounded-xl flex items-center gap-3 text-red-300">

@@ -1,7 +1,7 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
   "productName": "Tau Browser",
-  "version": "1.0.0-beta.1",
+  "version": "1.0.0-beta.2",
   "identifier": "org.tauos.browser",
   "build": {
     "frontendDist": "..",
@@ -10,19 +10,22 @@
     "beforeBuildCommand": ""
   },
   "app": {
+    "macOSPrivateApi": true,
+    "withGlobalTauri": true,
     "windows": [
       {
+        "label": "main",
         "title": "Tau Browser",
         "width": 1280,
         "height": 800,
         "minWidth": 800,
         "minHeight": 600,
         "resizable": true,
-        "fullscreen": false
+        "transparent": true
       }
     ],
     "security": {
-      "csp": "default-src 'self' https: data: blob:; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; frame-src https:; connect-src https:;"
+      "csp": "default-src 'self' https: http: data: blob:; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; frame-src https:; connect-src https: http: ipc: http://ipc.localhost;"
     }
   },
   "bundle": {

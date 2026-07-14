@@ -131,32 +131,66 @@ export default function TauAIPage() {
 
   const handleVoiceCommand = async () => {
     setIsListening(true);
+    setTranscript('');
+    setResponse('');
+
     try {
-      // Send voice command to TauAI API
-      const response = await fetch('/api/tauai', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          message: 'Heya Tau, how are you doing today?',
-          userId: 'demo-user'
-        })
+      if (!navigator.mediaDevices?.getUserMedia) {
+        setTranscript('(microphone unavailable)');
+        setResponse('Your browser does not support microphone access. Type in the chat demo instead.');
+        return;
+      }
+
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const recorder = new MediaRecorder(stream);
+      const chunks: BlobPart[] = [];
+
+      recorder.ondataavailable = (e) => chunks.push(e.data);
+
+      await new Promise<void>((resolve) => {
+        recorder.onstop = () => resolve();
+        recorder.start();
+        setTimeout(() => recorder.stop(), 4000);
       });
 
-      const data = await response.json();
-      
-      if (data.status === 'success') {
-        setTranscript('Heya Tau, how are you doing today?');
-        setResponse(data.message);
-      } else {
-        setTranscript('Heya Tau, how are you doing today?');
-        setResponse('Heya! I\'m doing absolutely fantastic, thanks for asking! 🤖✨ I\'m here and ready to help you with anything - whether it\'s managing your Tau OS apps, telling you a terrible joke, or just having a great conversation! What can I do for you today?');
+      stream.getTracks().forEach((t) => t.stop());
+      const blob = new Blob(chunks, { type: 'audio/webm' });
+
+      const form = new FormData();
+      form.append('audio', blob, 'voice.webm');
+      form.append('followUp', 'true');
+
+      const voiceRes = await fetch('/api/tauai/voice', { method: 'POST', body: form });
+      const voiceData = await voiceRes.json();
+
+      if (voiceData.useClientStt && 'webkitSpeechRecognition' in window) {
+        const SpeechRecognition = (window as any).webkitSpeechRecognition;
+        const recognition = new SpeechRecognition();
+        recognition.lang = 'en-US';
+        const clientText = await new Promise<string>((resolve) => {
+          recognition.onresult = (ev: any) => resolve(ev.results[0][0].transcript);
+          recognition.onerror = () => resolve('');
+          recognition.start();
+        });
+        if (clientText) {
+          setTranscript(clientText);
+          const chatRes = await fetch('/api/tauai/chat', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ messages: [{ role: 'user', content: clientText }] }),
+          });
+          const chatData = await chatRes.json();
+          setResponse(chatData.message || chatData.response || 'No response');
+          return;
+        }
       }
+
+      setTranscript(voiceData.transcription || '(no speech detected)');
+      setResponse(voiceData.response || voiceData.message || 'Tau AI is ready — connect an API key for full responses.');
     } catch (error) {
-      console.error('TauAI API Error:', error);
-      setTranscript('Heya Tau, how are you doing today?');
-      setResponse('Heya! I\'m doing absolutely fantastic, thanks for asking! 🤖✨ I\'m here and ready to help you with anything - whether it\'s managing your Tau OS apps, telling you a terrible joke, or just having a great conversation! What can I do for you today?');
+      console.error('TauAI Voice Error:', error);
+      setTranscript('Voice capture failed');
+      setResponse('Try again or use the text chat at /api/tauai/chat.');
     } finally {
       setIsListening(false);
     }

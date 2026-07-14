@@ -5,7 +5,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import {
   Shield, Download, Bookmark, History, Settings, LogOut,
-  Trash2, RefreshCw, Globe, Lock, Eye, Zap, ExternalLink, Plus
+  Trash2, RefreshCw, Globe, Lock, Eye, Zap, ExternalLink, Plus, Layers
 } from 'lucide-react';
 import Link from 'next/link';
 
@@ -24,6 +24,8 @@ export default function TauBrowserDashboard() {
   const [settings, setSettings] = useState(null);
   const [privacy, setPrivacy] = useState(null);
   const [downloads, setDownloads] = useState(null);
+  const [spaces, setSpaces] = useState([]);
+  const [browserTabs, setBrowserTabs] = useState([]);
   const [newBookmark, setNewBookmark] = useState({ title: '', url: '' });
 
   const loadData = useCallback(async () => {
@@ -39,6 +41,8 @@ export default function TauBrowserDashboard() {
         setHistory(data.history ?? []);
         setSettings(data.settings);
         setPrivacy(data.privacy);
+        setSpaces(data.spaces ?? []);
+        setBrowserTabs(data.tabs ?? []);
       }
       if (dlRes.ok) {
         setDownloads(await dlRes.json());
@@ -116,6 +120,7 @@ export default function TauBrowserDashboard() {
 
   const tabs = [
     { id: 'overview', label: 'Overview', icon: Shield },
+    { id: 'spaces', label: 'Spaces', icon: Layers },
     { id: 'bookmarks', label: 'Bookmarks', icon: Bookmark },
     { id: 'history', label: 'History', icon: History },
     { id: 'settings', label: 'Privacy', icon: Settings },
@@ -199,6 +204,29 @@ export default function TauBrowserDashboard() {
               <p className="text-sm text-gray-400">{stat.label}</p>
             </motion.div>
           ))}
+        </div>
+      )}
+
+      {activeTab === 'spaces' && (
+        <div className="space-y-4">
+          {spaces.length === 0 ? (
+            <p className="text-gray-500 py-8 text-center">No spaces synced yet. Create spaces in the desktop app.</p>
+          ) : (
+            spaces.map((s) => (
+              <div key={s.id} className="p-4 bg-gray-900/30 border border-gray-800 rounded-xl">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="font-medium text-white">{s.name}</p>
+                    <p className="text-xs text-gray-500">{browserTabs.filter((t) => t.space_id === s.id).length} tabs</p>
+                  </div>
+                  <span
+                    className="w-4 h-4 rounded-full"
+                    style={{ backgroundColor: s.color || '#6366f1' }}
+                  />
+                </div>
+              </div>
+            ))
+          )}
         </div>
       )}
 
