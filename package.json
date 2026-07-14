@@ -15,6 +15,8 @@
     "talk:setup": "node scripts/setup-tautalk-storage.mjs",
     "privacy:setup": "node scripts/setup-privacy-audit.mjs",
     "test:e2e": "node scripts/e2e-smoke.mjs",
+    "verify:downloads": "node scripts/verify-downloads.mjs",
+    "mail:smoke": "node scripts/launch-mail-smoke.mjs",
     "monitoring:up": "docker compose -f monitoring/docker-compose.yml up -d"
   },
   "dependencies": {

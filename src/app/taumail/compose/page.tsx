@@ -2,7 +2,7 @@
 
 import DashboardShell from '@/components/apps/DashboardShell';
 import TauMailSubNav from '@/components/apps/TauMailSubNav';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import { motion } from 'framer-motion';
 import { 
   Mail, Inbox, Send, Archive, Trash2, Star, Search, Plus, 
@@ -13,11 +13,21 @@ import {
   AlignLeft, AlignCenter, AlignRight, List
 } from 'lucide-react';
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 import TauMailDemoBanner from '@/components/apps/TauMailDemoBanner';
 import { useTauMailSession } from '@/hooks/useTauMailSession';
 import { isDemoSession } from '@/lib/taumail-demo';
 
 export default function TauMailCompose() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-black flex items-center justify-center text-gray-400">Loading compose…</div>}>
+      <TauMailComposeInner />
+    </Suspense>
+  );
+}
+
+function TauMailComposeInner() {
+  const searchParams = useSearchParams();
   const { user, isLoggedIn, isDemo, logout } = useTauMailSession();
   const [composeData, setComposeData] = useState({
     to: '',
@@ -29,6 +39,23 @@ export default function TauMailCompose() {
   const [loading, setLoading] = useState(false);
   const [showCC, setShowCC] = useState(false);
   const [showBCC, setShowBCC] = useState(false);
+
+  useEffect(() => {
+    const to = searchParams.get('to');
+    const cc = searchParams.get('cc');
+    const subject = searchParams.get('subject');
+    const body = searchParams.get('body');
+    if (to || cc || subject || body) {
+      setComposeData((prev) => ({
+        ...prev,
+        to: to ?? prev.to,
+        cc: cc ?? prev.cc,
+        subject: subject ?? prev.subject,
+        text: body ?? prev.text,
+      }));
+      if (cc) setShowCC(true);
+    }
+  }, [searchParams]);
 
   const handleComposeEmail = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -62,7 +89,8 @@ export default function TauMailCompose() {
       const result = await response.json();
       
       if (response.ok) {
-        alert(`✅ Email sent successfully!\n\nFrom: ${result.fromName} <${result.from}>\nMessage ID: ${result.messageId}`);
+        const hint = result.deliverabilityHint ? `\n\nNote: ${result.deliverabilityHint}` : '';
+        alert(`✅ Email sent successfully!\n\nFrom: ${result.fromName} <${result.from}>\nTo: ${composeData.to}\nMessage ID: ${result.messageId}${hint}`);
         setComposeData({ to: '', cc: '', bcc: '', subject: '', text: '' });
         // Redirect to sent items
         window.location.href = '/taumail/sent';

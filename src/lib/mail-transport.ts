@@ -10,14 +10,42 @@ export type SendMailInput = {
   html?: string;
   cc?: string | string[];
   bcc?: string | string[];
+  replyTo?: string;
+  inReplyTo?: string;
+  references?: string;
 };
 
 export type SendMailResult = {
   messageId: string;
   transport: 'smtp' | 'sendgrid' | 'dev';
+  accepted?: string[];
+  rejected?: string[];
+  envelopeFrom?: string;
 };
 
-function usePhoneSmtp(): boolean {
+function isExternalAddress(email: string): boolean {
+  const domain = email.split('@')[1]?.toLowerCase() || '';
+  return Boolean(domain && domain !== 'tauos.org');
+}
+
+function recipientList(to: string | string[]): string[] {
+  const raw = Array.isArray(to) ? to : [to];
+  return raw.flatMap((r) => String(r).split(',')).map((e) => e.trim()).filter(Boolean);
+}
+
+/** Prefer SendGrid for Gmail/external when API key exists — Vultr SMTP lacks DKIM alignment. */
+function shouldUseSendGrid(input: SendMailInput): boolean {
+  if (!process.env.SENDGRID_API_KEY) return false;
+  if (process.env.MAIL_TRANSPORT === 'sendgrid') return true;
+  const recipients = recipientList(input.to);
+  // External recipients always use SendGrid (DKIM) even when MAIL_TRANSPORT=smtp
+  if (recipients.some(isExternalAddress)) return true;
+  if (process.env.MAIL_TRANSPORT === 'smtp') return false;
+  return false;
+}
+
+function usePhoneSmtp(input?: SendMailInput): boolean {
+  if (input && shouldUseSendGrid(input)) return false;
   if (process.env.MAIL_TRANSPORT === 'smtp') return true;
   if (process.env.MAIL_TRANSPORT === 'sendgrid') return false;
   if (process.env.PHONE_MAIL_SERVER === 'true') return true;
@@ -61,18 +89,46 @@ export async function sendMail(input: SendMailInput): Promise<SendMailResult> {
     ? `"${input.from.name}" <${input.from.email}>`
     : input.from.email;
 
-  if (usePhoneSmtp()) {
+  // Envelope sender must match SMTP-auth domain for relay deliverability (SPF alignment)
+  const envelopeFrom =
+    process.env.SMTP_ENVELOPE_FROM?.trim() ||
+    process.env.MAIL_FROM?.trim() ||
+    input.from.email;
+
+  const headers: Record<string, string> = {};
+  if (input.inReplyTo) headers['In-Reply-To'] = input.inReplyTo;
+  if (input.references) headers['References'] = input.references;
+
+  if (usePhoneSmtp(input)) {
     const transport = getSmtpTransport();
     const info = await transport.sendMail({
       from: fromHeader,
+      sender: envelopeFrom !== input.from.email ? envelopeFrom : undefined,
+      replyTo: input.replyTo || input.from.email,
       to: input.to,
       cc: input.cc,
       bcc: input.bcc,
       subject: input.subject,
       text: input.text,
       html: input.html,
+      headers,
+      envelope: {
+        from: envelopeFrom,
+        to: Array.isArray(input.to) ? input.to : [input.to],
+      },
     });
-    return { messageId: info.messageId || `smtp-${Date.now()}`, transport: 'smtp' };
+
+    if (info.rejected?.length) {
+      throw new Error(`SMTP rejected recipients: ${info.rejected.join(', ')}`);
+    }
+
+    return {
+      messageId: info.messageId || `smtp-${Date.now()}`,
+      transport: 'smtp',
+      accepted: info.accepted,
+      rejected: info.rejected,
+      envelopeFrom,
+    };
   }
 
   if (process.env.SENDGRID_API_KEY) {
@@ -85,10 +141,16 @@ export async function sendMail(input: SendMailInput): Promise<SendMailResult> {
       html: input.html || input.text,
       cc: input.cc,
       bcc: input.bcc,
+      replyTo: input.replyTo || input.from.email,
+      headers: {
+        ...(input.inReplyTo ? { 'In-Reply-To': input.inReplyTo } : {}),
+        ...(input.references ? { References: input.references } : {}),
+      },
     });
     return {
       messageId: response.headers['x-message-id'] || `sg-${Date.now()}`,
       transport: 'sendgrid',
+      envelopeFrom: input.from.email,
     };
   }
 

@@ -15,8 +15,18 @@ import Link from 'next/link';
 import TauMailDemoBanner from '@/components/apps/TauMailDemoBanner';
 import { useTauMailSession } from '@/hooks/useTauMailSession';
 import { isDemoSession, mapDemoInboxForList } from '@/lib/taumail-demo';
+import {
+  mailComposeHref,
+  replySubject,
+  forwardSubject,
+  buildQuotedReplyBody,
+  buildForwardBody,
+  extractEmailAddress,
+} from '@/lib/taumail-compose';
+import { useRouter } from 'next/navigation';
 
 export default function TauMailInbox() {
+  const router = useRouter();
   const { user, isLoggedIn, isDemo, logout } = useTauMailSession();
   const [emails, setEmails] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -52,11 +62,14 @@ export default function TauMailInbox() {
         const mappedEmails = (data.emails || []).map(email => ({
           id: email.id,
           from: email.display_name || email.sender_name || email.from_email || 'Unknown',
+          fromEmail: email.from_email || email.sender_email || extractEmailAddress(email.from_email || ''),
           subject: email.subject || 'No Subject',
           preview: email.body ? email.body.substring(0, 100) + '...' : 'No preview',
+          body: email.body || '',
           time: email.received_at ? new Date(email.received_at).toLocaleString() : 'Unknown time',
           unread: !email.is_read,
-          starred: false
+          starred: false,
+          messageId: email.message_id || null,
         }));
         setEmails(mappedEmails);
       } else {
@@ -139,6 +152,16 @@ export default function TauMailInbox() {
     } catch (error) {
       console.error('Error marking email as read:', error);
     }
+  };
+
+  const openReply = (email: { fromEmail?: string; from?: string; subject?: string; body?: string; time?: string }, mode: 'reply' | 'forward') => {
+    const to = mode === 'reply' ? (email.fromEmail || extractEmailAddress(email.from || '')) : '';
+    const subject = mode === 'reply' ? replySubject(email.subject || '') : forwardSubject(email.subject || '');
+    const body =
+      mode === 'reply'
+        ? buildQuotedReplyBody(email.from || '', email.time || '', email.body || '')
+        : buildForwardBody(email.from || '', email.time || '', email.subject || '', email.body || '');
+    router.push(mailComposeHref({ to, subject, body }));
   };
 
   const filteredEmails = emails.filter(email => 
@@ -256,18 +279,28 @@ export default function TauMailInbox() {
                     </div>
                     <div className="flex items-center space-x-2">
                       {email.unread && (
-                        <button 
-                          onClick={() => markAsRead(email.id)}
-                          className="p-1 text-yellow-400 hover:text-yellow-300 transition-colors"
-                          title="Mark as read"
-                        >
-                          <CheckCircle className="w-4 h-4" />
-                        </button>
+                        <button
+                        onClick={(e) => { e.stopPropagation(); markAsRead(email.id); }}
+                        className="p-1 text-yellow-400 hover:text-yellow-300 transition-colors"
+                        title="Mark as read"
+                      >
+                        <CheckCircle className="w-4 h-4" />
+                      </button>
                       )}
-                      <button className="p-1 text-gray-400 hover:text-white transition-colors">
+                      <button
+                        type="button"
+                        onClick={(e) => { e.stopPropagation(); openReply(email, 'reply'); }}
+                        className="p-1 text-gray-400 hover:text-white transition-colors"
+                        title="Reply"
+                      >
                         <Reply className="w-4 h-4" />
                       </button>
-                      <button className="p-1 text-gray-400 hover:text-white transition-colors">
+                      <button
+                        type="button"
+                        onClick={(e) => { e.stopPropagation(); openReply(email, 'forward'); }}
+                        className="p-1 text-gray-400 hover:text-white transition-colors"
+                        title="Forward"
+                      >
                         <Forward className="w-4 h-4" />
                       </button>
                       <button className="p-1 text-gray-400 hover:text-white transition-colors">
@@ -320,11 +353,19 @@ export default function TauMailInbox() {
               </div>
 
               <div className="flex space-x-3 pt-4">
-                <button className="flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-yellow-400 to-orange-500 text-black rounded-lg font-semibold hover:shadow-lg hover:shadow-yellow-400/25 transition-all duration-200">
+                <button
+                  type="button"
+                  onClick={() => openReply(selectedEmail, 'reply')}
+                  className="flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-yellow-400 to-orange-500 text-black rounded-lg font-semibold hover:shadow-lg hover:shadow-yellow-400/25 transition-all duration-200"
+                >
                   <Reply className="w-4 h-4" />
                   <span>Reply</span>
                 </button>
-                <button className="flex items-center space-x-2 px-4 py-2 bg-gray-700 text-white rounded-lg hover:bg-gray-600 transition-colors">
+                <button
+                  type="button"
+                  onClick={() => openReply(selectedEmail, 'forward')}
+                  className="flex items-center space-x-2 px-4 py-2 bg-gray-700 text-white rounded-lg hover:bg-gray-600 transition-colors"
+                >
                   <Forward className="w-4 h-4" />
                   <span>Forward</span>
                 </button>

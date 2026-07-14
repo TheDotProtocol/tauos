@@ -2,6 +2,7 @@ import { getPool, getJwtSecret } from '@/lib/db-pool';
 import { NextRequest, NextResponse } from 'next/server';
 import jwt from 'jsonwebtoken';
 import { sendMail } from '@/lib/mail-transport';
+import { isExternalRecipient } from '@/lib/taumail-compose';
 
 export async function POST(request: NextRequest) {
   try {
@@ -12,9 +13,9 @@ export async function POST(request: NextRequest) {
 
     const token = authHeader.substring(7);
     const jwtSecret = getJwtSecret('taumail');
-    const decoded = jwt.verify(token, jwtSecret) as { userId: number };
+    const decoded = jwt.verify(token, jwtSecret) as { userId: number | string };
 
-    const { to, subject, body, cc, bcc } = await request.json();
+    const { to, subject, body, cc, bcc, inReplyTo, references } = await request.json();
 
     if (!to || !subject || !body) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
@@ -42,7 +43,7 @@ export async function POST(request: NextRequest) {
       </p>
     </div>`;
 
-    const { messageId, transport } = await sendMail({
+    const { messageId, transport, accepted, envelopeFrom } = await sendMail({
       from: { email: fromEmail, name: fromName },
       to,
       subject,
@@ -50,7 +51,15 @@ export async function POST(request: NextRequest) {
       html,
       cc,
       bcc,
+      replyTo: fromEmail,
+      inReplyTo,
+      references,
     });
+
+    const external = isExternalRecipient(String(to).split(',')[0]?.trim() || '');
+    const deliverabilityHint = external
+      ? 'Message accepted by our mail server. External delivery (Gmail, etc.) requires SPF/DKIM/DMARC on tauos.org — check recipient spam folder if not received within 5 minutes.'
+      : undefined;
 
     const result = await getPool().query(
       `INSERT INTO sent_emails (user_id, recipient_email, subject, body, sent_at, smtp_status, message_id)
@@ -65,6 +74,9 @@ export async function POST(request: NextRequest) {
       email: result.rows[0],
       messageId,
       transport,
+      accepted,
+      envelopeFrom,
+      deliverabilityHint,
       from: fromEmail,
       fromName,
     });

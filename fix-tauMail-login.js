@@ -58,10 +58,10 @@ async function createUser() {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        email: 'saleena@tauos.org',
-        password: 'Saleena@132',
-        username: 'saleena',
-        fullName: 'Saleena User'
+        email: process.env.TAU_TEST_EMAIL || 'test@tauos.org',
+        password: process.env.TAU_TEST_PASSWORD || '',
+        username: 'testuser',
+        fullName: 'Test User'
       })
     });
     
@@ -89,8 +89,8 @@ async function testLogin() {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        email: 'saleena@tauos.org',
-        password: 'Saleena@132'
+        email: process.env.TAU_TEST_EMAIL || 'test@tauos.org',
+        password: process.env.TAU_TEST_PASSWORD || ''
       })
     });
     
