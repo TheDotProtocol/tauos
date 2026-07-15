@@ -20,7 +20,9 @@ import { isDemoSession } from '@/lib/taumail-demo';
 import {
   TAUMAIL_MAX_ATTACHMENT_BYTES,
   TAUMAIL_MAX_FILES,
+  TAUMAIL_INLINE_ATTACHMENT_BYTES,
   formatAttachmentSize,
+  readFileAsBase64,
   validateFilesForCompose,
 } from '@/lib/taumail-attachments';
 
@@ -120,45 +122,93 @@ function TauMailComposeInner() {
         return;
       }
 
-      const attachmentRefs = [];
-      for (const a of attachments) {
-        const prepRes = await fetch('/api/taumail/emails/attachments', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({
+      let attachmentPayload: unknown;
+
+      if (attachments.length === 0) {
+        attachmentPayload = undefined;
+      } else if (attachmentTotalBytes <= TAUMAIL_INLINE_ATTACHMENT_BYTES) {
+        attachmentPayload = await Promise.all(
+          attachments.map(async (a) => ({
             filename: a.file.name,
             contentType: a.file.type || 'application/octet-stream',
+            content: await readFileAsBase64(a.file),
             size: a.file.size,
-          }),
-        });
-        const prep = await prepRes.json();
-        if (!prepRes.ok) {
-          throw new Error(prep.error || prep.details || 'Failed to prepare attachment upload');
-        }
+          }))
+        );
+      } else {
+        const attachmentRefs = [];
+        for (const a of attachments) {
+          let ref: {
+            attachmentId: string;
+            path: string;
+            filename: string;
+            contentType: string;
+            size: number;
+          } | null = null;
 
-        const uploadRes = await fetch(prep.uploadUrl, {
-          method: 'PUT',
-          headers: {
-            Authorization: `Bearer ${prep.token}`,
-            'Content-Type': a.file.type || 'application/octet-stream',
-            'x-upsert': 'true',
-          },
-          body: a.file,
-        });
-        if (!uploadRes.ok) {
-          throw new Error(`Failed to upload ${a.file.name}`);
-        }
+          const prepRes = await fetch('/api/taumail/emails/attachments', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify({
+              filename: a.file.name,
+              contentType: a.file.type || 'application/octet-stream',
+              size: a.file.size,
+            }),
+          });
+          const prep = await prepRes.json();
 
-        attachmentRefs.push({
-          attachmentId: prep.attachmentId,
-          path: prep.path,
-          filename: a.file.name,
-          contentType: a.file.type || 'application/octet-stream',
-          size: a.file.size,
-        });
+          if (prepRes.ok && prep.uploadUrl && prep.token) {
+            const uploadRes = await fetch(prep.uploadUrl, {
+              method: 'PUT',
+              headers: {
+                Authorization: `Bearer ${prep.token}`,
+                'Content-Type': a.file.type || 'application/octet-stream',
+                'x-upsert': 'true',
+              },
+              body: a.file,
+            });
+            if (uploadRes.ok) {
+              ref = {
+                attachmentId: prep.attachmentId,
+                path: prep.path,
+                filename: a.file.name,
+                contentType: a.file.type || 'application/octet-stream',
+                size: a.file.size,
+              };
+            }
+          }
+
+          if (!ref && a.file.size <= TAUMAIL_INLINE_ATTACHMENT_BYTES) {
+            const fd = new FormData();
+            fd.append('file', a.file);
+            const upRes = await fetch('/api/taumail/emails/attachments/upload', {
+              method: 'PUT',
+              headers: { Authorization: `Bearer ${token}` },
+              body: fd,
+            });
+            const up = await upRes.json();
+            if (upRes.ok) {
+              ref = {
+                attachmentId: up.attachmentId,
+                path: up.path,
+                filename: up.filename,
+                contentType: up.contentType,
+                size: up.size,
+              };
+            }
+          }
+
+          if (!ref) {
+            throw new Error(
+              prep.details || prep.error || `Failed to upload attachment "${a.file.name}"`
+            );
+          }
+          attachmentRefs.push(ref);
+        }
+        attachmentPayload = attachmentRefs;
       }
 
       const response = await fetch('/api/taumail/emails/send', {
@@ -173,7 +223,7 @@ function TauMailComposeInner() {
           bcc: composeData.bcc || undefined,
           subject: composeData.subject,
           body: composeData.text,
-          attachments: attachmentRefs.length ? attachmentRefs : undefined,
+          attachments: attachmentPayload,
         })
       });
 

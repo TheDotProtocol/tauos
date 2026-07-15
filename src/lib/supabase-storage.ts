@@ -112,8 +112,8 @@ export async function createSignedUploadUrl(
   objectPath: string,
   expiresIn = 3600
 ): Promise<{ path: string; token: string; signedUrl: string }> {
-  const path = objectPath.replace(/^\/+/, '');
-  const encodedPath = path.split('/').map(encodeURIComponent).join('/');
+  const objectPathClean = objectPath.replace(/^\/+/, '');
+  const encodedPath = objectPathClean.split('/').map(encodeURIComponent).join('/');
   const res = await fetch(
     `${storageBase(cfg)}/object/upload/sign/${encodeURIComponent(cfg.bucket)}/${encodedPath}`,
     {
@@ -121,6 +121,7 @@ export async function createSignedUploadUrl(
       headers: {
         Authorization: `Bearer ${cfg.serviceKey}`,
         'Content-Type': 'application/json',
+        'x-upsert': 'true',
       },
       body: JSON.stringify({ expiresIn }),
     }
@@ -130,16 +131,25 @@ export async function createSignedUploadUrl(
     throw new Error(`Signed upload failed (${res.status}): ${await res.text()}`);
   }
 
-  const json = (await res.json()) as { path?: string; token?: string; signedUrl?: string };
-  if (!json.signedUrl || !json.token || !json.path) {
+  const json = (await res.json()) as {
+    path?: string;
+    token?: string;
+    signedUrl?: string;
+    signedURL?: string;
+    url?: string;
+  };
+  const rawUrl = json.signedUrl || json.signedURL || json.url;
+  const uploadToken = json.token;
+  const resolvedPath = json.path || objectPathClean;
+  if (!rawUrl || !uploadToken) {
     throw new Error('Invalid signed upload response');
   }
 
-  const signedUrl = json.signedUrl.startsWith('http')
-    ? json.signedUrl
-    : `${cfg.url}/storage/v1${json.signedUrl}`;
+  const signedUrl = rawUrl.startsWith('http')
+    ? rawUrl
+    : `${cfg.url}/storage/v1${rawUrl.startsWith('/') ? rawUrl : `/${rawUrl}`}`;
 
-  return { path: json.path, token: json.token, signedUrl };
+  return { path: resolvedPath, token: uploadToken, signedUrl };
 }
 
 export async function createSignedDownloadUrl(

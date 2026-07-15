@@ -13,6 +13,7 @@ import {
   Activity, Settings, Calendar, Clock, LogOut, User, X, AlertTriangle
 } from 'lucide-react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import TauMailDemoBanner from '@/components/apps/TauMailDemoBanner';
 import { useTauMailSession } from '@/hooks/useTauMailSession';
 import {
@@ -20,8 +21,17 @@ import {
   isDemoSession,
   mapDemoInboxForList,
 } from '@/lib/taumail-demo';
+import {
+  mailComposeHref,
+  replySubject,
+  forwardSubject,
+  buildQuotedReplyBody,
+  buildForwardBody,
+  extractEmailAddress,
+} from '@/lib/taumail-compose';
 
 export default function TauMailDashboard() {
+  const router = useRouter();
   const { user, isLoggedIn, isDemo, logout } = useTauMailSession();
   const [activeTab, setActiveTab] = useState('inbox');
   const [showComposeModal, setShowComposeModal] = useState(false);
@@ -66,8 +76,10 @@ export default function TauMailDashboard() {
         const mappedEmails = (data.emails || []).map(email => ({
           id: email.id,
           from: email.display_name || email.sender_name || email.from_email || 'Unknown',
+          fromEmail: email.from_email || email.sender_email || extractEmailAddress(email.from_email || ''),
           subject: email.subject || 'No Subject',
           preview: email.body ? email.body.substring(0, 100) + '...' : 'No preview',
+          body: email.body || '',
           time: email.received_at ? new Date(email.received_at).toLocaleString() : 'Unknown time',
           unread: !email.is_read,
           starred: false
@@ -191,6 +203,19 @@ export default function TauMailDashboard() {
     }
   };
 
+  const openReply = (
+    email: { fromEmail?: string; from?: string; subject?: string; body?: string; preview?: string; time?: string },
+    mode: 'reply' | 'forward'
+  ) => {
+    const to = mode === 'reply' ? (email.fromEmail || extractEmailAddress(email.from || '')) : '';
+    const subject = mode === 'reply' ? replySubject(email.subject || '') : forwardSubject(email.subject || '');
+    const bodyText = email.body || email.preview || '';
+    const body =
+      mode === 'reply'
+        ? buildQuotedReplyBody(email.from || '', email.time || '', bodyText)
+        : buildForwardBody(email.from || '', email.time || '', email.subject || '', bodyText);
+    router.push(mailComposeHref({ to, subject, body }));
+  };
 
   const emailMetrics = {
     totalEmails: emails.length,
@@ -435,10 +460,20 @@ export default function TauMailDashboard() {
                         </p>
                       </div>
                       <div className="flex items-center space-x-2">
-                        <button className="p-1 text-gray-400 hover:text-white transition-colors">
+                        <button
+                          type="button"
+                          onClick={(e) => { e.stopPropagation(); openReply(email, 'reply'); }}
+                          className="p-1 text-gray-400 hover:text-white transition-colors"
+                          title="Reply"
+                        >
                           <Reply className="w-4 h-4" />
                         </button>
-                        <button className="p-1 text-gray-400 hover:text-white transition-colors">
+                        <button
+                          type="button"
+                          onClick={(e) => { e.stopPropagation(); openReply(email, 'forward'); }}
+                          className="p-1 text-gray-400 hover:text-white transition-colors"
+                          title="Forward"
+                        >
                           <Forward className="w-4 h-4" />
                         </button>
                         <button className="p-1 text-gray-400 hover:text-white transition-colors">
@@ -651,15 +686,25 @@ export default function TauMailDashboard() {
               </div>
 
               <div className="border-t border-gray-800 pt-4">
-                <p className="text-gray-300 leading-relaxed">{selectedEmail.preview}</p>
+                <p className="text-gray-300 leading-relaxed whitespace-pre-wrap">
+                  {selectedEmail.body || selectedEmail.preview}
+                </p>
               </div>
 
               <div className="flex space-x-3 pt-4">
-                <button className="flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-yellow-400 to-orange-500 text-black rounded-lg font-semibold hover:shadow-lg hover:shadow-yellow-400/25 transition-all duration-200">
+                <button
+                  type="button"
+                  onClick={() => openReply(selectedEmail, 'reply')}
+                  className="flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-yellow-400 to-orange-500 text-black rounded-lg font-semibold hover:shadow-lg hover:shadow-yellow-400/25 transition-all duration-200"
+                >
                   <Reply className="w-4 h-4" />
                   <span>Reply</span>
                 </button>
-                <button className="flex items-center space-x-2 px-4 py-2 bg-gray-700 text-white rounded-lg hover:bg-gray-600 transition-colors">
+                <button
+                  type="button"
+                  onClick={() => openReply(selectedEmail, 'forward')}
+                  className="flex items-center space-x-2 px-4 py-2 bg-gray-700 text-white rounded-lg hover:bg-gray-600 transition-colors"
+                >
                   <Forward className="w-4 h-4" />
                   <span>Forward</span>
                 </button>

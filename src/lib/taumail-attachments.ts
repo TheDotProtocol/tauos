@@ -1,6 +1,8 @@
 /** Tau Mail attachment limits and validation (shared client + server) */
 
 export const TAUMAIL_MAX_ATTACHMENT_BYTES = 15 * 1024 * 1024; // 15 MB total per message
+/** Inline in send JSON — stays under Vercel ~4.5 MB request limit (with base64 overhead). */
+export const TAUMAIL_INLINE_ATTACHMENT_BYTES = 3 * 1024 * 1024; // 3 MB total inline
 export const TAUMAIL_MAX_FILES = 10;
 
 export type MailAttachmentPayload = {
