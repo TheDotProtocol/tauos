@@ -2,7 +2,7 @@
 
 import DashboardShell from '@/components/apps/DashboardShell';
 import TauMailSubNav from '@/components/apps/TauMailSubNav';
-import React, { useState, useEffect, Suspense } from 'react';
+import React, { useState, useEffect, Suspense, useRef, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { 
   Mail, Inbox, Send, Archive, Trash2, Star, Search, Plus, 
@@ -17,6 +17,18 @@ import { useSearchParams } from 'next/navigation';
 import TauMailDemoBanner from '@/components/apps/TauMailDemoBanner';
 import { useTauMailSession } from '@/hooks/useTauMailSession';
 import { isDemoSession } from '@/lib/taumail-demo';
+import {
+  TAUMAIL_MAX_ATTACHMENT_BYTES,
+  TAUMAIL_MAX_FILES,
+  formatAttachmentSize,
+  validateFilesForCompose,
+} from '@/lib/taumail-attachments';
+
+type ComposeAttachment = {
+  id: string;
+  file: File;
+  previewUrl?: string;
+};
 
 export default function TauMailCompose() {
   return (
@@ -39,6 +51,43 @@ function TauMailComposeInner() {
   const [loading, setLoading] = useState(false);
   const [showCC, setShowCC] = useState(false);
   const [showBCC, setShowBCC] = useState(false);
+  const [attachments, setAttachments] = useState<ComposeAttachment[]>([]);
+  const [dragOver, setDragOver] = useState(false);
+  const [attachError, setAttachError] = useState('');
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const attachmentTotalBytes = attachments.reduce((sum, a) => sum + a.file.size, 0);
+
+  const addFiles = useCallback((files: FileList | File[]) => {
+    const list = Array.from(files);
+    if (attachments.length + list.length > TAUMAIL_MAX_FILES) {
+      setAttachError(`Maximum ${TAUMAIL_MAX_FILES} attachments per email`);
+      return;
+    }
+
+    const check = validateFilesForCompose(list, attachmentTotalBytes);
+    if (check.ok === false) {
+      setAttachError(check.error);
+      return;
+    }
+
+    setAttachError('');
+    const next: ComposeAttachment[] = list.map((file) => ({
+      id: `${file.name}-${file.size}-${Date.now()}-${Math.random().toString(36).slice(2)}`,
+      file,
+      previewUrl: file.type.startsWith('image/') ? URL.createObjectURL(file) : undefined,
+    }));
+    setAttachments((prev) => [...prev, ...next]);
+  }, [attachments.length, attachmentTotalBytes]);
+
+  const removeAttachment = (id: string) => {
+    setAttachments((prev) => {
+      const item = prev.find((a) => a.id === id);
+      if (item?.previewUrl) URL.revokeObjectURL(item.previewUrl);
+      return prev.filter((a) => a.id !== id);
+    });
+    setAttachError('');
+  };
 
   useEffect(() => {
     const to = searchParams.get('to');
@@ -71,6 +120,47 @@ function TauMailComposeInner() {
         return;
       }
 
+      const attachmentRefs = [];
+      for (const a of attachments) {
+        const prepRes = await fetch('/api/taumail/emails/attachments', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            filename: a.file.name,
+            contentType: a.file.type || 'application/octet-stream',
+            size: a.file.size,
+          }),
+        });
+        const prep = await prepRes.json();
+        if (!prepRes.ok) {
+          throw new Error(prep.error || prep.details || 'Failed to prepare attachment upload');
+        }
+
+        const uploadRes = await fetch(prep.uploadUrl, {
+          method: 'PUT',
+          headers: {
+            Authorization: `Bearer ${prep.token}`,
+            'Content-Type': a.file.type || 'application/octet-stream',
+            'x-upsert': 'true',
+          },
+          body: a.file,
+        });
+        if (!uploadRes.ok) {
+          throw new Error(`Failed to upload ${a.file.name}`);
+        }
+
+        attachmentRefs.push({
+          attachmentId: prep.attachmentId,
+          path: prep.path,
+          filename: a.file.name,
+          contentType: a.file.type || 'application/octet-stream',
+          size: a.file.size,
+        });
+      }
+
       const response = await fetch('/api/taumail/emails/send', {
         method: 'POST',
         headers: {
@@ -82,7 +172,8 @@ function TauMailComposeInner() {
           cc: composeData.cc || undefined,
           bcc: composeData.bcc || undefined,
           subject: composeData.subject,
-          body: composeData.text
+          body: composeData.text,
+          attachments: attachmentRefs.length ? attachmentRefs : undefined,
         })
       });
 
@@ -90,8 +181,10 @@ function TauMailComposeInner() {
       
       if (response.ok) {
         const hint = result.deliverabilityHint ? `\n\nNote: ${result.deliverabilityHint}` : '';
-        alert(`✅ Email sent successfully!\n\nFrom: ${result.fromName} <${result.from}>\nTo: ${composeData.to}\nMessage ID: ${result.messageId}${hint}`);
+        alert(`✅ Email sent successfully!\n\nFrom: ${result.fromName} <${result.from}>\nTo: ${composeData.to}${result.attachmentCount ? `\nAttachments: ${result.attachmentCount}` : ''}\nMessage ID: ${result.messageId}${hint}`);
         setComposeData({ to: '', cc: '', bcc: '', subject: '', text: '' });
+        attachments.forEach((a) => { if (a.previewUrl) URL.revokeObjectURL(a.previewUrl); });
+        setAttachments([]);
         // Redirect to sent items
         window.location.href = '/taumail/sent';
       } else {
@@ -226,7 +319,24 @@ function TauMailComposeInner() {
               <label className="block text-sm font-medium text-gray-300 mb-2">
                 Message <span className="text-red-400">*</span>
               </label>
-              <div className="border border-gray-700 rounded-lg overflow-hidden">
+              <div
+                className={`border rounded-lg overflow-hidden transition-colors ${
+                  dragOver ? 'border-yellow-400 ring-1 ring-yellow-400/50' : 'border-gray-700'
+                }`}
+                onDragOver={(e) => {
+                  e.preventDefault();
+                  setDragOver(true);
+                }}
+                onDragLeave={(e) => {
+                  e.preventDefault();
+                  if (e.currentTarget === e.target) setDragOver(false);
+                }}
+                onDrop={(e) => {
+                  e.preventDefault();
+                  setDragOver(false);
+                  if (e.dataTransfer.files?.length) addFiles(e.dataTransfer.files);
+                }}
+              >
                 {/* Formatting Toolbar */}
                 <div className="bg-gray-800 px-4 py-2 border-b border-gray-700 flex items-center space-x-2">
                   <button type="button" className="p-2 text-gray-400 hover:text-white transition-colors">
@@ -262,10 +372,70 @@ function TauMailComposeInner() {
                   onChange={(e) => setComposeData({...composeData, text: e.target.value})}
                   rows={12}
                   className="w-full px-4 py-3 bg-gray-800 text-white placeholder-gray-400 focus:outline-none resize-none"
-                  placeholder="Type your message here..."
+                  placeholder="Type your message here… Drag and drop files or images to attach (max 15 MB total)."
                   required
                 />
+
+                {dragOver && (
+                  <div className="px-4 py-3 bg-yellow-400/10 border-t border-yellow-400/30 text-yellow-300 text-sm text-center">
+                    Drop files to attach
+                  </div>
+                )}
               </div>
+
+              <input
+                ref={fileInputRef}
+                type="file"
+                multiple
+                className="hidden"
+                onChange={(e) => {
+                  if (e.target.files?.length) addFiles(e.target.files);
+                  e.target.value = '';
+                }}
+              />
+
+              {attachError && (
+                <p className="mt-2 text-sm text-red-400 flex items-center gap-2">
+                  <AlertCircle className="w-4 h-4 shrink-0" />
+                  {attachError}
+                </p>
+              )}
+
+              {attachments.length > 0 && (
+                <div className="mt-3 space-y-2">
+                  <div className="flex items-center justify-between text-xs text-gray-400">
+                    <span>{attachments.length} attachment{attachments.length !== 1 ? 's' : ''}</span>
+                    <span>
+                      {formatAttachmentSize(attachmentTotalBytes)} / {formatAttachmentSize(TAUMAIL_MAX_ATTACHMENT_BYTES)}
+                    </span>
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    {attachments.map((a) => (
+                      <div
+                        key={a.id}
+                        className="flex items-center gap-2 px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-sm text-gray-200 max-w-full"
+                      >
+                        {a.previewUrl ? (
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <img src={a.previewUrl} alt="" className="w-8 h-8 rounded object-cover shrink-0" />
+                        ) : (
+                          <Paperclip className="w-4 h-4 shrink-0 text-yellow-400" />
+                        )}
+                        <span className="truncate max-w-[160px]" title={a.file.name}>{a.file.name}</span>
+                        <span className="text-gray-500 text-xs shrink-0">{formatAttachmentSize(a.file.size)}</span>
+                        <button
+                          type="button"
+                          onClick={() => removeAttachment(a.id)}
+                          className="p-0.5 text-gray-400 hover:text-red-400 shrink-0"
+                          aria-label={`Remove ${a.file.name}`}
+                        >
+                          <X className="w-4 h-4" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Action Buttons */}
@@ -273,10 +443,16 @@ function TauMailComposeInner() {
               <div className="flex items-center space-x-3">
                 <button
                   type="button"
+                  onClick={() => fileInputRef.current?.click()}
                   className="flex items-center space-x-2 px-4 py-2 text-gray-400 hover:text-white transition-colors"
                 >
                   <Paperclip className="w-4 h-4" />
                   <span>Attach</span>
+                  {attachments.length > 0 && (
+                    <span className="text-xs bg-yellow-400/20 text-yellow-300 px-1.5 py-0.5 rounded">
+                      {attachments.length}
+                    </span>
+                  )}
                 </button>
                 <button
                   type="button"

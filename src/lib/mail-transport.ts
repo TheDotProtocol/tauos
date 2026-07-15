@@ -13,6 +13,11 @@ export type SendMailInput = {
   replyTo?: string;
   inReplyTo?: string;
   references?: string;
+  attachments?: Array<{
+    filename: string;
+    contentType: string;
+    content: string;
+  }>;
 };
 
 export type SendMailResult = {
@@ -97,6 +102,23 @@ function smtpConfigured(): boolean {
   return Boolean(process.env.SMTP_HOST || process.env.PHONE_SMTP_HOST);
 }
 
+function toMailAttachments(input: SendMailInput) {
+  return (input.attachments ?? []).map((a) => ({
+    filename: a.filename,
+    content: Buffer.from(a.content, 'base64'),
+    contentType: a.contentType,
+  }));
+}
+
+function toSendGridAttachments(input: SendMailInput) {
+  return (input.attachments ?? []).map((a) => ({
+    filename: a.filename,
+    type: a.contentType,
+    content: a.content,
+    disposition: 'attachment' as const,
+  }));
+}
+
 async function sendViaSmtp(input: SendMailInput): Promise<SendMailResult> {
   const fromHeader = input.from.name
     ? `"${input.from.name}" <${input.from.email}>`
@@ -123,6 +145,7 @@ async function sendViaSmtp(input: SendMailInput): Promise<SendMailResult> {
     text: input.text,
     html: input.html,
     headers,
+    attachments: toMailAttachments(input),
     envelope: {
       from: envelopeFrom,
       to: Array.isArray(input.to) ? input.to : [input.to],
@@ -165,6 +188,7 @@ async function sendViaSendGrid(input: SendMailInput): Promise<SendMailResult> {
     cc: input.cc,
     bcc: input.bcc,
     replyTo: input.replyTo || input.from.email,
+    attachments: toSendGridAttachments(input),
     headers: {
       ...(input.inReplyTo ? { 'In-Reply-To': input.inReplyTo } : {}),
       ...(input.references ? { References: input.references } : {}),

@@ -3,6 +3,48 @@ import { NextRequest, NextResponse } from 'next/server';
 import jwt from 'jsonwebtoken';
 import { sendMail } from '@/lib/mail-transport';
 import { isExternalRecipient } from '@/lib/taumail-compose';
+import { validateAttachmentPayloads, validateAttachmentRefs } from '@/lib/taumail-attachments';
+import {
+  fetchMailAttachmentContent,
+  deleteMailAttachment,
+} from '@/lib/taumail-attachment-storage';
+
+async function resolveAttachments(raw: unknown) {
+  if (raw == null) {
+    return { ok: true as const, attachments: [], totalBytes: 0, storagePaths: [] as string[] };
+  }
+
+  if (Array.isArray(raw) && raw.length > 0 && (raw[0] as { path?: string }).path) {
+    const refCheck = validateAttachmentRefs(raw);
+    if (refCheck.ok === false) {
+      return { ok: false as const, error: refCheck.error };
+    }
+
+    const attachments = [];
+    for (const ref of refCheck.refs) {
+      const fetched = await fetchMailAttachmentContent(ref.path);
+      attachments.push({
+        filename: ref.filename,
+        contentType: ref.contentType || fetched.contentType,
+        content: fetched.content,
+        size: ref.size,
+      });
+    }
+
+    return {
+      ok: true as const,
+      attachments,
+      totalBytes: refCheck.totalBytes,
+      storagePaths: refCheck.refs.map((r) => r.path),
+    };
+  }
+
+  const inline = validateAttachmentPayloads(raw);
+  if (inline.ok === false) {
+    return { ok: false as const, error: inline.error };
+  }
+  return inline;
+}
 
 export async function POST(request: NextRequest) {
   try {
@@ -15,10 +57,15 @@ export async function POST(request: NextRequest) {
     const jwtSecret = getJwtSecret('taumail');
     const decoded = jwt.verify(token, jwtSecret) as { userId: number | string };
 
-    const { to, subject, body, cc, bcc, inReplyTo, references } = await request.json();
+    const { to, subject, body, cc, bcc, inReplyTo, references, attachments } = await request.json();
 
     if (!to || !subject || !body) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
+    }
+
+    const attachmentCheck = await resolveAttachments(attachments);
+    if (!attachmentCheck.ok) {
+      return NextResponse.json({ error: attachmentCheck.error }, { status: 400 });
     }
 
     const userResult = await getPool().query(
@@ -54,6 +101,11 @@ export async function POST(request: NextRequest) {
       replyTo: fromEmail,
       inReplyTo,
       references,
+      attachments: attachmentCheck.attachments.map((a) => ({
+        filename: a.filename,
+        contentType: a.contentType,
+        content: a.content,
+      })),
     });
 
     const external = isExternalRecipient(String(to).split(',')[0]?.trim() || '');
@@ -71,6 +123,10 @@ export async function POST(request: NextRequest) {
       [decoded.userId, to, subject, body, transport, messageId]
     );
 
+    await Promise.all(
+      attachmentCheck.storagePaths.map((path) => deleteMailAttachment(path))
+    );
+
     return NextResponse.json({
       success: true,
       message: 'Email sent successfully',
@@ -82,6 +138,8 @@ export async function POST(request: NextRequest) {
       deliverabilityHint,
       from: fromEmail,
       fromName,
+      attachmentCount: attachmentCheck.attachments.length,
+      attachmentBytes: attachmentCheck.totalBytes,
     });
   } catch (error) {
     console.error('TauMail Send Email Error:', error);

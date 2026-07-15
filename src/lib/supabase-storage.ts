@@ -86,6 +86,62 @@ export async function deleteObject(
   }
 }
 
+export async function downloadObject(
+  cfg: SupabaseStorageConfig,
+  objectPath: string
+): Promise<{ data: ArrayBuffer; contentType: string }> {
+  const path = objectPath.replace(/^\/+/, '');
+  const encodedPath = path.split('/').map(encodeURIComponent).join('/');
+  const res = await fetch(
+    `${storageBase(cfg)}/object/${encodeURIComponent(cfg.bucket)}/${encodedPath}`,
+    { headers: { Authorization: `Bearer ${cfg.serviceKey}` } }
+  );
+
+  if (!res.ok) {
+    throw new Error(`Download failed (${res.status}): ${await res.text()}`);
+  }
+
+  return {
+    data: await res.arrayBuffer(),
+    contentType: res.headers.get('content-type') || 'application/octet-stream',
+  };
+}
+
+export async function createSignedUploadUrl(
+  cfg: SupabaseStorageConfig,
+  objectPath: string,
+  expiresIn = 3600
+): Promise<{ path: string; token: string; signedUrl: string }> {
+  const path = objectPath.replace(/^\/+/, '');
+  const encodedPath = path.split('/').map(encodeURIComponent).join('/');
+  const res = await fetch(
+    `${storageBase(cfg)}/object/upload/sign/${encodeURIComponent(cfg.bucket)}/${encodedPath}`,
+    {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${cfg.serviceKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ expiresIn }),
+    }
+  );
+
+  if (!res.ok) {
+    throw new Error(`Signed upload failed (${res.status}): ${await res.text()}`);
+  }
+
+  const json = (await res.json()) as { path?: string; token?: string; signedUrl?: string };
+  if (!json.signedUrl || !json.token || !json.path) {
+    throw new Error('Invalid signed upload response');
+  }
+
+  const signedUrl = json.signedUrl.startsWith('http')
+    ? json.signedUrl
+    : `${cfg.url}/storage/v1${json.signedUrl}`;
+
+  return { path: json.path, token: json.token, signedUrl };
+}
+
 export async function createSignedDownloadUrl(
   cfg: SupabaseStorageConfig,
   objectPath: string,
