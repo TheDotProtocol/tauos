@@ -1,6 +1,6 @@
 {
   "version": "1.0.0-beta.2",
-  "updatedAt": "2026-07-14T09:30:00Z",
+  "updatedAt": "2026-07-16T07:40:00Z",
   "releaseBase": "https://github.com/TheDotProtocol/tauos/releases/download/tauos-v1.0.0-beta.2",
   "artifacts": [
     {
@@ -11,7 +11,7 @@
       "kind": "iso",
       "filename": "TauOS-Desktop-v1.0.0.iso",
       "url": "https://github.com/TheDotProtocol/tauos/releases/download/tauos-v1.0.0-beta.2/TauOS-Desktop-v1.0.0.iso",
-      "size": 419430400,
+      "size": 419192832,
       "sha256": "8f7f8c8ebf59b5ceabf34e06f7088200580a5d500fcbd7c852512db613d8bf2f",
       "available": true,
       "description": "Bootable live/install ISO for Intel/AMD PCs"
