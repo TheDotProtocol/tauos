@@ -46,8 +46,8 @@ async function main() {
   for (const name of [
     'TauBrowser_1.0.0-beta.2_x64-setup.exe',
     'TauBrowser_1.0.0-beta.2_aarch64.dmg',
-    'TauBrowser_1.0.0-beta.2_x86_64.dmg',
-    'TauBrowser_1.0.0-beta.2_amd64.deb',
+    'TauBrowser_1.0.0-beta.2_x64.dmg',
+    'TauBrowser_1.0.0-beta.2_amd64.AppImage',
   ]) {
     const r = await checkUrl(`Tau Browser ${name}`, `${browserBase}/${name}`);
     if (r.ok) console.log(`  ✓ Tau Browser ${name} (${r.status})`);

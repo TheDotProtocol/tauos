@@ -1,6 +1,6 @@
 [package]
 name = "taubrowser"
-version = "1.0.0-beta.1"
+version = "1.0.0-beta.2"
 description = "Tau Browser — privacy-first cross-platform web browser"
 authors = ["Tau Core Inc."]
 edition = "2021"

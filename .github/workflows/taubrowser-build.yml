@@ -13,15 +13,19 @@ jobs:
       matrix:
         include:
           - platform: macos-latest
+            target: aarch64-apple-darwin
             args: '--target aarch64-apple-darwin'
             name: macos-arm
           - platform: macos-latest
+            target: x86_64-apple-darwin
             args: '--target x86_64-apple-darwin'
             name: macos
           - platform: ubuntu-22.04
+            target: ''
             args: ''
             name: linux
           - platform: windows-latest
+            target: ''
             args: ''
             name: windows
 
@@ -39,8 +43,8 @@ jobs:
         uses: dtolnay/rust-toolchain@stable
 
       - name: Rust target (macOS cross)
-        if: matrix.platform == 'macos-latest' && matrix.args != ''
-        run: rustup target add ${{ matrix.args }}
+        if: matrix.platform == 'macos-latest' && matrix.target != ''
+        run: rustup target add ${{ matrix.target }}
 
       - name: Linux dependencies
         if: matrix.platform == 'ubuntu-22.04'
@@ -79,17 +83,26 @@ jobs:
       - name: List bundles
         run: find artifacts -type f \( -name '*.dmg' -o -name '*.exe' -o -name '*.deb' -o -name '*.AppImage' \) -print
 
+      - name: Prepare release assets
+        run: |
+          mkdir -p release
+          find artifacts -type f \( -name '*.dmg' -o -name '*.exe' -o -name '*.deb' -o -name '*.AppImage' \) -print0 \
+            | while IFS= read -r -d '' f; do
+                base="$(basename "$f")"
+                # Match download URLs: TauBrowser_* (no space in filename)
+                out="${base/Tau Browser_/TauBrowser_}"
+                cp "$f" "release/$out"
+                echo "  $out"
+              done
+          ls -lah release/
+
       - name: Publish GitHub Release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ github.ref_name }}
           name: Tau Browser ${{ github.ref_name }}
           generate_release_notes: true
-          files: |
-            artifacts/**/*.dmg
-            artifacts/**/*.exe
-            artifacts/**/*.deb
-            artifacts/**/*.AppImage
+          files: release/*
 
   android:
     runs-on: ubuntu-latest
