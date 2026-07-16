@@ -25,8 +25,9 @@ npm run dev                    # Launch in dev mode
 
 ```
 apps/taubrowser-desktop/
-├── index.html          # Browser chrome UI
-├── src/main.js         # Navigation, blocklist, sync
+├── ui/                 # Browser chrome UI (Tauri frontendDist)
+│   ├── index.html
+│   └── src/main.js     # Navigation, blocklist, sync
 └── src-tauri/          # Rust shell + embedded blocklist
     └── src/blocklist.json
 ```

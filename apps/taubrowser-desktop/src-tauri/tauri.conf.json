@@ -4,7 +4,7 @@
   "version": "1.0.0-beta.2",
   "identifier": "org.tauos.browser",
   "build": {
-    "frontendDist": "..",
+    "frontendDist": "../ui",
     "devUrl": "http://localhost:1420",
     "beforeDevCommand": "npm run dev:web",
     "beforeBuildCommand": ""
