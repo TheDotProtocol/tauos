@@ -27,8 +27,8 @@ export async function GET(request: NextRequest) {
     
     // Get user's incoming emails with proper sender information and security filtering
     const result = await getPool().query(
-      `SELECT ie.id, ie.subject, ie.body, ie.from_email, ie.sender_name, 
-              ie.received_at, ie.is_read, ie.is_spam,
+      `SELECT ie.id, ie.subject, ie.body, ie.body_html, ie.from_email, ie.sender_name,
+              ie.received_at, ie.is_read, ie.is_spam, ie.attachments,
               COALESCE(ie.sender_name, ie.from_email) as display_name,
               ie.from_email as sender_email,
               CASE 

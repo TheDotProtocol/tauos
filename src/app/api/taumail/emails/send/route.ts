@@ -2,12 +2,58 @@ import { getPool, getJwtSecret } from '@/lib/db-pool';
 import { NextRequest, NextResponse } from 'next/server';
 import jwt from 'jsonwebtoken';
 import { sendMail } from '@/lib/mail-transport';
-import { isExternalRecipient } from '@/lib/taumail-compose';
-import { validateAttachmentPayloads, validateAttachmentRefs } from '@/lib/taumail-attachments';
+import { isExternalRecipient, extractEmailAddress } from '@/lib/taumail-compose';
+import { validateAttachmentPayloads, validateAttachmentRefs, type MailAttachmentPayload } from '@/lib/taumail-attachments';
 import {
   fetchMailAttachmentContent,
   deleteMailAttachment,
 } from '@/lib/taumail-attachment-storage';
+import { isAllowedMailDomain, parseEmailAddress } from '@/config/mail-domains';
+
+async function deliverToInternalInboxes(
+  fromEmail: string,
+  fromName: string,
+  to: string,
+  subject: string,
+  body: string,
+  html: string,
+  attachments: MailAttachmentPayload[]
+) {
+  const recipients = String(to)
+    .split(',')
+    .map((r) => extractEmailAddress(r.trim()))
+    .filter(Boolean);
+
+  for (const recipientEmail of recipients) {
+    const parsed = parseEmailAddress(recipientEmail);
+    if (!parsed || !isAllowedMailDomain(parsed.domain)) continue;
+
+    const userResult = await getPool().query(
+      'SELECT id FROM users WHERE LOWER(email) = LOWER($1) OR username = $2',
+      [recipientEmail, parsed.local]
+    );
+    if (userResult.rows.length === 0) continue;
+
+    const displayFrom = fromName ? `${fromName} <${fromEmail}>` : fromEmail;
+    await getPool().query(
+      `INSERT INTO incoming_emails (
+          user_id, from_email, sender_name, subject, body, body_text, body_html,
+          received_at, is_spam, headers, attachments
+        ) VALUES ($1, $2, $3, $4, $5, $6, $7, CURRENT_TIMESTAMP, false, $8, $9)`,
+      [
+        userResult.rows[0].id,
+        displayFrom,
+        fromName || parsed.local,
+        subject,
+        body,
+        body,
+        html,
+        JSON.stringify({ internalDelivery: true }),
+        JSON.stringify(attachments),
+      ]
+    );
+  }
+}
 
 async function resolveAttachments(raw: unknown) {
   if (raw == null) {
@@ -89,6 +135,16 @@ export async function POST(request: NextRequest) {
         <a href="https://www.tauos.org/taumail" style="color: #b8860b;">tauos.org/taumail</a>
       </p>
     </div>`;
+
+    await deliverToInternalInboxes(
+      fromEmail,
+      fromName,
+      to,
+      subject,
+      body,
+      html,
+      attachmentCheck.attachments
+    );
 
     const { messageId, transport, accepted, envelopeFrom } = await sendMail({
       from: { email: fromEmail, name: fromName },

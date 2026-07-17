@@ -386,6 +386,22 @@ function TauMailComposeInner() {
                   setDragOver(false);
                   if (e.dataTransfer.files?.length) addFiles(e.dataTransfer.files);
                 }}
+                onPaste={(e) => {
+                  const items = e.clipboardData?.items;
+                  if (!items) return;
+                  const pasted: File[] = [];
+                  for (let i = 0; i < items.length; i++) {
+                    const item = items[i];
+                    if (item.kind === 'file') {
+                      const file = item.getAsFile();
+                      if (file) pasted.push(file);
+                    }
+                  }
+                  if (pasted.length) {
+                    e.preventDefault();
+                    addFiles(pasted);
+                  }
+                }}
               >
                 {/* Formatting Toolbar */}
                 <div className="bg-gray-800 px-4 py-2 border-b border-gray-700 flex items-center space-x-2">
@@ -422,7 +438,7 @@ function TauMailComposeInner() {
                   onChange={(e) => setComposeData({...composeData, text: e.target.value})}
                   rows={12}
                   className="w-full px-4 py-3 bg-gray-800 text-white placeholder-gray-400 focus:outline-none resize-none"
-                  placeholder="Type your message here… Drag and drop files or images to attach (max 15 MB total)."
+                  placeholder="Type your message here… Paste, drag-and-drop, or use Attach for files (max 15 MB total)."
                   required
                 />
 

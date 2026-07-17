@@ -267,7 +267,6 @@ export default function TauMailLanding() {
                 <Server className={`w-4 h-4 ${serverStatus.ok ? 'text-green-400' : 'text-red-400'}`} />
                 <span className={serverStatus.ok ? 'text-green-300' : 'text-red-300'}>
                   Mail node: {serverStatus.ok ? 'online' : 'offline'}
-                  {serverStatus.host && ` (${serverStatus.transport} @ ${serverStatus.host}:${serverStatus.port})`}
                 </span>
               </div>
             )}

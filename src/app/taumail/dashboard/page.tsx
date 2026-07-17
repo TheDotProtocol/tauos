@@ -10,7 +10,7 @@ import {
   Mail, Inbox, Send, Archive, Trash2, Star, Search, Plus, 
   Filter, Download, Reply, Forward, MoreVertical, Users, 
   Shield, Lock, Eye, CheckCircle, AlertCircle, BarChart3, 
-  Activity, Settings, Calendar, Clock, LogOut, User, X, AlertTriangle
+  Activity, Settings, Calendar, Clock, LogOut, User, X, AlertTriangle, Paperclip
 } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -29,6 +29,8 @@ import {
   buildForwardBody,
   extractEmailAddress,
 } from '@/lib/taumail-compose';
+import { parseStoredIncomingAttachments } from '@/lib/taumail-inbound';
+import TauMailAttachmentList from '@/components/apps/TauMailAttachmentList';
 
 export default function TauMailDashboard() {
   const router = useRouter();
@@ -73,17 +75,22 @@ export default function TauMailDashboard() {
       if (response.ok) {
         const data = await response.json();
         // Map API response to frontend format
-        const mappedEmails = (data.emails || []).map(email => ({
+        const mappedEmails = (data.emails || []).map(email => {
+          const attachments = parseStoredIncomingAttachments(email.attachments);
+          return {
           id: email.id,
           from: email.display_name || email.sender_name || email.from_email || 'Unknown',
           fromEmail: email.from_email || email.sender_email || extractEmailAddress(email.from_email || ''),
           subject: email.subject || 'No Subject',
           preview: email.body ? email.body.substring(0, 100) + '...' : 'No preview',
           body: email.body || '',
+          bodyHtml: email.body_html || '',
+          attachments,
           time: email.received_at ? new Date(email.received_at).toLocaleString() : 'Unknown time',
           unread: !email.is_read,
           starred: false
-        }));
+        };
+        });
         setEmails(mappedEmails);
       } else {
         // If no inbox endpoint, create some sample emails for demo
@@ -689,6 +696,7 @@ export default function TauMailDashboard() {
                 <p className="text-gray-300 leading-relaxed whitespace-pre-wrap">
                   {selectedEmail.body || selectedEmail.preview}
                 </p>
+                <TauMailAttachmentList attachments={selectedEmail.attachments || []} />
               </div>
 
               <div className="flex space-x-3 pt-4">

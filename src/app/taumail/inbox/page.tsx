@@ -9,7 +9,7 @@ import {
   Filter, Download, Reply, Forward, MoreVertical, Users, 
   Shield, Lock, Eye, CheckCircle, AlertCircle, BarChart3, 
   Activity, Settings, Calendar, Clock, LogOut, User, X,
-  RefreshCw, ChevronLeft
+  RefreshCw, ChevronLeft, Paperclip
 } from 'lucide-react';
 import Link from 'next/link';
 import TauMailDemoBanner from '@/components/apps/TauMailDemoBanner';
@@ -23,6 +23,8 @@ import {
   buildForwardBody,
   extractEmailAddress,
 } from '@/lib/taumail-compose';
+import { parseStoredIncomingAttachments } from '@/lib/taumail-inbound';
+import TauMailAttachmentList from '@/components/apps/TauMailAttachmentList';
 import { useRouter } from 'next/navigation';
 
 export default function TauMailInbox() {
@@ -59,18 +61,23 @@ export default function TauMailInbox() {
       if (response.ok) {
         const data = await response.json();
         // Map API response to frontend format
-        const mappedEmails = (data.emails || []).map(email => ({
+        const mappedEmails = (data.emails || []).map(email => {
+          const attachments = parseStoredIncomingAttachments(email.attachments);
+          return {
           id: email.id,
           from: email.display_name || email.sender_name || email.from_email || 'Unknown',
           fromEmail: email.from_email || email.sender_email || extractEmailAddress(email.from_email || ''),
           subject: email.subject || 'No Subject',
           preview: email.body ? email.body.substring(0, 100) + '...' : 'No preview',
           body: email.body || '',
+          bodyHtml: email.body_html || '',
+          attachments,
           time: email.received_at ? new Date(email.received_at).toLocaleString() : 'Unknown time',
           unread: !email.is_read,
           starred: false,
           messageId: email.message_id || null,
-        }));
+        };
+        });
         setEmails(mappedEmails);
       } else {
         // Fallback to demo emails for testing
@@ -276,6 +283,12 @@ export default function TauMailInbox() {
                       <p className="text-sm text-gray-500 mt-1 truncate">
                         {email.preview || 'No preview'}
                       </p>
+                      {email.attachments?.length > 0 && (
+                        <p className="text-xs text-yellow-400/80 mt-1 flex items-center gap-1">
+                          <Paperclip className="w-3 h-3" />
+                          {email.attachments.length} attachment{email.attachments.length !== 1 ? 's' : ''}
+                        </p>
+                      )}
                     </div>
                     <div className="flex items-center space-x-2">
                       {email.unread && (
@@ -350,6 +363,7 @@ export default function TauMailInbox() {
                 <p className="text-gray-300 leading-relaxed whitespace-pre-wrap">
                   {selectedEmail.body || selectedEmail.preview}
                 </p>
+                <TauMailAttachmentList attachments={selectedEmail.attachments || []} />
               </div>
 
               <div className="flex space-x-3 pt-4">
