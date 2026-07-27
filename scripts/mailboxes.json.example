@@ -1,0 +1,21 @@
+{
+  "defaultPassword": "ChangeMe-After-First-Login!",
+  "mailboxes": [
+    {
+      "email": "ceo@thearholdings.group",
+      "fullName": "AR Holdings CEO",
+      "username": "arh-ceo"
+    },
+    {
+      "email": "info@estayshotels.com",
+      "fullName": "eStays Reservations",
+      "username": "estays-info"
+    },
+    {
+      "email": "you@tauos.org",
+      "fullName": "Your Name",
+      "username": "yourname",
+      "password": "Optional-per-user-override"
+    }
+  ]
+}

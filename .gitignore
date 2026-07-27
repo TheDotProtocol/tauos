@@ -141,3 +141,7 @@ public/TauOS-Desktop.iso
 tauos-desktop.iso
 new-website/sources/emergent/
 new-website/sources/replit/
+
+# Bulk mailbox provisioning (contains real addresses/passwords)
+scripts/mailboxes.json
+scripts/mailboxes-provisioned.json

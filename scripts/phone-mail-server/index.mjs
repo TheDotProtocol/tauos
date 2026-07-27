@@ -20,6 +20,11 @@ const HOSTED_DOMAINS = [
   'globaldotbank.com',
   'onenumbr.com',
   'kibouor.com',
+  'tauphones.com',
+  'easaanfoundation.com',
+  'projectgrayscale.com',
+  'thedotprotocol.com',
+  'asktrabaajo.com',
 ];
 
 const LISTEN_HOST = process.env.PHONE_SMTP_LISTEN_HOST || '0.0.0.0';

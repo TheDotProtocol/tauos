@@ -16,6 +16,11 @@ DOMAINS=(
   globaldotbank.com
   onenumbr.com
   kibouor.com
+  tauphones.com
+  easaanfoundation.com
+  projectgrayscale.com
+  thedotprotocol.com
+  asktrabaajo.com
 )
 
 echo "=============================================="

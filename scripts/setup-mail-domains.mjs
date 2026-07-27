@@ -1,23 +1,14 @@
 #!/usr/bin/env node
 /**
- * Seed organizations for all 7 Tau Mail production domains.
+ * Seed organizations for all Tau Mail production domains.
  * Usage: npm run mail:setup
  */
 import dotenv from 'dotenv';
 import pg from 'pg';
+import { MAIL_ORGANIZATIONS } from './mail-domains-data.mjs';
 
 dotenv.config({ path: '.env.local' });
 dotenv.config();
-
-const DOMAINS = [
-  { name: 'Tau Core Inc.', domain: 'tauos.org' },
-  { name: 'Tau Mail', domain: 'taumail.com' },
-  { name: 'AR Holdings Group Corporation', domain: 'thearholdings.group' },
-  { name: 'eStays Hotels', domain: 'estayshotels.com' },
-  { name: 'Global Dot Bank', domain: 'globaldotbank.com' },
-  { name: 'One Numbr', domain: 'onenumbr.com' },
-  { name: 'Kibouor', domain: 'kibouor.com' },
-];
 
 async function getOrgColumns(pool) {
   const { rows } = await pool.query(
@@ -83,24 +74,24 @@ async function main() {
   const pool = new pg.Pool({ connectionString, ssl: { rejectUnauthorized: false } });
 
   try {
-    console.log('Setting up mail domain organizations...\n');
+    console.log(`Setting up ${MAIL_ORGANIZATIONS.length} mail domain organizations...\n`);
 
     const columns = await getOrgColumns(pool);
     if (!columns.has('domain') || !columns.has('name')) {
       throw new Error('organizations table missing required columns (name, domain)');
     }
 
-    for (const org of DOMAINS) {
+    for (const org of MAIL_ORGANIZATIONS) {
       const { action, id } = await upsertOrg(pool, org, columns);
       console.log(`  ${action === 'created' ? '+' : '✓'} @${org.domain} (${action}, id: ${id})`);
     }
 
     const all = await pool.query(
       'SELECT id, name, domain FROM organizations WHERE domain = ANY($1) ORDER BY domain',
-      [DOMAINS.map((d) => d.domain)]
+      [MAIL_ORGANIZATIONS.map((d) => d.domain)]
     );
 
-    console.log(`\n✅ ${all.rows.length} mail domains ready (~${all.rows.length * 5} planned mailboxes):\n`);
+    console.log(`\n✅ ${all.rows.length} mail domains ready:\n`);
     all.rows.forEach((row) => {
       console.log(`   ${row.id}. ${row.name} (@${row.domain})`);
     });

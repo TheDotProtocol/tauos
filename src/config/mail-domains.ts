@@ -49,13 +49,48 @@ export const MAIL_DOMAINS = [
     mxHost: 'mail.kibouor.com',
     comingSoon: false,
   },
+  {
+    domain: 'tauphones.com',
+    label: 'Tau Phones',
+    organization: 'Tau Phones LLC',
+    mxHost: 'mail.tauphones.com',
+    comingSoon: false,
+  },
+  {
+    domain: 'easaanfoundation.com',
+    label: 'Easaan Foundation',
+    organization: 'Easaan Foundation',
+    mxHost: 'mail.easaanfoundation.com',
+    comingSoon: false,
+  },
+  {
+    domain: 'projectgrayscale.com',
+    label: 'Project Grayscale',
+    organization: 'Project Grayscale',
+    mxHost: 'mail.projectgrayscale.com',
+    comingSoon: false,
+  },
+  {
+    domain: 'thedotprotocol.com',
+    label: 'The Dot Protocol',
+    organization: 'The Dot Protocol',
+    mxHost: 'mail.thedotprotocol.com',
+    comingSoon: false,
+  },
+  {
+    domain: 'asktrabaajo.com',
+    label: 'AskTrabaajo',
+    organization: 'AskTrabaajo',
+    mxHost: 'mail.asktrabaajo.com',
+    comingSoon: false,
+  },
 ] as const;
 
 export type MailDomain = (typeof MAIL_DOMAINS)[number]['domain'];
 
 export const DEFAULT_MAIL_DOMAIN: MailDomain = 'tauos.org';
 
-/** ~5 mailboxes per domain × 7 domains */
+/** ~5 mailboxes per domain × 12 domains */
 export const PLANNED_MAILBOXES_PER_DOMAIN = 5;
 
 export function isAllowedMailDomain(domain: string): domain is MailDomain {

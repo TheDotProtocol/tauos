@@ -9,6 +9,8 @@
     "lint": "next lint",
     "mail:server": "node scripts/phone-mail-server/index.mjs",
     "mail:setup": "node scripts/setup-mail-domains.mjs",
+    "mail:provision": "node scripts/provision-mailboxes.mjs",
+    "mail:dns-checklist": "node scripts/generate-dns-checklist.mjs",
     "storage:setup": "node scripts/setup-supabase-storage.mjs",
     "cloud:setup": "node scripts/setup-taucloud-storage.mjs",
     "browser:setup": "node scripts/setup-taubrowser-storage.mjs",
