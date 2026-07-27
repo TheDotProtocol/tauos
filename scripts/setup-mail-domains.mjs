@@ -64,6 +64,38 @@ async function upsertOrg(pool, org, columns) {
   return { action: 'created', id: result.rows[0].id };
 }
 
+async function migrateTaumailDomain(pool) {
+  const OLD = 'taumail.com';
+  const NEW = 'taumail.org';
+
+  const oldOrg = await pool.query('SELECT id FROM organizations WHERE domain = $1', [OLD]);
+  if (oldOrg.rows.length === 0) return;
+
+  console.log(`\n↻ Migrating @${OLD} → @${NEW}...`);
+
+  const newOrg = await pool.query('SELECT id FROM organizations WHERE domain = $1', [NEW]);
+  if (newOrg.rows.length > 0) {
+    await pool.query(
+      `UPDATE users SET organization_id = $1,
+        email = REPLACE(LOWER(email), '@${OLD}', '@${NEW}')
+       WHERE organization_id = $2 OR LOWER(email) LIKE '%@${OLD}'`,
+      [newOrg.rows[0].id, oldOrg.rows[0].id]
+    );
+    await pool.query('DELETE FROM organizations WHERE domain = $1', [OLD]);
+    console.log(`  ✓ Merged org @${OLD} into existing @${NEW}`);
+    return;
+  }
+
+  await pool.query('UPDATE organizations SET domain = $1, name = $2 WHERE domain = $3', [
+    NEW,
+    'Tau Mail',
+    OLD,
+  ]);
+  await pool.query(`UPDATE users SET email = REPLACE(LOWER(email), '@${OLD}', '@${NEW}')
+    WHERE LOWER(email) LIKE '%@${OLD}'`);
+  console.log(`  ✓ Renamed org @${OLD} → @${NEW}`);
+}
+
 async function main() {
   const connectionString = process.env.DATABASE_URL;
   if (!connectionString) {
@@ -80,6 +112,8 @@ async function main() {
     if (!columns.has('domain') || !columns.has('name')) {
       throw new Error('organizations table missing required columns (name, domain)');
     }
+
+    await migrateTaumailDomain(pool);
 
     for (const org of MAIL_ORGANIZATIONS) {
       const { action, id } = await upsertOrg(pool, org, columns);

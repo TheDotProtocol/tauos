@@ -1,7 +1,7 @@
 /** Shared mail domain list for setup, DNS checklist, and docs. */
 export const MAIL_ORGANIZATIONS = [
   { name: 'Tau Core Inc.', domain: 'tauos.org', label: 'Tau OS', mxHost: 'mail.tauos.org' },
-  { name: 'Tau Mail', domain: 'taumail.com', label: 'Tau Mail', mxHost: 'mail.taumail.com' },
+  { name: 'Tau Mail', domain: 'taumail.org', label: 'Tau Mail', mxHost: 'mail.taumail.org' },
   { name: 'AR Holdings Group Corporation', domain: 'thearholdings.group', label: 'AR Holdings', mxHost: 'mail.thearholdings.group' },
   { name: 'eStays Hotels', domain: 'estayshotels.com', label: 'eStays Hotels', mxHost: 'mail.estayshotels.com' },
   { name: 'Global Dot Bank', domain: 'globaldotbank.com', label: 'Global Dot Bank', mxHost: 'mail.globaldotbank.com' },

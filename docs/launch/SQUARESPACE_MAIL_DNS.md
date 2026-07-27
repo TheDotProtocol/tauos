@@ -22,7 +22,7 @@ For each domain below, add:
 MX host per domain:
 
 - `mail.tauos.org`
-- `mail.taumail.com`
+- `mail.taumail.org`
 - `mail.thearholdings.group`
 - `mail.estayshotels.com`
 - `mail.globaldotbank.com`
@@ -36,6 +36,18 @@ MX host per domain:
 
 DKIM: add `default._domainkey` TXT after OpenDKIM keys are generated on the Vultr mail host.
 
+## Website (taumail.org — Vercel)
+
+Add these in Squarespace DNS for **taumail.org** (separate from mail records above):
+
+| Type | Host | Value |
+|------|------|--------|
+| A | `@` | `76.76.21.21` |
+| CNAME | `www` | `cname.vercel-dns.com` |
+| CNAME | `workspace` | `cname.vercel-dns.com` |
+
+Then add **taumail.org**, **www.taumail.org**, and **workspace.taumail.org** as domains in the Vercel project (same as tauos.org).
+
 ## Vultr (once)
 
 Reverse DNS for `149.28.156.7` → `mail.tauos.org`
@@ -47,4 +59,4 @@ dig MX thearholdings.group +short
 dig A mail.thearholdings.group +short
 ```
 
-Login test: https://www.tauos.org/taumail — any provisioned email + password from secure handoff.
+Login test: https://taumail.org — any provisioned email + password from secure handoff.

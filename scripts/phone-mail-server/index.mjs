@@ -14,7 +14,7 @@ dotenv.config();
 
 const HOSTED_DOMAINS = [
   'tauos.org',
-  'taumail.com',
+  'taumail.org',
   'thearholdings.group',
   'estayshotels.com',
   'globaldotbank.com',

@@ -8,6 +8,14 @@ type HostRoute = {
 
 const HOST_ROUTES: HostRoute[] = [
   {
+    hosts: ['workspace.taumail.org', 'workspace.taumail.localhost'],
+    basePath: '/taumail/workspace',
+  },
+  {
+    hosts: ['taumail.org', 'www.taumail.org', 'taumail.localhost'],
+    basePath: '/taumail',
+  },
+  {
     hosts: ['developer.tauos.org', 'developer.localhost'],
     basePath: '/developers',
   },

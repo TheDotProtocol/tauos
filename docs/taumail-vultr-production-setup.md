@@ -47,7 +47,7 @@ Next week (optional):
 | Domain | MX host | Org |
 |--------|---------|-----|
 | `tauos.org` | `mail.tauos.org` | Tau Core Inc. |
-| `taumail.com` | `mail.taumail.com` | Tau Mail |
+| `taumail.org` | `mail.taumail.org` | Tau Mail |
 | `thearholdings.group` | `mail.thearholdings.group` | AR Holdings Group |
 | `estayshotels.com` | `mail.estayshotels.com` | eStays Hotels |
 | `globaldotbank.com` | `mail.globaldotbank.com` | Global Dot Bank |
@@ -83,7 +83,7 @@ Replace `VULTR_IP` with your server IP. Repeat at each domain registrar.
 
 ```
 mail.tauos.org           A    VULTR_IP
-mail.taumail.com         A    VULTR_IP
+mail.taumail.org         A    VULTR_IP
 mail.thearholdings.group A    VULTR_IP
 mail.estayshotels.com    A    VULTR_IP
 mail.globaldotbank.com   A    VULTR_IP
@@ -95,7 +95,7 @@ mail.kibouor.com         A    VULTR_IP
 
 ```
 tauos.org                MX   10 mail.tauos.org
-taumail.com              MX   10 mail.taumail.com
+taumail.org              MX   10 mail.taumail.org
 thearholdings.group      MX   10 mail.thearholdings.group
 estayshotels.com         MX   10 mail.estayshotels.com
 globaldotbank.com        MX   10 mail.globaldotbank.com
@@ -107,7 +107,7 @@ kibouor.com              MX   10 mail.kibouor.com
 
 ```
 tauos.org                TXT  "v=spf1 ip4:VULTR_IP -all"
-taumail.com              TXT  "v=spf1 ip4:VULTR_IP -all"
+taumail.org              TXT  "v=spf1 ip4:VULTR_IP -all"
 ... (same pattern for all 7)
 ```
 
@@ -219,7 +219,7 @@ Run these **before** inviting all 35 users.
 | 1 | DNS MX | `dig MX tauos.org` → `mail.tauos.org` |
 | 2 | PTR | Reverse DNS = `mail.tauos.org` |
 | 3 | Register | Create `test@tauos.org` on `/taumail` |
-| 4 | Internal send | `test@tauos.org` → `hello@taumail.com` appears in inbox |
+| 4 | Internal send | `test@tauos.org` → `hello@taumail.org` appears in inbox |
 | 5 | Outbound external | Send to your personal Gmail — arrives in Inbox (not Spam) |
 | 6 | Inbound external | Reply from Gmail — appears in Tau Mail inbox within 1 min |
 | 7 | All 7 domains | Repeat 4–6 for one address on each domain |
@@ -252,7 +252,7 @@ npm run mail:setup
 
 - **Preview UI:** `/taumail` → Preview email UI (demo@tauos.org)
 - **Real register:** Create account if Supabase is reachable
-- **Local relay:** Send between `@tauos.org` and `@taumail.com` addresses on localhost
+- **Local relay:** Send between `@tauos.org` and `@taumail.org` addresses on localhost
 
 ---
 
@@ -300,7 +300,7 @@ So we can finish the install script and go live:
 
 | Week | Focus |
 |------|--------|
-| **This week** | Vultr account + VPS + DNS for `tauos.org` + `taumail.com` pilot |
+| **This week** | Vultr account + VPS + DNS for `tauos.org` + `taumail.org` pilot |
 | **This week** | We ship updated multi-domain Vultr script + Vercel env |
 | **Next week** | Roll remaining 5 domains + all 35 mailboxes |
 | **Next week** | Phone Termux backup + monitoring |

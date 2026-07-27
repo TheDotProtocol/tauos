@@ -10,7 +10,7 @@ export async function GET() {
       mxHost: d.mxHost,
       comingSoon: d.comingSoon,
     })),
-    defaultDomain: 'tauos.org',
+    defaultDomain: 'taumail.org',
     count: MAIL_DOMAINS.length,
   });
 }

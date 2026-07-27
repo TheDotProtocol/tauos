@@ -8,10 +8,10 @@ export const MAIL_DOMAINS = [
     comingSoon: false,
   },
   {
-    domain: 'taumail.com',
+    domain: 'taumail.org',
     label: 'Tau Mail',
     organization: 'Tau Mail',
-    mxHost: 'mail.taumail.com',
+    mxHost: 'mail.taumail.org',
     comingSoon: false,
   },
   {

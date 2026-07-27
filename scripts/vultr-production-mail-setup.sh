@@ -10,7 +10,7 @@ RELAY_PASS="${RELAY_PASS:-$(openssl rand -base64 24)}"
 
 DOMAINS=(
   tauos.org
-  taumail.com
+  taumail.org
   thearholdings.group
   estayshotels.com
   globaldotbank.com
@@ -114,7 +114,7 @@ EOF
 cat > /etc/postfix/virtual_mailbox.pcre <<'PCRE'
 # Accept any local part on hosted domains
 /^(?i)([^@]+@tauos.org)$/          tauos/$1
-/^(?i)([^@]+@taumail.com)$/        taumail/$1
+/^(?i)([^@]+@taumail.org)$/        taumail/$1
 /^(?i)([^@]+@thearholdings.group)$/ ar/$1
 /^(?i)([^@]+@estayshotels.com)$/    estays/$1
 /^(?i)([^@]+@globaldotbank.com)$/  gdb/$1
