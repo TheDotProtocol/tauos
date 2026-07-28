@@ -98,6 +98,31 @@ async function main() {
   `);
   console.log('  ✓ tautalk_typing');
 
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS tautalk_otp_verifications (
+      id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      channel TEXT NOT NULL CHECK (channel IN ('email', 'phone')),
+      destination TEXT NOT NULL,
+      code_hash TEXT NOT NULL,
+      expires_at TIMESTAMPTZ NOT NULL,
+      consumed_at TIMESTAMPTZ,
+      attempts INTEGER DEFAULT 0,
+      created_at TIMESTAMPTZ DEFAULT NOW()
+    )
+  `);
+  await pool.query(
+    'CREATE INDEX IF NOT EXISTS idx_tautalk_otp_dest ON tautalk_otp_verifications (channel, destination, created_at DESC)'
+  );
+  console.log('  ✓ tautalk_otp_verifications');
+
+  await pool.query(`
+    ALTER TABLE users ADD COLUMN IF NOT EXISTS email_verified BOOLEAN DEFAULT false
+  `);
+  await pool.query(`
+    ALTER TABLE users ADD COLUMN IF NOT EXISTS phone_verified BOOLEAN DEFAULT false
+  `);
+  console.log('  ✓ users.email_verified / phone_verified');
+
   console.log('\n✅ Tau Talk schema ready');
   await pool.end();
 }

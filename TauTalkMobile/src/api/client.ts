@@ -56,12 +56,24 @@ export async function login(identifier: string, password: string) {
   return parseJson<AuthResponse>(res);
 }
 
+export async function sendRegistrationOtp(channel: 'email' | 'phone', value: string) {
+  const body = channel === 'email' ? { channel, email: value } : { channel, phone: value };
+  const res = await fetch(`${API_BASE}/api/tautalk/auth/otp/send`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
+  });
+  return parseJson<{ success: boolean; message: string; devCode?: string }>(res);
+}
+
 export async function register(payload: {
   username: string;
   fullName: string;
   email: string;
   phone?: string;
   password: string;
+  emailOtp: string;
+  phoneOtp?: string;
 }) {
   const res = await fetch(`${API_BASE}/api/tautalk/auth/register`, {
     method: 'POST',

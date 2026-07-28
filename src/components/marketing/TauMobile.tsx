@@ -1,7 +1,9 @@
 'use client';
 
 import { motion } from "framer-motion";
-import { Shield, Cpu, Lock, EyeOff, Cloud } from "lucide-react";
+import { Shield, Cpu, Lock, EyeOff, Cloud, MessageCircle } from "lucide-react";
+import Link from "next/link";
+import Image from "next/image";
 
 export default function TauMobile() {
   const chips = [
@@ -109,6 +111,42 @@ export default function TauMobile() {
             </motion.div>
           ))}
         </div>
+
+        <motion.div
+          className="mt-16 max-w-xl mx-auto"
+          initial={{ opacity: 0, y: 24 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+        >
+          <div className="bg-card/60 border border-primary/30 rounded-2xl p-8 backdrop-blur-md">
+            <div className="flex flex-col sm:flex-row items-center gap-6">
+              <Image
+                src="/brand/tautalk-icon.png"
+                alt="TauTalk"
+                width={88}
+                height={88}
+                className="rounded-2xl ring-2 ring-primary/40"
+              />
+              <div className="text-left flex-1">
+                <div className="flex items-center gap-2 mb-2">
+                  <MessageCircle className="w-5 h-5 text-primary" />
+                  <h3 className="text-2xl font-bold text-white">TauTalk — Public Beta</h3>
+                </div>
+                <p className="text-muted-foreground text-sm mb-4">
+                  Encrypted messaging for Android. Register with Gmail or any email — OTP verified.
+                  No telemetry. Locations use OpenStreetMap.
+                </p>
+                <Link
+                  href="/tautalk"
+                  className="inline-flex items-center gap-2 bg-primary text-black font-bold px-6 py-3 rounded-xl hover:opacity-90 transition"
+                >
+                  <MessageCircle className="w-5 h-5" />
+                  Explore TauTalk
+                </Link>
+              </div>
+            </div>
+          </div>
+        </motion.div>
       </div>
     </section>
   );

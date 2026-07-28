@@ -121,6 +121,19 @@
       "description": "ARM64 Linux AppImage"
     },
     {
+      "id": "tautalk-android-apk",
+      "label": "TauTalk for Android (Public Beta)",
+      "platform": "android",
+      "arch": "universal",
+      "kind": "package",
+      "filename": "TauTalk-1.0.0-beta.apk",
+      "url": "/downloads/TauTalk-1.0.0-beta.apk",
+      "size": 61290830,
+      "sha256": "117a47584d5f7ea50ca42f1612d11cd62781ffbd6e977eaebf8323820ac6dd88",
+      "available": true,
+      "description": "Encrypted messaging · email & SMS OTP registration · OpenStreetMap locations"
+    },
+    {
       "id": "iso-desktop-arm64",
       "label": "TauOS Desktop ISO (ARM64)",
       "platform": "linux",

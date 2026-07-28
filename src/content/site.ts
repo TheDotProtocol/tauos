@@ -32,8 +32,8 @@ export const site = {
   footer: {
     blurb: 'Privacy-first, AI-native operating system ecosystem built for humanity.',
     products: [
-      { label: 'Tau OS', href: '#' },
-      { label: 'Tau Mobile', href: '#' },
+      { label: 'Tau OS', href: '/download' },
+      { label: 'TauTalk', href: '/tautalk' },
       { label: 'Tau Mail', href: '/taumail' },
       { label: 'Tau Cloud', href: '/taucloud' },
       { label: 'Tau AI', href: '/tauai' },
