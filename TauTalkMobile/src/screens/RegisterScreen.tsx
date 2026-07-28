@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import {
   ActivityIndicator,
+  Alert,
   KeyboardAvoidingView,
   Platform,
   Pressable,
@@ -11,7 +12,7 @@ import {
   TextInput,
   View,
 } from 'react-native';
-import { register } from '../api/client';
+import { register, sendRegistrationOtp } from '../api/client';
 import GlassPanel from '../components/GlassPanel';
 import PrivacyPledge from '../components/PrivacyPledge';
 import { saveSession } from '../storage/session';
@@ -29,21 +30,84 @@ export default function RegisterScreen({ onSuccess, onBack }: Props) {
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
+  const [emailOtp, setEmailOtp] = useState('');
+  const [phoneOtp, setPhoneOtp] = useState('');
   const [loading, setLoading] = useState(false);
+  const [sendingEmail, setSendingEmail] = useState(false);
+  const [sendingPhone, setSendingPhone] = useState(false);
   const [error, setError] = useState('');
+
+  const resolvedEmail = () => {
+    const trimmed = email.trim();
+    if (trimmed.includes('@')) return trimmed.toLowerCase();
+    const clean = username.trim().replace(/^@/, '');
+    return clean ? `${clean}@tauos.org` : '';
+  };
+
+  const sendEmailCode = async () => {
+    const target = resolvedEmail();
+    if (!target.includes('@')) {
+      setError('Enter a valid email (Gmail, Outlook, or @taumail.org)');
+      return;
+    }
+    setError('');
+    setSendingEmail(true);
+    try {
+      const res = await sendRegistrationOtp('email', target);
+      if (res.devCode) {
+        Alert.alert('Dev code', `Email OTP: ${res.devCode}`);
+      } else {
+        Alert.alert('Code sent', `Check ${target} for your 6-digit code`);
+      }
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Could not send email code');
+    } finally {
+      setSendingEmail(false);
+    }
+  };
+
+  const sendPhoneCode = async () => {
+    if (!phone.trim()) {
+      setError('Enter phone with country code first');
+      return;
+    }
+    setError('');
+    setSendingPhone(true);
+    try {
+      const res = await sendRegistrationOtp('phone', phone.trim());
+      if (res.devCode) {
+        Alert.alert('Dev code', `SMS OTP: ${res.devCode}`);
+      } else {
+        Alert.alert('Code sent', 'Check your SMS for the 6-digit code');
+      }
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Could not send SMS code');
+    } finally {
+      setSendingPhone(false);
+    }
+  };
 
   const submit = async () => {
     setError('');
+    if (!emailOtp.trim()) {
+      setError('Verify your email with the 6-digit code');
+      return;
+    }
+    if (phone.trim() && !phoneOtp.trim()) {
+      setError('Verify your phone with the SMS code');
+      return;
+    }
     setLoading(true);
     try {
       const cleanUsername = username.trim().replace(/^@/, '');
-      const resolvedEmail = email.includes('@') ? email : `${cleanUsername}@tauos.org`;
       const data = await register({
         username: cleanUsername,
         fullName: fullName.trim(),
-        email: resolvedEmail.toLowerCase(),
+        email: resolvedEmail(),
         phone: phone.trim() || undefined,
         password,
+        emailOtp: emailOtp.trim(),
+        phoneOtp: phone.trim() ? phoneOtp.trim() : undefined,
       });
       await saveSession(data.token, data.user);
       onSuccess(data.token, data.user);
@@ -61,7 +125,9 @@ export default function RegisterScreen({ onSuccess, onBack }: Props) {
       <StatusBar barStyle="light-content" backgroundColor={colors.bg} />
       <ScrollView contentContainerStyle={styles.scroll} keyboardShouldPersistTaps="handled">
         <Text style={styles.title}>Join TauTalk</Text>
-        <Text style={styles.subtitle}>Pick a @username · encrypted by default</Text>
+        <Text style={styles.subtitle}>
+          Verify email (Gmail & external). Phone SMS when Twilio is live — leave phone blank for now.
+        </Text>
 
         <GlassPanel style={styles.card} strong>
           <Text style={styles.label}>@ Username</Text>
@@ -84,13 +150,31 @@ export default function RegisterScreen({ onSuccess, onBack }: Props) {
           <Text style={styles.label}>Email</Text>
           <TextInput
             style={styles.input}
-            placeholder="you@taumail.org (optional @tauos.org default)"
+            placeholder="you@gmail.com or you@taumail.org"
             placeholderTextColor={colors.textSoft}
             autoCapitalize="none"
             keyboardType="email-address"
             value={email}
             onChangeText={setEmail}
           />
+          <Pressable style={styles.codeBtn} onPress={sendEmailCode} disabled={sendingEmail}>
+            {sendingEmail ? (
+              <ActivityIndicator color={colors.goldLight} size="small" />
+            ) : (
+              <Text style={styles.codeBtnText}>Send email verification code</Text>
+            )}
+          </Pressable>
+          <Text style={styles.label}>Email code</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="6-digit code"
+            placeholderTextColor={colors.textSoft}
+            keyboardType="number-pad"
+            maxLength={6}
+            value={emailOtp}
+            onChangeText={setEmailOtp}
+          />
+
           <Text style={styles.label}>Phone (optional)</Text>
           <TextInput
             style={styles.input}
@@ -100,6 +184,28 @@ export default function RegisterScreen({ onSuccess, onBack }: Props) {
             value={phone}
             onChangeText={setPhone}
           />
+          {phone.trim() ? (
+            <>
+              <Pressable style={styles.codeBtn} onPress={sendPhoneCode} disabled={sendingPhone}>
+                {sendingPhone ? (
+                  <ActivityIndicator color={colors.goldLight} size="small" />
+                ) : (
+                  <Text style={styles.codeBtnText}>Send SMS verification code</Text>
+                )}
+              </Pressable>
+              <Text style={styles.label}>SMS code</Text>
+              <TextInput
+                style={styles.input}
+                placeholder="6-digit SMS code"
+                placeholderTextColor={colors.textSoft}
+                keyboardType="number-pad"
+                maxLength={6}
+                value={phoneOtp}
+                onChangeText={setPhoneOtp}
+              />
+            </>
+          ) : null}
+
           <Text style={styles.label}>Password</Text>
           <TextInput
             style={styles.input}
@@ -157,6 +263,16 @@ const styles = StyleSheet.create({
     borderColor: colors.border,
     fontSize: 16,
   },
+  codeBtn: {
+    borderRadius: radii.md,
+    borderWidth: 1,
+    borderColor: colors.glassBorder,
+    backgroundColor: colors.goldDim,
+    paddingVertical: 11,
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  codeBtnText: { color: colors.goldLight, fontWeight: '700', fontSize: 14 },
   button: {
     backgroundColor: colors.goldLight,
     borderRadius: radii.md,
