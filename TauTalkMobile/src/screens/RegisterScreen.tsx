@@ -15,6 +15,7 @@ import {
 import { register, sendRegistrationOtp } from '../api/client';
 import GlassPanel from '../components/GlassPanel';
 import PrivacyPledge from '../components/PrivacyPledge';
+import { PHONE_AUTH_ENABLED } from '../config';
 import { saveSession } from '../storage/session';
 import { colors, radii } from '../theme';
 import type { TauUser } from '../storage/session';
@@ -93,7 +94,7 @@ export default function RegisterScreen({ onSuccess, onBack }: Props) {
       setError('Verify your email with the 6-digit code');
       return;
     }
-    if (phone.trim() && !phoneOtp.trim()) {
+    if (PHONE_AUTH_ENABLED && phone.trim() && !phoneOtp.trim()) {
       setError('Verify your phone with the SMS code');
       return;
     }
@@ -104,10 +105,10 @@ export default function RegisterScreen({ onSuccess, onBack }: Props) {
         username: cleanUsername,
         fullName: fullName.trim(),
         email: resolvedEmail(),
-        phone: phone.trim() || undefined,
+        phone: PHONE_AUTH_ENABLED && phone.trim() ? phone.trim() : undefined,
         password,
         emailOtp: emailOtp.trim(),
-        phoneOtp: phone.trim() ? phoneOtp.trim() : undefined,
+        phoneOtp: PHONE_AUTH_ENABLED && phone.trim() ? phoneOtp.trim() : undefined,
       });
       await saveSession(data.token, data.user);
       onSuccess(data.token, data.user);
@@ -126,7 +127,7 @@ export default function RegisterScreen({ onSuccess, onBack }: Props) {
       <ScrollView contentContainerStyle={styles.scroll} keyboardShouldPersistTaps="handled">
         <Text style={styles.title}>Join TauTalk</Text>
         <Text style={styles.subtitle}>
-          Verify email (Gmail & external). Phone SMS when Twilio is live — leave phone blank for now.
+          Verify your email — Gmail and external addresses welcome
         </Text>
 
         <GlassPanel style={styles.card} strong>
@@ -175,34 +176,38 @@ export default function RegisterScreen({ onSuccess, onBack }: Props) {
             onChangeText={setEmailOtp}
           />
 
-          <Text style={styles.label}>Phone (optional)</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="+1 555 123 4567"
-            placeholderTextColor={colors.textSoft}
-            keyboardType="phone-pad"
-            value={phone}
-            onChangeText={setPhone}
-          />
-          {phone.trim() ? (
+          {PHONE_AUTH_ENABLED ? (
             <>
-              <Pressable style={styles.codeBtn} onPress={sendPhoneCode} disabled={sendingPhone}>
-                {sendingPhone ? (
-                  <ActivityIndicator color={colors.goldLight} size="small" />
-                ) : (
-                  <Text style={styles.codeBtnText}>Send SMS verification code</Text>
-                )}
-              </Pressable>
-              <Text style={styles.label}>SMS code</Text>
+              <Text style={styles.label}>Phone (optional)</Text>
               <TextInput
                 style={styles.input}
-                placeholder="6-digit SMS code"
+                placeholder="+1 555 123 4567"
                 placeholderTextColor={colors.textSoft}
-                keyboardType="number-pad"
-                maxLength={6}
-                value={phoneOtp}
-                onChangeText={setPhoneOtp}
+                keyboardType="phone-pad"
+                value={phone}
+                onChangeText={setPhone}
               />
+              {phone.trim() ? (
+                <>
+                  <Pressable style={styles.codeBtn} onPress={sendPhoneCode} disabled={sendingPhone}>
+                    {sendingPhone ? (
+                      <ActivityIndicator color={colors.goldLight} size="small" />
+                    ) : (
+                      <Text style={styles.codeBtnText}>Send SMS verification code</Text>
+                    )}
+                  </Pressable>
+                  <Text style={styles.label}>SMS code</Text>
+                  <TextInput
+                    style={styles.input}
+                    placeholder="6-digit SMS code"
+                    placeholderTextColor={colors.textSoft}
+                    keyboardType="number-pad"
+                    maxLength={6}
+                    value={phoneOtp}
+                    onChangeText={setPhoneOtp}
+                  />
+                </>
+              ) : null}
             </>
           ) : null}
 

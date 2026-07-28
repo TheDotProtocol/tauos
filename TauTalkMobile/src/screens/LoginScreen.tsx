@@ -14,6 +14,7 @@ import {
 import { login } from '../api/client';
 import GlassPanel from '../components/GlassPanel';
 import PrivacyPledge from '../components/PrivacyPledge';
+import { PHONE_AUTH_ENABLED } from '../config';
 import { saveSession } from '../storage/session';
 import { colors, radii, shadows } from '../theme';
 import type { TauUser } from '../storage/session';
@@ -70,25 +71,27 @@ export default function LoginScreen({ onSuccess, onRegister }: Props) {
       </View>
 
       <GlassPanel style={styles.card} strong>
-        <View style={styles.modeRow}>
-          <Pressable
-            style={[styles.modeBtn, mode === 'email' && styles.modeBtnActive]}
-            onPress={() => setMode('email')}>
-            <Text style={[styles.modeText, mode === 'email' && styles.modeTextActive]}>Email</Text>
-          </Pressable>
-          <Pressable
-            style={[styles.modeBtn, mode === 'phone' && styles.modeBtnActive]}
-            onPress={() => setMode('phone')}>
-            <Text style={[styles.modeText, mode === 'phone' && styles.modeTextActive]}>Phone</Text>
-          </Pressable>
-        </View>
+        {PHONE_AUTH_ENABLED ? (
+          <View style={styles.modeRow}>
+            <Pressable
+              style={[styles.modeBtn, mode === 'email' && styles.modeBtnActive]}
+              onPress={() => setMode('email')}>
+              <Text style={[styles.modeText, mode === 'email' && styles.modeTextActive]}>Email</Text>
+            </Pressable>
+            <Pressable
+              style={[styles.modeBtn, mode === 'phone' && styles.modeBtnActive]}
+              onPress={() => setMode('phone')}>
+              <Text style={[styles.modeText, mode === 'phone' && styles.modeTextActive]}>Phone</Text>
+            </Pressable>
+          </View>
+        ) : null}
 
         <TextInput
           style={styles.input}
-          placeholder={mode === 'email' ? 'you@taumail.org' : '+1 555 123 4567'}
+          placeholder="you@taumail.org"
           placeholderTextColor={colors.textSoft}
           autoCapitalize="none"
-          keyboardType={mode === 'phone' ? 'phone-pad' : 'email-address'}
+          keyboardType="email-address"
           value={identifier}
           onChangeText={setIdentifier}
         />

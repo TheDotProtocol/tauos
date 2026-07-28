@@ -294,3 +294,120 @@ export async function registerIdentityKey(token: string, publicKey: string) {
     throw new Error(data.error || 'Failed to register encryption key');
   }
 }
+
+export type CallSession = {
+  id: string;
+  conversation_id: string;
+  caller_id: string;
+  callee_id: string;
+  mode: 'voice' | 'video';
+  status: 'ringing' | 'active' | 'ended' | 'declined' | 'missed';
+  started_at: string;
+  answered_at: string | null;
+  ended_at: string | null;
+};
+
+export type CallSignal = {
+  id: string;
+  session_id: string;
+  sender_id: string;
+  signal_type: string;
+  payload: unknown;
+  created_at: string;
+};
+
+export async function startCall(
+  token: string,
+  conversationId: string,
+  mode: 'voice' | 'video'
+): Promise<CallSession | null> {
+  try {
+    const res = await fetch(`${API_BASE}/api/tautalk/calls`, {
+      method: 'POST',
+      headers: authHeaders(token),
+      body: JSON.stringify({ conversationId, mode }),
+    });
+    const data = await parseJson<{ session: CallSession }>(res);
+    return data.session;
+  } catch {
+    return null;
+  }
+}
+
+export async function endCall(token: string, sessionId: string) {
+  await fetch(`${API_BASE}/api/tautalk/calls/${sessionId}`, {
+    method: 'POST',
+    headers: authHeaders(token),
+    body: JSON.stringify({ action: 'end' }),
+  });
+}
+
+export async function sendCallSignal(
+  token: string,
+  sessionId: string,
+  signalType: string,
+  payload: unknown
+) {
+  await fetch(`${API_BASE}/api/tautalk/calls/${sessionId}/signals`, {
+    method: 'POST',
+    headers: authHeaders(token),
+    body: JSON.stringify({ signalType, payload }),
+  });
+}
+
+export async function pollCallSignals(
+  token: string,
+  sessionId: string,
+  since?: string
+): Promise<CallSignal[]> {
+  try {
+    const qs = since ? `?since=${encodeURIComponent(since)}` : '';
+    const res = await fetch(`${API_BASE}/api/tautalk/calls/${sessionId}/signals${qs}`, {
+      headers: authHeaders(token),
+    });
+    if (!res.ok) return [];
+    const data = await parseJson<{ signals: CallSignal[] }>(res);
+    return data.signals ?? [];
+  } catch {
+    return [];
+  }
+}
+
+export type IncomingCall = CallSession & {
+  caller?: {
+    id: string;
+    username: string;
+    full_name: string;
+    avatar_url?: string | null;
+  };
+};
+
+export async function fetchIncomingCalls(token: string): Promise<IncomingCall[]> {
+  try {
+    const res = await fetch(`${API_BASE}/api/tautalk/calls`, {
+      headers: authHeaders(token),
+    });
+    if (!res.ok) return [];
+    const data = await parseJson<{ incoming: IncomingCall[] }>(res);
+    return data.incoming ?? [];
+  } catch {
+    return [];
+  }
+}
+
+export async function acceptCall(token: string, sessionId: string) {
+  const res = await fetch(`${API_BASE}/api/tautalk/calls/${sessionId}`, {
+    method: 'POST',
+    headers: authHeaders(token),
+    body: JSON.stringify({ action: 'accept' }),
+  });
+  return parseJson<{ session: CallSession }>(res);
+}
+
+export async function declineCall(token: string, sessionId: string) {
+  await fetch(`${API_BASE}/api/tautalk/calls/${sessionId}`, {
+    method: 'POST',
+    headers: authHeaders(token),
+    body: JSON.stringify({ action: 'decline' }),
+  });
+}

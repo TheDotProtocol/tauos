@@ -20,17 +20,21 @@ import {
   fetchConversationKeys,
   fetchMessages,
   fetchTyping,
+  IncomingCall,
   Message,
   sendMessage as sendMessageApi,
   sendTyping,
+  startCall,
   uploadAttachment,
 } from '../api/client';
 import AttachmentSheet, { AttachmentAction } from '../components/AttachmentSheet';
 import Avatar from '../components/Avatar';
-import CallPreviewScreen, { CallMode } from '../components/CallPreviewScreen';
+import CallPreviewScreen, { CallConnectionState, CallMode } from '../components/CallPreviewScreen';
 import ImageViewerModal from '../components/ImageViewerModal';
 import MIcon from '../components/MIcon';
 import MessageBubble from '../components/MessageBubble';
+import { CallMediaState, TauCallManager } from '../calls/TauCallManager';
+import { WEBRTC_MEDIA_ENABLED } from '../config';
 import {
   buildCryptoContext,
   ConversationCryptoContext,
@@ -52,17 +56,34 @@ type Props = {
   user: TauUser;
   conversation: Conversation;
   onBack: () => void;
+  incomingCall?: IncomingCall | null;
+  onIncomingHandled?: () => void;
 };
 
 type ChatItem = Message & { payload: MessagePayload };
 
-export default function ChatScreen({ token, user, conversation, onBack }: Props) {
+export default function ChatScreen({
+  token,
+  user,
+  conversation,
+  onBack,
+  incomingCall,
+  onIncomingHandled,
+}: Props) {
   const [messages, setMessages] = useState<ChatItem[]>([]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
   const [sheetOpen, setSheetOpen] = useState(false);
   const [callMode, setCallMode] = useState<CallMode | null>(null);
+  const [callConnectionState, setCallConnectionState] = useState<CallConnectionState>('preview');
+  const [callMedia, setCallMedia] = useState<CallMediaState>({
+    localStreamURL: null,
+    remoteStreamURL: null,
+    muted: false,
+    cameraOff: false,
+  });
+  const callManagerRef = useRef(new TauCallManager());
   const [viewerUri, setViewerUri] = useState<string | null>(null);
   const [typingNames, setTypingNames] = useState<string[]>([]);
   const [cryptoCtx, setCryptoCtx] = useState<ConversationCryptoContext | null>(null);
@@ -241,6 +262,101 @@ export default function ChatScreen({ token, user, conversation, onBack }: Props)
     }
   };
 
+  useEffect(() => {
+    return callManagerRef.current.subscribe(setCallMedia);
+  }, []);
+
+  useEffect(() => {
+    if (callMedia.remoteStreamURL) {
+      setCallConnectionState('connected');
+    }
+  }, [callMedia.remoteStreamURL]);
+
+  useEffect(() => {
+    callManagerRef.current.onConnected = () => setCallConnectionState('connected');
+    callManagerRef.current.onFailed = (message) => {
+      if (callMode !== null) {
+        Alert.alert('Call ended', message);
+        closeCall();
+      }
+    };
+  }, [callMode]);
+
+  const beginCallMedia = async (
+    session: NonNullable<Awaited<ReturnType<typeof startCall>>>,
+    mode: CallMode,
+    incoming: boolean
+  ) => {
+    if (!WEBRTC_MEDIA_ENABLED) {
+      setCallConnectionState('preview');
+      return;
+    }
+    setCallConnectionState('connecting');
+    const ok = incoming
+      ? await callManagerRef.current.startIncoming(token, session, mode)
+      : await callManagerRef.current.startOutgoing(token, session, mode);
+    if (!ok) {
+      setCallConnectionState('preview');
+    }
+  };
+
+  const openCall = async (mode: CallMode) => {
+    setCallMode(mode);
+    setCallConnectionState('connecting');
+    const session = await startCall(token, conversation.id, mode);
+    if (!session) {
+      setCallConnectionState('preview');
+      return;
+    }
+    await beginCallMedia(session, mode, false);
+  };
+
+  const closeCall = async () => {
+    await callManagerRef.current.hangup();
+    setCallMode(null);
+    setCallConnectionState('preview');
+  };
+
+  const onLivePhotoCaptured = async (uri: string) => {
+    try {
+      const att = await uploadAttachment(
+        token,
+        uri,
+        `live-photo-${Date.now()}.jpg`,
+        'image/jpeg'
+      );
+      await sendPayload({
+        v: 1,
+        kind: 'image',
+        path: att.path,
+        url: att.url,
+        mime: att.mime,
+        name: att.name,
+        caption: '📸 Live photo during call',
+      });
+    } catch (e) {
+      Alert.alert(
+        'Live photo',
+        e instanceof Error ? e.message : 'Could not save photo to chat'
+      );
+    }
+  };
+
+  useEffect(() => {
+    if (!incomingCall) return;
+    let cancelled = false;
+    (async () => {
+      setCallMode(incomingCall.mode);
+      await beginCallMedia(incomingCall, incomingCall.mode, true);
+      if (!cancelled) {
+        onIncomingHandled?.();
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [incomingCall]);
+
   const onAttachment = async (action: AttachmentAction) => {
     if (action === 'camera') {
       launchCamera({ mediaType: 'photo', quality: 0.85 }, async (res) => {
@@ -319,13 +435,13 @@ export default function ChatScreen({ token, user, conversation, onBack }: Props)
         </View>
         <Pressable
           style={styles.headerAction}
-          onPress={() => setCallMode('voice')}
+          onPress={() => openCall('voice')}
           hitSlop={8}>
           <MIcon name="call" size={22} color={colors.goldLight} />
         </Pressable>
         <Pressable
           style={styles.headerAction}
-          onPress={() => setCallMode('video')}
+          onPress={() => openCall('video')}
           hitSlop={8}>
           <MIcon name="videocam" size={22} color={colors.goldLight} />
         </Pressable>
@@ -390,7 +506,7 @@ export default function ChatScreen({ token, user, conversation, onBack }: Props)
         visible={sheetOpen}
         onClose={() => setSheetOpen(false)}
         onPick={onAttachment}
-        onCallPreview={(mode) => setCallMode(mode)}
+        onCallPreview={(mode) => openCall(mode)}
       />
 
       <ImageViewerModal
@@ -404,7 +520,16 @@ export default function ChatScreen({ token, user, conversation, onBack }: Props)
         mode={callMode ?? 'voice'}
         peerName={peerName}
         peerAvatar={peerAvatar}
-        onClose={() => setCallMode(null)}
+        connectionState={callConnectionState}
+        localStreamURL={callMedia.localStreamURL}
+        remoteStreamURL={callMedia.remoteStreamURL}
+        muted={callMedia.muted}
+        cameraOff={callMedia.cameraOff}
+        onClose={closeCall}
+        onToggleMute={() => callManagerRef.current.toggleMute()}
+        onToggleCamera={() => callManagerRef.current.toggleCamera()}
+        onFlipCamera={() => callManagerRef.current.flipCamera()}
+        onLivePhotoCaptured={callMode === 'video' ? onLivePhotoCaptured : undefined}
       />
     </KeyboardAvoidingView>
   );

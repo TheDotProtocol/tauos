@@ -14,11 +14,13 @@ import {
   Check,
   X,
   ArrowLeft,
+  Globe,
+  Apple,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 const ANDROID_APK = '/downloads/TauTalk-1.0.0-beta.apk';
-const APK_SIZE = '~58 MB';
+const APK_SIZE = '~77 MB';
 
 const comparisons = [
   { feature: 'End-to-end encrypted messages', tautalk: true, whatsapp: true, telegram: 'optional', signal: true },
@@ -83,10 +85,23 @@ export default function TauTalkMarketing() {
                   </a>
                 </Button>
                 <Button asChild size="lg" variant="outline" className="border-primary/40">
+                  <Link href="/tautalk/chat">
+                    <Globe className="w-5 h-5 mr-2" />
+                    Use in browser
+                  </Link>
+                </Button>
+                <Button asChild size="lg" variant="outline" className="border-white/20">
                   <a href="#compare">See how we compare</a>
                 </Button>
               </div>
-              <p className="text-xs text-muted-foreground mt-4">APK {APK_SIZE} · iOS coming next</p>
+              <p className="text-xs text-muted-foreground mt-4 flex flex-wrap items-center gap-x-3 gap-y-1 justify-center lg:justify-start">
+                <span>APK {APK_SIZE}</span>
+                <span className="hidden sm:inline">·</span>
+                <span className="inline-flex items-center gap-1">
+                  <Apple className="w-3 h-3" />
+                  iPhone & iPad — use browser chat until native iOS ships
+                </span>
+              </p>
             </motion.div>
 
             <motion.div

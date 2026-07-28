@@ -35,6 +35,9 @@ RELEASE_*.md
 ROLLBACK.md
 RUNBOOK.md
 
+# Local development documentation (not shipped to GitHub)
+docs/
+
 # Node modules
 node_modules/
 npm-debug.log*

@@ -5,9 +5,16 @@ import RegisterScreen from './src/screens/RegisterScreen';
 import ChatsScreen from './src/screens/ChatsScreen';
 import ProfileScreen from './src/screens/ProfileScreen';
 import ChatScreen from './src/screens/ChatScreen';
+import IncomingCallModal from './src/components/IncomingCallModal';
+import {
+  Conversation,
+  declineCall,
+  fetchConversations,
+  fetchIncomingCalls,
+  IncomingCall,
+} from './src/api/client';
 import { clearSession, loadSession, TauUser } from './src/storage/session';
 import { colors } from './src/theme';
-import type { Conversation } from './src/api/client';
 
 type Screen = 'login' | 'register' | 'chats' | 'chat' | 'profile';
 
@@ -17,6 +24,8 @@ function App(): JSX.Element {
   const [token, setToken] = useState<string | null>(null);
   const [user, setUser] = useState<TauUser | null>(null);
   const [activeConversation, setActiveConversation] = useState<Conversation | null>(null);
+  const [incomingCall, setIncomingCall] = useState<IncomingCall | null>(null);
+  const [acceptedIncoming, setAcceptedIncoming] = useState<IncomingCall | null>(null);
 
   useEffect(() => {
     loadSession().then((session) => {
@@ -29,6 +38,21 @@ function App(): JSX.Element {
     });
   }, []);
 
+  useEffect(() => {
+    if (!token || screen === 'login' || screen === 'register') return;
+
+    const poll = async () => {
+      const calls = await fetchIncomingCalls(token);
+      if (calls.length > 0 && !incomingCall && !acceptedIncoming) {
+        setIncomingCall(calls[0]);
+      }
+    };
+
+    poll();
+    const interval = setInterval(poll, 3000);
+    return () => clearInterval(interval);
+  }, [token, screen, incomingCall, acceptedIncoming]);
+
   const onAuthSuccess = (nextToken: string, nextUser: TauUser) => {
     setToken(nextToken);
     setUser(nextUser);
@@ -40,7 +64,57 @@ function App(): JSX.Element {
     setToken(null);
     setUser(null);
     setActiveConversation(null);
+    setIncomingCall(null);
+    setAcceptedIncoming(null);
     setScreen('login');
+  };
+
+  const conversationFromIncoming = async (call: IncomingCall): Promise<Conversation> => {
+    if (!token) {
+      throw new Error('Not signed in');
+    }
+    const list = await fetchConversations(token);
+    const existing = list.find((c) => c.id === call.conversation_id);
+    if (existing) return existing;
+
+    return {
+      id: call.conversation_id,
+      type: 'direct',
+      title: null,
+      updated_at: new Date().toISOString(),
+      last_message_at: null,
+      last_message_encrypted: null,
+      unread_count: 0,
+      peer: call.caller
+        ? {
+            id: call.caller.id,
+            username: call.caller.username,
+            email: '',
+            full_name: call.caller.full_name,
+            avatar_url: call.caller.avatar_url ?? null,
+          }
+        : null,
+    };
+  };
+
+  const onAcceptIncoming = async () => {
+    if (!incomingCall) return;
+    try {
+      const conversation = await conversationFromIncoming(incomingCall);
+      setActiveConversation(conversation);
+      setAcceptedIncoming(incomingCall);
+      setIncomingCall(null);
+      setScreen('chat');
+    } catch {
+      setIncomingCall(null);
+    }
+  };
+
+  const onDeclineIncoming = async () => {
+    if (incomingCall && token) {
+      await declineCall(token, incomingCall.id).catch(() => {});
+    }
+    setIncomingCall(null);
   };
 
   if (booting) {
@@ -89,9 +163,20 @@ function App(): JSX.Element {
           token={token}
           user={user}
           conversation={activeConversation}
-          onBack={() => setScreen('chats')}
+          onBack={() => {
+            setAcceptedIncoming(null);
+            setScreen('chats');
+          }}
+          incomingCall={acceptedIncoming}
+          onIncomingHandled={() => setAcceptedIncoming(null)}
         />
       ) : null}
+
+      <IncomingCallModal
+        call={incomingCall}
+        onAccept={onAcceptIncoming}
+        onDecline={onDeclineIncoming}
+      />
     </View>
   );
 }

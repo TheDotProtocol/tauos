@@ -123,6 +123,40 @@ async function main() {
   `);
   console.log('  ✓ users.email_verified / phone_verified');
 
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS tautalk_call_sessions (
+      id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      conversation_id UUID NOT NULL REFERENCES tautalk_conversations(id) ON DELETE CASCADE,
+      caller_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      callee_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      mode TEXT NOT NULL CHECK (mode IN ('voice', 'video')),
+      status TEXT NOT NULL DEFAULT 'ringing'
+        CHECK (status IN ('ringing', 'active', 'ended', 'declined', 'missed')),
+      started_at TIMESTAMPTZ DEFAULT NOW(),
+      answered_at TIMESTAMPTZ,
+      ended_at TIMESTAMPTZ
+    )
+  `);
+  await pool.query(
+    'CREATE INDEX IF NOT EXISTS idx_tautalk_call_sessions_callee ON tautalk_call_sessions (callee_id, status)'
+  );
+  console.log('  ✓ tautalk_call_sessions');
+
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS tautalk_call_signals (
+      id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      session_id UUID NOT NULL REFERENCES tautalk_call_sessions(id) ON DELETE CASCADE,
+      sender_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      signal_type TEXT NOT NULL,
+      payload JSONB NOT NULL DEFAULT '{}',
+      created_at TIMESTAMPTZ DEFAULT NOW()
+    )
+  `);
+  await pool.query(
+    'CREATE INDEX IF NOT EXISTS idx_tautalk_call_signals_session ON tautalk_call_signals (session_id, created_at)'
+  );
+  console.log('  ✓ tautalk_call_signals');
+
   console.log('\n✅ Tau Talk schema ready');
   await pool.end();
 }
