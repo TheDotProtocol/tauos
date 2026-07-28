@@ -26,7 +26,7 @@ export async function findUserByEmailOrUsername(query: string) {
   const email = q.includes('@') ? q : `${q}@tauos.org`;
   const username = q.replace(/@tauos\.org$/, '');
   const result = await getPool().query(
-    `SELECT id, username, email, full_name FROM users
+    `SELECT id, username, email, full_name, avatar_url FROM users
      WHERE LOWER(email) = $1 OR LOWER(username) = $2 LIMIT 1`,
     [email, username]
   );
@@ -44,7 +44,18 @@ export async function listConversations(userId: string | number) {
              ORDER BY m.created_at DESC LIMIT 1) AS last_message_at,
             (SELECT COUNT(*)::int FROM tautalk_messages m
              WHERE m.conversation_id = c.id AND m.deleted_at IS NULL
-               AND m.created_at > COALESCE(p.last_read_at, '1970-01-01')) AS unread_count
+               AND m.created_at > COALESCE(p.last_read_at, '1970-01-01')) AS unread_count,
+             (SELECT json_build_object(
+               'id', u.id,
+               'username', u.username,
+               'email', u.email,
+               'full_name', u.full_name,
+               'avatar_url', u.avatar_url
+             )
+             FROM tautalk_participants p2
+             JOIN users u ON u.id = p2.user_id
+             WHERE p2.conversation_id = c.id AND p2.user_id <> $1
+             LIMIT 1) AS peer
      FROM tautalk_conversations c
      JOIN tautalk_participants p ON p.conversation_id = c.id AND p.user_id = $1
      ORDER BY c.updated_at DESC`,
@@ -55,7 +66,7 @@ export async function listConversations(userId: string | number) {
 
 export async function getConversationParticipants(conversationId: string) {
   const result = await getPool().query(
-    `SELECT u.id, u.username, u.email, u.full_name, p.last_read_at
+    `SELECT u.id, u.username, u.email, u.full_name, u.avatar_url, p.last_read_at
      FROM tautalk_participants p
      JOIN users u ON u.id = p.user_id
      WHERE p.conversation_id = $1`,

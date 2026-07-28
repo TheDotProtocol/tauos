@@ -3,16 +3,37 @@ import { NextRequest, NextResponse } from 'next/server';
 import bcrypt from 'bcryptjs';
 import { issueSsoToken } from '@/lib/tau-auth';
 
+function normalizePhone(raw: string): string {
+  const digits = raw.replace(/\D/g, '');
+  if (!digits) return '';
+  return raw.trim().startsWith('+') ? `+${digits}` : digits;
+}
+
+function isPhoneIdentifier(value: string): boolean {
+  const trimmed = value.trim();
+  if (trimmed.includes('@')) return false;
+  return /^\+?[\d\s().-]{7,}$/.test(trimmed);
+}
+
 export async function POST(request: NextRequest) {
   try {
-    const { email, password } = await request.json();
-    if (!email || !password) {
-      return NextResponse.json({ error: 'Email and password are required' }, { status: 400 });
+    const { email, phone, password, identifier } = await request.json();
+    const loginId = (identifier || email || phone || '').trim();
+    if (!loginId || !password) {
+      return NextResponse.json(
+        { error: 'Email or phone and password are required' },
+        { status: 400 }
+      );
     }
 
+    const usePhone = isPhoneIdentifier(loginId);
     const result = await getPool().query(
-      `SELECT id, username, email, password_hash, full_name, is_active FROM users WHERE email = $1`,
-      [email.toLowerCase().trim()]
+      usePhone
+        ? `SELECT id, username, email, phone, password_hash, full_name, avatar_url, is_active
+           FROM users WHERE phone = $1`
+        : `SELECT id, username, email, phone, password_hash, full_name, avatar_url, is_active
+           FROM users WHERE email = $1`,
+      [usePhone ? normalizePhone(loginId) : loginId.toLowerCase()]
     );
 
     if (result.rows.length === 0) {
@@ -49,7 +70,9 @@ export async function POST(request: NextRequest) {
         id: user.id,
         username: user.username,
         email: user.email,
+        phone: user.phone ?? null,
         fullName: user.full_name,
+        avatarUrl: user.avatar_url ?? null,
       },
     });
   } catch (error) {

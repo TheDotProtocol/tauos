@@ -27,6 +27,7 @@ export async function GET(request: NextRequest) {
       participants.map(async (p) => ({
         userId: p.id,
         username: p.username,
+        fullName: p.full_name,
         publicKey: (await getPublicKey(p.id))?.public_key ?? null,
         lastReadAt: p.last_read_at,
       }))

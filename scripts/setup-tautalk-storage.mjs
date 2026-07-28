@@ -77,6 +77,27 @@ async function main() {
     'CREATE INDEX IF NOT EXISTS idx_tautalk_participants_user ON tautalk_participants(user_id)'
   );
 
+  await pool.query(`
+    ALTER TABLE users ADD COLUMN IF NOT EXISTS phone TEXT
+  `);
+  await pool.query(`
+    CREATE UNIQUE INDEX IF NOT EXISTS idx_users_phone ON users (phone) WHERE phone IS NOT NULL
+  `);
+  await pool.query(`
+    ALTER TABLE users ADD COLUMN IF NOT EXISTS avatar_url TEXT
+  `);
+  console.log('  ✓ users.avatar_url');
+
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS tautalk_typing (
+      conversation_id UUID NOT NULL REFERENCES tautalk_conversations(id) ON DELETE CASCADE,
+      user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      updated_at TIMESTAMPTZ DEFAULT NOW(),
+      PRIMARY KEY (conversation_id, user_id)
+    )
+  `);
+  console.log('  ✓ tautalk_typing');
+
   console.log('\n✅ Tau Talk schema ready');
   await pool.end();
 }
