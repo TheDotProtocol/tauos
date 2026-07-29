@@ -170,6 +170,28 @@ export async function missCall(token: string, sessionId: string) {
   });
 }
 
+export async function uploadAttachment(token: string, file: File) {
+  const form = new FormData();
+  form.append('file', file);
+  const res = await fetch('/api/tautalk/attachments', {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${token}` },
+    body: form,
+  });
+  const data = await parseJson<{
+    attachment: { path: string; url: string; mime: string; size: number; name: string };
+  }>(res);
+  return data.attachment;
+}
+
+export async function signedAttachmentUrl(token: string, path: string) {
+  const res = await fetch(`/api/tautalk/attachments?path=${encodeURIComponent(path)}`, {
+    headers: headers(token),
+  });
+  const data = await parseJson<{ url: string }>(res);
+  return data.url;
+}
+
 export async function sendCallSignal(
   token: string,
   sessionId: string,

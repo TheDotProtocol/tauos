@@ -121,19 +121,42 @@ export async function decryptMessage(
   ctx?: ConversationCryptoContext
 ): Promise<string> {
   const keys: CryptoKey[] = [];
+
   if (ctx) {
-    keys.push(await deriveConversationKey(conversationId, ctx));
+    try {
+      keys.push(await deriveConversationKey(conversationId, ctx));
+    } catch {
+      /* try fallbacks */
+    }
+
+    if (ctx.type === 'direct') {
+      const { privateKey } = await getOrCreateKeyPair();
+      const peers = ctx.participantPublicKeys.filter((k) => k && k !== ctx.myPublicKey);
+      for (const peerKey of peers) {
+        try {
+          keys.push(await deriveDirectKey(conversationId, privateKey, peerKey));
+        } catch {
+          /* skip invalid peer keys */
+        }
+      }
+    }
   }
+
   keys.push(await deriveLegacyKey(conversationId));
 
   const combined = Uint8Array.from(atob(payload), (c) => c.charCodeAt(0));
   const iv = combined.slice(0, 12);
   const data = combined.slice(12);
 
+  const seen = new Set<string>();
   for (const key of keys) {
     try {
       const decrypted = await crypto.subtle.decrypt({ name: 'AES-GCM', iv }, key, data);
-      return new TextDecoder().decode(decrypted);
+      const text = new TextDecoder().decode(decrypted);
+      if (!seen.has(text)) {
+        seen.add(text);
+        return text;
+      }
     } catch {
       /* try next key */
     }

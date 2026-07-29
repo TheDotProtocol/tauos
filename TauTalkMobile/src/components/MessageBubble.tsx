@@ -81,17 +81,29 @@ export default function MessageBubble({ payload, isMe, token, time, onImagePress
   }
 
   if (payload.kind === 'file') {
+    const isAudio = payload.mime.startsWith('audio/');
     return (
       <View style={[styles.row, isMe ? styles.rowMe : styles.rowOther]}>
         <Pressable
           style={bubbleStyle}
-          onPress={() => mediaUrl && Linking.openURL(mediaUrl)}
-          disabled={!mediaUrl}>
-          <MIcon name="attach-file" size={22} color={colors.goldLight} style={styles.fileIcon} />
-          <Text style={[styles.text, isMe && styles.textMe]} numberOfLines={2}>
-            {payload.name}
-          </Text>
-          <Text style={styles.fileMeta}>{payload.mime}</Text>
+          onPress={() => !isAudio && mediaUrl && Linking.openURL(mediaUrl)}
+          disabled={isAudio || !mediaUrl}>
+          {isAudio ? (
+            <>
+              <MIcon name="mic" size={22} color={colors.goldLight} style={styles.fileIcon} />
+              <Text style={[styles.text, isMe && styles.textMe]}>
+                {mediaUrl ? 'Voice message' : 'Loading voice…'}
+              </Text>
+            </>
+          ) : (
+            <>
+              <MIcon name="attach-file" size={22} color={colors.goldLight} style={styles.fileIcon} />
+              <Text style={[styles.text, isMe && styles.textMe]} numberOfLines={2}>
+                {payload.name}
+              </Text>
+              <Text style={styles.fileMeta}>{payload.mime}</Text>
+            </>
+          )}
           <Text style={[styles.time, isMe && styles.timeMe]}>{time}</Text>
         </Pressable>
       </View>

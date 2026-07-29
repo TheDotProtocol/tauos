@@ -21,9 +21,18 @@ import {
   fetchIncomingCalls,
   startCall,
   declineCall,
+  uploadAttachment,
   type TalkProfile,
   type IncomingCall,
 } from '@/lib/tautalk-web-api';
+import {
+  contentTypeForPayload,
+  parsePayload,
+  textPayload,
+  type MessagePayload,
+} from '@/lib/tautalk-message-payload';
+import TauTalkMessageBubble from '@/components/tautalk/TauTalkMessageBubble';
+import TauTalkAttachSheet from '@/components/tautalk/TauTalkAttachSheet';
 import { TAUTALK_UNAVAILABLE_MESSAGE } from '@/lib/tautalk-call-constants';
 import { startIncomingRing, startOutgoingRingback, stopCallSounds } from '@/lib/tautalk-call-sounds';
 import { WebCallManager, type WebCallMediaState } from '@/lib/tautalk-web-call';
@@ -34,6 +43,7 @@ import {
   MessageCircle,
   Send,
   Plus,
+  Paperclip,
   Search,
   Shield,
   LogOut,
@@ -68,7 +78,9 @@ export default function TauTalkChatClient() {
   const [conversations, setConversations] = useState<TalkConversation[]>([]);
   const [activeId, setActiveId] = useState<string | null>(null);
   const [messages, setMessages] = useState<any[]>([]);
-  const [decrypted, setDecrypted] = useState<Record<string, string>>({});
+  const [decrypted, setDecrypted] = useState<Record<string, MessagePayload>>({});
+  const [showAttach, setShowAttach] = useState(false);
+  const [voiceRecording, setVoiceRecording] = useState(false);
   const [cryptoCtx, setCryptoCtx] = useState<ConversationCryptoContext | null>(null);
   const [cryptoReady, setCryptoReady] = useState(false);
   const [cryptoError, setCryptoError] = useState('');
@@ -95,6 +107,10 @@ export default function TauTalkChatClient() {
   const cryptoCtxRef = useRef<ConversationCryptoContext | null>(null);
   const isOutgoingCallRef = useRef(false);
   const unavailableTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const photoInputRef = useRef<HTMLInputElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const voiceChunksRef = useRef<Blob[]>([]);
 
   useEffect(() => {
     cryptoCtxRef.current = cryptoCtx;
@@ -127,11 +143,23 @@ export default function TauTalkChatClient() {
 
   const decryptAll = useCallback(
     async (msgs: any[], conversationId: string, ctx: ConversationCryptoContext | null) => {
-      const dec: Record<string, string> = {};
+      const dec: Record<string, MessagePayload> = {};
       for (const m of msgs) {
-        dec[m.id] = await decryptMessage(conversationId, m.content_encrypted, ctx ?? undefined);
+        const plain = await decryptMessage(conversationId, m.content_encrypted, ctx ?? undefined);
+        dec[m.id] = parsePayload(plain);
       }
       setDecrypted(dec);
+    },
+    []
+  );
+
+  const decryptOne = useCallback(
+    async (conversationId: string, messageId: string, contentEncrypted: string) => {
+      const ctx = cryptoCtxRef.current;
+      if (!ctx) return;
+      const plain = await decryptMessage(conversationId, contentEncrypted, ctx);
+      const payload = parsePayload(plain);
+      setDecrypted((prev) => ({ ...prev, [messageId]: payload }));
     },
     []
   );
@@ -142,6 +170,7 @@ export default function TauTalkChatClient() {
       setCryptoReady(false);
       setCryptoError('');
       try {
+        await registerIdentityKey(token);
         const parts = await fetchConversationKeys(token, conversationId);
         setParticipants(parts);
         const ctx = await buildCryptoContext(conversationId, convType, parts);
@@ -237,6 +266,11 @@ export default function TauTalkChatClient() {
   }, []);
 
   useEffect(() => {
+    if (!cryptoCtx || !activeId || messages.length === 0) return;
+    void decryptAll(messages, activeId, cryptoCtx);
+  }, [cryptoCtx, activeId, messages, decryptAll]);
+
+  useEffect(() => {
     if (!activeId || !token) return;
     let cancelled = false;
     const conv = conversations.find((c) => c.id === activeId);
@@ -258,12 +292,18 @@ export default function TauTalkChatClient() {
           if (prev.some((x) => x.id === m.id)) return prev;
           return [...prev, m];
         });
-        const text = await decryptMessage(
-          activeId,
-          m.content_encrypted,
-          cryptoCtxRef.current ?? undefined
-        );
-        setDecrypted((prev) => ({ ...prev, [m.id]: text }));
+        const tryDecrypt = () => decryptOne(activeId, m.id, m.content_encrypted);
+        if (cryptoCtxRef.current) {
+          await tryDecrypt();
+        } else {
+          const waitId = window.setInterval(() => {
+            if (cryptoCtxRef.current) {
+              window.clearInterval(waitId);
+              void tryDecrypt();
+            }
+          }, 200);
+          window.setTimeout(() => window.clearInterval(waitId), 10000);
+        }
       } catch {
         /* ignore */
       }
@@ -274,7 +314,7 @@ export default function TauTalkChatClient() {
       cancelled = true;
       es.close();
     };
-  }, [activeId, token, conversations, prepareConversation, loadMessages]);
+  }, [activeId, token, conversations, prepareConversation, loadMessages, decryptOne]);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -284,37 +324,160 @@ export default function TauTalkChatClient() {
     setActiveId(id);
     setMobileShowChat(true);
     setSendError('');
+    setDecrypted({});
+    setMessages([]);
   };
 
-  const sendMessage = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setSendError('');
-    if (!input.trim() || !activeId || !token) return;
-    if (!cryptoReady || !cryptoCtxRef.current) {
+  const sendPayload = async (payload: MessagePayload) => {
+    if (!activeId || !token || !cryptoCtxRef.current) {
       setSendError('Securing connection… try again in a moment.');
       return;
     }
 
     setSending(true);
+    setSendError('');
     try {
-      const encrypted = await encryptMessage(activeId, input.trim(), cryptoCtxRef.current);
+      const json = JSON.stringify(payload);
+      const encrypted = await encryptMessage(activeId, json, cryptoCtxRef.current);
       const res = await fetch('/api/tautalk/messages', {
         method: 'POST',
         headers: headers(token),
-        body: JSON.stringify({ conversationId: activeId, contentEncrypted: encrypted }),
+        body: JSON.stringify({
+          conversationId: activeId,
+          contentEncrypted: encrypted,
+          contentType: contentTypeForPayload(payload),
+        }),
       });
       const data = await res.json();
-      if (!res.ok) {
-        throw new Error(data.error || 'Send failed');
-      }
-      setInput('');
-      await loadMessages(activeId, cryptoCtxRef.current);
+      if (!res.ok) throw new Error(data.error || 'Send failed');
+
+      const saved = data.message;
+      setMessages((prev) => {
+        if (prev.some((x) => x.id === saved.id)) return prev;
+        return [...prev, { ...saved, sender_username: user?.username }];
+      });
+      setDecrypted((prev) => ({ ...prev, [saved.id]: payload }));
       await loadConversations();
     } catch (err) {
       setSendError(err instanceof Error ? err.message : 'Could not send message');
     } finally {
       setSending(false);
     }
+  };
+
+  const sendMessage = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!input.trim()) return;
+    const text = input.trim();
+    setInput('');
+    await sendPayload(textPayload(text));
+  };
+
+  const uploadAndSend = async (file: File, kind: 'image' | 'file') => {
+    if (!token) return;
+    try {
+      setSending(true);
+      const att = await uploadAttachment(token, file);
+      if (kind === 'image') {
+        await sendPayload({
+          v: 1,
+          kind: 'image',
+          path: att.path,
+          url: att.url,
+          mime: att.mime,
+          name: att.name,
+          caption: input.trim() || undefined,
+        });
+        setInput('');
+      } else {
+        await sendPayload({
+          v: 1,
+          kind: 'file',
+          path: att.path,
+          url: att.url,
+          name: att.name,
+          mime: att.mime,
+          size: att.size,
+        });
+      }
+    } catch (err) {
+      setSendError(err instanceof Error ? err.message : 'Upload failed');
+    } finally {
+      setSending(false);
+      setShowAttach(false);
+    }
+  };
+
+  const shareLocation = () => {
+    if (!navigator.geolocation) {
+      setSendError('Location is not supported in this browser.');
+      return;
+    }
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        void sendPayload({
+          v: 1,
+          kind: 'location',
+          lat: pos.coords.latitude,
+          lng: pos.coords.longitude,
+          label: 'My location',
+        });
+        setShowAttach(false);
+      },
+      () => setSendError('Could not get your location. Allow location access and try again.'),
+      { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 }
+    );
+  };
+
+  const startVoiceNote = async () => {
+    if (!navigator.mediaDevices?.getUserMedia) {
+      setSendError('Voice notes need microphone access.');
+      return;
+    }
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      voiceChunksRef.current = [];
+      const mime = MediaRecorder.isTypeSupported('audio/webm') ? 'audio/webm' : 'audio/mp4';
+      const recorder = new MediaRecorder(stream, { mimeType: mime });
+      mediaRecorderRef.current = recorder;
+      recorder.ondataavailable = (ev) => {
+        if (ev.data.size > 0) voiceChunksRef.current.push(ev.data);
+      };
+      recorder.onstop = async () => {
+        stream.getTracks().forEach((t) => t.stop());
+        const blob = new Blob(voiceChunksRef.current, { type: mime });
+        if (blob.size < 800) {
+          setSendError('Recording too short.');
+          return;
+        }
+        const ext = mime.includes('webm') ? 'webm' : 'm4a';
+        const file = new File([blob], `voice-${Date.now()}.${ext}`, { type: mime });
+        await uploadAndSend(file, 'file');
+      };
+      recorder.start();
+      setVoiceRecording(true);
+    } catch {
+      setSendError('Microphone permission is required for voice notes.');
+    }
+  };
+
+  const stopVoiceNote = () => {
+    const recorder = mediaRecorderRef.current;
+    if (recorder && recorder.state !== 'inactive') recorder.stop();
+    mediaRecorderRef.current = null;
+    setVoiceRecording(false);
+  };
+
+  const onPhotoSelected = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    e.target.value = '';
+    if (file) void uploadAndSend(file, 'image');
+  };
+
+  const onFileSelected = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    e.target.value = '';
+    if (file) void uploadAndSend(file, 'file');
   };
 
   const beginCall = async (mode: 'voice' | 'video') => {
@@ -661,30 +824,47 @@ export default function TauTalkChatClient() {
                   const isMe =
                     String(m.sender_id) === String(user?.id) ||
                     m.sender_username === user?.username;
+                  const payload = decrypted[m.id];
+                  const time = new Date(m.created_at).toLocaleTimeString();
                   return (
-                    <div key={m.id} className={`flex ${isMe ? 'justify-end' : 'justify-start'}`}>
-                      <div
-                        className={`max-w-[85%] sm:max-w-[75%] px-4 py-2 rounded-2xl text-sm ${
-                          isMe
-                            ? 'bg-green-600 text-white rounded-br-sm'
-                            : 'bg-gray-800 text-gray-100 rounded-bl-sm'
-                        }`}
-                      >
-                        {!isMe && (
-                          <p className="text-xs text-green-400 mb-1">{m.sender_username}</p>
-                        )}
-                        <p className="whitespace-pre-wrap break-words">
-                          {decrypted[m.id] ?? '…'}
-                        </p>
-                        <p className="text-[10px] opacity-60 mt-1">
-                          {new Date(m.created_at).toLocaleTimeString()}
-                        </p>
-                      </div>
+                    <div key={m.id}>
+                      {!isMe && (
+                        <p className="text-xs text-green-400 mb-1 px-1">{m.sender_username}</p>
+                      )}
+                      {payload ? (
+                        <TauTalkMessageBubble
+                          payload={payload}
+                          isMe={isMe}
+                          token={token!}
+                          time={time}
+                        />
+                      ) : (
+                        <div className={`flex ${isMe ? 'justify-end' : 'justify-start'}`}>
+                          <div className="px-4 py-2 rounded-2xl text-sm bg-gray-800 text-gray-400 animate-pulse">
+                            Decrypting…
+                          </div>
+                        </div>
+                      )}
                     </div>
                   );
                 })}
                 <div ref={bottomRef} />
               </div>
+
+              <input
+                ref={photoInputRef}
+                type="file"
+                accept="image/*"
+                capture="environment"
+                className="hidden"
+                onChange={onPhotoSelected}
+              />
+              <input
+                ref={fileInputRef}
+                type="file"
+                className="hidden"
+                onChange={onFileSelected}
+              />
 
               <form
                 onSubmit={sendMessage}
@@ -692,6 +872,15 @@ export default function TauTalkChatClient() {
               >
                 {sendError ? <p className="text-xs text-red-400">{sendError}</p> : null}
                 <div className="flex gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setShowAttach(true)}
+                    disabled={!cryptoReady || sending}
+                    className="px-3 py-3 rounded-xl bg-gray-800 text-green-400 disabled:opacity-40"
+                    title="Attach photo, file, voice note, or location"
+                  >
+                    <Paperclip className="w-5 h-5" />
+                  </button>
                   <input
                     value={input}
                     onChange={(e) => setInput(e.target.value)}
@@ -829,6 +1018,22 @@ export default function TauTalkChatClient() {
         open={showProfile}
         onClose={() => setShowProfile(false)}
         onUpdated={(p) => setProfile(p)}
+      />
+
+      <TauTalkAttachSheet
+        open={showAttach}
+        recording={voiceRecording}
+        onClose={() => {
+          if (voiceRecording) stopVoiceNote();
+          setShowAttach(false);
+        }}
+        onPhoto={() => photoInputRef.current?.click()}
+        onFile={() => fileInputRef.current?.click()}
+        onLocation={shareLocation}
+        onStartVoice={startVoiceNote}
+        onStopVoice={stopVoiceNote}
+        onVoiceCall={() => void beginCall('voice')}
+        onVideoCall={() => void beginCall('video')}
       />
     </div>
   );

@@ -160,13 +160,30 @@ export async function decryptMessage(
   payload: string,
   ctx?: ConversationCryptoContext
 ): Promise<string> {
-  const keys: Uint8Array[] = [];
-  if (ctx) {
-    keys.push(await deriveConversationKeyBytes(conversationId, ctx));
-  }
-  keys.push(deriveLegacyKeyBytes(conversationId));
+  const keyBytesList: Uint8Array[] = [];
 
-  for (const key of keys) {
+  if (ctx) {
+    try {
+      keyBytesList.push(await deriveConversationKeyBytes(conversationId, ctx));
+    } catch {
+      /* try fallbacks */
+    }
+    if (ctx.type === 'direct') {
+      const { privateKey } = await getOrCreateKeyPair();
+      const peers = ctx.participantPublicKeys.filter((k) => k && k !== ctx.myPublicKey);
+      for (const peerKey of peers) {
+        try {
+          keyBytesList.push(deriveDirectKeyBytes(conversationId, privateKey, peerKey));
+        } catch {
+          /* skip */
+        }
+      }
+    }
+  }
+
+  keyBytesList.push(deriveLegacyKeyBytes(conversationId));
+
+  for (const key of keyBytesList) {
     const text = decryptWithKey(key, payload);
     if (text !== null) return text;
   }

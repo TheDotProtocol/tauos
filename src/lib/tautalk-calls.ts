@@ -28,6 +28,28 @@ export async function getPeerForCall(conversationId: string, userId: string | nu
   return peer;
 }
 
+export async function expireStaleCallSessions(conversationId?: string) {
+  await getPool().query(
+    `UPDATE tautalk_call_sessions
+     SET status = 'missed', ended_at = NOW()
+     WHERE status = 'ringing' AND started_at < NOW() - INTERVAL '15 seconds'`
+  );
+  await getPool().query(
+    `UPDATE tautalk_call_sessions
+     SET status = 'ended', ended_at = NOW()
+     WHERE status = 'active'
+       AND COALESCE(answered_at, started_at) < NOW() - INTERVAL '2 hours'`
+  );
+  if (conversationId) {
+    await getPool().query(
+      `UPDATE tautalk_call_sessions
+       SET status = 'missed', ended_at = NOW()
+       WHERE conversation_id = $1 AND status = 'ringing'`,
+      [conversationId]
+    );
+  }
+}
+
 export async function createCallSession(
   userId: string | number,
   conversationId: string,
@@ -36,10 +58,13 @@ export async function createCallSession(
   const allowed = await userInConversation(userId, conversationId);
   if (!allowed) throw new Error('Not found');
 
+  await expireStaleCallSessions(conversationId);
+
   const peer = await getPeerForCall(conversationId, userId);
   const existing = await getPool().query(
     `SELECT id FROM tautalk_call_sessions
-     WHERE conversation_id = $1 AND status IN ('ringing', 'active')
+     WHERE conversation_id = $1 AND status = 'active'
+       AND COALESCE(answered_at, started_at) > NOW() - INTERVAL '5 minutes'
      LIMIT 1`,
     [conversationId]
   );
@@ -66,6 +91,7 @@ export async function getCallSession(sessionId: string, userId: string | number)
 }
 
 export async function listIncomingCalls(userId: string | number) {
+  await expireStaleCallSessions();
   const result = await getPool().query(
     `SELECT s.*,
             c.type AS conversation_type,
