@@ -4,10 +4,11 @@ import { useCallback, useEffect, useState } from 'react';
 import { TAU_TOKEN_KEY, TAU_USER_KEY } from '@/lib/tau-auth-constants';
 
 export type TauSessionUser = {
-  id: number;
+  id: string | number;
   username: string;
   email: string;
   fullName?: string;
+  avatarUrl?: string | null;
 };
 
 type Options = {
@@ -72,7 +73,7 @@ export function useTauSession(options: Options = {}) {
 /** Persist SSO session after Tau ID login/register */
 export function persistTauSession(
   token: string,
-  user: { id: number; username: string; email: string; fullName?: string }
+  user: { id: string | number; username: string; email: string; fullName?: string; avatarUrl?: string | null }
 ) {
   localStorage.setItem(TAU_TOKEN_KEY, token);
   localStorage.setItem(TAU_USER_KEY, JSON.stringify(user));
