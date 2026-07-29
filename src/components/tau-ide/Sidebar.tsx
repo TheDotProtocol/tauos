@@ -3,8 +3,8 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
-  Home, Code, GitBranch, Settings, Terminal, FileText, Zap, Brain,
-  ChevronDown, X, BookOpen, Rocket, LogIn
+  Home, Code, GitBranch, Settings, Terminal, Brain,
+  ChevronDown, X, BookOpen, Rocket, LogIn, Search
 } from 'lucide-react';
 import { useState } from 'react';
 
@@ -24,6 +24,7 @@ const menuItems: NavItem[] = [
   { id: 'projects', label: 'Projects', icon: Code, href: `${BASE}/projects` },
   { id: 'workspace', label: 'Tau IDE', icon: Code, href: `${BASE}/workspace` },
   { id: 'architect', label: 'Tau Architect', icon: Brain, href: `${BASE}/architect` },
+  { id: 'search', label: 'Search', icon: Search, href: `${BASE}/search` },
   { id: 'tauscript', label: 'TauScript', icon: Terminal, href: `${BASE}/tauscript` },
   { id: 'terminal', label: 'Terminal', icon: Terminal, href: `${BASE}/terminal` },
   { id: 'git', label: 'Git', icon: GitBranch, href: `${BASE}/git` },

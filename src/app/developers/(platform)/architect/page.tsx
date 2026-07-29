@@ -16,7 +16,7 @@ import {
   loadMemory, saveMemory, updateMemoryFromResponse, createEmptyMemory, type ProjectMemory
 } from '@/lib/tau-ide/architect/memory';
 import { extractMermaidDiagrams, parseProjectBlock } from '@/lib/tau-ide/architect/project-generator';
-import { upsertProject, getActiveProject } from '@/lib/tau-ide/projects';
+import { upsertProject, getActiveProject, getActiveProjectId, loadProjects } from '@/lib/tau-ide/projects';
 import Link from 'next/link';
 
 type Message = { role: 'user' | 'assistant'; content: string; phase?: ArchitectPhaseId };
@@ -48,7 +48,8 @@ What would you like to create?`,
   const [loading, setLoading] = useState(false);
   const [phase, setPhase] = useState<ArchitectPhaseId>('discovery');
   const [mode, setMode] = useState<'beginner' | 'professional'>('beginner');
-  const [memory, setMemory] = useState<ProjectMemory>(() => loadMemory());
+  const [memory, setMemory] = useState<ProjectMemory>(() => createEmptyMemory(getActiveProjectId()));
+  const [projectId, setProjectId] = useState(getActiveProjectId());
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [completedPhases, setCompletedPhases] = useState<ArchitectPhaseId[]>([]);
   const [diagrams, setDiagrams] = useState<string[]>([]);
@@ -58,6 +59,14 @@ What would you like to create?`,
   useEffect(() => {
     const savedMode = localStorage.getItem('tau-ide-mode');
     if (savedMode === 'professional' || savedMode === 'beginner') setMode(savedMode);
+    loadProjects().then(() => {
+      const id = getActiveProjectId();
+      setProjectId(id);
+      loadMemory(id).then((m) => {
+        setMemory(m);
+        setPhase(m.currentPhase);
+      });
+    });
   }, []);
 
   useEffect(() => {
@@ -92,7 +101,8 @@ What would you like to create?`,
           messages: next.map(({ role, content }) => ({ role, content })),
           phase,
           mode,
-          memory,
+          memory: { ...memory, projectId },
+          projectId,
           stream: useStream,
         }),
       });
@@ -138,6 +148,7 @@ What would you like to create?`,
 
   const processResponse = (content: string) => {
     const updated = updateMemoryFromResponse(memory, phase, content);
+    updated.projectId = projectId;
     setMemory(updated);
     saveMemory(updated);
 
@@ -160,8 +171,9 @@ What would you like to create?`,
         name: f.path.split('/').pop() || f.path,
         content: f.content,
       })),
+    }).then(() => {
+      alert(`"${project.projectName}" imported with ${project.files.length} files. Open Tau IDE workspace to review.`);
     });
-    alert(`"${project.projectName}" imported with ${project.files.length} files. Open Tau IDE workspace to review.`);
   };
 
   const validateProject = async () => {

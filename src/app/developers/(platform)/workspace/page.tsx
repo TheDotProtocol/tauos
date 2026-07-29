@@ -4,10 +4,10 @@ import { useState, useEffect, useCallback } from 'react';
 import PlatformShell from '@/components/tau-ide/PlatformShell';
 import CodeEditor from '@/components/tau-ide/CodeEditor';
 import {
-  Play, Folder, File, ChevronRight, ChevronDown, X, Plus, Terminal as TerminalIcon, Save
+  Play, Folder, File, X, Terminal as TerminalIcon, Save, Cloud
 } from 'lucide-react';
 import {
-  getActiveProject, upsertProject, type ProjectFile, type TauProject
+  getActiveProject, upsertProjectLocal, loadProjects, type ProjectFile, type TauProject
 } from '@/lib/tau-ide/projects';
 
 type OpenTab = ProjectFile & { modified?: boolean };
@@ -22,15 +22,43 @@ export default function WorkspacePage() {
   const [explorerOpen, setExplorerOpen] = useState(true);
   const [expandedFolders, setExpandedFolders] = useState<Set<string>>(new Set(['/']));
 
+  const [saveStatus, setSaveStatus] = useState<'saved' | 'saving' | 'modified'>('saved');
+
   useEffect(() => {
-    const p = getActiveProject();
-    setProject(p);
-    const main = p.files.find((f) => f.path === '/main.tau') ?? p.files[0];
-    if (main) {
-      setTabs([{ ...main, modified: false }]);
-      setActivePath(main.path);
-    }
+    loadProjects().then(() => {
+      const p = getActiveProject();
+      setProject(p);
+      const main = p.files.find((f) => f.path === '/main.tau') ?? p.files[0];
+      if (main) {
+        setTabs([{ ...main, modified: false }]);
+        setActivePath(main.path);
+      }
+    });
   }, []);
+
+  // Auto-save every 30 seconds when modified
+  useEffect(() => {
+    const hasModified = tabs.some((t) => t.modified);
+    if (!hasModified || !project) return;
+    setSaveStatus('modified');
+    const timer = setTimeout(() => saveAll(), 30000);
+    return () => clearTimeout(timer);
+  }, [tabs, project]);
+
+  const saveAll = () => {
+    if (!project) return;
+    setSaveStatus('saving');
+    const files = project.files.map((f) => {
+      const tab = tabs.find((t) => t.path === f.path);
+      return tab ? { ...f, content: tab.content } : f;
+    });
+    const updated = upsertProjectLocal({ ...project, files });
+    setProject(updated);
+    setTabs((prev) => prev.map((t) => ({ ...t, modified: false })));
+    setSaveStatus('saved');
+  };
+
+  const saveFile = () => saveAll();
 
   const activeTab = tabs.find((t) => t.path === activePath);
 
@@ -38,17 +66,12 @@ export default function WorkspacePage() {
     setTabs((prev) =>
       prev.map((t) => (t.path === activePath ? { ...t, content, modified: true } : t))
     );
+    setProject((p) => p ? {
+      ...p,
+      files: p.files.map((f) => f.path === activePath ? { ...f, content } : f),
+    } : p);
+    setSaveStatus('modified');
   }, [activePath]);
-
-  const saveFile = () => {
-    if (!project || !activeTab) return;
-    const files = project.files.map((f) =>
-      f.path === activeTab.path ? { ...f, content: activeTab.content } : f
-    );
-    const updated = upsertProject({ ...project, files });
-    setProject(updated);
-    setTabs((prev) => prev.map((t) => (t.path === activePath ? { ...t, modified: false } : t)));
-  };
 
   const openFile = (file: ProjectFile) => {
     if (!tabs.find((t) => t.path === file.path)) {
@@ -103,8 +126,11 @@ export default function WorkspacePage() {
             <Play className="w-4 h-4" /> {running ? 'Running…' : 'Run TauScript'}
           </button>
           <button onClick={saveFile} className="flex items-center gap-1.5 px-3 py-1.5 glass rounded-lg text-sm text-gray-300 hover:text-white">
-            <Save className="w-4 h-4" /> Save
+            <Save className="w-4 h-4" /> {saveStatus === 'saving' ? 'Saving…' : saveStatus === 'modified' ? 'Save *' : 'Saved'}
           </button>
+          <span className="text-xs text-gray-600 flex items-center gap-1 ml-2">
+            <Cloud className="w-3 h-3" /> Auto-save
+          </span>
           <button onClick={() => setTerminalOpen(!terminalOpen)} className="flex items-center gap-1.5 px-3 py-1.5 glass rounded-lg text-sm text-gray-300 hover:text-white ml-auto">
             <TerminalIcon className="w-4 h-4" /> Terminal
           </button>

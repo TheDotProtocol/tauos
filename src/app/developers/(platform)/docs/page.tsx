@@ -10,8 +10,9 @@ const sections = [
     icon: BookOpen,
     links: [
       { href: '/developers', label: 'Tau IDE Landing', desc: 'Platform overview' },
-      { href: '/developers/dashboard', label: 'Dashboard', desc: 'Quick actions and stats' },
-      { href: '/developers/projects', label: 'Projects', desc: 'Create and manage projects' },
+      { href: '/developers/dashboard', label: 'Dashboard', desc: 'Engineering control center' },
+      { href: '/developers/projects', label: 'Projects', desc: 'Server-synced projects with auto-save' },
+      { href: '/developers/search', label: 'Global Search', desc: 'Files, tasks, memory, architecture' },
     ],
   },
   {
@@ -27,14 +28,15 @@ const sections = [
     title: 'AI & Architecture',
     icon: Brain,
     links: [
-      { href: '/developers/architect', label: 'Tau Architect', desc: 'AI software architect workspace' },
+      { href: '/developers/architect', label: 'Tau Architect', desc: 'Persistent AI memory across sessions' },
     ],
   },
   {
     title: 'DevOps',
     icon: Rocket,
     links: [
-      { href: '/developers/git', label: 'Git', desc: 'Local commits and branches (v1)' },
+      { href: '/developers/git', label: 'Git', desc: 'GitHub/GitLab remote push, branches, history' },
+      { href: '/developers/settings', label: 'Secrets & Versions', desc: 'Encrypted secrets and version restore' },
       { href: '/developers/automation', label: 'Deployment', desc: 'Vercel, Docker, self-hosted' },
     ],
   },
@@ -71,10 +73,11 @@ export default function DocsPage() {
           <h3 className="font-semibold flex items-center gap-2 mb-2">
             <Shield className="w-4 h-4 text-cyan-400" /> Ecosystem docs
           </h3>
-          <p className="text-sm text-gray-400">
-            TauCore platform documentation (installation, privacy, APIs) is available at{' '}
-            <Link href="/resources" className="text-cyan-400 hover:underline">Resources</Link> when published.
-            Tau IDE docs focus on the developer platform only.
+          <p className="text-sm text-gray-400 mt-4">
+            <strong className="text-gray-300">Infrastructure (Sprint 3):</strong> Run{' '}
+            <code className="text-cyan-400">npm run tau-ide:setup</code> with{' '}
+            <code className="text-cyan-400">DATABASE_URL</code> set. Projects persist in PostgreSQL with file fallback at{' '}
+            <code className="text-cyan-400">.data/tau-ide/</code> when offline.
           </p>
         </section>
       </div>

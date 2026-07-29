@@ -7,6 +7,10 @@
 .env.development
 *.env
 *secret*
+# Allow Tau IDE secrets API route and server module (not secret values)
+!src/app/api/tau-ide/projects/**/secrets/
+!src/app/api/tau-ide/projects/**/secrets/**
+!src/lib/tau-ide/server/secrets.ts
 *password*
 *key*
 # Allow Next.js API route folders (not secret files)
@@ -19,6 +23,7 @@
 *.sql
 *.db
 *.sqlite
+.data/tau-ide/
 
 # Test files
 *test*.js

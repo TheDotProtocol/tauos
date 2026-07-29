@@ -3,6 +3,7 @@ import { runAiChat, streamAiChat } from '@/lib/ai-gateway';
 import { getPhasePrompt, type ArchitectPhaseId } from '@/lib/tau-ide/architect/phases';
 import { buildOrchestratorPrompt, getAgentsForPhase, type AgentRole } from '@/lib/tau-ide/architect/agents';
 import { buildMemoryContext, type ProjectMemory } from '@/lib/tau-ide/architect/memory';
+import { getAiMemory, saveAiMemory, appendConversation } from '@/lib/tau-ide/server/memory';
 
 export async function POST(request: NextRequest) {
   try {
@@ -12,6 +13,7 @@ export async function POST(request: NextRequest) {
       phase = 'discovery',
       mode = 'beginner',
       memory,
+      projectId,
       provider,
       model,
       stream = false,
@@ -20,6 +22,7 @@ export async function POST(request: NextRequest) {
       phase?: ArchitectPhaseId;
       mode?: 'beginner' | 'professional';
       memory?: ProjectMemory;
+      projectId?: string;
       provider?: string;
       model?: string;
       stream?: boolean;
@@ -32,7 +35,16 @@ export async function POST(request: NextRequest) {
     const phaseAgents = getAgentsForPhase(phase).map((a) => a.role);
     const orchestrator = buildOrchestratorPrompt(phase, phaseAgents as AgentRole[]);
     const phasePrompt = getPhasePrompt(phase, mode);
-    const memoryContext = memory ? buildMemoryContext(memory) : '';
+
+    // Load persistent memory from server when projectId provided
+    let persistentMemory = memory;
+    if (projectId) {
+      const stored = await getAiMemory(projectId);
+      if (stored) persistentMemory = { ...stored, ...memory, projectId };
+      else if (memory) await saveAiMemory(projectId, memory);
+    }
+
+    const memoryContext = persistentMemory ? buildMemoryContext(persistentMemory) : '';
 
     const systemContent = `${orchestrator}\n\n${phasePrompt}${memoryContext}`;
 
@@ -79,6 +91,12 @@ export async function POST(request: NextRequest) {
       privacyMode: true,
       agent: `architect-${phase}`,
     });
+
+    if (projectId) {
+      await appendConversation(projectId, { role: 'assistant', content: result.message, phase, provider: result.provider });
+      const lastUser = [...messages].reverse().find((m) => m.role === 'user');
+      if (lastUser) await appendConversation(projectId, { role: 'user', content: lastUser.content, phase });
+    }
 
     return NextResponse.json({
       message: result.message,

@@ -15,6 +15,7 @@
     "cloud:setup": "node scripts/setup-taucloud-storage.mjs",
     "browser:setup": "node scripts/setup-taubrowser-storage.mjs",
     "talk:setup": "node scripts/setup-tautalk-storage.mjs",
+    "tau-ide:setup": "node scripts/setup-tau-ide-infrastructure.mjs",
     "privacy:setup": "node scripts/setup-privacy-audit.mjs",
     "test:e2e": "node scripts/e2e-smoke.mjs",
     "verify:downloads": "node scripts/verify-downloads.mjs",

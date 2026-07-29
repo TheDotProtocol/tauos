@@ -1,5 +1,6 @@
 import type { ArchitectPhaseId } from './phases';
 import type { AgentRole } from './agents';
+import { apiFetch } from '@/lib/tau-ide/sync-client';
 
 export type ProjectMemory = {
   projectId: string;
@@ -28,22 +29,6 @@ export type ProjectTask = {
 
 const MEMORY_KEY = 'tau-architect-memory';
 
-export function loadMemory(projectId = 'default'): ProjectMemory {
-  if (typeof window === 'undefined') return createEmptyMemory(projectId);
-  try {
-    const raw = localStorage.getItem(`${MEMORY_KEY}-${projectId}`);
-    if (!raw) return createEmptyMemory(projectId);
-    return JSON.parse(raw) as ProjectMemory;
-  } catch {
-    return createEmptyMemory(projectId);
-  }
-}
-
-export function saveMemory(memory: ProjectMemory) {
-  memory.updatedAt = new Date().toISOString();
-  localStorage.setItem(`${MEMORY_KEY}-${memory.projectId}`, JSON.stringify(memory));
-}
-
 export function createEmptyMemory(projectId: string): ProjectMemory {
   return {
     projectId,
@@ -63,17 +48,61 @@ export function createEmptyMemory(projectId: string): ProjectMemory {
   };
 }
 
+export function loadMemoryLocal(projectId: string): ProjectMemory {
+  if (typeof window === 'undefined') return createEmptyMemory(projectId);
+  try {
+    const raw = localStorage.getItem(`${MEMORY_KEY}-${projectId}`);
+    if (!raw) return createEmptyMemory(projectId);
+    return JSON.parse(raw) as ProjectMemory;
+  } catch {
+    return createEmptyMemory(projectId);
+  }
+}
+
+export function saveMemoryLocal(memory: ProjectMemory) {
+  memory.updatedAt = new Date().toISOString();
+  localStorage.setItem(`${MEMORY_KEY}-${memory.projectId}`, JSON.stringify(memory));
+}
+
+export async function loadMemory(projectId: string): Promise<ProjectMemory> {
+  try {
+    const data = await apiFetch<{ memory: ProjectMemory | null }>(`/api/tau-ide/projects/${projectId}/memory`);
+    if (data.memory) {
+      saveMemoryLocal(data.memory);
+      return data.memory;
+    }
+  } catch { /* fallback */ }
+  return loadMemoryLocal(projectId);
+}
+
+export async function saveMemory(memory: ProjectMemory) {
+  saveMemoryLocal(memory);
+  try {
+    await apiFetch(`/api/tau-ide/projects/${memory.projectId}/memory`, {
+      method: 'PUT',
+      body: JSON.stringify({ memory }),
+    });
+  } catch { /* local saved */ }
+}
+
+export async function appendConversation(projectId: string, msg: { role: string; content: string; phase?: string; provider?: string }) {
+  try {
+    await apiFetch(`/api/tau-ide/projects/${projectId}/conversations`, {
+      method: 'POST',
+      body: JSON.stringify(msg),
+    });
+  } catch { /* skip */ }
+}
+
 export function updateMemoryFromResponse(memory: ProjectMemory, phase: ArchitectPhaseId, content: string): ProjectMemory {
   memory.currentPhase = phase;
   memory.deliverables[phase] = content;
 
-  // Extract goals from discovery
   if (phase === 'discovery') {
     const goalMatch = content.match(/(?:goal|problem|solve)[:\s]+(.+)/gi);
     if (goalMatch) memory.goals = Array.from(new Set([...memory.goals, ...goalMatch.slice(0, 5)]));
   }
 
-  // Extract architecture decisions
   const decisionPattern = /(?:decision|chose|selected|recommend)[:\s]+(.+)/gi;
   let match;
   while ((match = decisionPattern.exec(content)) !== null) {
@@ -83,11 +112,9 @@ export function updateMemoryFromResponse(memory: ProjectMemory, phase: Architect
     }
   }
 
-  // Extract mermaid diagrams
   const mermaidMatch = content.match(/```mermaid\n([\s\S]*?)```/);
   if (mermaidMatch) memory.deliverables[`${phase}-diagram`] = mermaidMatch[1];
 
-  // Extract tasks
   const taskMatches = Array.from(content.matchAll(/```tau-task\n([\s\S]*?)```/g));
   for (const tm of taskMatches) {
     try {
@@ -98,7 +125,7 @@ export function updateMemoryFromResponse(memory: ProjectMemory, phase: Architect
     } catch { /* skip */ }
   }
 
-  saveMemory(memory);
+  void saveMemory(memory);
   return memory;
 }
 
@@ -114,5 +141,13 @@ export function buildMemoryContext(memory: ProjectMemory): string {
     parts.push(`Decisions: ${memory.architectureDecisions.slice(-5).map((d) => d.decision).join('; ')}`);
   }
   if (memory.conversationSummary) parts.push(`Summary: ${memory.conversationSummary}`);
-  return parts.length ? `\n\nPROJECT CONTEXT:\n${parts.join('\n')}` : '';
+  for (const [phase, content] of Object.entries(memory.deliverables)) {
+    if (!phase.includes('diagram') && content.length > 50) {
+      parts.push(`${phase} (saved): ${content.slice(0, 400)}...`);
+    }
+  }
+  return parts.length ? `\n\nPROJECT CONTEXT (persistent memory):\n${parts.join('\n')}` : '';
 }
+
+// Backward compat sync aliases
+export { loadMemoryLocal as loadMemorySync, saveMemoryLocal as saveMemorySync };
