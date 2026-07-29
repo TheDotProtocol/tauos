@@ -1,321 +1,191 @@
 'use client';
 
-import MarketingPageShell from '@/components/marketing/MarketingPageShell';
-import { motion } from 'framer-motion';
+import Link from 'next/link';
 import {
-  Code, Github, Bug, FileText, Palette, Users, Globe, Shield,
-  Lock, Eye, Zap, Heart, GitBranch, Terminal, Database, Server,
-  Smartphone, Monitor, Tablet, ArrowRight, Mail, ExternalLink,
-  CheckCircle, Star, GitPullRequest, GitCommit, GitMerge
+  Code, GitBranch, Terminal, Brain, Shield, Rocket, BookOpen, Lock,
+  ArrowRight, Sparkles, Layers, Globe
 } from 'lucide-react';
 
-export default function DevelopersPage() {
+const features = [
+  { icon: Code, title: 'Tau IDE Workspace', desc: 'Monaco editor, file explorer, tabs, terminal, and project management in one workspace.' },
+  { icon: Brain, title: 'Tau Architect', desc: 'AI software architect — describe your app in plain English and get PRD, architecture, and code.' },
+  { icon: Terminal, title: 'TauScript', desc: 'A real programming language with lexer, parser, runtime, and REPL — not a demo.' },
+  { icon: GitBranch, title: 'Git Integration', desc: 'Repository management, commits, and branches — foundation ready for v1.' },
+  { icon: Rocket, title: 'Deploy Anywhere', desc: 'Architecture for Vercel, Docker, Tau Cloud, and self-hosted deployment.' },
+  { icon: Shield, title: 'Secure by Tau', desc: 'Privacy-first development with zero telemetry in TauScript runs.' },
+];
+
+export default function TauIdeLandingPage() {
   return (
-    <MarketingPageShell
-      title="Developers"
-      subtitle="Build on Tau OS with SDKs, APIs, and open documentation."
-    >
-      <section className="py-8 bg-gradient-to-r from-yellow-500/10 to-orange-500/10 border-b border-gray-800">
-        <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <p className="text-gray-300">
-            <span className="text-yellow-400 font-semibold">TauStudio IDE</span> — write and run TauScript in the browser.
+    <div className="min-h-screen bg-[#0a0a0a] text-white">
+      {/* Nav */}
+      <nav className="border-b border-white/10 glass-strong sticky top-0 z-50">
+        <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+          <Link href="/developers" className="flex items-center gap-3">
+            <img src="/brand/tau-ide-logo.png" alt="Tau IDE" className="w-10 h-10 rounded-lg" />
+            <div>
+              <span className="font-bold text-white">Tau IDE</span>
+              <span className="hidden sm:inline text-xs text-cyan-400 ml-2">Developer Platform</span>
+            </div>
+          </Link>
+          <div className="flex items-center gap-3 text-sm">
+            <Link href="/developers/docs" className="text-gray-400 hover:text-cyan-400 hidden sm:inline">Docs</Link>
+            <Link href="/developers/login" className="text-gray-400 hover:text-white">Sign in</Link>
+            <Link href="/developers/dashboard" className="btn-primary text-sm py-2 px-4">
+              Open Platform <ArrowRight className="w-4 h-4" />
+            </Link>
+          </div>
+        </div>
+      </nav>
+
+      {/* Hero */}
+      <section className="relative overflow-hidden py-20 lg:py-28">
+        <div className="absolute inset-0 bg-gradient-to-b from-cyan-500/10 via-transparent to-transparent pointer-events-none" />
+        <div className="max-w-7xl mx-auto px-4 text-center relative">
+          <img
+            src="/brand/tau-ide-logo.png"
+            alt="Tau IDE"
+            className="w-32 h-32 mx-auto rounded-2xl shadow-2xl shadow-cyan-500/20 mb-8"
+          />
+          <h1 className="text-4xl md:text-6xl font-bold mb-4">
+            <span className="text-white">Tau </span>
+            <span className="text-gradient">IDE</span>
+          </h1>
+          <p className="text-xl text-cyan-400/90 font-medium mb-2">Developer Platform</p>
+          <p className="text-lg text-gray-400 max-w-2xl mx-auto mb-10">
+            One platform to design, build, understand, and deploy software.
+            Professional IDE, AI architect, TauScript language, Git, and deployment — unified.
           </p>
-          <a
-            href="/developers/ide"
-            className="px-5 py-2.5 bg-yellow-500 text-black font-semibold rounded-lg hover:bg-yellow-400 transition-colors"
-          >
-            Open IDE →
-          </a>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Link href="/developers/dashboard" className="btn-primary text-lg px-8 py-3">
+              Get Started <ArrowRight className="w-5 h-5" />
+            </Link>
+            <Link href="/developers/architect" className="btn-secondary text-lg px-8 py-3">
+              <Sparkles className="w-5 h-5" /> Try Tau Architect
+            </Link>
+          </div>
         </div>
       </section>
-      {/* TauScript examples gallery */}
-      <section className="py-16 bg-gray-950 border-b border-gray-800">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl font-bold text-white mb-2 text-center">TauScript examples</h2>
-          <p className="text-gray-400 text-center mb-10">Run these in the <a href="/developers/ide" className="text-yellow-400 hover:underline">browser IDE</a></p>
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+
+      {/* Intro */}
+      <section className="py-16 border-t border-white/5">
+        <div className="max-w-7xl mx-auto px-4 grid lg:grid-cols-2 gap-12 items-center">
+          <div>
+            <h2 className="text-3xl font-bold mb-4">The foundation of the Tau ecosystem</h2>
+            <p className="text-gray-400 leading-relaxed mb-6">
+              Tau IDE is not just another code editor. It is the developer platform where Tau Core, Tau Mail,
+              Tau Cloud, Tau Browser, and Tau AI are built. Think GitHub + Cursor + VS Code + Vercel — one coherent product.
+            </p>
+            <ul className="space-y-3 text-gray-300">
+              {['Beginner Mode — build with conversation', 'Professional Mode — full IDE control', 'AI Architect Mode — senior architect in your workspace'].map((item) => (
+                <li key={item} className="flex items-center gap-2">
+                  <span className="w-1.5 h-1.5 rounded-full bg-cyan-400" />
+                  {item}
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div className="grid grid-cols-2 gap-4">
             {[
-              { title: 'Hello Tau', code: 'print("Hello from TauScript")' },
-              { title: 'Variables', code: 'let x = 42\nprint(x + 8)' },
-              { title: 'Loop', code: 'for i in 1..3 {\n  print("step " + i)\n}' },
-              { title: 'Function', code: 'fn greet(name) {\n  return "Hi " + name\n}\nprint(greet("dev"))' },
-              { title: 'Privacy check', code: 'print("No telemetry in TauScript runs")' },
-              { title: 'API ping', code: 'print("Use fetch from host app for HTTP")' },
-            ].map((ex) => (
-              <div key={ex.title} className="p-4 bg-gray-900/50 border border-gray-800 rounded-xl">
-                <h3 className="text-yellow-400 font-semibold mb-2">{ex.title}</h3>
-                <pre className="text-xs text-gray-300 font-mono whitespace-pre-wrap bg-black/40 p-3 rounded-lg">{ex.code}</pre>
+              { icon: Layers, label: 'Code Host' },
+              { icon: Code, label: 'Build & Deploy' },
+              { icon: Terminal, label: 'TauScript Powered' },
+              { icon: Globe, label: 'Collaborate' },
+            ].map(({ icon: Icon, label }) => (
+              <div key={label} className="card text-center py-6">
+                <Icon className="w-8 h-8 text-cyan-400 mx-auto mb-2" />
+                <p className="text-sm font-medium">{label}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
-      {/* Philosophy Section */}
-      <section className="py-20 bg-black">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            viewport={{ once: true }}
-            className="text-center mb-16"
-          >
-            <h2 className="text-4xl md:text-5xl font-bold mb-6">
-              <Globe className="w-12 h-12 text-yellow-400 mx-auto mb-4" />
-              <span className="bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">
-                Our Philosophy
-              </span>
-            </h2>
-          </motion.div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {[
-              {
-                icon: Heart,
-                title: "Freedom First",
-                description: "Users should own their data, identity, and digital choices."
-              },
-              {
-                icon: Eye,
-                title: "Transparency",
-                description: "Every line of code is open for inspection, review, and contribution."
-              },
-              {
-                icon: Shield,
-                title: "Security",
-                description: "Built from the ground up to protect users, not exploit them."
-              },
-              {
-                icon: Users,
-                title: "Collaboration",
-                description: "Like the Linux Foundation, Tau Core Inc. provides governance, while Tau Core Inc. drives commercial adoption."
-              }
-            ].map((item, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, delay: index * 0.1 }}
-                viewport={{ once: true }}
-                className="p-6 bg-gray-900/30 backdrop-blur-sm border border-gray-800 rounded-2xl hover:border-yellow-400/30 transition-all duration-300"
-              >
-                <item.icon className="w-12 h-12 text-yellow-400 mb-4" />
-                <h3 className="text-xl font-bold text-white mb-3">{item.title}</h3>
-                <p className="text-gray-300">{item.description}</p>
-              </motion.div>
+      {/* Features */}
+      <section className="py-16 bg-[#0d0d0d]">
+        <div className="max-w-7xl mx-auto px-4">
+          <h2 className="text-3xl font-bold text-center mb-12">Everything you need</h2>
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {features.map(({ icon: Icon, title, desc }) => (
+              <div key={title} className="card">
+                <Icon className="w-8 h-8 text-cyan-400 mb-4" />
+                <h3 className="text-lg font-semibold mb-2">{title}</h3>
+                <p className="text-sm text-gray-400">{desc}</p>
+              </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Get Involved Section */}
-      <section className="py-20 bg-gradient-to-b from-black to-gray-900">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            viewport={{ once: true }}
-            className="text-center mb-16"
-          >
-            <h2 className="text-4xl md:text-5xl font-bold mb-6">
-              <Code className="w-12 h-12 text-yellow-400 mx-auto mb-4" />
-              <span className="bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">
-                Get Involved
-              </span>
-            </h2>
-          </motion.div>
+      {/* TauScript */}
+      <section className="py-16 border-t border-white/5">
+        <div className="max-w-7xl mx-auto px-4 grid lg:grid-cols-2 gap-12 items-center">
+          <div className="order-2 lg:order-1">
+            <pre className="glass p-4 rounded-xl text-sm font-mono text-green-300 overflow-x-auto">
+{`fn greet(name) {
+  return "Hello, " + name;
+}
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
-            {[
-              {
-                icon: Github,
-                title: "Contribute Code",
-                description: "Join us on GitHub (coming soon).",
-                color: "from-blue-500 to-cyan-500"
-              },
-              {
-                icon: Bug,
-                title: "Test & Report Bugs",
-                description: "Help us strengthen Tau OS by stress-testing releases.",
-                color: "from-red-500 to-pink-500"
-              },
-              {
-                icon: FileText,
-                title: "Write Documentation",
-                description: "Good docs matter — clear guides empower users.",
-                color: "from-green-500 to-emerald-500"
-              },
-              {
-                icon: Palette,
-                title: "Design Apps & Tools",
-                description: "Build privacy-first apps that enhance the Tau ecosystem.",
-                color: "from-purple-500 to-indigo-500"
-              }
-            ].map((item, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, delay: index * 0.1 }}
-                viewport={{ once: true }}
-                className="p-6 bg-gray-900/30 backdrop-blur-sm border border-gray-800 rounded-2xl hover:border-yellow-400/30 transition-all duration-300"
-              >
-                <div className={`w-12 h-12 bg-gradient-to-r ${item.color} rounded-xl flex items-center justify-center mb-4`}>
-                  <item.icon className="w-6 h-6 text-white" />
-                </div>
-                <h3 className="text-xl font-bold text-white mb-3">{item.title}</h3>
-                <p className="text-gray-300">{item.description}</p>
-              </motion.div>
-            ))}
+print(greet("Tau"));`}
+            </pre>
           </div>
-        </div>
-      </section>
-
-      {/* Technical Stack Section */}
-      <section className="py-20 bg-black">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            viewport={{ once: true }}
-            className="text-center mb-16"
-          >
-            <h2 className="text-4xl md:text-5xl font-bold mb-6">
-              <Terminal className="w-12 h-12 text-yellow-400 mx-auto mb-4" />
-              <span className="bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">
-                Technical Stack
-              </span>
-            </h2>
-          </motion.div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {[
-              {
-                icon: Server,
-                title: "Core",
-                description: "Lightweight Linux-based OS, customized for sovereignty & control."
-              },
-              {
-                icon: Mail,
-                title: "TauMail",
-                description: "Encrypted, independent email service."
-              },
-              {
-                icon: Database,
-                title: "TauCloud",
-                description: "Secure, decentralized storage and collaboration tools."
-              },
-              {
-                icon: Code,
-                title: "SDKs",
-                description: "Developer-friendly tools to build applications directly on Tau OS."
-              }
-            ].map((item, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, delay: index * 0.1 }}
-                viewport={{ once: true }}
-                className="p-6 bg-gray-900/30 backdrop-blur-sm border border-gray-800 rounded-2xl hover:border-yellow-400/30 transition-all duration-300"
-              >
-                <item.icon className="w-12 h-12 text-yellow-400 mb-4" />
-                <h3 className="text-xl font-bold text-white mb-3">{item.title}</h3>
-                <p className="text-gray-300">{item.description}</p>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Community Section */}
-      <section className="py-20 bg-gradient-to-b from-gray-900 to-black">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            viewport={{ once: true }}
-            className="text-center mb-16"
-          >
-            <h2 className="text-4xl md:text-5xl font-bold mb-6">
-              <Users className="w-12 h-12 text-yellow-400 mx-auto mb-4" />
-              <span className="bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">
-                Community
-              </span>
-            </h2>
-            <p className="text-xl text-gray-300 max-w-3xl mx-auto mb-8">
-              Tau is not a product — it's a <span className="text-yellow-400 font-semibold">movement</span>.
-              <br />
-              We welcome developers, sysadmins, security researchers, UI/UX designers, and anyone with a vision for a better digital future.
+          <div className="order-1 lg:order-2">
+            <h2 className="text-3xl font-bold mb-4">TauScript</h2>
+            <p className="text-gray-400 mb-4">
+              A real programming language — lexer, parser, AST, evaluator, and REPL.
+              Documentation and runtime stay synchronized. No fake syntax.
             </p>
-            <a
-              href="mailto:verify@tauos.org"
-              className="inline-flex items-center space-x-2 bg-gradient-to-r from-yellow-400 to-orange-500 text-black px-8 py-4 rounded-xl font-semibold hover:shadow-lg hover:shadow-yellow-400/25 transition-all duration-300"
-            >
-              <Mail className="w-5 h-5" />
-              <span>Join our early dev program</span>
-            </a>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* Why Build on Tau Section */}
-      <section className="py-20 bg-black">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            viewport={{ once: true }}
-            className="text-center mb-16"
-          >
-            <h2 className="text-4xl md:text-5xl font-bold mb-6">
-              <Zap className="w-12 h-12 text-yellow-400 mx-auto mb-4" />
-              <span className="bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">
-                Why Build on Tau?
-              </span>
-            </h2>
-          </motion.div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
-            {[
-              "No corporate gatekeepers.",
-              "Open governance model under Tau Core Inc..",
-              "Commercialization opportunities through Tau Core Inc..",
-              "A real chance to shape the future of operating systems."
-            ].map((item, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, delay: index * 0.1 }}
-                viewport={{ once: true }}
-                className="flex items-center space-x-4 p-6 bg-gray-900/30 backdrop-blur-sm border border-gray-800 rounded-2xl hover:border-yellow-400/30 transition-all duration-300"
-              >
-                <CheckCircle className="w-6 h-6 text-yellow-400 flex-shrink-0" />
-                <p className="text-gray-300">{item}</p>
-              </motion.div>
-            ))}
+            <Link href="/developers/tauscript" className="text-cyan-400 hover:underline inline-flex items-center gap-1">
+              Explore TauScript <ArrowRight className="w-4 h-4" />
+            </Link>
           </div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            viewport={{ once: true }}
-            className="text-center"
-          >
-            <div className="bg-gradient-to-r from-gray-900 to-black border border-gray-800 rounded-2xl p-8 max-w-4xl mx-auto">
-              <p className="text-2xl md:text-3xl font-bold text-white mb-4">
-                Your code. Your rules. Our collective future.
-              </p>
-            </div>
-          </motion.div>
         </div>
       </section>
-    </MarketingPageShell>
+
+      {/* Tau Architect */}
+      <section className="py-16 bg-gradient-to-r from-cyan-500/5 to-purple-500/5">
+        <div className="max-w-7xl mx-auto px-4 text-center">
+          <Brain className="w-12 h-12 text-cyan-400 mx-auto mb-4" />
+          <h2 className="text-3xl font-bold mb-4">Tau Architect</h2>
+          <p className="text-gray-400 max-w-2xl mx-auto mb-8">
+            Zero programming knowledge required. Describe your software in natural language.
+            Tau Architect gathers requirements, designs architecture, and generates your project inside Tau IDE.
+          </p>
+          <Link href="/developers/architect" className="btn-primary">
+            Start Building with AI <Sparkles className="w-5 h-5" />
+          </Link>
+        </div>
+      </section>
+
+      {/* Privacy & Open Source */}
+      <section className="py-16 border-t border-white/5">
+        <div className="max-w-7xl mx-auto px-4 grid md:grid-cols-2 gap-8">
+          <div className="card">
+            <Lock className="w-8 h-8 text-cyan-400 mb-4" />
+            <h3 className="text-xl font-bold mb-2">Privacy First</h3>
+            <p className="text-gray-400 text-sm">Your code stays yours. TauScript runs locally. No telemetry in language execution.</p>
+          </div>
+          <div className="card">
+            <BookOpen className="w-8 h-8 text-cyan-400 mb-4" />
+            <h3 className="text-xl font-bold mb-2">Open Source</h3>
+            <p className="text-gray-400 text-sm">Built on transparent foundations. Inspect, contribute, and deploy on your terms.</p>
+          </div>
+        </div>
+      </section>
+
+      {/* CTA */}
+      <section className="py-20 text-center border-t border-white/10">
+        <h2 className="text-3xl font-bold mb-4">Ready to build?</h2>
+        <p className="text-gray-400 mb-8">One account. Multiple projects. Persistent workspaces.</p>
+        <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <Link href="/developers/register" className="btn-primary px-8 py-3">Create Account</Link>
+          <Link href="/developers/workspace" className="btn-secondary px-8 py-3">Open Tau IDE</Link>
+        </div>
+      </section>
+
+      <footer className="border-t border-white/10 py-8 text-center text-sm text-gray-500">
+        <p>Tau IDE v1.0 — Developer Platform · <Link href="https://www.tauos.org" className="hover:text-cyan-400">tauos.org</Link></p>
+      </footer>
+    </div>
   );
 }

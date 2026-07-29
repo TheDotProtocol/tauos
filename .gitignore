@@ -36,7 +36,7 @@ ROLLBACK.md
 RUNBOOK.md
 
 # Local development documentation (not shipped to GitHub)
-docs/
+/docs/
 
 # Node modules
 node_modules/

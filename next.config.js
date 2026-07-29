@@ -26,6 +26,11 @@ const nextConfig = {
         destination: '/taumail/dashboard',
         permanent: false,
       },
+      {
+        source: '/developers/ide',
+        destination: '/developers/workspace',
+        permanent: false,
+      },
     ];
   },
   // Disable static optimization for dynamic API routes
