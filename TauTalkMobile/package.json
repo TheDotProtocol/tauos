@@ -9,6 +9,8 @@
     "start": "react-native start",
     "start:clean": "react-native start --reset-cache",
     "icon": "bash scripts/generate-launcher-icon.sh",
+    "android:release": "cd android && ./gradlew assembleRelease",
+    "apk:publish": "npm run android:release && cp android/app/build/outputs/apk/release/app-release.apk ../public/downloads/TauTalk-1.0.0-beta.apk && echo 'Published to public/downloads/TauTalk-1.0.0-beta.apk'",
     "test": "jest"
   },
   "dependencies": {
