@@ -19,12 +19,14 @@ import {
   buildCryptoContext,
   fetchConversationKeys,
   fetchIncomingCalls,
+  fetchCallSession,
   startCall,
   declineCall,
   uploadAttachment,
   type TalkProfile,
   type IncomingCall,
 } from '@/lib/tautalk-web-api';
+import { ensureCallNotificationPermission, notifyIncomingCall } from '@/lib/tautalk-call-notify';
 import {
   contentTypeForPayload,
   parsePayload,
@@ -39,6 +41,7 @@ import { WebCallManager, type WebCallMediaState } from '@/lib/tautalk-web-call';
 import TauTalkAvatar from '@/components/tautalk/TauTalkAvatar';
 import TauTalkProfileModal from '@/components/tautalk/TauTalkProfileModal';
 import TauTalkCallOverlay from '@/components/tautalk/TauTalkCallOverlay';
+import TauTalkIncomingCall from '@/components/tautalk/TauTalkIncomingCall';
 import {
   MessageCircle,
   Send,
@@ -105,6 +108,8 @@ export default function TauTalkChatClient() {
   const eventSourceRef = useRef<EventSource | null>(null);
   const callManagerRef = useRef<WebCallManager | null>(null);
   const cryptoCtxRef = useRef<ConversationCryptoContext | null>(null);
+  const [callPeerName, setCallPeerName] = useState('');
+  const lastNotifiedCallRef = useRef<string | null>(null);
   const isOutgoingCallRef = useRef(false);
   const unavailableTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const photoInputRef = useRef<HTMLInputElement>(null);
@@ -210,15 +215,22 @@ export default function TauTalkChatClient() {
       .finally(() => setLoading(false));
   }, [ready, token, loadConversations]);
 
-  // Poll incoming calls
+  // Poll incoming calls (1s for fast ring)
   useEffect(() => {
     if (!token) return;
+    void ensureCallNotificationPermission();
     const poll = async () => {
       try {
         const incoming = await fetchIncomingCalls(token);
-        if (incoming.length > 0 && !callOpen) {
-          setIncomingCall(incoming[0]);
+        if (incoming.length > 0 && !callOpen && !isOutgoingCallRef.current) {
+          const call = incoming[0];
+          setIncomingCall(call);
+          if (lastNotifiedCallRef.current !== call.id) {
+            lastNotifiedCallRef.current = call.id;
+            notifyIncomingCall(call);
+          }
         } else if (incoming.length === 0) {
+          lastNotifiedCallRef.current = null;
           setIncomingCall((prev) => {
             if (prev && !callOpen) stopCallSounds();
             return null;
@@ -229,7 +241,7 @@ export default function TauTalkChatClient() {
       }
     };
     poll();
-    const id = setInterval(poll, 3000);
+    const id = setInterval(poll, 1000);
     return () => clearInterval(id);
   }, [token, callOpen]);
 
@@ -485,9 +497,12 @@ export default function TauTalkChatClient() {
     const mgr = callManagerRef.current;
     if (!mgr) return;
 
+    void ensureCallNotificationPermission();
     setCallError('');
     setCallMode(mode);
+    setCallPeerName(activePeerName);
     isOutgoingCallRef.current = true;
+    setIncomingCall(null);
     setCallOpen(true);
     startOutgoingRingback();
 
@@ -533,21 +548,44 @@ export default function TauTalkChatClient() {
   };
 
   const acceptIncoming = async () => {
-    if (!token || !incomingCall) return;
+    const call = incomingCall;
+    if (!token || !call) return;
     const mgr = callManagerRef.current;
     if (!mgr) return;
 
     stopCallSounds();
+    setIncomingCall(null);
+    lastNotifiedCallRef.current = null;
+
+    try {
+      const session = await fetchCallSession(token, call.id);
+      if (session.status !== 'ringing') {
+        setSendError('This call has already ended.');
+        return;
+      }
+    } catch {
+      setSendError('Could not verify call. Try again.');
+      return;
+    }
+
+    const callerName = call.caller?.full_name || call.caller?.username || 'Contact';
+    setCallPeerName(callerName);
     setCallError('');
-    setCallMode(incomingCall.mode);
+    setCallMode(call.mode);
     isOutgoingCallRef.current = false;
+
+    if (call.conversation_id) {
+      setActiveId(call.conversation_id);
+      setMobileShowChat(true);
+    }
+
     setCallOpen(true);
 
     mgr.onFailed = (msg) => {
       stopCallSounds();
       setCallError(msg);
       setCallOpen(false);
-      setIncomingCall(null);
+      setCallPeerName('');
     };
     mgr.onConnected = () => {
       setCallError('');
@@ -556,25 +594,32 @@ export default function TauTalkChatClient() {
     mgr.onUnanswered = null;
 
     try {
-      const ok = await mgr.startIncoming(token, incomingCall, incomingCall.mode);
-      if (ok) {
-        setIncomingCall(null);
-        if (incomingCall.conversation_id) {
-          selectConversation(incomingCall.conversation_id);
-        }
-      } else {
+      const ok = await mgr.startIncoming(token, call, call.mode);
+      if (!ok) {
         setCallOpen(false);
+        setCallPeerName('');
       }
     } catch (err) {
       const msg = err instanceof Error ? err.message : 'Could not join call';
       setCallError(msg);
       setCallOpen(false);
+      setCallPeerName('');
+      setSendError(msg);
     }
+  };
+
+  const declineIncoming = async () => {
+    if (!incomingCall || !token) return;
+    stopCallSounds();
+    lastNotifiedCallRef.current = null;
+    await declineCall(token, incomingCall.id).catch(() => {});
+    setIncomingCall(null);
   };
 
   const hangupCall = async () => {
     stopCallSounds();
     isOutgoingCallRef.current = false;
+    lastNotifiedCallRef.current = null;
     if (unavailableTimerRef.current) {
       clearTimeout(unavailableTimerRef.current);
       unavailableTimerRef.current = null;
@@ -582,6 +627,7 @@ export default function TauTalkChatClient() {
     await callManagerRef.current?.hangup();
     setCallOpen(false);
     setCallError('');
+    setCallPeerName('');
     setCallMedia(emptyCallMedia);
   };
 
@@ -971,41 +1017,18 @@ export default function TauTalkChatClient() {
         </div>
       )}
 
-      {incomingCall && !callOpen ? (
-        <div className="fixed inset-0 z-[55] bg-black/80 flex items-center justify-center p-4">
-          <div className="bg-gray-900 border border-green-500/30 rounded-2xl p-8 max-w-sm w-full text-center">
-            <p className="text-green-400 text-sm mb-2">Incoming {incomingCall.mode} call</p>
-            <p className="text-xl font-bold mb-6">
-              {incomingCall.caller?.full_name || incomingCall.caller?.username || 'Someone'}
-            </p>
-            <div className="flex gap-3">
-              <button
-                type="button"
-                onClick={() => {
-                  stopCallSounds();
-                  declineCall(token!, incomingCall.id);
-                  setIncomingCall(null);
-                }}
-                className="flex-1 py-3 rounded-xl bg-gray-700 font-medium"
-              >
-                Decline
-              </button>
-              <button
-                type="button"
-                onClick={acceptIncoming}
-                className="flex-1 py-3 rounded-xl bg-green-500 text-black font-semibold"
-              >
-                Accept
-              </button>
-            </div>
-          </div>
-        </div>
+      {incomingCall && !callOpen && !isOutgoingCallRef.current ? (
+        <TauTalkIncomingCall
+          call={incomingCall}
+          onAccept={() => void acceptIncoming()}
+          onDecline={() => void declineIncoming()}
+        />
       ) : null}
 
       <TauTalkCallOverlay
         open={callOpen}
         mode={callMode}
-        peerName={activePeerName}
+        peerName={callPeerName || activePeerName}
         media={callMedia}
         error={callError}
         onToggleMute={() => callManagerRef.current?.toggleMute()}

@@ -137,6 +137,14 @@ export async function fetchIncomingCalls(token: string): Promise<IncomingCall[]>
   return data.incoming ?? [];
 }
 
+export async function fetchCallSession(token: string, sessionId: string): Promise<CallSession> {
+  const res = await fetch(`/api/tautalk/calls?sessionId=${encodeURIComponent(sessionId)}`, {
+    headers: headers(token),
+  });
+  const data = await parseJson<{ session: CallSession }>(res);
+  return data.session;
+}
+
 export async function acceptCall(token: string, sessionId: string) {
   const res = await fetch(`/api/tautalk/calls/${sessionId}`, {
     method: 'POST',

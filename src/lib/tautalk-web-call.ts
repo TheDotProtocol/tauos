@@ -7,6 +7,7 @@ const ICE_SERVERS: RTCIceServer[] = [
 ];
 
 const SIGNAL_POLL_MS = 1500;
+const CALLEE_OFFER_WAIT_MS = 12_000;
 
 export type WebCallMediaState = {
   localStream: MediaStream | null;
@@ -32,6 +33,7 @@ export class WebCallManager {
   private remoteDescriptionSet = false;
   private listeners = new Set<Listener>();
   private ringTimer: ReturnType<typeof setTimeout> | null = null;
+  private offerWaitTimer: ReturnType<typeof setTimeout> | null = null;
   private callAnswered = false;
   private unansweredHandled = false;
   private mediaState: WebCallMediaState = {
@@ -84,7 +86,9 @@ export class WebCallManager {
     this.role = 'callee';
     this.mode = mode;
     await acceptCall(token, session.id);
-    return this.bootstrap(false);
+    const ok = await this.bootstrap(false);
+    if (ok) this.startCalleeOfferWait();
+    return ok;
   }
 
   private async bootstrap(createOffer: boolean): Promise<boolean> {
@@ -180,6 +184,7 @@ export class WebCallManager {
     if (!this.pc || !this.session) return;
 
     if (type === 'offer') {
+      this.clearOfferWaitTimer();
       const offer = payload as RTCSessionDescriptionInit;
       await this.pc.setRemoteDescription(offer);
       this.remoteDescriptionSet = true;
@@ -216,8 +221,35 @@ export class WebCallManager {
     }
 
     if (type === 'hangup') {
-      this.onFailed?.('Call ended');
+      void this.handleRemoteHangup();
+      return;
     }
+  }
+
+  private async handleRemoteHangup() {
+    await this.cleanup(true);
+    this.onFailed?.('Call ended');
+  }
+
+  private clearOfferWaitTimer() {
+    if (this.offerWaitTimer) {
+      clearTimeout(this.offerWaitTimer);
+      this.offerWaitTimer = null;
+    }
+  }
+
+  private startCalleeOfferWait() {
+    if (this.role !== 'callee') return;
+    this.clearOfferWaitTimer();
+    this.offerWaitTimer = setTimeout(() => {
+      void this.handleCalleeNoOffer();
+    }, CALLEE_OFFER_WAIT_MS);
+  }
+
+  private async handleCalleeNoOffer() {
+    if (this.callAnswered || this.remoteDescriptionSet) return;
+    this.onFailed?.('Caller hung up');
+    await this.cleanup(true);
   }
 
   private async flushIce() {
@@ -281,6 +313,7 @@ export class WebCallManager {
 
   private async cleanup(endRemote = true) {
     this.clearRingTimer();
+    this.clearOfferWaitTimer();
     this.stopPolling();
     if (endRemote && this.session) {
       await endCall(this.token, this.session.id).catch(() => {});

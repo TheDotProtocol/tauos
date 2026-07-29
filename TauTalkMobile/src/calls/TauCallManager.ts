@@ -17,6 +17,8 @@ import { ICE_SERVERS, SIGNAL_POLL_MS } from './iceConfig';
 import { ensureCallPermissions } from './permissions';
 import { TAUTALK_RING_TIMEOUT_MS } from './callConstants';
 
+const CALLEE_OFFER_WAIT_MS = 12_000;
+
 export type CallMediaState = {
   localStreamURL: string | null;
   remoteStreamURL: string | null;
@@ -52,6 +54,7 @@ export class TauCallManager {
   onUnanswered: (() => void) | null = null;
 
   private ringTimer: ReturnType<typeof setTimeout> | null = null;
+  private offerWaitTimer: ReturnType<typeof setTimeout> | null = null;
   private callAnswered = false;
   private unansweredHandled = false;
 
@@ -106,7 +109,9 @@ export class TauCallManager {
     this.role = 'callee';
     this.mode = mode;
     await acceptCall(token, session.id);
-    return this.bootstrap(false);
+    const ok = await this.bootstrap(false);
+    if (ok) this.startCalleeOfferWait();
+    return ok;
   }
 
   private async bootstrap(createOffer: boolean): Promise<boolean> {
@@ -207,6 +212,7 @@ export class TauCallManager {
     if (!this.pc || !this.session) return;
 
     if (type === 'offer') {
+      this.clearOfferWaitTimer();
       const offer = payload as RTCSessionDescriptionInit;
       await this.pc.setRemoteDescription(new RTCSessionDescription(offer));
       this.remoteDescriptionSet = true;
@@ -240,8 +246,35 @@ export class TauCallManager {
     }
 
     if (type === 'hangup') {
-      this.onFailed?.('Call ended');
+      void this.handleRemoteHangup();
+      return;
     }
+  }
+
+  private async handleRemoteHangup() {
+    await this.cleanup(true);
+    this.onFailed?.('Call ended');
+  }
+
+  private clearOfferWaitTimer() {
+    if (this.offerWaitTimer) {
+      clearTimeout(this.offerWaitTimer);
+      this.offerWaitTimer = null;
+    }
+  }
+
+  private startCalleeOfferWait() {
+    if (this.role !== 'callee') return;
+    this.clearOfferWaitTimer();
+    this.offerWaitTimer = setTimeout(() => {
+      void this.handleCalleeNoOffer();
+    }, CALLEE_OFFER_WAIT_MS);
+  }
+
+  private async handleCalleeNoOffer() {
+    if (this.callAnswered || this.remoteDescriptionSet) return;
+    this.onFailed?.('Caller hung up');
+    await this.cleanup(true);
   }
 
   private async flushIceQueue() {
@@ -302,6 +335,7 @@ export class TauCallManager {
 
   private async cleanup(endRemote = true) {
     this.clearRingTimer();
+    this.clearOfferWaitTimer();
     this.stopPolling();
     if (endRemote && this.session) {
       await endCall(this.token, this.session.id).catch(() => {});

@@ -53,7 +53,7 @@ function App(): JSX.Element {
     };
 
     poll();
-    const interval = setInterval(poll, 3000);
+    const interval = setInterval(poll, 1000);
     return () => clearInterval(interval);
   }, [token, screen, incomingCall, acceptedIncoming]);
 

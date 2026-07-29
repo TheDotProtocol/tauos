@@ -32,22 +32,24 @@ export async function expireStaleCallSessions(conversationId?: string) {
   await getPool().query(
     `UPDATE tautalk_call_sessions
      SET status = 'missed', ended_at = NOW()
-     WHERE status = 'ringing' AND started_at < NOW() - INTERVAL '15 seconds'`
+     WHERE status = 'ringing' AND started_at < NOW() - INTERVAL '20 seconds'`
   );
   await getPool().query(
     `UPDATE tautalk_call_sessions
      SET status = 'ended', ended_at = NOW()
      WHERE status = 'active'
-       AND COALESCE(answered_at, started_at) < NOW() - INTERVAL '2 hours'`
+       AND COALESCE(answered_at, started_at) < NOW() - INTERVAL '90 seconds'`
   );
-  if (conversationId) {
-    await getPool().query(
-      `UPDATE tautalk_call_sessions
-       SET status = 'missed', ended_at = NOW()
-       WHERE conversation_id = $1 AND status = 'ringing'`,
-      [conversationId]
-    );
-  }
+}
+
+/** End any in-flight sessions for a conversation so a new call can start cleanly. */
+export async function resetCallSessionsForConversation(conversationId: string) {
+  await getPool().query(
+    `UPDATE tautalk_call_sessions
+     SET status = 'ended', ended_at = NOW()
+     WHERE conversation_id = $1 AND status IN ('ringing', 'active')`,
+    [conversationId]
+  );
 }
 
 export async function createCallSession(
@@ -58,19 +60,10 @@ export async function createCallSession(
   const allowed = await userInConversation(userId, conversationId);
   if (!allowed) throw new Error('Not found');
 
-  await expireStaleCallSessions(conversationId);
+  await expireStaleCallSessions();
+  await resetCallSessionsForConversation(conversationId);
 
   const peer = await getPeerForCall(conversationId, userId);
-  const existing = await getPool().query(
-    `SELECT id FROM tautalk_call_sessions
-     WHERE conversation_id = $1 AND status = 'active'
-       AND COALESCE(answered_at, started_at) > NOW() - INTERVAL '5 minutes'
-     LIMIT 1`,
-    [conversationId]
-  );
-  if (existing.rows.length > 0) {
-    throw new Error('A call is already in progress');
-  }
 
   const result = await getPool().query(
     `INSERT INTO tautalk_call_sessions (conversation_id, caller_id, callee_id, mode, status)
