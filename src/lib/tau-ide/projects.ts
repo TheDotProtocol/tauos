@@ -1,4 +1,6 @@
-import { apiFetch, setSyncMeta } from './sync-client';
+import { apiFetch, setSyncMeta, ApiError } from './sync-client';
+import { getStoredToken } from './auth-client';
+import { setConnectionStatus } from './connection-status';
 
 export type ProjectFile = { path: string; name: string; content: string };
 
@@ -62,7 +64,21 @@ function saveLocal(projects: TauProject[]) {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(projects));
 }
 
+function isAuthenticated(): boolean {
+  return typeof window !== 'undefined' && Boolean(getStoredToken());
+}
+
 export async function loadProjects(): Promise<TauProject[]> {
+  if (!isAuthenticated()) {
+    setConnectionStatus({
+      state: 'local-only',
+      message: 'Projects stored locally. Sign in to enable cloud sync.',
+      authenticated: false,
+      database: false,
+    });
+    return loadLocal();
+  }
+
   try {
     const data = await apiFetch<{ projects: Record<string, unknown>[] }>('/api/tau-ide/projects');
     if (data.projects?.length) {
@@ -77,12 +93,22 @@ export async function loadProjects(): Promise<TauProject[]> {
         })
       );
       saveLocal(projects);
+      setConnectionStatus({ state: 'connected', message: 'Projects loaded from cloud.', database: true, authenticated: true });
       return projects;
     }
-  } catch {
-    /* fall back to local */
+    setConnectionStatus({ state: 'connected', message: 'Connected — no cloud projects yet.', database: true, authenticated: true });
+    return loadLocal();
+  } catch (e) {
+    if (e instanceof ApiError && (e.status === 401 || e.status === 0)) {
+      return loadLocal();
+    }
+    setConnectionStatus({
+      state: 'cloud-unavailable',
+      message: 'Could not load cloud projects. Using local copy.',
+      lastError: e instanceof Error ? e.message : 'Load failed',
+    });
+    return loadLocal();
   }
-  return loadLocal();
 }
 
 export function loadProjectsSync(): TauProject[] {
@@ -111,9 +137,13 @@ export async function upsertProject(project: TauProject): Promise<TauProject> {
   if (idx >= 0) local[idx] = updated; else local.push(updated);
   saveLocal(local);
 
+  if (!isAuthenticated()) {
+    setSyncMeta(project.id, { status: 'local' });
+    return updated;
+  }
+
   try {
     if (project.id.startsWith('proj_') || project.id === 'default') {
-      // Local-only id — create on server
       const created = await apiFetch<{ project: Record<string, unknown> }>('/api/tau-ide/projects', {
         method: 'POST',
         body: JSON.stringify({ name: project.name, description: project.description, language: project.language }),
@@ -138,6 +168,7 @@ export async function upsertProject(project: TauProject): Promise<TauProject> {
     setSyncMeta(project.id, { status: 'synced' });
   } catch {
     setSyncMeta(project.id, { status: 'pending' });
+    setConnectionStatus({ state: 'sync-pending', message: 'Save queued — will retry on reconnect.' });
   }
   return updated;
 }
@@ -148,11 +179,29 @@ export function upsertProjectLocal(project: TauProject): TauProject {
   const idx = local.findIndex((p) => p.id === project.id);
   if (idx >= 0) local[idx] = updated; else local.push(updated);
   saveLocal(local);
-  upsertProject(updated).catch(() => {});
+  upsertProject(updated).catch(() => {
+    setSyncMeta(project.id, { status: 'failed' });
+  });
   return updated;
 }
 
 export async function createProject(name: string, description = ''): Promise<TauProject> {
+  if (!isAuthenticated()) {
+    const now = new Date().toISOString();
+    const project: TauProject = {
+      id: `proj_${Date.now()}`,
+      name,
+      description,
+      language: 'tauscript',
+      createdAt: now,
+      updatedAt: now,
+      files: [{ path: '/main.tau', name: 'main.tau', content: `print("New project: ${name}");\n` }],
+    };
+    upsertProjectLocal(project);
+    setActiveProjectId(project.id);
+    return project;
+  }
+
   try {
     const data = await apiFetch<{ project: Record<string, unknown> }>('/api/tau-ide/projects', {
       method: 'POST',
@@ -164,8 +213,14 @@ export async function createProject(name: string, description = ''): Promise<Tau
     local.unshift(project);
     saveLocal(local);
     setActiveProjectId(project.id);
+    setSyncMeta(project.id, { status: 'synced' });
     return project;
-  } catch {
+  } catch (e) {
+    setConnectionStatus({
+      state: 'sync-failed',
+      message: 'Could not create cloud project. Created locally instead.',
+      lastError: e instanceof Error ? e.message : 'Create failed',
+    });
     const now = new Date().toISOString();
     const project: TauProject = {
       id: `proj_${Date.now()}`,
@@ -184,7 +239,9 @@ export async function createProject(name: string, description = ''): Promise<Tau
 
 export async function deleteProject(id: string) {
   try {
-    await apiFetch(`/api/tau-ide/projects/${id}`, { method: 'DELETE' });
+    if (isAuthenticated() && !id.startsWith('proj_') && id !== 'default') {
+      await apiFetch(`/api/tau-ide/projects/${id}`, { method: 'DELETE' });
+    }
   } catch { /* local delete anyway */ }
   const projects = loadLocal().filter((p) => p.id !== id);
   if (projects.length === 0) projects.push(defaultProject());

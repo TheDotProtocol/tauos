@@ -26,6 +26,7 @@ export default function TauIdeLandingPage() {
             <div>
               <span className="font-bold text-white">Tau IDE</span>
               <span className="hidden sm:inline text-xs text-cyan-400 ml-2">Developer Platform</span>
+              <span className="ml-2 text-[10px] px-2 py-0.5 rounded-full bg-cyan-500/20 text-cyan-400 border border-cyan-500/30">Public Beta RC1</span>
             </div>
           </Link>
           <div className="flex items-center gap-3 text-sm">
@@ -183,8 +184,15 @@ print(greet("Tau"));`}
         </div>
       </section>
 
-      <footer className="border-t border-white/10 py-8 text-center text-sm text-gray-500">
-        <p>Tau IDE v1.0 — Developer Platform · <Link href="https://www.tauos.org" className="hover:text-cyan-400">tauos.org</Link></p>
+      <footer className="border-t border-white/10 py-8 text-center text-sm text-gray-500 space-y-2">
+        <p>Tau IDE v1.0.0-beta.1 — Developer Platform · <Link href="https://www.tauos.org" className="hover:text-cyan-400">tauos.org</Link></p>
+        <p className="flex flex-wrap justify-center gap-4 text-xs">
+          <Link href="/legal/privacy" className="hover:text-cyan-400">Privacy Policy</Link>
+          <Link href="/legal/terms" className="hover:text-cyan-400">Terms of Service</Link>
+          <Link href="/legal/acceptable-use" className="hover:text-cyan-400">Acceptable Use</Link>
+          <Link href="/legal/cookies" className="hover:text-cyan-400">Cookies</Link>
+        </p>
+        <p className="text-xs text-gray-600">AI-generated code should be reviewed. Tau Architect requires sign-in.</p>
       </footer>
     </div>
   );

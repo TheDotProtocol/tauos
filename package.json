@@ -16,6 +16,8 @@
     "browser:setup": "node scripts/setup-taubrowser-storage.mjs",
     "talk:setup": "node scripts/setup-tautalk-storage.mjs",
     "tau-ide:setup": "node scripts/setup-tau-ide-infrastructure.mjs",
+    "tau-ide:test:unit": "npx tsx scripts/tau-ide-unit.ts",
+    "tau-ide:test:e2e": "node scripts/tau-ide-e2e.mjs",
     "tau": "npx tsx scripts/tau-cli.ts",
     "taupm": "npx tsx scripts/tau-cli.ts pm",
     "tauscript:test": "npx tsx scripts/tau-cli.ts test",

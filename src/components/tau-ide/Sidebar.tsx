@@ -4,9 +4,10 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
   Home, Code, GitBranch, Settings, Terminal, Brain,
-  ChevronDown, X, BookOpen, Rocket, LogIn, Search
+  ChevronDown, X, BookOpen, Rocket, LogIn, LogOut, Search
 } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { getStoredUser, clearSession } from '@/lib/tau-ide/auth-client';
 
 const BASE = '/developers';
 
@@ -41,6 +42,17 @@ interface SidebarProps {
 export default function TauIdeSidebar({ isOpen, onClose }: SidebarProps) {
   const pathname = usePathname();
   const [expanded, setExpanded] = useState<string[]>([]);
+  const [user, setUser] = useState<{ fullName?: string; username?: string } | null>(null);
+
+  useEffect(() => {
+    setUser(getStoredUser());
+  }, []);
+
+  const logout = () => {
+    clearSession();
+    setUser(null);
+    window.location.href = '/developers/login';
+  };
 
   const isActive = (href: string) => pathname === href || pathname.startsWith(href + '/');
 
@@ -68,7 +80,7 @@ export default function TauIdeSidebar({ isOpen, onClose }: SidebarProps) {
             </button>
           </div>
 
-          <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
+          <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto" aria-label="Tau IDE navigation">
             {menuItems.map((item) => {
               const Icon = item.icon;
               const active = isActive(item.href);
@@ -128,16 +140,37 @@ export default function TauIdeSidebar({ isOpen, onClose }: SidebarProps) {
           </nav>
 
           <div className="p-4 border-t border-white/10 space-y-2">
-            <Link
-              href={`${BASE}/login`}
-              className="flex items-center gap-2 px-3 py-2 text-sm text-gray-400 hover:text-cyan-400 rounded-lg hover:bg-white/5"
-            >
-              <LogIn className="w-4 h-4" />
-              Sign in
-            </Link>
+            {user ? (
+              <>
+                <p className="text-xs text-gray-400 px-3 truncate" aria-label="Signed in user">
+                  {user.fullName || user.username}
+                </p>
+                <button
+                  type="button"
+                  onClick={logout}
+                  className="flex items-center gap-2 px-3 py-2 text-sm text-gray-400 hover:text-red-400 rounded-lg hover:bg-white/5 w-full"
+                >
+                  <LogOut className="w-4 h-4" />
+                  Sign out
+                </button>
+              </>
+            ) : (
+              <Link
+                href={`${BASE}/login`}
+                className="flex items-center gap-2 px-3 py-2 text-sm text-gray-400 hover:text-cyan-400 rounded-lg hover:bg-white/5"
+              >
+                <LogIn className="w-4 h-4" />
+                Sign in for cloud sync
+              </Link>
+            )}
             <div className="glass p-3 rounded-lg">
-              <p className="text-xs font-medium text-cyan-400">TauScript v1.0</p>
+              <p className="text-xs font-medium text-cyan-400">TauScript v1.0 · Public Beta RC1</p>
               <p className="text-xs text-gray-500 mt-1">Privacy-first programming language</p>
+            </div>
+            <div className="flex flex-wrap gap-2 px-1 text-[10px] text-gray-600">
+              <Link href="/legal/privacy" className="hover:text-cyan-400">Privacy</Link>
+              <Link href="/legal/terms" className="hover:text-cyan-400">Terms</Link>
+              <Link href="/legal/acceptable-use" className="hover:text-cyan-400">AUP</Link>
             </div>
           </div>
         </div>

@@ -1,13 +1,10 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { handleLSPRequest } from '@/lib/tauscript/lsp/server';
+import { withTauScriptGuard } from '@/lib/tau-ide/server/route-guard';
 
-export async function POST(request: NextRequest) {
-  try {
-    const { method, params } = await request.json();
-    if (!method) return NextResponse.json({ error: 'method required' }, { status: 400 });
-    const result = handleLSPRequest(method, params ?? {});
-    return NextResponse.json(result);
-  } catch (e) {
-    return NextResponse.json({ error: e instanceof Error ? e.message : 'LSP failed' }, { status: 500 });
-  }
-}
+export const POST = withTauScriptGuard(async (_request, body) => {
+  const { method, params } = body;
+  if (!method) return NextResponse.json({ error: 'method required' }, { status: 400 });
+  const result = handleLSPRequest(String(method), (params ?? {}) as Record<string, unknown>);
+  return NextResponse.json(result);
+}, 'tauscript.lsp');

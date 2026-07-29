@@ -1,13 +1,13 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { compile } from '@/lib/tauscript/compiler/pipeline';
+import { withTauScriptGuard } from '@/lib/tau-ide/server/route-guard';
 
-export async function POST(request: NextRequest) {
-  try {
-    const { code, target = 'ir', optimize = true } = await request.json();
-    if (!code) return NextResponse.json({ error: 'code required' }, { status: 400 });
-    const result = compile(code, { target, optimize });
-    return NextResponse.json(result);
-  } catch (e) {
-    return NextResponse.json({ error: e instanceof Error ? e.message : 'Compile failed' }, { status: 500 });
+export const POST = withTauScriptGuard(async (_request, body) => {
+  const { code, target = 'ir', optimize = true } = body;
+  if (!code) return NextResponse.json({ error: 'code required' }, { status: 400 });
+  if (typeof code === 'string' && code.length > 200_000) {
+    return NextResponse.json({ error: 'Code exceeds maximum size' }, { status: 413 });
   }
-}
+  const result = compile(String(code), { target: target as 'ir' | 'js' | 'interpret', optimize: Boolean(optimize) });
+  return NextResponse.json(result);
+}, 'tauscript.compile');

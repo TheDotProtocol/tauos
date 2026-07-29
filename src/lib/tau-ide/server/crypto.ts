@@ -3,7 +3,16 @@ import crypto from 'crypto';
 const ALGO = 'aes-256-gcm';
 
 function getKey(): Buffer {
-  const secret = process.env.TAU_IDE_SECRETS_KEY || process.env.JWT_SECRET || 'tau-ide-dev-key-change-in-production';
+  const secret = process.env.TAU_IDE_SECRETS_KEY || process.env.JWT_SECRET;
+  if (!secret) {
+    if (process.env.NODE_ENV === 'production') {
+      throw new Error('TAU_IDE_SECRETS_KEY is required in production');
+    }
+    return crypto.createHash('sha256').update('tau-ide-dev-key-local-only').digest();
+  }
+  if (process.env.NODE_ENV === 'production' && secret === 'tau-ide-dev-key-change-in-production') {
+    throw new Error('TAU_IDE_SECRETS_KEY must not use the development default in production');
+  }
   return crypto.createHash('sha256').update(secret).digest();
 }
 

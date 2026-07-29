@@ -17,6 +17,8 @@ import {
 } from '@/lib/tau-ide/architect/memory';
 import { extractMermaidDiagrams, parseProjectBlock } from '@/lib/tau-ide/architect/project-generator';
 import { upsertProject, getActiveProject, getActiveProjectId, loadProjects } from '@/lib/tau-ide/projects';
+import { authHeaders } from '@/lib/tau-ide/sync-client';
+import { getStoredToken } from '@/lib/tau-ide/auth-client';
 import Link from 'next/link';
 
 type Message = { role: 'user' | 'assistant'; content: string; phase?: ArchitectPhaseId };
@@ -94,9 +96,12 @@ What would you like to create?`,
     setStreamingText('');
 
     try {
+      if (!getStoredToken()) {
+        throw new Error('Sign in required to use Tau Architect. Go to Settings or Login.');
+      }
       const res = await fetch('/api/tau-ide/architect', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: authHeaders(),
         body: JSON.stringify({
           messages: next.map(({ role, content }) => ({ role, content })),
           phase,
@@ -181,7 +186,7 @@ What would you like to create?`,
     if (!last) return;
     const res = await fetch('/api/tau-ide/architect/validate', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: authHeaders(),
       body: JSON.stringify({ content: last.content }),
     });
     const data = await res.json();
