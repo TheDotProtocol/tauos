@@ -104,11 +104,16 @@ export async function buildCryptoContext(
 ): Promise<ConversationCryptoContext> {
   const { getOrCreateKeyPair } = await import('@/lib/tautalk-crypto');
   const { publicKey } = await getOrCreateKeyPair();
-  const keys = participants.map((p) => p.publicKey).filter(Boolean) as string[];
+  const participantPublicKeys = participants
+    .map((p) => p.publicKey)
+    .filter((k): k is string => Boolean(k));
+  if (!participantPublicKeys.includes(publicKey)) {
+    participantPublicKeys.push(publicKey);
+  }
   return {
     type: convType === 'group' ? 'group' : 'direct',
     myPublicKey: publicKey,
-    participantPublicKeys: keys,
+    participantPublicKeys,
   };
 }
 

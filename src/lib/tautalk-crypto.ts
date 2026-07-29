@@ -37,7 +37,7 @@ async function importPrivateKey(b64: string): Promise<CryptoKey> {
     raw,
     { name: 'ECDH', namedCurve: 'P-256' },
     true,
-    ['deriveKey']
+    ['deriveKey', 'deriveBits']
   );
 }
 
@@ -145,7 +145,7 @@ export async function generateKeyPair(): Promise<{ publicKey: string; privateKey
   const pair = await crypto.subtle.generateKey(
     { name: 'ECDH', namedCurve: 'P-256' },
     true,
-    ['deriveKey']
+    ['deriveKey', 'deriveBits']
   );
   const pub = await crypto.subtle.exportKey('spki', pair.publicKey);
   const priv = await crypto.subtle.exportKey('pkcs8', pair.privateKey);

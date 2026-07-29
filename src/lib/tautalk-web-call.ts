@@ -80,11 +80,13 @@ export class WebCallManager {
   private async bootstrap(createOffer: boolean): Promise<boolean> {
     if (!this.session || typeof window === 'undefined') return false;
     try {
+      this.patch({ connectionState: 'connecting' });
+
       this.localStream = await navigator.mediaDevices.getUserMedia({
         audio: true,
         video: this.mode === 'video',
       });
-      this.patch({ localStream: this.localStream, connectionState: 'connecting' });
+      this.patch({ localStream: this.localStream });
 
       this.pc = new RTCPeerConnection({ iceServers: ICE_SERVERS });
       this.localStream.getTracks().forEach((t) => this.pc!.addTrack(t, this.localStream!));
@@ -139,12 +141,23 @@ export class WebCallManager {
     }
   }
 
+  private parsePayload(payload: unknown): unknown {
+    if (typeof payload === 'string') {
+      try {
+        return JSON.parse(payload);
+      } catch {
+        return payload;
+      }
+    }
+    return payload;
+  }
+
   private async pollSignals() {
     if (!this.session) return;
     const signals = await pollCallSignals(this.token, this.session.id, this.lastSignalAt);
     for (const s of signals) {
       this.lastSignalAt = s.created_at;
-      await this.handleSignal(s.signal_type, s.payload);
+      await this.handleSignal(s.signal_type, this.parsePayload(s.payload));
     }
   }
 
@@ -173,11 +186,16 @@ export class WebCallManager {
 
     if (type === 'ice-candidate') {
       const c = payload as RTCIceCandidateInit;
+      if (!c?.candidate) return;
       if (!this.remoteDescriptionSet) {
         this.iceQueue.push(c);
         return;
       }
-      await this.pc.addIceCandidate(c);
+      try {
+        await this.pc.addIceCandidate(c);
+      } catch {
+        /* ignore duplicate / late candidates */
+      }
       return;
     }
 
@@ -189,7 +207,13 @@ export class WebCallManager {
   private async flushIce() {
     if (!this.pc) return;
     while (this.iceQueue.length) {
-      await this.pc.addIceCandidate(this.iceQueue.shift()!);
+      const c = this.iceQueue.shift()!;
+      if (!c?.candidate) continue;
+      try {
+        await this.pc.addIceCandidate(c);
+      } catch {
+        /* ignore */
+      }
     }
   }
 

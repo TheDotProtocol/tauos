@@ -9,6 +9,7 @@ type Props = {
   mode: 'voice' | 'video';
   peerName: string;
   media: WebCallMediaState;
+  error?: string;
   onToggleMute: () => void;
   onToggleCamera: () => void;
   onHangup: () => void;
@@ -19,12 +20,14 @@ export default function TauTalkCallOverlay({
   mode,
   peerName,
   media,
+  error,
   onToggleMute,
   onToggleCamera,
   onHangup,
 }: Props) {
   const localRef = useRef<HTMLVideoElement>(null);
   const remoteRef = useRef<HTMLVideoElement>(null);
+  const remoteAudioRef = useRef<HTMLAudioElement>(null);
 
   useEffect(() => {
     if (localRef.current) {
@@ -36,19 +39,40 @@ export default function TauTalkCallOverlay({
     if (remoteRef.current) {
       remoteRef.current.srcObject = media.remoteStream;
     }
+    if (remoteAudioRef.current) {
+      remoteAudioRef.current.srcObject = media.remoteStream;
+      if (media.remoteStream) {
+        remoteAudioRef.current.play().catch(() => {});
+      }
+    }
   }, [media.remoteStream]);
 
   if (!open) return null;
 
+  const statusLabel =
+    error ||
+    (media.connectionState === 'connected'
+      ? 'Connected'
+      : media.connectionState === 'connecting'
+        ? 'Connecting…'
+        : 'Ringing…');
+
   return (
     <div className="fixed inset-0 z-[60] bg-black/95 flex flex-col">
+      <audio ref={remoteAudioRef} autoPlay playsInline className="hidden" />
+
       <div className="flex-1 relative flex items-center justify-center p-4">
         {mode === 'video' && media.remoteStream ? (
-          <video ref={remoteRef} autoPlay playsInline className="max-h-full max-w-full rounded-2xl bg-gray-900" />
+          <video
+            ref={remoteRef}
+            autoPlay
+            playsInline
+            className="max-h-full max-w-full rounded-2xl bg-gray-900"
+          />
         ) : (
           <div className="text-center">
-            <p className="text-2xl font-bold text-white mb-2">{peerName}</p>
-            <p className="text-gray-400 capitalize">{media.connectionState === 'connected' ? 'Connected' : 'Connecting…'}</p>
+            <p className="text-2xl font-bold text-white mb-2">{peerName || 'Contact'}</p>
+            <p className={`capitalize ${error ? 'text-red-400' : 'text-gray-400'}`}>{statusLabel}</p>
           </div>
         )}
         {mode === 'video' && media.localStream ? (

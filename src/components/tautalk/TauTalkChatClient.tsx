@@ -84,6 +84,7 @@ export default function TauTalkChatClient() {
   const [incomingCall, setIncomingCall] = useState<IncomingCall | null>(null);
   const [callOpen, setCallOpen] = useState(false);
   const [callMode, setCallMode] = useState<'voice' | 'video'>('voice');
+  const [callError, setCallError] = useState('');
   const [callMedia, setCallMedia] = useState<WebCallMediaState>(emptyCallMedia);
 
   const bottomRef = useRef<HTMLDivElement>(null);
@@ -280,40 +281,68 @@ export default function TauTalkChatClient() {
     const mgr = callManagerRef.current;
     if (!mgr) return;
 
+    setCallError('');
     setCallMode(mode);
+    setCallOpen(true);
+
     mgr.onFailed = (msg) => {
+      setCallError(msg);
       setCallOpen(false);
       setSendError(msg);
     };
-    mgr.onConnected = () => {};
+    mgr.onConnected = () => setCallError('');
 
-    const session = await startCall(token, activeId, mode);
-    const ok = await mgr.startOutgoing(token, session, mode);
-    if (ok) setCallOpen(true);
+    try {
+      const session = await startCall(token, activeId, mode);
+      const ok = await mgr.startOutgoing(token, session, mode);
+      if (!ok) {
+        setCallOpen(false);
+      }
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : 'Could not start call';
+      setCallError(msg);
+      setCallOpen(false);
+      setSendError(msg);
+    }
   };
 
   const acceptIncoming = async () => {
     if (!token || !incomingCall) return;
     const mgr = callManagerRef.current;
     if (!mgr) return;
+
+    setCallError('');
     setCallMode(incomingCall.mode);
-    mgr.onFailed = () => {
+    setCallOpen(true);
+
+    mgr.onFailed = (msg) => {
+      setCallError(msg);
       setCallOpen(false);
       setIncomingCall(null);
     };
-    const ok = await mgr.startIncoming(token, incomingCall, incomingCall.mode);
-    if (ok) {
-      setCallOpen(true);
-      setIncomingCall(null);
-      if (incomingCall.conversation_id) {
-        selectConversation(incomingCall.conversation_id);
+    mgr.onConnected = () => setCallError('');
+
+    try {
+      const ok = await mgr.startIncoming(token, incomingCall, incomingCall.mode);
+      if (ok) {
+        setIncomingCall(null);
+        if (incomingCall.conversation_id) {
+          selectConversation(incomingCall.conversation_id);
+        }
+      } else {
+        setCallOpen(false);
       }
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : 'Could not join call';
+      setCallError(msg);
+      setCallOpen(false);
     }
   };
 
   const hangupCall = async () => {
     await callManagerRef.current?.hangup();
     setCallOpen(false);
+    setCallError('');
     setCallMedia(emptyCallMedia);
   };
 
@@ -590,8 +619,16 @@ export default function TauTalkChatClient() {
                   <input
                     value={input}
                     onChange={(e) => setInput(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' && !e.shiftKey) {
+                        e.preventDefault();
+                        if (input.trim() && cryptoReady && !sending) {
+                          void sendMessage(e as unknown as React.FormEvent);
+                        }
+                      }
+                    }}
                     placeholder={
-                      cryptoReady ? 'Type an encrypted message…' : 'Preparing encryption…'
+                      cryptoReady ? 'Type a message · Enter to send' : 'Preparing encryption…'
                     }
                     disabled={!cryptoReady || sending}
                     className="flex-1 px-4 py-3 bg-gray-800 border border-gray-700 rounded-xl text-white focus:border-green-500 outline-none disabled:opacity-50"
@@ -704,6 +741,7 @@ export default function TauTalkChatClient() {
         mode={callMode}
         peerName={activePeerName}
         media={callMedia}
+        error={callError}
         onToggleMute={() => callManagerRef.current?.toggleMute()}
         onToggleCamera={() => callManagerRef.current?.toggleCamera()}
         onHangup={hangupCall}
