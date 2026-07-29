@@ -17,7 +17,7 @@ export async function POST(request: NextRequest) {
     // Query user from database
     const result = await getPool().query(
       'SELECT id, username, email, password_hash, full_name, is_active FROM users WHERE email = $1',
-      [email]
+      [email.trim().toLowerCase()]
     );
 
     if (result.rows.length === 0) {
@@ -38,7 +38,7 @@ export async function POST(request: NextRequest) {
 
     // Update last login
     await getPool().query(
-      'UPDATE users SET last_login = CURRENT_TIMESTAMP WHERE id = $1',
+      'UPDATE users SET last_login_at = CURRENT_TIMESTAMP WHERE id = $1',
       [user.id]
     );
 
