@@ -16,7 +16,7 @@ import { WEBRTC_MEDIA_ENABLED } from '../config';
 import { colors, radii } from '../theme';
 
 export type CallMode = 'voice' | 'video';
-export type CallConnectionState = 'preview' | 'connecting' | 'connected';
+export type CallConnectionState = 'preview' | 'ringing' | 'connecting' | 'connected' | 'unavailable';
 
 type Props = {
   visible: boolean;
@@ -73,15 +73,19 @@ export default function CallPreviewScreen({
   const ss = String(seconds % 60).padStart(2, '0');
 
   const statusLabel =
-    connectionState === 'connected' || hasRemoteVideo
-      ? 'Encrypted · connected'
-      : connectionState === 'connecting'
-        ? WEBRTC_MEDIA_ENABLED
-          ? 'Connecting media…'
-          : 'Connecting…'
-        : isVideo
-          ? 'Encrypted video'
-          : 'Encrypted voice';
+    connectionState === 'unavailable'
+      ? 'Not available'
+      : connectionState === 'connected' || hasRemoteVideo
+        ? 'Encrypted · connected'
+        : connectionState === 'ringing'
+          ? 'Ringing…'
+          : connectionState === 'connecting'
+            ? WEBRTC_MEDIA_ENABLED
+              ? 'Connecting media…'
+              : 'Connecting…'
+            : isVideo
+              ? 'Encrypted video'
+              : 'Encrypted voice';
 
   const triggerFlash = () => {
     flashOpacity.setValue(0.85);

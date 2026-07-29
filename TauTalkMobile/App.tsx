@@ -6,6 +6,7 @@ import ChatsScreen from './src/screens/ChatsScreen';
 import ProfileScreen from './src/screens/ProfileScreen';
 import ChatScreen from './src/screens/ChatScreen';
 import IncomingCallModal from './src/components/IncomingCallModal';
+import { startIncomingRing, stopCallSounds } from './src/calls/callSounds';
 import {
   Conversation,
   declineCall,
@@ -45,6 +46,9 @@ function App(): JSX.Element {
       const calls = await fetchIncomingCalls(token);
       if (calls.length > 0 && !incomingCall && !acceptedIncoming) {
         setIncomingCall(calls[0]);
+      } else if (calls.length === 0 && incomingCall) {
+        setIncomingCall(null);
+        stopCallSounds();
       }
     };
 
@@ -52,6 +56,14 @@ function App(): JSX.Element {
     const interval = setInterval(poll, 3000);
     return () => clearInterval(interval);
   }, [token, screen, incomingCall, acceptedIncoming]);
+
+  useEffect(() => {
+    if (incomingCall) {
+      startIncomingRing();
+      return () => stopCallSounds();
+    }
+    return undefined;
+  }, [incomingCall]);
 
   const onAuthSuccess = (nextToken: string, nextUser: TauUser) => {
     setToken(nextToken);
@@ -99,6 +111,7 @@ function App(): JSX.Element {
 
   const onAcceptIncoming = async () => {
     if (!incomingCall) return;
+    stopCallSounds();
     try {
       const conversation = await conversationFromIncoming(incomingCall);
       setActiveConversation(conversation);
@@ -111,6 +124,7 @@ function App(): JSX.Element {
   };
 
   const onDeclineIncoming = async () => {
+    stopCallSounds();
     if (incomingCall && token) {
       await declineCall(token, incomingCall.id).catch(() => {});
     }

@@ -1,8 +1,9 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
-import { Mic, MicOff, PhoneOff, Video, VideoOff } from 'lucide-react';
+import { Mic, MicOff, Phone, PhoneOff, Video, VideoOff } from 'lucide-react';
 import type { WebCallMediaState } from '@/lib/tautalk-web-call';
+import { TAUTALK_UNAVAILABLE_MESSAGE } from '@/lib/tautalk-call-constants';
 
 type Props = {
   open: boolean;
@@ -14,6 +15,15 @@ type Props = {
   onToggleCamera: () => void;
   onHangup: () => void;
 };
+
+function statusLabel(media: WebCallMediaState, error?: string) {
+  if (error) return error;
+  if (media.connectionState === 'connected') return 'Connected';
+  if (media.connectionState === 'unavailable') return TAUTALK_UNAVAILABLE_MESSAGE;
+  if (media.connectionState === 'connecting') return 'Connecting…';
+  if (media.connectionState === 'ringing') return 'Ringing…';
+  return 'Calling…';
+}
 
 export default function TauTalkCallOverlay({
   open,
@@ -49,13 +59,12 @@ export default function TauTalkCallOverlay({
 
   if (!open) return null;
 
-  const statusLabel =
-    error ||
-    (media.connectionState === 'connected'
-      ? 'Connected'
-      : media.connectionState === 'connecting'
-        ? 'Connecting…'
-        : 'Ringing…');
+  const label = statusLabel(media, error);
+  const ringing =
+    media.connectionState === 'ringing' ||
+    (media.connectionState === 'connecting' && !media.remoteStream);
+  const unavailable =
+    media.connectionState === 'unavailable' || label === TAUTALK_UNAVAILABLE_MESSAGE;
 
   return (
     <div className="fixed inset-0 z-[60] bg-black/95 flex flex-col">
@@ -71,8 +80,19 @@ export default function TauTalkCallOverlay({
           />
         ) : (
           <div className="text-center">
+            <div
+              className={`mx-auto mb-5 w-24 h-24 rounded-full flex items-center justify-center ${
+                ringing ? 'bg-green-500/20 animate-pulse' : unavailable ? 'bg-red-500/15' : 'bg-gray-800'
+              }`}
+            >
+              {mode === 'video' ? (
+                <Video className="w-10 h-10 text-green-400" />
+              ) : (
+                <Phone className="w-10 h-10 text-green-400" />
+              )}
+            </div>
             <p className="text-2xl font-bold text-white mb-2">{peerName || 'Contact'}</p>
-            <p className={`capitalize ${error ? 'text-red-400' : 'text-gray-400'}`}>{statusLabel}</p>
+            <p className={`${unavailable || error ? 'text-red-400' : 'text-gray-400'}`}>{label}</p>
           </div>
         )}
         {mode === 'video' && media.localStream ? (
@@ -87,23 +107,27 @@ export default function TauTalkCallOverlay({
       </div>
 
       <div className="flex items-center justify-center gap-4 pb-10 px-4">
-        <button
-          type="button"
-          onClick={onToggleMute}
-          className="p-4 rounded-full bg-gray-800 text-white hover:bg-gray-700"
-          aria-label={media.muted ? 'Unmute' : 'Mute'}
-        >
-          {media.muted ? <MicOff className="w-6 h-6" /> : <Mic className="w-6 h-6" />}
-        </button>
-        {mode === 'video' ? (
-          <button
-            type="button"
-            onClick={onToggleCamera}
-            className="p-4 rounded-full bg-gray-800 text-white hover:bg-gray-700"
-            aria-label={media.cameraOff ? 'Camera on' : 'Camera off'}
-          >
-            {media.cameraOff ? <VideoOff className="w-6 h-6" /> : <Video className="w-6 h-6" />}
-          </button>
+        {!unavailable ? (
+          <>
+            <button
+              type="button"
+              onClick={onToggleMute}
+              className="p-4 rounded-full bg-gray-800 text-white hover:bg-gray-700"
+              aria-label={media.muted ? 'Unmute' : 'Mute'}
+            >
+              {media.muted ? <MicOff className="w-6 h-6" /> : <Mic className="w-6 h-6" />}
+            </button>
+            {mode === 'video' ? (
+              <button
+                type="button"
+                onClick={onToggleCamera}
+                className="p-4 rounded-full bg-gray-800 text-white hover:bg-gray-700"
+                aria-label={media.cameraOff ? 'Camera on' : 'Camera off'}
+              >
+                {media.cameraOff ? <VideoOff className="w-6 h-6" /> : <Video className="w-6 h-6" />}
+              </button>
+            ) : null}
+          </>
         ) : null}
         <button
           type="button"

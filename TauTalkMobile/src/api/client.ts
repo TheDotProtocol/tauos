@@ -342,6 +342,14 @@ export async function endCall(token: string, sessionId: string) {
   });
 }
 
+export async function missCall(token: string, sessionId: string) {
+  await fetch(`${API_BASE}/api/tautalk/calls/${sessionId}`, {
+    method: 'POST',
+    headers: authHeaders(token),
+    body: JSON.stringify({ action: 'miss' }),
+  });
+}
+
 export async function sendCallSignal(
   token: string,
   sessionId: string,

@@ -8,12 +8,14 @@ import {
 import {
   acceptCall,
   endCall,
+  missCall,
   pollCallSignals,
   sendCallSignal,
   type CallSession,
 } from '../api/client';
 import { ICE_SERVERS, SIGNAL_POLL_MS } from './iceConfig';
 import { ensureCallPermissions } from './permissions';
+import { TAUTALK_RING_TIMEOUT_MS } from './callConstants';
 
 export type CallMediaState = {
   localStreamURL: string | null;
@@ -47,6 +49,11 @@ export class TauCallManager {
   };
   onConnected: (() => void) | null = null;
   onFailed: ((message: string) => void) | null = null;
+  onUnanswered: (() => void) | null = null;
+
+  private ringTimer: ReturnType<typeof setTimeout> | null = null;
+  private callAnswered = false;
+  private unansweredHandled = false;
 
   subscribe(listener: Listener) {
     this.listeners.add(listener);
@@ -82,7 +89,11 @@ export class TauCallManager {
     this.session = session;
     this.role = 'caller';
     this.mode = mode;
-    return this.bootstrap(true);
+    this.callAnswered = false;
+    this.unansweredHandled = false;
+    const ok = await this.bootstrap(true);
+    if (ok) this.startUnansweredTimer();
+    return ok;
   }
 
   async startIncoming(
@@ -160,6 +171,7 @@ export class TauCallManager {
     this.pc.onconnectionstatechange = () => {
       const state = this.pc?.connectionState;
       if (state === 'connected') {
+        this.markAnswered();
         this.onConnected?.();
       } else if (state === 'failed' || state === 'disconnected') {
         this.onFailed?.('Call connection lost');
@@ -209,6 +221,7 @@ export class TauCallManager {
     }
 
     if (type === 'answer') {
+      this.markAnswered();
       const answer = payload as RTCSessionDescriptionInit;
       await this.pc.setRemoteDescription(new RTCSessionDescription(answer));
       this.remoteDescriptionSet = true;
@@ -258,10 +271,39 @@ export class TauCallManager {
     track?._switchCamera?.();
   }
 
-  async hangup() {
+  private clearRingTimer() {
+    if (this.ringTimer) {
+      clearTimeout(this.ringTimer);
+      this.ringTimer = null;
+    }
+  }
+
+  private markAnswered() {
+    this.callAnswered = true;
+    this.clearRingTimer();
+  }
+
+  private startUnansweredTimer() {
+    if (this.role !== 'caller') return;
+    this.clearRingTimer();
+    this.ringTimer = setTimeout(() => {
+      void this.handleUnanswered();
+    }, TAUTALK_RING_TIMEOUT_MS);
+  }
+
+  private async handleUnanswered() {
+    if (this.callAnswered || this.unansweredHandled || !this.session) return;
+    this.unansweredHandled = true;
+    await missCall(this.token, this.session.id).catch(() => {});
+    await sendCallSignal(this.token, this.session.id, 'hangup', {}).catch(() => {});
+    await this.cleanup(false);
+    this.onUnanswered?.();
+  }
+
+  private async cleanup(endRemote = true) {
+    this.clearRingTimer();
     this.stopPolling();
-    if (this.session) {
-      await sendCallSignal(this.token, this.session.id, 'hangup', {}).catch(() => {});
+    if (endRemote && this.session) {
       await endCall(this.token, this.session.id).catch(() => {});
     }
     this.localStream?.getTracks().forEach((t) => t.stop());
@@ -273,11 +315,19 @@ export class TauCallManager {
     this.iceQueue = [];
     this.remoteDescriptionSet = false;
     this.lastSignalAt = undefined;
+    this.callAnswered = false;
     this.patchMedia({
       localStreamURL: null,
       remoteStreamURL: null,
       muted: false,
       cameraOff: false,
     });
+  }
+
+  async hangup() {
+    if (this.session) {
+      await sendCallSignal(this.token, this.session.id, 'hangup', {}).catch(() => {});
+    }
+    await this.cleanup(true);
   }
 }

@@ -5,6 +5,7 @@ import {
   declineCallSession,
   endCallSession,
   getCallSession,
+  missCallSession,
 } from '@/lib/tautalk-calls';
 
 export const dynamic = 'force-dynamic';
@@ -49,8 +50,12 @@ export async function POST(request: NextRequest, { params }: Params) {
       const session = await endCallSession(sessionId, auth.userId);
       return NextResponse.json({ success: true, session });
     }
+    if (action === 'miss') {
+      const session = await missCallSession(sessionId, auth.userId);
+      return NextResponse.json({ success: true, session });
+    }
 
-    return NextResponse.json({ error: 'action must be accept, decline, or end' }, { status: 400 });
+    return NextResponse.json({ error: 'action must be accept, decline, end, or miss' }, { status: 400 });
   } catch (error) {
     const msg = error instanceof Error ? error.message : 'Call action failed';
     const status = msg === 'Not found' ? 404 : 400;

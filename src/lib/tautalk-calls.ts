@@ -117,10 +117,28 @@ export async function declineCallSession(sessionId: string, userId: string | num
   return result.rows[0] as CallSession;
 }
 
+export async function missCallSession(sessionId: string, userId: string | number) {
+  const session = await getCallSession(sessionId, userId);
+  if (!session) throw new Error('Not found');
+  if (String(session.caller_id) !== uid(userId)) throw new Error('Only caller can mark missed');
+  if (session.status !== 'ringing') throw new Error('Call is not ringing');
+
+  const result = await getPool().query(
+    `UPDATE tautalk_call_sessions
+     SET status = 'missed', ended_at = NOW()
+     WHERE id = $1
+     RETURNING *`,
+    [sessionId]
+  );
+  return result.rows[0] as CallSession;
+}
+
 export async function endCallSession(sessionId: string, userId: string | number) {
   const session = await getCallSession(sessionId, userId);
   if (!session) throw new Error('Not found');
-  if (session.status === 'ended' || session.status === 'declined') return session;
+  if (session.status === 'ended' || session.status === 'declined' || session.status === 'missed') {
+    return session;
+  }
 
   const result = await getPool().query(
     `UPDATE tautalk_call_sessions

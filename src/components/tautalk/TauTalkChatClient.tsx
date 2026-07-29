@@ -24,6 +24,8 @@ import {
   type TalkProfile,
   type IncomingCall,
 } from '@/lib/tautalk-web-api';
+import { TAUTALK_UNAVAILABLE_MESSAGE } from '@/lib/tautalk-call-constants';
+import { startIncomingRing, startOutgoingRingback, stopCallSounds } from '@/lib/tautalk-call-sounds';
 import { WebCallManager, type WebCallMediaState } from '@/lib/tautalk-web-call';
 import TauTalkAvatar from '@/components/tautalk/TauTalkAvatar';
 import TauTalkProfileModal from '@/components/tautalk/TauTalkProfileModal';
@@ -91,6 +93,8 @@ export default function TauTalkChatClient() {
   const eventSourceRef = useRef<EventSource | null>(null);
   const callManagerRef = useRef<WebCallManager | null>(null);
   const cryptoCtxRef = useRef<ConversationCryptoContext | null>(null);
+  const isOutgoingCallRef = useRef(false);
+  const unavailableTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     cryptoCtxRef.current = cryptoCtx;
@@ -185,6 +189,11 @@ export default function TauTalkChatClient() {
         const incoming = await fetchIncomingCalls(token);
         if (incoming.length > 0 && !callOpen) {
           setIncomingCall(incoming[0]);
+        } else if (incoming.length === 0) {
+          setIncomingCall((prev) => {
+            if (prev && !callOpen) stopCallSounds();
+            return null;
+          });
         }
       } catch {
         /* ignore */
@@ -194,6 +203,38 @@ export default function TauTalkChatClient() {
     const id = setInterval(poll, 3000);
     return () => clearInterval(id);
   }, [token, callOpen]);
+
+  useEffect(() => {
+    if (incomingCall && !callOpen) {
+      startIncomingRing();
+      return () => stopCallSounds();
+    }
+    return undefined;
+  }, [incomingCall, callOpen]);
+
+  useEffect(() => {
+    if (
+      callOpen &&
+      isOutgoingCallRef.current &&
+      callMedia.connectionState !== 'connected' &&
+      callMedia.connectionState !== 'unavailable' &&
+      !callMedia.remoteStream
+    ) {
+      startOutgoingRingback();
+      return () => stopCallSounds();
+    }
+    if (callMedia.connectionState === 'connected' || callMedia.remoteStream) {
+      stopCallSounds();
+    }
+    return undefined;
+  }, [callOpen, callMedia.connectionState, callMedia.remoteStream]);
+
+  useEffect(() => {
+    return () => {
+      stopCallSounds();
+      if (unavailableTimerRef.current) clearTimeout(unavailableTimerRef.current);
+    };
+  }, []);
 
   useEffect(() => {
     if (!activeId || !token) return;
@@ -283,26 +324,48 @@ export default function TauTalkChatClient() {
 
     setCallError('');
     setCallMode(mode);
+    isOutgoingCallRef.current = true;
     setCallOpen(true);
+    startOutgoingRingback();
 
     mgr.onFailed = (msg) => {
+      stopCallSounds();
       setCallError(msg);
       setCallOpen(false);
       setSendError(msg);
+      isOutgoingCallRef.current = false;
     };
-    mgr.onConnected = () => setCallError('');
+    mgr.onConnected = () => {
+      setCallError('');
+      stopCallSounds();
+    };
+    mgr.onUnanswered = () => {
+      stopCallSounds();
+      isOutgoingCallRef.current = false;
+      setCallError(TAUTALK_UNAVAILABLE_MESSAGE);
+      if (unavailableTimerRef.current) clearTimeout(unavailableTimerRef.current);
+      unavailableTimerRef.current = setTimeout(() => {
+        setCallOpen(false);
+        setCallError('');
+        setSendError(TAUTALK_UNAVAILABLE_MESSAGE);
+      }, 1800);
+    };
 
     try {
       const session = await startCall(token, activeId, mode);
       const ok = await mgr.startOutgoing(token, session, mode);
       if (!ok) {
+        stopCallSounds();
         setCallOpen(false);
+        isOutgoingCallRef.current = false;
       }
     } catch (err) {
+      stopCallSounds();
       const msg = err instanceof Error ? err.message : 'Could not start call';
       setCallError(msg);
       setCallOpen(false);
       setSendError(msg);
+      isOutgoingCallRef.current = false;
     }
   };
 
@@ -311,16 +374,23 @@ export default function TauTalkChatClient() {
     const mgr = callManagerRef.current;
     if (!mgr) return;
 
+    stopCallSounds();
     setCallError('');
     setCallMode(incomingCall.mode);
+    isOutgoingCallRef.current = false;
     setCallOpen(true);
 
     mgr.onFailed = (msg) => {
+      stopCallSounds();
       setCallError(msg);
       setCallOpen(false);
       setIncomingCall(null);
     };
-    mgr.onConnected = () => setCallError('');
+    mgr.onConnected = () => {
+      setCallError('');
+      stopCallSounds();
+    };
+    mgr.onUnanswered = null;
 
     try {
       const ok = await mgr.startIncoming(token, incomingCall, incomingCall.mode);
@@ -340,6 +410,12 @@ export default function TauTalkChatClient() {
   };
 
   const hangupCall = async () => {
+    stopCallSounds();
+    isOutgoingCallRef.current = false;
+    if (unavailableTimerRef.current) {
+      clearTimeout(unavailableTimerRef.current);
+      unavailableTimerRef.current = null;
+    }
     await callManagerRef.current?.hangup();
     setCallOpen(false);
     setCallError('');
@@ -717,6 +793,7 @@ export default function TauTalkChatClient() {
               <button
                 type="button"
                 onClick={() => {
+                  stopCallSounds();
                   declineCall(token!, incomingCall.id);
                   setIncomingCall(null);
                 }}

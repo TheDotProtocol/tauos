@@ -34,6 +34,8 @@ import ImageViewerModal from '../components/ImageViewerModal';
 import MIcon from '../components/MIcon';
 import MessageBubble from '../components/MessageBubble';
 import { CallMediaState, TauCallManager } from '../calls/TauCallManager';
+import { TAUTALK_UNAVAILABLE_MESSAGE } from '../calls/callConstants';
+import { startOutgoingRingback, stopCallSounds } from '../calls/callSounds';
 import { WEBRTC_MEDIA_ENABLED } from '../config';
 import {
   buildCryptoContext,
@@ -268,17 +270,30 @@ export default function ChatScreen({
 
   useEffect(() => {
     if (callMedia.remoteStreamURL) {
+      stopCallSounds();
       setCallConnectionState('connected');
     }
   }, [callMedia.remoteStreamURL]);
 
   useEffect(() => {
-    callManagerRef.current.onConnected = () => setCallConnectionState('connected');
+    callManagerRef.current.onConnected = () => {
+      stopCallSounds();
+      setCallConnectionState('connected');
+    };
     callManagerRef.current.onFailed = (message) => {
+      stopCallSounds();
       if (callMode !== null) {
         Alert.alert('Call ended', message);
         closeCall();
       }
+    };
+    callManagerRef.current.onUnanswered = () => {
+      stopCallSounds();
+      setCallConnectionState('unavailable');
+      Alert.alert('TauTalk', TAUTALK_UNAVAILABLE_MESSAGE);
+      setTimeout(() => {
+        void closeCall();
+      }, 1500);
     };
   }, [callMode]);
 
@@ -291,27 +306,35 @@ export default function ChatScreen({
       setCallConnectionState('preview');
       return;
     }
-    setCallConnectionState('connecting');
+    setCallConnectionState(incoming ? 'connecting' : 'ringing');
+    if (!incoming) startOutgoingRingback();
     const ok = incoming
       ? await callManagerRef.current.startIncoming(token, session, mode)
       : await callManagerRef.current.startOutgoing(token, session, mode);
     if (!ok) {
+      stopCallSounds();
       setCallConnectionState('preview');
+    } else if (!incoming) {
+      setCallConnectionState('ringing');
     }
   };
 
   const openCall = async (mode: CallMode) => {
     setCallMode(mode);
-    setCallConnectionState('connecting');
+    setCallConnectionState('ringing');
+    startOutgoingRingback();
     const session = await startCall(token, conversation.id, mode);
     if (!session) {
+      stopCallSounds();
       setCallConnectionState('preview');
+      setCallMode(null);
       return;
     }
     await beginCallMedia(session, mode, false);
   };
 
   const closeCall = async () => {
+    stopCallSounds();
     await callManagerRef.current.hangup();
     setCallMode(null);
     setCallConnectionState('preview');

@@ -1,4 +1,5 @@
-import { acceptCall, endCall, pollCallSignals, sendCallSignal, type CallSession } from '@/lib/tautalk-web-api';
+import { acceptCall, endCall, missCall, pollCallSignals, sendCallSignal, type CallSession } from '@/lib/tautalk-web-api';
+import { TAUTALK_RING_TIMEOUT_MS, TAUTALK_UNAVAILABLE_MESSAGE } from '@/lib/tautalk-call-constants';
 
 const ICE_SERVERS: RTCIceServer[] = [
   { urls: 'stun:stun.l.google.com:19302' },
@@ -12,7 +13,7 @@ export type WebCallMediaState = {
   remoteStream: MediaStream | null;
   muted: boolean;
   cameraOff: boolean;
-  connectionState: RTCPeerConnectionState | 'idle';
+  connectionState: RTCPeerConnectionState | 'idle' | 'ringing' | 'unavailable';
 };
 
 type Listener = (state: WebCallMediaState) => void;
@@ -30,6 +31,9 @@ export class WebCallManager {
   private iceQueue: RTCIceCandidateInit[] = [];
   private remoteDescriptionSet = false;
   private listeners = new Set<Listener>();
+  private ringTimer: ReturnType<typeof setTimeout> | null = null;
+  private callAnswered = false;
+  private unansweredHandled = false;
   private mediaState: WebCallMediaState = {
     localStream: null,
     remoteStream: null,
@@ -40,6 +44,7 @@ export class WebCallManager {
 
   onConnected: (() => void) | null = null;
   onFailed: ((message: string) => void) | null = null;
+  onUnanswered: (() => void) | null = null;
 
   subscribe(listener: Listener) {
     this.listeners.add(listener);
@@ -65,7 +70,12 @@ export class WebCallManager {
     this.session = session;
     this.role = 'caller';
     this.mode = mode;
-    return this.bootstrap(true);
+    this.callAnswered = false;
+    this.unansweredHandled = false;
+    this.patch({ connectionState: 'ringing' });
+    const ok = await this.bootstrap(true);
+    if (ok) this.startUnansweredTimer();
+    return ok;
   }
 
   async startIncoming(token: string, session: CallSession, mode: 'voice' | 'video') {
@@ -110,8 +120,13 @@ export class WebCallManager {
       this.pc.onconnectionstatechange = () => {
         const state = this.pc?.connectionState ?? 'idle';
         this.patch({ connectionState: state });
-        if (state === 'connected') this.onConnected?.();
-        if (state === 'failed' || state === 'disconnected') this.onFailed?.('Call connection lost');
+        if (state === 'connected') {
+          this.markAnswered();
+          this.onConnected?.();
+        }
+        if (state === 'failed' || state === 'disconnected') {
+          this.onFailed?.('Call connection lost');
+        }
       };
 
       if (createOffer) {
@@ -178,6 +193,7 @@ export class WebCallManager {
     }
 
     if (type === 'answer') {
+      this.markAnswered();
       await this.pc.setRemoteDescription(payload as RTCSessionDescriptionInit);
       this.remoteDescriptionSet = true;
       await this.flushIce();
@@ -231,10 +247,42 @@ export class WebCallManager {
     this.patch({ cameraOff: !track.enabled });
   }
 
-  async hangup() {
-    this.stopPolling();
+  private clearRingTimer() {
+    if (this.ringTimer) {
+      clearTimeout(this.ringTimer);
+      this.ringTimer = null;
+    }
+  }
+
+  private markAnswered() {
+    this.callAnswered = true;
+    this.clearRingTimer();
+  }
+
+  private startUnansweredTimer() {
+    if (this.role !== 'caller') return;
+    this.clearRingTimer();
+    this.ringTimer = setTimeout(() => {
+      void this.handleUnanswered();
+    }, TAUTALK_RING_TIMEOUT_MS);
+  }
+
+  private async handleUnanswered() {
+    if (this.callAnswered || this.unansweredHandled) return;
+    this.unansweredHandled = true;
+    this.patch({ connectionState: 'unavailable' });
     if (this.session) {
+      await missCall(this.token, this.session.id).catch(() => {});
       await sendCallSignal(this.token, this.session.id, 'hangup', {}).catch(() => {});
+    }
+    await this.cleanup(false);
+    this.onUnanswered?.();
+  }
+
+  private async cleanup(endRemote = true) {
+    this.clearRingTimer();
+    this.stopPolling();
+    if (endRemote && this.session) {
       await endCall(this.token, this.session.id).catch(() => {});
     }
     this.localStream?.getTracks().forEach((t) => t.stop());
@@ -246,6 +294,7 @@ export class WebCallManager {
     this.iceQueue = [];
     this.remoteDescriptionSet = false;
     this.lastSignalAt = undefined;
+    this.callAnswered = false;
     this.patch({
       localStream: null,
       remoteStream: null,
@@ -253,5 +302,13 @@ export class WebCallManager {
       cameraOff: false,
       connectionState: 'idle',
     });
+  }
+
+  async hangup() {
+    this.clearRingTimer();
+    if (this.session) {
+      await sendCallSignal(this.token, this.session.id, 'hangup', {}).catch(() => {});
+    }
+    await this.cleanup(true);
   }
 }
