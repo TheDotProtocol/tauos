@@ -2,7 +2,26 @@
  * TauScript AST (Abstract Syntax Tree) Types
  */
 
-export type TauValue = number | string | boolean | null | TauArray | TauMap | TauFunction;
+export type TauValue = number | string | boolean | null | TauArray | TauMap | TauFunction | TauStruct | TauEnumValue | TauResult;
+
+export interface TauStruct {
+  type: 'struct';
+  name: string;
+  fields: Map<string, TauValue>;
+}
+
+export interface TauEnumValue {
+  type: 'enum';
+  enumName: string;
+  variant: string;
+  payload?: TauValue;
+}
+
+export interface TauResult {
+  type: 'result';
+  ok: boolean;
+  value: TauValue;
+}
 
 export interface TauArray extends Array<TauValue> {
   // Extended array with TauScript-specific methods
@@ -17,6 +36,7 @@ export interface TauFunction {
   params: string[];
   body: ASTNode[];
   closure?: Environment;
+  jsImpl?: (args: TauValue[]) => TauValue;
 }
 
 export type Result<T, E = string> = 
@@ -45,7 +65,13 @@ export type ASTNode =
   | ReturnNode
   | ArrayNode
   | MapNode
-  | IndexNode;
+  | IndexNode
+  | StructDefNode
+  | EnumDefNode
+  | MatchNode
+  | ImportNode
+  | StructInstanceNode
+  | MemberAccessNode;
 
 export interface LiteralNode {
   type: 'literal';
@@ -162,6 +188,55 @@ export interface IndexNode {
   type: 'index';
   object: ASTNode;
   index: ASTNode;
+  line?: number;
+  column?: number;
+}
+
+export interface StructDefNode {
+  type: 'structDef';
+  name: string;
+  fields: Array<{ name: string; defaultValue?: ASTNode }>;
+  line?: number;
+  column?: number;
+}
+
+export interface EnumDefNode {
+  type: 'enumDef';
+  name: string;
+  variants: string[];
+  line?: number;
+  column?: number;
+}
+
+export interface MatchNode {
+  type: 'match';
+  expression: ASTNode;
+  arms: Array<{ pattern: string; param?: string; body: ASTNode[] }>;
+  line?: number;
+  column?: number;
+}
+
+export interface ImportNode {
+  type: 'import';
+  names: string[];
+  module: string;
+  alias?: string;
+  line?: number;
+  column?: number;
+}
+
+export interface StructInstanceNode {
+  type: 'structInstance';
+  name: string;
+  fields: Array<{ name: string; value: ASTNode }>;
+  line?: number;
+  column?: number;
+}
+
+export interface MemberAccessNode {
+  type: 'memberAccess';
+  object: ASTNode;
+  member: string;
   line?: number;
   column?: number;
 }

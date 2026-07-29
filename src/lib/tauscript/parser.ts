@@ -4,7 +4,7 @@
  */
 
 import { Token, TokenType } from './lexer';
-import type { ASTNode, LiteralNode, VariableNode, BinaryOpNode, UnaryOpNode, AssignmentNode, FunctionCallNode, FunctionDefNode, IfNode, WhileNode, ForNode, BlockNode, ReturnNode, ArrayNode, MapNode, IndexNode } from './ast';
+import type { ASTNode, LiteralNode, VariableNode, BinaryOpNode, UnaryOpNode, AssignmentNode, FunctionCallNode, FunctionDefNode, IfNode, WhileNode, ForNode, BlockNode, ReturnNode, ArrayNode, MapNode, IndexNode, StructDefNode, EnumDefNode, MatchNode, ImportNode, StructInstanceNode, MemberAccessNode } from './ast';
 
 export class Parser {
   private tokens: Token[];
@@ -33,6 +33,18 @@ export class Parser {
   }
 
   private parseStatement(): ASTNode | null {
+    if (this.match(TokenType.IMPORT)) {
+      return this.parseImport();
+    }
+    if (this.match(TokenType.STRUCT)) {
+      return this.parseStructDef();
+    }
+    if (this.match(TokenType.ENUM)) {
+      return this.parseEnumDef();
+    }
+    if (this.match(TokenType.MATCH)) {
+      return this.parseMatch();
+    }
     if (this.match(TokenType.LET, TokenType.CONST)) {
       return this.parseVariableDeclaration();
     }
@@ -56,6 +68,89 @@ export class Parser {
     }
     
     return this.parseExpressionStatement();
+  }
+
+  private parseImport(): ImportNode {
+    this.consume(TokenType.LEFT_BRACE, 'Expected "{" after import');
+    const names: string[] = [];
+    do {
+      this.consume(TokenType.IDENTIFIER, 'Expected import name');
+      names.push(this.previous().value as string);
+    } while (this.match(TokenType.COMMA));
+    this.consume(TokenType.RIGHT_BRACE, 'Expected "}" after import names');
+    this.consume(TokenType.FROM, 'Expected "from" after import names');
+    const moduleToken = this.consume(TokenType.STRING, 'Expected module path string');
+    let alias: string | undefined;
+    if (this.match(TokenType.AS)) {
+      this.consume(TokenType.IDENTIFIER, 'Expected alias name');
+      alias = this.previous().value as string;
+    }
+    return { type: 'import', names, module: moduleToken.value as string, alias };
+  }
+
+  private parseStructDef(): StructDefNode {
+    this.consume(TokenType.IDENTIFIER, 'Expected struct name');
+    const name = this.previous().value as string;
+    this.consume(TokenType.LEFT_BRACE, 'Expected "{" after struct name');
+    const fields: Array<{ name: string; defaultValue?: ASTNode }> = [];
+    while (!this.check(TokenType.RIGHT_BRACE) && !this.isAtEnd()) {
+      this.consume(TokenType.IDENTIFIER, 'Expected field name');
+      const fieldName = this.previous().value as string;
+      let defaultValue: ASTNode | undefined;
+      if (this.match(TokenType.COLON)) {
+        defaultValue = this.parseExpression();
+      }
+      fields.push({ name: fieldName, defaultValue });
+      this.match(TokenType.COMMA);
+    }
+    this.consume(TokenType.RIGHT_BRACE, 'Expected "}" after struct fields');
+    return { type: 'structDef', name, fields };
+  }
+
+  private parseEnumDef(): EnumDefNode {
+    this.consume(TokenType.IDENTIFIER, 'Expected enum name');
+    const name = this.previous().value as string;
+    this.consume(TokenType.LEFT_BRACE, 'Expected "{" after enum name');
+    const variants: string[] = [];
+    while (!this.check(TokenType.RIGHT_BRACE) && !this.isAtEnd()) {
+      this.consume(TokenType.IDENTIFIER, 'Expected variant name');
+      variants.push(this.previous().value as string);
+      this.match(TokenType.COMMA);
+    }
+    this.consume(TokenType.RIGHT_BRACE, 'Expected "}" after enum variants');
+    return { type: 'enumDef', name, variants };
+  }
+
+  private parseMatch(): MatchNode {
+    const expression = this.parseExpression();
+    this.consume(TokenType.LEFT_BRACE, 'Expected "{" after match expression');
+    const arms: Array<{ pattern: string; param?: string; body: ASTNode[] }> = [];
+    while (!this.check(TokenType.RIGHT_BRACE) && !this.isAtEnd()) {
+      this.consume(TokenType.IDENTIFIER, 'Expected pattern');
+      const pattern = this.previous().value as string;
+      let param: string | undefined;
+      if (this.match(TokenType.LEFT_PAREN)) {
+        this.consume(TokenType.IDENTIFIER, 'Expected param name');
+        param = this.previous().value as string;
+        this.consume(TokenType.RIGHT_PAREN, 'Expected ")" after param');
+      }
+      this.consume(TokenType.FAT_ARROW, 'Expected "=>" after pattern');
+      const body: ASTNode[] = [];
+      if (this.match(TokenType.LEFT_BRACE)) {
+        while (!this.check(TokenType.RIGHT_BRACE) && !this.isAtEnd()) {
+          const stmt = this.parseStatement();
+          if (stmt) body.push(stmt);
+        }
+        this.consume(TokenType.RIGHT_BRACE, 'Expected "}" after match arm');
+      } else {
+        const stmt = this.parseStatement();
+        if (stmt) body.push(stmt);
+      }
+      arms.push({ pattern, param, body });
+      this.match(TokenType.COMMA);
+    }
+    this.consume(TokenType.RIGHT_BRACE, 'Expected "}" after match arms');
+    return { type: 'match', expression, arms };
   }
 
   private parseVariableDeclaration(): AssignmentNode {
@@ -474,15 +569,8 @@ export class Parser {
         } as IndexNode;
       } else if (this.match(TokenType.DOT)) {
         this.consume(TokenType.IDENTIFIER, 'Expected property name');
-        const name = this.previous().value as string;
-        expr = {
-          type: 'functionCall',
-          name: {
-            type: 'variable',
-            name
-          } as VariableNode,
-          args: [expr]
-        } as FunctionCallNode;
+        const member = this.previous().value as string;
+        expr = { type: 'memberAccess', object: expr, member } as MemberAccessNode;
       } else {
         break;
       }
@@ -526,7 +614,11 @@ export class Parser {
       return { type: 'literal', value: this.previous().value } as LiteralNode;
     }
     if (this.match(TokenType.IDENTIFIER)) {
-      return { type: 'variable', name: this.previous().value as string } as VariableNode;
+      const name = this.previous().value as string;
+      if (this.check(TokenType.LEFT_BRACE)) {
+        return this.parseStructInstance(name);
+      }
+      return { type: 'variable', name } as VariableNode;
     }
     if (this.match(TokenType.LEFT_PAREN)) {
       const expr = this.parseExpression();
@@ -541,6 +633,21 @@ export class Parser {
     }
     
     throw new Error(`Unexpected token: ${this.peek().type}`);
+  }
+
+  private parseStructInstance(name: string): StructInstanceNode {
+    this.consume(TokenType.LEFT_BRACE, 'Expected "{" after struct name');
+    const fields: Array<{ name: string; value: ASTNode }> = [];
+    while (!this.check(TokenType.RIGHT_BRACE) && !this.isAtEnd()) {
+      this.consume(TokenType.IDENTIFIER, 'Expected field name');
+      const fieldName = this.previous().value as string;
+      this.consume(TokenType.COLON, 'Expected ":" after field name');
+      const value = this.parseExpression();
+      fields.push({ name: fieldName, value });
+      this.match(TokenType.COMMA);
+    }
+    this.consume(TokenType.RIGHT_BRACE, 'Expected "}" after struct fields');
+    return { type: 'structInstance', name, fields };
   }
 
   private parseArray(): ArrayNode {

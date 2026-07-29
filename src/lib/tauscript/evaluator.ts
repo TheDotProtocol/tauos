@@ -3,14 +3,17 @@
  * Executes the AST and produces results
  */
 
-import type { ASTNode, TauValue, TauArray, TauMap, TauFunction, Result, Environment } from './ast';
-import type { LiteralNode, VariableNode, BinaryOpNode, UnaryOpNode, AssignmentNode, FunctionCallNode, FunctionDefNode, IfNode, WhileNode, ForNode, BlockNode, ReturnNode, ArrayNode, MapNode, IndexNode } from './ast';
+import type { ASTNode, TauValue, TauArray, TauMap, TauFunction, Result, Environment, TauStruct, TauEnumValue, TauResult } from './ast';
+import type { LiteralNode, VariableNode, BinaryOpNode, UnaryOpNode, AssignmentNode, FunctionCallNode, FunctionDefNode, IfNode, WhileNode, ForNode, BlockNode, ReturnNode, ArrayNode, MapNode, IndexNode, StructDefNode, EnumDefNode, MatchNode, ImportNode, StructInstanceNode, MemberAccessNode } from './ast';
+import { importFromModule } from './stdlib';
 
 export class Evaluator {
   private environment: Environment;
   private output: string[] = [];
   private returnValue: TauValue | null = null;
   private hasReturned: boolean = false;
+  private structDefs: Map<string, StructDefNode> = new Map();
+  private enumDefs: Map<string, EnumDefNode> = new Map();
 
   constructor(parentEnvironment?: Environment) {
     this.environment = {
@@ -280,6 +283,24 @@ export class Evaluator {
       
       case 'index':
         return this.evaluateIndex(node as IndexNode);
+
+      case 'structDef':
+        return this.evaluateStructDef(node as StructDefNode);
+
+      case 'enumDef':
+        return this.evaluateEnumDef(node as EnumDefNode);
+
+      case 'match':
+        return this.evaluateMatch(node as MatchNode);
+
+      case 'import':
+        return this.evaluateImport(node as ImportNode);
+
+      case 'structInstance':
+        return this.evaluateStructInstance(node as StructInstanceNode);
+
+      case 'memberAccess':
+        return this.evaluateMemberAccess(node as MemberAccessNode);
       
       default:
         throw new Error(`Unknown node type: ${(node as any).type}`);
@@ -382,8 +403,8 @@ export class Evaluator {
 
     // Check for built-in functions with JS implementation
     const func = this.environment.functions.get(funcName);
-    if (func && (func as any).jsImpl) {
-      return (func as any).jsImpl(args);
+    if (func && func.jsImpl) {
+      return func.jsImpl(args);
     }
 
     // Check for user-defined functions
@@ -556,6 +577,102 @@ export class Evaluator {
     throw new Error('Index operation only supported for arrays and maps');
   }
 
+  private evaluateStructDef(node: StructDefNode): TauValue {
+    this.structDefs.set(node.name, node);
+    this.output.push(`Struct '${node.name}' defined`);
+    return null;
+  }
+
+  private evaluateEnumDef(node: EnumDefNode): TauValue {
+    this.enumDefs.set(node.name, node);
+    this.environment.variables.set(node.name, { type: 'enumType', enumName: node.name, variant: '' } as TauEnumValue & { type: 'enumType' });
+    this.output.push(`Enum '${node.name}' defined`);
+    return null;
+  }
+
+  private evaluateStructInstance(node: StructInstanceNode): TauValue {
+    const def = this.structDefs.get(node.name);
+    const fields = new Map<string, TauValue>();
+    if (def) {
+      for (const f of def.fields) {
+        fields.set(f.name, f.defaultValue ? this.evaluateNode(f.defaultValue) : null);
+      }
+    }
+    for (const f of node.fields) {
+      fields.set(f.name, this.evaluateNode(f.value));
+    }
+    return { type: 'struct', name: node.name, fields };
+  }
+
+  private evaluateMemberAccess(node: MemberAccessNode): TauValue {
+    const object = this.evaluateNode(node.object);
+    if (object && typeof object === 'object' && 'type' in object) {
+      if ((object as { type: string }).type === 'enumType') {
+        const enumName = (object as TauEnumValue).enumName;
+        const enumDef = this.enumDefs.get(enumName);
+        if (enumDef && enumDef.variants.includes(node.member)) {
+          return { type: 'enum', enumName, variant: node.member };
+        }
+      }
+      if (object.type === 'struct') {
+        const s = object as TauStruct;
+        if (!s.fields.has(node.member)) throw new Error(`Field '${node.member}' not found on struct '${s.name}'`);
+        return s.fields.get(node.member)!;
+      }
+      if (object.type === 'enum') {
+        const e = object as TauEnumValue;
+        if (node.member === 'name') return e.variant;
+        if (node.member === 'enum') return e.enumName;
+      }
+      if (object.type === 'result') {
+        const r = object as TauResult;
+        if (node.member === 'ok') return r.ok;
+        if (node.member === 'value') return r.value;
+      }
+    }
+    throw new Error(`Cannot access member '${node.member}'`);
+  }
+
+  private evaluateMatch(node: MatchNode): TauValue {
+    const value = this.evaluateNode(node.expression);
+    for (const arm of node.arms) {
+      let matched = false;
+      if (arm.pattern === '_' || arm.pattern === 'default') {
+        matched = true;
+      } else if (value && typeof value === 'object' && 'type' in value && value.type === 'result') {
+        const r = value as TauResult;
+        if (arm.pattern === 'ok' && r.ok) { matched = true; if (arm.param) this.setVariable(arm.param, r.value, true); }
+        if (arm.pattern === 'err' && !r.ok) { matched = true; if (arm.param) this.setVariable(arm.param, r.value, true); }
+      } else if (value && typeof value === 'object' && 'type' in value && value.type === 'enum') {
+        const e = value as TauEnumValue;
+        if (arm.pattern === e.variant) matched = true;
+      } else if (arm.pattern === String(value)) {
+        matched = true;
+      }
+      if (matched) {
+        for (const stmt of arm.body) {
+          const result = this.evaluateNode(stmt);
+          if (this.hasReturned) return result;
+        }
+        return null;
+      }
+    }
+    return null;
+  }
+
+  private evaluateImport(node: ImportNode): TauValue {
+    const imported = importFromModule(node.module, node.names);
+    imported.forEach((value, name) => {
+      if (typeof value === 'object' && value !== null && 'type' in value && value.type === 'function') {
+        this.environment.functions.set(name, value as TauFunction);
+      } else {
+        this.environment.variables.set(name, value as TauValue);
+      }
+    });
+    this.output.push(`Imported { ${node.names.join(', ')} } from "${node.module}"`);
+    return null;
+  }
+
   // Helper methods
   private getVariable(name: string): TauValue {
     let env: Environment | undefined = this.environment;
@@ -628,6 +745,21 @@ export class Evaluator {
         entries.push(`${k}: ${this.stringify(v)}`);
       });
       return '{' + entries.join(', ') + '}';
+    }
+    if (typeof value === 'object' && value !== null && 'type' in value) {
+      if (value.type === 'struct') {
+        const s = value as TauStruct;
+        const fields = Array.from(s.fields.entries()).map(([k, v]) => `${k}: ${this.stringify(v)}`).join(', ');
+        return `${s.name} { ${fields} }`;
+      }
+      if (value.type === 'enum') {
+        const e = value as TauEnumValue;
+        return `${e.enumName}.${e.variant}`;
+      }
+      if (value.type === 'result') {
+        const r = value as TauResult;
+        return r.ok ? `ok(${this.stringify(r.value)})` : `err(${this.stringify(r.value)})`;
+      }
     }
     return String(value);
   }

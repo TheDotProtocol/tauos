@@ -27,6 +27,15 @@ export enum TokenType {
   OK = 'OK',
   ERR = 'ERR',
   RESULT = 'RESULT',
+  STRUCT = 'STRUCT',
+  ENUM = 'ENUM',
+  IMPORT = 'IMPORT',
+  FROM = 'FROM',
+  AS = 'AS',
+  INTERFACE = 'INTERFACE',
+  TRAIT = 'TRAIT',
+  TYPE = 'TYPE',
+  PUB = 'PUB',
   TRUE = 'TRUE',
   FALSE = 'FALSE',
   NULL_KW = 'NULL_KW',
@@ -55,6 +64,7 @@ export enum TokenType {
   COLON = 'COLON',
   QUESTION = 'QUESTION',
   ARROW = 'ARROW',
+  FAT_ARROW = 'FAT_ARROW',
   
   // Brackets
   LEFT_PAREN = 'LEFT_PAREN',
@@ -90,6 +100,15 @@ const KEYWORDS: Record<string, TokenType> = {
   'ok': TokenType.OK,
   'err': TokenType.ERR,
   'result': TokenType.RESULT,
+  'struct': TokenType.STRUCT,
+  'enum': TokenType.ENUM,
+  'import': TokenType.IMPORT,
+  'from': TokenType.FROM,
+  'as': TokenType.AS,
+  'interface': TokenType.INTERFACE,
+  'trait': TokenType.TRAIT,
+  'type': TokenType.TYPE,
+  'pub': TokenType.PUB,
   'true': TokenType.TRUE,
   'false': TokenType.FALSE,
   'null': TokenType.NULL_KW,
@@ -151,7 +170,7 @@ export class Lexer {
       case '-':
         if (this.peek() === '>') {
           this.advance();
-          return this.makeToken(TokenType.ARROW, '->', line, column);
+          return this.makeToken(TokenType.FAT_ARROW, '=>', line, column);
         }
         return this.makeToken(TokenType.MINUS, char, line, column);
       case '*': return this.makeToken(TokenType.MULTIPLY, char, line, column);
