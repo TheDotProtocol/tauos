@@ -301,6 +301,13 @@ export class Evaluator {
 
       case 'memberAccess':
         return this.evaluateMemberAccess(node as MemberAccessNode);
+
+      case 'traitDef':
+      case 'interfaceDef':
+        return null;
+
+      case 'await':
+        return this.evaluateNode((node as { expression: ASTNode }).expression);
       
       default:
         throw new Error(`Unknown node type: ${(node as any).type}`);

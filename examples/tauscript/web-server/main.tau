@@ -1,0 +1,23 @@
+// Web Server foundations — TauScript v1.0
+import { iso } from "std.time";
+import { stringify } from "std.json";
+
+struct Route {
+  path: "",
+  handler: ""
+}
+
+fn router(path) {
+  match path {
+    "/" => { print("Home at " + iso()) },
+    "/api" => { print(stringify({ version: "1.0.0" })) },
+    _ => { print("404") }
+  }
+}
+
+router("/");
+router("/api");
+
+fn test_router() {
+  router("/");
+}

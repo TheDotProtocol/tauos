@@ -1,0 +1,15 @@
+// CLI Tool example — TauScript v1.0
+import { upper, trim } from "std.string";
+import { get } from "std.env";
+
+fn greet(name) {
+  return "Hello, " + upper(trim(name)) + "!";
+}
+
+let platform = get("platform");
+print(greet("tau developer"));
+print("Platform: " + platform);
+
+fn test_greet() {
+  print(greet("test"));
+}

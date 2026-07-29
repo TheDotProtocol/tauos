@@ -71,7 +71,10 @@ export type ASTNode =
   | MatchNode
   | ImportNode
   | StructInstanceNode
-  | MemberAccessNode;
+  | MemberAccessNode
+  | TraitDefNode
+  | InterfaceDefNode
+  | AwaitNode;
 
 export interface LiteralNode {
   type: 'literal';
@@ -126,6 +129,8 @@ export interface FunctionDefNode {
   name: string;
   params: string[];
   body: ASTNode[];
+  async?: boolean;
+  typeParams?: string[];
   line?: number;
   column?: number;
 }
@@ -237,6 +242,29 @@ export interface MemberAccessNode {
   type: 'memberAccess';
   object: ASTNode;
   member: string;
+  line?: number;
+  column?: number;
+}
+
+export interface TraitDefNode {
+  type: 'traitDef';
+  name: string;
+  methods: Array<{ name: string; params: string[] }>;
+  line?: number;
+  column?: number;
+}
+
+export interface InterfaceDefNode {
+  type: 'interfaceDef';
+  name: string;
+  methods: Array<{ name: string; params: string[] }>;
+  line?: number;
+  column?: number;
+}
+
+export interface AwaitNode {
+  type: 'await';
+  expression: ASTNode;
   line?: number;
   column?: number;
 }

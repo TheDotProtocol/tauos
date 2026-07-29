@@ -95,6 +95,52 @@ export async function globalSearch(userId: string, query: string) {
     for (const c of convos.rows) {
       results.push({ type: 'conversation', label: c.phase ?? 'AI chat', snippet: c.content.slice(0, 120), projectId: c.project_id, href: `/developers/architect?project=${c.project_id}` });
     }
+
+    const tasks = await getPool().query(
+      `SELECT t.project_id, t.title, t.type, t.status FROM tau_ide_tasks t
+       JOIN tau_ide_projects p ON p.id = t.project_id
+       WHERE p.owner_id = $1 AND LOWER(t.title) LIKE $2 LIMIT 15`,
+      [userId, `%${q}%`]
+    );
+    for (const t of tasks.rows) {
+      results.push({ type: 'task', label: t.title, snippet: `${t.type} · ${t.status}`, projectId: t.project_id, href: `/developers/dashboard?project=${t.project_id}` });
+    }
+
+    const nodes = await getPool().query(
+      `SELECT n.project_id, n.label, n.node_type, LEFT(n.content, 100) AS snippet FROM tau_ide_knowledge_nodes n
+       JOIN tau_ide_projects p ON p.id = n.project_id
+       WHERE p.owner_id = $1 AND (LOWER(n.label) LIKE $2 OR LOWER(n.content) LIKE $2) LIMIT 15`,
+      [userId, `%${q}%`]
+    );
+    for (const n of nodes.rows) {
+      results.push({ type: 'knowledge', label: n.label, snippet: n.snippet, projectId: n.project_id, href: `/developers/architect?project=${n.project_id}` });
+    }
+
+    const gitOps = await getPool().query(
+      `SELECT g.project_id, g.operation, g.details FROM tau_ide_git_operations g
+       JOIN tau_ide_projects p ON p.id = g.project_id
+       WHERE p.owner_id = $1 AND (LOWER(g.operation) LIKE $2 OR g.details::text ILIKE $2) LIMIT 10`,
+      [userId, `%${q}%`]
+    );
+    for (const g of gitOps.rows) {
+      results.push({ type: 'git', label: g.operation, snippet: JSON.stringify(g.details).slice(0, 100), projectId: g.project_id, href: `/developers/git?project=${g.project_id}` });
+    }
+  }
+
+  // TauScript stdlib / package search (always available)
+  if (q.includes('std.') || q.includes('tau-') || q.includes('package')) {
+    const packages = ['tau-http', 'tau-json', 'tau-cli', 'tau-test', 'tau-auth'];
+    packages.filter((p) => p.includes(q.replace('package', '').trim()) || q.includes('package')).forEach((p) => {
+      results.push({ type: 'package', label: p, snippet: 'TauScript package registry', href: '/developers/tauscript' });
+    });
+  }
+
+  if (q.includes('fn ') || q.includes('struct ') || q.includes('enum ')) {
+    results.push({ type: 'symbol', label: 'Symbol search', snippet: `Search symbols matching "${query}" in workspace`, href: '/developers/workspace' });
+  }
+
+  if (q.includes('doc') || q.includes('tutorial') || q.includes('spec')) {
+    results.push({ type: 'documentation', label: 'TauScript v1.0 Documentation', snippet: 'Language specification, CLI, taupm, stdlib reference', href: '/developers/tauscript' });
   }
 
   return results;

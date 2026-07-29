@@ -1,0 +1,9 @@
+[package]
+name = "my-tau-package"
+version = "1.0.0"
+description = "Example TauScript package"
+main = "main.tau"
+license = "MIT"
+
+[dependencies]
+tau-json = "^1.0.0"

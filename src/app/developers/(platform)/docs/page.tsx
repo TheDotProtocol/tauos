@@ -20,7 +20,7 @@ const sections = [
     icon: Code,
     links: [
       { href: '/developers/workspace', label: 'Tau IDE Workspace', desc: 'Monaco editor, files, tabs' },
-      { href: '/developers/tauscript', label: 'TauScript Language', desc: 'v1 syntax and REPL' },
+      { href: '/developers/tauscript', label: 'TauScript v1.0', desc: 'Language, CLI, taupm, LSP, stdlib' },
       { href: '/developers/terminal', label: 'Terminal', desc: 'Interactive TauScript REPL' },
     ],
   },
@@ -35,7 +35,7 @@ const sections = [
     title: 'DevOps',
     icon: Rocket,
     links: [
-      { href: '/developers/git', label: 'Git', desc: 'GitHub/GitLab remote push, branches, history' },
+      { href: '/developers/git', label: 'Git', desc: 'Clone, pull, push, merge, PRs, conflict resolution' },
       { href: '/developers/settings', label: 'Secrets & Versions', desc: 'Encrypted secrets and version restore' },
       { href: '/developers/automation', label: 'Deployment', desc: 'Vercel, Docker, self-hosted' },
     ],

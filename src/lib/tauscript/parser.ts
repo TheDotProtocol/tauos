@@ -4,7 +4,7 @@
  */
 
 import { Token, TokenType } from './lexer';
-import type { ASTNode, LiteralNode, VariableNode, BinaryOpNode, UnaryOpNode, AssignmentNode, FunctionCallNode, FunctionDefNode, IfNode, WhileNode, ForNode, BlockNode, ReturnNode, ArrayNode, MapNode, IndexNode, StructDefNode, EnumDefNode, MatchNode, ImportNode, StructInstanceNode, MemberAccessNode } from './ast';
+import type { ASTNode, LiteralNode, VariableNode, BinaryOpNode, UnaryOpNode, AssignmentNode, FunctionCallNode, FunctionDefNode, IfNode, WhileNode, ForNode, BlockNode, ReturnNode, ArrayNode, MapNode, IndexNode, StructDefNode, EnumDefNode, MatchNode, ImportNode, StructInstanceNode, MemberAccessNode, TraitDefNode, InterfaceDefNode, AwaitNode } from './ast';
 
 export class Parser {
   private tokens: Token[];
@@ -36,6 +36,12 @@ export class Parser {
     if (this.match(TokenType.IMPORT)) {
       return this.parseImport();
     }
+    if (this.match(TokenType.TRAIT)) {
+      return this.parseTraitDef();
+    }
+    if (this.match(TokenType.INTERFACE)) {
+      return this.parseInterfaceDef();
+    }
     if (this.match(TokenType.STRUCT)) {
       return this.parseStructDef();
     }
@@ -48,8 +54,10 @@ export class Parser {
     if (this.match(TokenType.LET, TokenType.CONST)) {
       return this.parseVariableDeclaration();
     }
-    if (this.match(TokenType.FUNCTION, TokenType.FN)) {
-      return this.parseFunctionDeclaration();
+    if (this.match(TokenType.FUNCTION, TokenType.FN, TokenType.ASYNC)) {
+      const isAsync = this.previous().type === TokenType.ASYNC;
+      if (isAsync) this.consume(TokenType.FN, 'Expected "fn" after async');
+      return this.parseFunctionDeclaration(isAsync);
     }
     if (this.match(TokenType.IF)) {
       return this.parseIfStatement();
@@ -175,10 +183,70 @@ export class Parser {
     };
   }
 
-  private parseFunctionDeclaration(): FunctionDefNode {
+  private parseTraitDef(): TraitDefNode {
+    this.consume(TokenType.IDENTIFIER, 'Expected trait name');
+    const name = this.previous().value as string;
+    this.consume(TokenType.LEFT_BRACE, 'Expected "{" after trait name');
+    const methods: Array<{ name: string; params: string[] }> = [];
+    while (!this.check(TokenType.RIGHT_BRACE) && !this.isAtEnd()) {
+      this.consume(TokenType.FN, 'Expected method signature');
+      this.consume(TokenType.IDENTIFIER, 'Expected method name');
+      const methodName = this.previous().value as string;
+      this.consume(TokenType.LEFT_PAREN, 'Expected "("');
+      const params: string[] = [];
+      if (!this.check(TokenType.RIGHT_PAREN)) {
+        do {
+          this.consume(TokenType.IDENTIFIER, 'Expected param');
+          params.push(this.previous().value as string);
+        } while (this.match(TokenType.COMMA));
+      }
+      this.consume(TokenType.RIGHT_PAREN, 'Expected ")"');
+      this.match(TokenType.SEMICOLON);
+      methods.push({ name: methodName, params });
+    }
+    this.consume(TokenType.RIGHT_BRACE, 'Expected "}"');
+    return { type: 'traitDef', name, methods };
+  }
+
+  private parseInterfaceDef(): InterfaceDefNode {
+    this.consume(TokenType.IDENTIFIER, 'Expected interface name');
+    const name = this.previous().value as string;
+    this.consume(TokenType.LEFT_BRACE, 'Expected "{" after interface name');
+    const methods: Array<{ name: string; params: string[] }> = [];
+    while (!this.check(TokenType.RIGHT_BRACE) && !this.isAtEnd()) {
+      this.consume(TokenType.FN, 'Expected method signature');
+      this.consume(TokenType.IDENTIFIER, 'Expected method name');
+      const methodName = this.previous().value as string;
+      this.consume(TokenType.LEFT_PAREN, 'Expected "("');
+      const params: string[] = [];
+      if (!this.check(TokenType.RIGHT_PAREN)) {
+        do {
+          this.consume(TokenType.IDENTIFIER, 'Expected param');
+          params.push(this.previous().value as string);
+        } while (this.match(TokenType.COMMA));
+      }
+      this.consume(TokenType.RIGHT_PAREN, 'Expected ")"');
+      this.match(TokenType.SEMICOLON);
+      methods.push({ name: methodName, params });
+    }
+    this.consume(TokenType.RIGHT_BRACE, 'Expected "}"');
+    return { type: 'interfaceDef', name, methods };
+  }
+
+  private parseFunctionDeclaration(isAsync = false): FunctionDefNode {
     this.consume(TokenType.IDENTIFIER, 'Expected function name');
     const name = this.previous().value as string;
-    
+
+    let typeParams: string[] | undefined;
+    if (this.match(TokenType.LESS)) {
+      typeParams = [];
+      do {
+        this.consume(TokenType.IDENTIFIER, 'Expected type parameter');
+        typeParams.push(this.previous().value as string);
+      } while (this.match(TokenType.COMMA));
+      this.consume(TokenType.GREATER, 'Expected ">" after type parameters');
+    }
+
     this.consume(TokenType.LEFT_PAREN, 'Expected "(" after function name');
     const params: string[] = [];
     
@@ -209,7 +277,9 @@ export class Parser {
       type: 'functionDef',
       name,
       params,
-      body
+      body,
+      async: isAsync,
+      typeParams,
     };
   }
 
@@ -540,6 +610,9 @@ export class Parser {
   }
 
   private parseUnary(): ASTNode {
+    if (this.match(TokenType.AWAIT)) {
+      return { type: 'await', expression: this.parseUnary() } as AwaitNode;
+    }
     if (this.match(TokenType.NOT, TokenType.MINUS)) {
       const operator = this.previous().type;
       const right = this.parseUnary();

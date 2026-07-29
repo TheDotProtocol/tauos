@@ -1,0 +1,29 @@
+// Database pattern example — TauScript v1.0
+struct Record {
+  id: 0,
+  data: ""
+}
+
+let db = [];
+
+fn insert(record) {
+  db.push(record);
+  return record.id;
+}
+
+fn find(id) {
+  for r in db {
+    if (r.id == id) {
+      return r;
+    }
+  }
+  return null;
+}
+
+insert(Record { id: 1, data: "first" });
+print(find(1).data);
+
+fn test_db() {
+  insert(Record { id: 2, data: "test" });
+  print(find(2).data);
+}

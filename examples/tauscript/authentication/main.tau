@@ -1,0 +1,21 @@
+// Authentication example — TauScript v1.0
+import { hash } from "std.crypto";
+
+struct User {
+  username: "",
+  token: ""
+}
+
+fn authenticate(username, password) {
+  let token = hash(username + password);
+  return User { username: username, token: token };
+}
+
+let user = authenticate("dev", "secret");
+print(user.username);
+print(user.token);
+
+fn test_auth() {
+  let u = authenticate("test", "pass");
+  print(u.token);
+}

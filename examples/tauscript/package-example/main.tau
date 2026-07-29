@@ -1,0 +1,12 @@
+import { parse, stringify } from "std.json";
+
+fn process(data) {
+  let obj = parse(data);
+  return stringify(obj);
+}
+
+print(process('{"name":"Tau"}'));
+
+fn test_parse() {
+  print(process('{"ok":true}'));
+}

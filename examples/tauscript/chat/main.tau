@@ -1,0 +1,31 @@
+// Chat application pattern — TauScript v1.0
+struct Message {
+  user: "",
+  text: "",
+  time: 0
+}
+
+import { now } from "std.time";
+
+let messages = [];
+
+fn send(user, text) {
+  let msg = Message { user: user, text: text, time: now() };
+  messages.push(msg);
+  return msg;
+}
+
+fn history() {
+  for m in messages {
+    print(m.user + ": " + m.text);
+  }
+}
+
+send("alice", "Hello!");
+send("bob", "Hi there!");
+history();
+
+fn test_chat() {
+  send("test", "msg");
+  print(length(messages));
+}
