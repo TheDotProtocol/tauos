@@ -1,10 +1,20 @@
 'use client';
 
+import { useEffect, useMemo, useState } from 'react';
 import Image from 'next/image';
 import { geistMono, geistSans, outfit } from '@/lib/website/fonts';
 import { tauMailAssets } from '@/lib/taumail/assets';
 import TauMailAppShell from '@/components/taumail/shared/TauMailAppShell';
 import { MailIcon } from '@/components/taumail/shared/MailIcon';
+import { useTauMailSession } from '@/hooks/useTauMailSession';
+import {
+  fetchTauMailCalendar,
+  fetchTauMailEmails,
+  fetchTauMailNotifications,
+  fetchTauMailProfile,
+  fetchTauMailStorage,
+  fetchTauMailTasks,
+} from '@/lib/taumail/api-client';
 
 const quickActions = [
   { label: 'Compose', sub: 'New draft', icon: tauMailAssets.icons.edit, href: '/taumail/compose' },
@@ -13,31 +23,80 @@ const quickActions = [
   { label: 'AI Summary', sub: 'All unreads', icon: tauMailAssets.icons.sparkles, href: '/taumail/ai' },
 ] as const;
 
-const aiDrafts = [
-  { title: 'Draft: Reply to Sariel Tau', preview: '"Acknowledge quantum protocol limits and schedule subsequent telemetry..."' },
-  { title: 'Draft: Confirm Delivery Receipt', preview: '"Acknowledge secure terminal handshake with Epsilon Cargo dispatch squad..."' },
-] as const;
-
-const alignments = [
-  { title: 'Quantum Computing Alignment', time: '10:30 AM · Tau Core' },
-  { title: 'Product Analytics Sync', time: '02:00 PM · Marketing' },
-] as const;
-
-const attachments = ['tau_universe_protocol.pdf', 'financial_projection_q4.xlsx', 'interface_concept_v3.fig'] as const;
-
-const notifications = [
-  { title: 'Node security handshake successful', meta: '4m ago · Security Subsystem', tone: 'success' as const },
-  { title: 'Springfield hub failsafe triggered', meta: '12m ago · Grid Maintenance', tone: 'danger' as const },
-];
-
 export default function TauMailDashboardPage() {
+  const { ready, isLoggedIn, user, isDemo } = useTauMailSession();
+  const [displayName, setDisplayName] = useState('');
+  const [unreadCount, setUnreadCount] = useState(0);
+  const [totalMessages, setTotalMessages] = useState(0);
+  const [todayEvents, setTodayEvents] = useState(0);
+  const [nextEventLabel, setNextEventLabel] = useState('No events today');
+  const [draftCount, setDraftCount] = useState(0);
+  const [tasksDone, setTasksDone] = useState(0);
+  const [tasksTotal, setTasksTotal] = useState(0);
+  const [usedGb, setUsedGb] = useState(0);
+  const [totalGb, setTotalGb] = useState(250);
+  const [agenda, setAgenda] = useState<{ title: string; time: string }[]>([]);
+  const [notifications, setNotifications] = useState<{ title: string; meta: string; tone: 'success' | 'danger' | 'info' | 'warning' }[]>([]);
+
+  useEffect(() => {
+    if (!ready || !isLoggedIn) return;
+
+    const name = user?.fullName || user?.username || 'there';
+    setDisplayName(name);
+
+    if (isDemo) return;
+
+    fetchTauMailProfile()
+      .then((profile) => {
+        if (profile?.displayName || profile?.fullName) {
+          setDisplayName(profile.displayName || profile.fullName);
+        }
+      })
+      .catch(() => undefined);
+
+    Promise.all([
+      fetchTauMailEmails('inbox'),
+      fetchTauMailEmails('drafts'),
+      fetchTauMailTasks(),
+      fetchTauMailStorage(),
+      fetchTauMailCalendar(),
+      fetchTauMailNotifications(),
+    ])
+      .then(([inbox, drafts, tasks, storage, calendar, notes]) => {
+        setUnreadCount(inbox.filter((e) => e.unread).length);
+        setTotalMessages(inbox.length);
+        setDraftCount(drafts.length);
+        setTasksTotal(tasks.length);
+        setTasksDone(tasks.filter((t) => t.done).length);
+        setUsedGb(storage.usedGb);
+        setTotalGb(storage.totalGb);
+        setTodayEvents(calendar.agenda.length);
+        setAgenda(calendar.agenda.slice(0, 2).map((item) => ({ title: item.title, time: item.time })));
+        setNextEventLabel(calendar.agenda[0] ? `Next: ${calendar.agenda[0].time}` : 'No events today');
+        setNotifications(notes.slice(0, 3));
+      })
+      .catch(console.error);
+  }, [ready, isLoggedIn, user, isDemo]);
+
+  const storagePct = useMemo(() => (totalGb ? Math.min(100, (usedGb / totalGb) * 100) : 0), [usedGb, totalGb]);
+
+  if (!ready || !isLoggedIn) {
+    return <div className={`${geistSans.className} flex min-h-screen items-center justify-center bg-[#070708] text-[#a1a1aa]`}>Loading...</div>;
+  }
+
   return (
     <TauMailAppShell active="dashboard">
       <div className={`${geistSans.className} flex-1 overflow-y-auto p-8`}>
         <div>
-          <h1 className={`${outfit.className} text-[28px] font-bold text-white`}>Welcome back, Cassiel V</h1>
+          <h1 className={`${outfit.className} text-[28px] font-bold text-white`}>Welcome back, {displayName}</h1>
           <p className="mt-1.5 text-sm text-[#a1a1aa]">
-            All systems functional. You have <span className="font-semibold text-[#d4a843]">12 unread signals</span> from the inner core network.
+            {unreadCount > 0 ? (
+              <>
+                You have <span className="font-semibold text-[#d4a843]">{unreadCount} unread</span> message{unreadCount === 1 ? '' : 's'} in your inbox.
+              </>
+            ) : (
+              'Your inbox is clear. Compose a new message anytime.'
+            )}
           </p>
         </div>
 
@@ -68,9 +127,9 @@ export default function TauMailDashboardPage() {
                   <MailIcon src={tauMailAssets.icons.mail} size={16} />
                 </div>
                 <p className={`${outfit.className} mt-4 text-[36px] font-bold text-white`}>
-                  12 <span className="text-sm font-normal text-[#71717a]">unreads</span>
+                  {unreadCount} <span className="text-sm font-normal text-[#71717a]">unreads</span>
                 </p>
-                <p className="text-xs text-[#a1a1aa]">1,452 total messages on file</p>
+                <p className="text-xs text-[#a1a1aa]">{totalMessages} messages loaded</p>
               </div>
               <div className="rounded-2xl border border-[rgba(255,255,255,0.05)] bg-[#121214] p-5">
                 <div className="flex items-center justify-between">
@@ -78,9 +137,9 @@ export default function TauMailDashboardPage() {
                   <MailIcon src={tauMailAssets.icons.clock} size={16} />
                 </div>
                 <p className={`${outfit.className} mt-4 text-[36px] font-bold text-white`}>
-                  3 <span className="text-sm font-normal text-[#71717a]">today</span>
+                  {todayEvents} <span className="text-sm font-normal text-[#71717a]">today</span>
                 </p>
-                <p className="text-xs font-medium text-[#d4a843]">Next alignment in 42m</p>
+                <p className="text-xs font-medium text-[#d4a843]">{nextEventLabel}</p>
               </div>
             </div>
 
@@ -88,36 +147,39 @@ export default function TauMailDashboardPage() {
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <MailIcon src={tauMailAssets.icons.wandSparkles} size={16} />
-                  <h2 className="text-[15px] font-semibold text-white">AI Smart Drafts Pending</h2>
+                  <h2 className="text-[15px] font-semibold text-white">Saved Drafts</h2>
                 </div>
                 <span className={`${geistMono.className} rounded-md bg-[rgba(212,168,67,0.08)] px-2 py-0.5 text-[11px] font-semibold text-[#d4a843]`}>
-                  5 SUGESTIONS
+                  {draftCount} DRAFT{draftCount === 1 ? '' : 'S'}
                 </span>
               </div>
-              <div className="mt-4 space-y-3">
-                {aiDrafts.map((draft) => (
-                  <div key={draft.title} className="rounded-lg border border-[rgba(255,255,255,0.05)] bg-[#070708] p-3">
-                    <p className="text-[13px] font-semibold text-white">{draft.title}</p>
-                    <p className="mt-1 truncate text-xs text-[#a1a1aa]">{draft.preview}</p>
-                  </div>
-                ))}
+              <div className="mt-4">
+                {draftCount === 0 ? (
+                  <p className="text-xs text-[#71717a]">No drafts yet. Start composing to save one.</p>
+                ) : (
+                  <a href="/taumail/drafts" className="text-sm font-medium text-[#d4a843] hover:underline">
+                    View {draftCount} draft{draftCount === 1 ? '' : 's'}
+                  </a>
+                )}
               </div>
             </div>
 
             <div className="rounded-2xl border border-[rgba(255,255,255,0.05)] bg-[#121214] p-6">
-              <h2 className="text-[15px] font-semibold text-white">Productivity Analytics</h2>
+              <h2 className="text-[15px] font-semibold text-white">Productivity</h2>
               <div className="mt-4 grid grid-cols-3 gap-5">
                 <div>
-                  <p className={`${geistMono.className} text-2xl font-bold text-[#d4a843]`}>142</p>
-                  <p className="text-xs text-[#71717a]">Emails Outbound</p>
+                  <p className={`${geistMono.className} text-2xl font-bold text-[#d4a843]`}>{totalMessages}</p>
+                  <p className="text-xs text-[#71717a]">Inbox Messages</p>
                 </div>
                 <div>
-                  <p className={`${geistMono.className} text-2xl font-bold text-white`}>4.2m</p>
-                  <p className="text-xs text-[#71717a]">Mean Response Time</p>
+                  <p className={`${geistMono.className} text-2xl font-bold text-white`}>{draftCount}</p>
+                  <p className="text-xs text-[#71717a]">Open Drafts</p>
                 </div>
                 <div>
-                  <p className={`${geistMono.className} text-2xl font-bold text-white`}>18 / 20</p>
-                  <p className="text-xs text-[#71717a]">Assigned Tasks Done</p>
+                  <p className={`${geistMono.className} text-2xl font-bold text-white`}>
+                    {tasksDone} / {tasksTotal}
+                  </p>
+                  <p className="text-xs text-[#71717a]">Tasks Complete</p>
                 </div>
               </div>
             </div>
@@ -127,50 +189,49 @@ export default function TauMailDashboardPage() {
             <div className="rounded-2xl border border-[rgba(255,255,255,0.05)] bg-[#121214] p-6">
               <div className="flex items-center justify-between text-xs">
                 <span className="text-[#71717a]">Cloud Storage</span>
-                <span className={`${geistMono.className} font-semibold text-white`}>142 GB / 250 GB</span>
+                <span className={`${geistMono.className} font-semibold text-white`}>
+                  {usedGb} GB / {totalGb} GB
+                </span>
               </div>
               <div className="mt-2 h-1.5 w-[200px] overflow-hidden rounded-full bg-[#1e1e24]">
-                <div className="h-full w-[57%] rounded-full bg-gradient-to-r from-[#d4a843] to-[#e8c547]" />
+                <div className="h-full rounded-full bg-gradient-to-r from-[#d4a843] to-[#e8c547]" style={{ width: `${storagePct}%` }} />
               </div>
               <Image src={tauMailAssets.shared.dividerLine} alt="" width={360} height={1} className="my-5 h-px w-full opacity-60" />
-              <h3 className="text-sm font-semibold text-white">Upcoming Alignments</h3>
+              <h3 className="text-sm font-semibold text-white">Today&apos;s Agenda</h3>
               <div className="mt-3 space-y-3">
-                {alignments.map((item) => (
-                  <div key={item.title} className="flex items-center justify-between gap-3">
-                    <div>
-                      <p className="text-[13px] font-medium text-white">{item.title}</p>
-                      <p className={`${geistMono.className} text-[11px] text-[#71717a]`}>{item.time}</p>
+                {agenda.length === 0 ? (
+                  <p className="text-xs text-[#71717a]">No events scheduled today</p>
+                ) : (
+                  agenda.map((item) => (
+                    <div key={item.title} className="flex items-center justify-between gap-3">
+                      <div>
+                        <p className="text-[13px] font-medium text-white">{item.title}</p>
+                        <p className={`${geistMono.className} text-[11px] text-[#71717a]`}>{item.time}</p>
+                      </div>
                     </div>
-                    <MailIcon src={tauMailAssets.icons.toggle} size={34} className="h-5 w-[34px]" />
-                  </div>
-                ))}
+                  ))
+                )}
               </div>
             </div>
 
             <div className="rounded-2xl border border-[rgba(255,255,255,0.05)] bg-[#121214] p-6">
-              <h3 className="text-sm font-semibold text-white">Recent Artifact Attachments</h3>
-              <div className="mt-2.5 flex flex-wrap gap-2">
-                {attachments.map((file) => (
-                  <div key={file} className="flex items-center gap-1.5 rounded-md border border-[rgba(255,255,255,0.05)] bg-[#070708] px-2 py-1.5">
-                    <MailIcon src={tauMailAssets.icons.file} size={12} />
-                    <span className={`${geistMono.className} max-w-[120px] truncate text-[11px] text-[#a1a1aa]`}>{file}</span>
-                  </div>
-                ))}
-              </div>
-              <Image src={tauMailAssets.shared.dividerLine} alt="" width={360} height={1} className="my-5 h-px w-full opacity-60" />
-              <h3 className="text-sm font-semibold text-white">Subsystem Notifications</h3>
+              <h3 className="text-sm font-semibold text-white">Recent Notifications</h3>
               <div className="mt-3 space-y-2.5">
-                {notifications.map((note) => (
-                  <div key={note.title} className="relative pl-3.5">
-                    <MailIcon
-                      src={note.tone === 'success' ? tauMailAssets.icons.statusSuccess : tauMailAssets.icons.statusDanger}
-                      size={6}
-                      className="absolute left-0 top-1.5"
-                    />
-                    <p className="text-xs font-medium text-white">{note.title}</p>
-                    <p className="text-[10px] text-[#71717a]">{note.meta}</p>
-                  </div>
-                ))}
+                {notifications.length === 0 ? (
+                  <p className="text-xs text-[#71717a]">No notifications yet</p>
+                ) : (
+                  notifications.map((note) => (
+                    <div key={note.title} className="relative pl-3.5">
+                      <MailIcon
+                        src={note.tone === 'success' ? tauMailAssets.icons.statusSuccess : tauMailAssets.icons.statusDanger}
+                        size={6}
+                        className="absolute left-0 top-1.5"
+                      />
+                      <p className="text-xs font-medium text-white">{note.title}</p>
+                      <p className="text-[10px] text-[#71717a]">{note.meta}</p>
+                    </div>
+                  ))
+                )}
               </div>
             </div>
           </div>

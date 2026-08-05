@@ -1,20 +1,21 @@
 'use client';
 
-import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { clsx } from 'clsx';
 import { geistMono, geistSans, outfit } from '@/lib/website/fonts';
 import { tauMailAssets, tauMailNavItems, type TauMailNavId } from '@/lib/taumail/assets';
 import { MailIcon } from '@/components/taumail/shared/MailIcon';
+import TauMailUserAvatar from '@/components/taumail/shared/TauMailUserAvatar';
 
 type TauMailSidebarProps = {
   active: TauMailNavId;
   userName?: string;
   userEmail?: string;
+  avatarUrl?: string | null;
 };
 
-export default function TauMailSidebar({ active, userName = 'Cassiel V', userEmail = 'admin@tau.net' }: TauMailSidebarProps) {
+export default function TauMailSidebar({ active, userName = 'Account', userEmail = '', avatarUrl }: TauMailSidebarProps) {
   const pathname = usePathname();
 
   return (
@@ -22,7 +23,7 @@ export default function TauMailSidebar({ active, userName = 'Cassiel V', userEma
       className={`${geistSans.className} flex h-full min-h-0 w-[240px] shrink-0 flex-col self-stretch border-r border-[rgba(255,255,255,0.05)] bg-[#121214] p-5`}
     >
       <Link href="/taumail/inbox" className="mb-6 flex shrink-0 items-center gap-3">
-        <Image
+        <img
           src={tauMailAssets.brand.logoIcon}
           alt=""
           width={32}
@@ -57,9 +58,9 @@ export default function TauMailSidebar({ active, userName = 'Cassiel V', userEma
       </nav>
 
       <div className="mt-4 flex shrink-0 flex-col gap-4">
-        <Image src={tauMailAssets.shared.dividerLine} alt="" width={200} height={1} className="h-px w-full opacity-60" />
+        <img src={tauMailAssets.shared.dividerLine} alt="" width={200} height={1} className="h-px w-full opacity-60" />
         <div className="flex items-center gap-3">
-          <Image src={tauMailAssets.avatars.userSidebar} alt="" width={32} height={32} className="size-8 rounded-2xl object-cover" />
+          <TauMailUserAvatar name={userName} imageUrl={avatarUrl} size={32} rounded="2xl" />
           <div className="min-w-0 flex-1">
             <p className="truncate text-[13px] font-semibold text-white">{userName}</p>
             <p className={`${geistMono.className} truncate text-[11px] text-[#71717a]`}>{userEmail}</p>

@@ -60,6 +60,7 @@ export type TauMailProfile = {
   organization: string;
   title: string;
   timezone: string;
+  avatarUrl?: string | null;
 };
 
 export type TauMailContact = {
@@ -244,6 +245,7 @@ export async function loginTauMail(email: string, password: string) {
       username: data.user.username,
       email: data.user.email,
       fullName: data.user.fullName,
+      avatarUrl: data.user.avatarUrl ?? null,
     }),
   );
   localStorage.removeItem('tauos_demo_mode');
@@ -345,10 +347,52 @@ export async function saveTauMailProfile(profile: TauMailProfile) {
         fullName: profile.fullName,
         email: profile.email,
         username: profile.displayName,
+        avatarUrl: profile.avatarUrl ?? parsed.avatarUrl ?? null,
       }),
     );
   }
   return { ok: true, profile: data.profile };
+}
+
+export async function uploadTauMailAvatar(file: File) {
+  const token = localStorage.getItem('tauos_token');
+  if (isDemoSession(token)) return { ok: true, demo: true, avatarUrl: null };
+
+  const formData = new FormData();
+  formData.append('file', file);
+  const res = await fetch('/api/taumail/profile/avatar', {
+    method: 'POST',
+    headers: authHeaders(),
+    body: formData,
+  });
+  const data = await res.json();
+  if (!res.ok) return { ok: false, error: data.error || 'Failed to upload avatar' };
+
+  const storedUser = localStorage.getItem('tauos_user');
+  if (storedUser && data.avatarUrl) {
+    const parsed = JSON.parse(storedUser);
+    localStorage.setItem('tauos_user', JSON.stringify({ ...parsed, avatarUrl: data.avatarUrl }));
+  }
+
+  return { ok: true, avatarUrl: data.avatarUrl as string };
+}
+
+export async function removeTauMailAvatar() {
+  const token = localStorage.getItem('tauos_token');
+  if (isDemoSession(token)) return { ok: true, demo: true };
+
+  const res = await fetch('/api/taumail/profile/avatar', {
+    method: 'DELETE',
+    headers: authHeaders(),
+  });
+  if (!res.ok) return { ok: false };
+
+  const storedUser = localStorage.getItem('tauos_user');
+  if (storedUser) {
+    const parsed = JSON.parse(storedUser);
+    localStorage.setItem('tauos_user', JSON.stringify({ ...parsed, avatarUrl: null }));
+  }
+  return { ok: true };
 }
 
 export async function fetchTauMailContacts(): Promise<TauMailContact[]> {

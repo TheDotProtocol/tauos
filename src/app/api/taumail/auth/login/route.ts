@@ -87,7 +87,7 @@ export async function POST(request: NextRequest) {
 
     // Query user from database with organization info
     const result = await getPool().query(
-      `SELECT u.id, u.username, u.email, u.password_hash, u.full_name, u.is_active, u.organization_id,
+      `SELECT u.id, u.username, u.email, u.password_hash, u.full_name, u.avatar_url, u.is_active, u.organization_id,
               o.name as organization_name, o.domain as organization_domain
        FROM users u 
        LEFT JOIN organizations o ON u.organization_id = o.id 
@@ -155,7 +155,8 @@ export async function POST(request: NextRequest) {
           id: user.organization_id,
           name: user.organization_name,
           domain: user.organization_domain
-        }
+        },
+        avatarUrl: user.avatar_url ?? null,
       }
     });
 

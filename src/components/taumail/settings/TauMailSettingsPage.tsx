@@ -1,15 +1,21 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import Image from 'next/image';
+import { useEffect, useRef, useState } from 'react';
 import { clsx } from 'clsx';
 import { geistMono, geistSans, outfit } from '@/lib/website/fonts';
 import { tauMailAssets } from '@/lib/taumail/assets';
 import TauMailAppShell from '@/components/taumail/shared/TauMailAppShell';
 import { MailIcon } from '@/components/taumail/shared/MailIcon';
+import TauMailUserAvatar from '@/components/taumail/shared/TauMailUserAvatar';
 import { useTauMailSession } from '@/hooks/useTauMailSession';
 import { DEMO_USER } from '@/lib/taumail-demo';
-import { fetchTauMailProfile, saveTauMailProfile, type TauMailProfile } from '@/lib/taumail/api-client';
+import {
+  fetchTauMailProfile,
+  removeTauMailAvatar,
+  saveTauMailProfile,
+  uploadTauMailAvatar,
+  type TauMailProfile,
+} from '@/lib/taumail/api-client';
 
 const settingsSections = [
   'Profile',
@@ -41,10 +47,13 @@ const connectedServices = ['Tau ID Core', 'Tau Cloud Storage', 'Tau Talk Termina
 
 export default function TauMailSettingsPage() {
   const { ready, isLoggedIn, user, logout, isDemo } = useTauMailSession();
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [activeSection, setActiveSection] = useState<(typeof settingsSections)[number]>('Profile');
   const [serverStatus, setServerStatus] = useState<string>('checking...');
   const [saved, setSaved] = useState(false);
   const [saveError, setSaveError] = useState('');
+  const [avatarError, setAvatarError] = useState('');
+  const [uploadingAvatar, setUploadingAvatar] = useState(false);
   const [profile, setProfile] = useState<ProfileForm>({
     fullName: '',
     displayName: '',
@@ -52,6 +61,7 @@ export default function TauMailSettingsPage() {
     organization: '',
     title: '',
     timezone: '(UTC-05:00) Eastern Time (US & Canada)',
+    avatarUrl: null,
   });
 
   useEffect(() => {
@@ -65,6 +75,7 @@ export default function TauMailSettingsPage() {
         organization: 'Tau Core Laboratories',
         title: 'Senior System Protocol Engineer',
         timezone: '(UTC-05:00) Eastern Time (US & Canada)',
+        avatarUrl: user.avatarUrl ?? null,
       });
       return;
     }
@@ -82,6 +93,7 @@ export default function TauMailSettingsPage() {
           organization: '',
           title: '',
           timezone: '(UTC-05:00) Eastern Time (US & Canada)',
+          avatarUrl: user.avatarUrl ?? null,
         });
       });
   }, [ready, user, isDemo]);
@@ -96,12 +108,16 @@ export default function TauMailSettingsPage() {
   const handleSave = async () => {
     setSaveError('');
     if (isDemo) {
-      localStorage.setItem('tauos_user', JSON.stringify({
-        ...user,
-        fullName: profile.fullName,
-        email: profile.email,
-        username: profile.displayName,
-      }));
+      localStorage.setItem(
+        'tauos_user',
+        JSON.stringify({
+          ...user,
+          fullName: profile.fullName,
+          email: profile.email,
+          username: profile.displayName,
+          avatarUrl: profile.avatarUrl ?? null,
+        }),
+      );
       setSaved(true);
       setTimeout(() => setSaved(false), 2000);
       return;
@@ -112,13 +128,59 @@ export default function TauMailSettingsPage() {
       setSaveError(result.error || 'Failed to save profile');
       return;
     }
+    if (result.profile) setProfile(result.profile);
     setSaved(true);
     setTimeout(() => setSaved(false), 2000);
+  };
+
+  const handleAvatarPick = () => {
+    setAvatarError('');
+    fileInputRef.current?.click();
+  };
+
+  const handleAvatarChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    event.target.value = '';
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      setAvatarError('Please choose a PNG, JPG, or WEBP image.');
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      setAvatarError('Image must be under 5 MB.');
+      return;
+    }
+
+    setUploadingAvatar(true);
+    setAvatarError('');
+    const result = await uploadTauMailAvatar(file);
+    setUploadingAvatar(false);
+
+    if (!result.ok) {
+      setAvatarError(result.error || 'Failed to upload photo');
+      return;
+    }
+
+    setProfile((p) => ({ ...p, avatarUrl: result.avatarUrl ?? null }));
+  };
+
+  const handleRemoveAvatar = async () => {
+    if (isDemo) {
+      setProfile((p) => ({ ...p, avatarUrl: null }));
+      return;
+    }
+    setUploadingAvatar(true);
+    await removeTauMailAvatar();
+    setUploadingAvatar(false);
+    setProfile((p) => ({ ...p, avatarUrl: null }));
   };
 
   if (!ready || !isLoggedIn) {
     return <div className={`${geistSans.className} flex min-h-screen items-center justify-center bg-[#070708] text-[#a1a1aa]`}>Loading...</div>;
   }
+
+  const avatarName = profile.displayName || profile.fullName || profile.email || 'Account';
 
   return (
     <TauMailAppShell active="settings" userName={profile.displayName} userEmail={profile.email}>
@@ -154,27 +216,56 @@ export default function TauMailSettingsPage() {
 
               <div className="mt-8 flex items-center gap-6">
                 <div className="relative">
-                  <Image src={tauMailAssets.avatars.userSidebar} alt="" width={96} height={96} className="size-24 rounded-full object-cover" />
-                  <button type="button" className="absolute inset-0 flex items-center justify-center rounded-full bg-black/50 text-xs font-semibold text-white">
-                    CHANGE
+                  <TauMailUserAvatar name={avatarName} imageUrl={profile.avatarUrl} size={96} />
+                  <button
+                    type="button"
+                    onClick={handleAvatarPick}
+                    disabled={uploadingAvatar}
+                    className="absolute inset-0 flex items-center justify-center rounded-full bg-black/50 text-xs font-semibold text-white disabled:opacity-60"
+                  >
+                    {uploadingAvatar ? '...' : profile.avatarUrl ? 'CHANGE' : 'UPLOAD'}
                   </button>
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/png,image/jpeg,image/webp"
+                    className="hidden"
+                    onChange={handleAvatarChange}
+                  />
                 </div>
-                <p className="text-xs text-[#71717a]">Recommended 256×256px · PNG, JPG, WEBP</p>
+                <div>
+                  <p className="text-xs text-[#71717a]">Recommended 256×256px · PNG, JPG, WEBP</p>
+                  {profile.avatarUrl ? (
+                    <button type="button" onClick={handleRemoveAvatar} className="mt-2 text-xs font-medium text-red-400 hover:text-red-300">
+                      Remove photo
+                    </button>
+                  ) : (
+                    <p className="mt-2 text-xs text-[#a1a1aa]">No profile photo yet</p>
+                  )}
+                  {avatarError ? <p className="mt-2 text-xs text-red-400">{avatarError}</p> : null}
+                </div>
               </div>
 
               <div className="mt-8 divide-y divide-[rgba(255,255,255,0.05)] rounded-xl border border-[rgba(255,255,255,0.05)] bg-[#121214]">
-                {profileFields.map(({ key, label }) => (
+                {profileFields.map(({ key, label }) => {
+                  const readOnly = key === 'email';
+                  return (
                   <div key={key} className="flex items-center justify-between gap-4 px-5 py-4">
                     <div className="min-w-0 flex-1">
                       <p className="text-xs text-[#71717a]">{label}</p>
                       <input
                         value={profile[key]}
+                        readOnly={readOnly}
                         onChange={(e) => setProfile((p) => ({ ...p, [key]: e.target.value }))}
-                        className="mt-1 w-full bg-transparent text-sm text-white outline-none"
+                        className={clsx(
+                          'mt-1 w-full bg-transparent text-sm text-white outline-none',
+                          readOnly && 'text-[#71717a]',
+                        )}
                       />
                     </div>
                   </div>
-                ))}
+                  );
+                })}
               </div>
 
               <div className="mt-6">

@@ -1,10 +1,9 @@
 'use client';
 
-import { useState } from 'react';
-import Image from 'next/image';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { geistMono, geistSans } from '@/lib/website/fonts';
-import { sendTauMail, saveTauMailDraft } from '@/lib/taumail/api-client';
+import { fetchTauMailProfile, saveTauMailDraft, sendTauMail } from '@/lib/taumail/api-client';
 import { tauMailAssets } from '@/lib/taumail/assets';
 import TauMailAppShell from '@/components/taumail/shared/TauMailAppShell';
 import { MailIcon } from '@/components/taumail/shared/MailIcon';
@@ -25,27 +24,48 @@ const toolbarIcons = [
   tauMailAssets.icons.paperclip,
 ] as const;
 
-const templates = [
-  { title: 'Node Protocol Report', desc: 'Standard telemetry sync summary template', subject: 'Node Protocol Report', body: 'Attached is the latest protocol telemetry summary...' },
-  { title: 'Weekly Ledger Update', desc: 'Performance metrics and operational logs', subject: 'Weekly Performance Ledger', body: 'Greetings command. We have finalized the weekly operational logs...' },
-  { title: 'Failsafe Incident Log', desc: 'Hub telemetry incident documentation', subject: 'Incident Report: Hub Telemetry', body: 'Urgent. Regional failsafes have been triggered...' },
-] as const;
-
 export default function TauMailComposePage() {
   const router = useRouter();
-  const { ready, isLoggedIn } = useTauMailSession();
-  const [to, setTo] = useState('sariel@tau.org, vance@tau.engineering');
-  const [subject, setSubject] = useState('Review: Telemetry Sync Handshake Protocol v4.3 Draft Specs');
-  const [body, setBody] = useState(
-    'Director Vance, Sariel,\n\nAttached is the draft specification for the Telemetry Sync Handshake Protocol (v4.3). We have incorporated the latency feedback from the Springfield hub incident and added redundant consensus checkpoints.\n\nPlease review sections 4.2 (Failsafe Triggers) and 7.1 (Cross-Node Alignment) before our alignment at 10:30 AM.\n\nBest,\nCassiel V',
-  );
+  const { ready, isLoggedIn, user, isDemo } = useTauMailSession();
+  const [to, setTo] = useState('');
+  const [subject, setSubject] = useState('');
+  const [body, setBody] = useState('');
+  const [signatureName, setSignatureName] = useState('');
+  const [signatureTitle, setSignatureTitle] = useState('');
+  const [signatureEmail, setSignatureEmail] = useState('');
   const [sending, setSending] = useState(false);
   const [savingDraft, setSavingDraft] = useState(false);
   const [draftId, setDraftId] = useState<string | undefined>();
   const [error, setError] = useState('');
   const [draftSaved, setDraftSaved] = useState(false);
 
+  useEffect(() => {
+    if (!ready || !isLoggedIn) return;
+
+    if (isDemo) {
+      setSignatureName(user?.fullName || user?.username || '');
+      setSignatureEmail(user?.email || '');
+      return;
+    }
+
+    fetchTauMailProfile()
+      .then((profile) => {
+        if (!profile) return;
+        setSignatureName(profile.displayName || profile.fullName || '');
+        setSignatureTitle(profile.title || '');
+        setSignatureEmail(profile.email || '');
+      })
+      .catch(() => {
+        setSignatureName(user?.fullName || user?.username || '');
+        setSignatureEmail(user?.email || '');
+      });
+  }, [ready, isLoggedIn, user, isDemo]);
+
   const handleSend = async () => {
+    if (!to.trim()) {
+      setError('Recipient is required');
+      return;
+    }
     setSending(true);
     setError('');
     const result = await sendTauMail({ to, subject, body });
@@ -85,7 +105,8 @@ export default function TauMailComposePage() {
               <input
                 value={to}
                 onChange={(e) => setTo(e.target.value)}
-                className="flex-1 bg-transparent text-sm text-white outline-none"
+                placeholder="recipient@example.com"
+                className="flex-1 bg-transparent text-sm text-white outline-none placeholder:text-[#71717a]"
               />
               <button type="button" className="ml-auto text-xs font-semibold text-[#71717a]">
                 CC / BCC
@@ -96,7 +117,8 @@ export default function TauMailComposePage() {
               <input
                 value={subject}
                 onChange={(e) => setSubject(e.target.value)}
-                className="flex-1 bg-transparent text-sm text-white outline-none"
+                placeholder="Subject"
+                className="flex-1 bg-transparent text-sm text-white outline-none placeholder:text-[#71717a]"
               />
             </div>
           </div>
@@ -112,10 +134,12 @@ export default function TauMailComposePage() {
           <textarea
             value={body}
             onChange={(e) => setBody(e.target.value)}
-            className="flex-1 resize-none overflow-y-auto bg-transparent px-8 py-6 text-sm leading-relaxed text-[#a1a1aa] outline-none"
+            placeholder="Write your message..."
+            className="flex-1 resize-none overflow-y-auto bg-transparent px-8 py-6 text-sm leading-relaxed text-[#a1a1aa] outline-none placeholder:text-[#71717a]"
           />
 
           {error ? <p className="px-8 text-xs text-red-400">{error}</p> : null}
+          {draftSaved ? <p className="px-8 text-xs text-[#d4a843]">Draft saved</p> : null}
 
           <div className="flex items-center gap-3 border-t border-[rgba(255,255,255,0.05)] px-8 py-4">
             <button
@@ -143,30 +167,21 @@ export default function TauMailComposePage() {
         </div>
 
         <aside className="w-[300px] shrink-0 overflow-y-auto border-l border-[rgba(255,255,255,0.05)] p-6">
-          <h3 className="text-xs font-semibold uppercase tracking-wide text-[#71717a]">Email Templates</h3>
-          <div className="mt-3 space-y-2">
-            {templates.map((t) => (
-              <button
-                key={t.title}
-                type="button"
-                onClick={() => {
-                  setSubject(t.subject);
-                  setBody(t.body);
-                }}
-                className="w-full rounded-lg border border-[rgba(255,255,255,0.05)] bg-[#121214] p-3 text-left"
-              >
-                <p className="text-[13px] font-semibold text-white">{t.title}</p>
-                <p className="mt-1 text-[11px] text-[#71717a]">{t.desc}</p>
-              </button>
-            ))}
-          </div>
-
-          <h3 className="mt-6 text-xs font-semibold uppercase tracking-wide text-[#71717a]">Signature Preview</h3>
+          <h3 className="text-xs font-semibold uppercase tracking-wide text-[#71717a]">Signature Preview</h3>
           <div className="mt-3 rounded-lg border border-[rgba(255,255,255,0.05)] bg-[#121214] p-3 text-xs">
-            <p className="font-semibold text-[#d4a843]">Cassiel V</p>
-            <p className="text-[#71717a]">Core Network Administrator</p>
-            <p className={`${geistMono.className} text-[#71717a]`}>cassiel@tau.net</p>
+            {signatureName ? (
+              <p className="font-semibold text-[#d4a843]">{signatureName}</p>
+            ) : (
+              <p className="text-[#71717a]">Your name will appear here</p>
+            )}
+            {signatureTitle ? <p className="text-[#71717a]">{signatureTitle}</p> : null}
+            {signatureEmail ? (
+              <p className={`${geistMono.className} text-[#71717a]`}>{signatureEmail}</p>
+            ) : (
+              <p className={`${geistMono.className} text-[#71717a]`}>your@email.com</p>
+            )}
           </div>
+          <p className="mt-4 text-[11px] text-[#71717a]">Update your signature details in Settings → Profile.</p>
         </aside>
       </div>
     </TauMailAppShell>

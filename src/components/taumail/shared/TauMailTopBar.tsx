@@ -1,12 +1,17 @@
 'use client';
 
-import Image from 'next/image';
 import Link from 'next/link';
 import { geistMono, geistSans, outfit } from '@/lib/website/fonts';
 import { tauMailAssets } from '@/lib/taumail/assets';
 import { MailIcon } from '@/components/taumail/shared/MailIcon';
+import TauMailUserAvatar from '@/components/taumail/shared/TauMailUserAvatar';
 
-export default function TauMailTopBar() {
+type TauMailTopBarProps = {
+  userName?: string;
+  avatarUrl?: string | null;
+};
+
+export default function TauMailTopBar({ userName = 'Account', avatarUrl }: TauMailTopBarProps) {
   return (
     <header
       className={`${geistSans.className} flex h-[72px] shrink-0 items-center justify-between border-b border-[rgba(255,255,255,0.05)] px-8 py-4`}
@@ -22,20 +27,22 @@ export default function TauMailTopBar() {
           <MailIcon src={tauMailAssets.icons.ellipseStatus} size={6} />
           <span className={`${geistMono.className} text-[11px] font-semibold text-[#d4a843]`}>TAUNET ACTIVE</span>
         </div>
-        <button
-          type="button"
+        <Link
+          href="/taumail/notifications"
           className="flex size-8 items-center justify-center rounded-2xl border border-[rgba(255,255,255,0.05)] bg-[#121214]"
           aria-label="Notifications"
         >
           <MailIcon src={tauMailAssets.icons.bellDot} size={16} />
-        </button>
-        <Image src={tauMailAssets.avatars.userTopbar} alt="" width={32} height={32} className="size-8 rounded-2xl object-cover" />
+        </Link>
+        <Link href="/taumail/settings">
+          <TauMailUserAvatar name={userName} imageUrl={avatarUrl} size={32} rounded="2xl" />
+        </Link>
       </div>
     </header>
   );
 }
 
-export function TauMailComposeTopBar() {
+export function TauMailComposeTopBar({ userName = 'Account', avatarUrl }: TauMailTopBarProps) {
   return (
     <header
       className={`${geistSans.className} flex h-[72px] shrink-0 items-center justify-between border-b border-[rgba(255,255,255,0.05)] px-8 py-4`}
@@ -49,10 +56,9 @@ export function TauMailComposeTopBar() {
           <MailIcon src={tauMailAssets.icons.ellipseStatus} size={6} />
           <span className={`${geistMono.className} text-[11px] font-semibold text-[#d4a843]`}>TAUNET ACTIVE</span>
         </div>
-        <button type="button" className="flex size-8 items-center justify-center rounded-2xl border border-[rgba(255,255,255,0.05)] bg-[#121214]" aria-label="Notifications">
-          <MailIcon src={tauMailAssets.icons.bellDot} size={16} />
-        </button>
-        <Image src={tauMailAssets.avatars.userTopbar} alt="" width={32} height={32} className="size-8 rounded-2xl object-cover" />
+        <Link href="/taumail/settings">
+          <TauMailUserAvatar name={userName} imageUrl={avatarUrl} size={32} rounded="2xl" />
+        </Link>
       </div>
     </header>
   );

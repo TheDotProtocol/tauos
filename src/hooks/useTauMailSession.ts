@@ -12,6 +12,7 @@ type StoredUser = {
   username: string;
   email: string;
   fullName: string;
+  avatarUrl?: string | null;
 };
 
 type UseTauMailSessionOptions = {
