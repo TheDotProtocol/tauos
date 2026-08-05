@@ -113,12 +113,12 @@ function toSendGridAttachments(input: SendMailInput) {
   }));
 }
 
-/** Domains verified in SendGrid (default: tauos.org). Other From domains must relay via authenticated address. */
+/** Domains verified in SendGrid. From addresses on other domains relay via tauos.org. */
 function getSendGridAuthenticatedDomains(): string[] {
   const raw =
     process.env.SENDGRID_AUTHENTICATED_DOMAINS?.trim() ||
     process.env.SENDGRID_AUTHENTICATED_DOMAIN?.trim() ||
-    'tauos.org';
+    'tauos.org,taumail.org';
   return raw
     .split(',')
     .map((d) => d.trim().toLowerCase())
