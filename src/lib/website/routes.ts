@@ -12,6 +12,8 @@ export const websiteRoutes = {
   tauGlass: '/products/tau-glass',
   tauBrowser: '/taubrowser',
   tauMail: '/taumail',
+  tauMailLogin: '/taumail/login',
+  tauMailRegister: '/taumail/register',
   tauTalk: '/tautalk',
   tauDrive: '/products/tau-drive',
   tauIde: '/developers',

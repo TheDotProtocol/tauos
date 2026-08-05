@@ -83,12 +83,20 @@ export default function TauMailProductPage() {
           <p className="mt-6 max-w-[600px] text-xl leading-relaxed text-[#a0a0a0]">
             Email that keeps your conversations private. Zero access tracking, on-device spam detection, and end-to-end encrypted inbox storage.
           </p>
-          <Link
-            href={websiteRoutes.tauMail}
-            className="mt-8 rounded-lg bg-[#d4af37] px-7 py-3.5 text-[15px] font-bold text-[#0f0f0f] hover:bg-[#e0bc4a]"
-          >
-            Get Tau Mail
-          </Link>
+          <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
+            <Link
+              href={websiteRoutes.tauMailLogin}
+              className="rounded-lg bg-[#d4af37] px-7 py-3.5 text-[15px] font-bold text-[#0f0f0f] hover:bg-[#e0bc4a]"
+            >
+              Get Tau Mail
+            </Link>
+            <Link
+              href={websiteRoutes.tauMailLogin}
+              className="rounded-lg border border-[#2a2820] bg-[#161616] px-7 py-3.5 text-[15px] font-semibold text-white hover:border-[#d4af37] hover:text-[#d4af37]"
+            >
+              Already a Tau? Login
+            </Link>
+          </div>
 
           {/* Mail mockup — Figma 31:1472 */}
           <div className="mt-16 flex w-full max-w-[1000px] overflow-hidden rounded-xl border border-[#2a2820] bg-[#161616] shadow-[0_16px_32px_-4px_rgba(0,0,0,0.7)]">
@@ -189,7 +197,7 @@ export default function TauMailProductPage() {
                   ))}
                 </ul>
                 <Link
-                  href={websiteRoutes.register}
+                  href={websiteRoutes.tauMailRegister}
                   className={`mt-8 block w-full rounded-lg py-3 text-center text-sm font-semibold ${
                     plan.highlighted
                       ? 'bg-[#d4af37] text-[#0f0f0f] hover:bg-[#e0bc4a]'

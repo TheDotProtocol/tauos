@@ -6,13 +6,12 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { geistMono, geistSans, outfit } from '@/lib/website/fonts';
 import { loginTauMail } from '@/lib/taumail/api-client';
-import { DEMO_CREDENTIALS } from '@/lib/taumail-demo';
 import { tauMailAssets } from '@/lib/taumail/assets';
 import { MailIcon } from '@/components/taumail/shared/MailIcon';
 
 export default function TauMailLoginPage() {
   const router = useRouter();
-  const [email, setEmail] = useState<string>(DEMO_CREDENTIALS.email);
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [remember, setRemember] = useState(true);
   const [showPassword, setShowPassword] = useState(false);
@@ -64,7 +63,10 @@ export default function TauMailLoginPage() {
             <input
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="mt-2 w-full rounded-lg border-[1.5px] border-[#d4a843] bg-[#070708] px-3 py-3 text-sm text-white outline-none"
+              placeholder="you@taumail.org"
+              autoComplete="email"
+              required
+              className="mt-2 w-full rounded-lg border-[1.5px] border-[#d4a843] bg-[#070708] px-3 py-3 text-sm text-white outline-none placeholder:text-[#71717a]"
             />
           </div>
 
@@ -76,16 +78,18 @@ export default function TauMailLoginPage() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••••••••••"
+                autoComplete="current-password"
+                required
                 className="flex-1 bg-transparent text-sm text-white outline-none placeholder:text-[#a1a1aa]"
               />
               <button type="button" onClick={() => setShowPassword((v) => !v)} className="text-xs font-semibold text-[#a1a1aa]">
-                Show
+                {showPassword ? 'Hide' : 'Show'}
               </button>
             </div>
           </div>
 
           <div className="flex items-center justify-between">
-            <label className="flex items-center gap-2 text-[13px] text-[#a1a1aa]">
+            <label className="flex cursor-pointer items-center gap-2 text-[13px] text-[#a1a1aa]">
               <span className="flex size-4 items-center justify-center rounded border-[1.5px] border-[#d4a843] bg-[rgba(212,168,67,0.08)]">
                 {remember ? <MailIcon src={tauMailAssets.auth.checkmark} size={10} /> : null}
               </span>
@@ -99,28 +103,6 @@ export default function TauMailLoginPage() {
 
           <button type="submit" disabled={loading} className="rounded-lg bg-[#d4a843] py-3 text-sm font-semibold text-[#121214] disabled:opacity-60">
             {loading ? 'Signing in...' : 'Sign In'}
-          </button>
-
-          <p className={`${geistMono.className} text-center text-[10px] text-[#71717a]`}>
-            Demo: {DEMO_CREDENTIALS.email} / {DEMO_CREDENTIALS.password}
-          </p>
-
-          <div className="flex items-center gap-3">
-            <Image src={tauMailAssets.shared.line} alt="" width={160} height={1} className="h-px flex-1" />
-            <span className={`${geistMono.className} text-[11px] text-[#71717a]`}>OR</span>
-            <Image src={tauMailAssets.shared.line} alt="" width={160} height={1} className="h-px flex-1" />
-          </div>
-
-          <button
-            type="button"
-            onClick={() => {
-              setEmail(DEMO_CREDENTIALS.email);
-              setPassword(DEMO_CREDENTIALS.password);
-            }}
-            className="flex items-center justify-center gap-2.5 rounded-lg border border-[#d4a843] py-3 text-sm font-semibold text-[#d4a843]"
-          >
-            <Image src={tauMailAssets.brand.logoIcon} alt="" width={16} height={16} className="rounded" />
-            Use Demo Account
           </button>
         </form>
 
