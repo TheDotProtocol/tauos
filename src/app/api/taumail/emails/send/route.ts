@@ -9,6 +9,7 @@ import {
   deleteMailAttachment,
 } from '@/lib/taumail-attachment-storage';
 import { isAllowedMailDomain, parseEmailAddress } from '@/config/mail-domains';
+import { resolveTauMailAvatarUrl } from '@/lib/taumail/profile-server';
 
 async function deliverToInternalInboxes(
   fromEmail: string,
@@ -115,7 +116,7 @@ export async function POST(request: NextRequest) {
     }
 
     const userResult = await getPool().query(
-      'SELECT username, email, full_name FROM users WHERE id = $1',
+      'SELECT username, email, full_name, display_name, avatar_url FROM users WHERE id = $1',
       [decoded.userId]
     );
 
@@ -125,10 +126,27 @@ export async function POST(request: NextRequest) {
 
     const user = userResult.rows[0];
     const fromEmail = user.email;
-    const fromName = user.full_name || user.username;
+    const fromName = user.full_name || user.display_name || user.username;
+    const avatarUrl = await resolveTauMailAvatarUrl(decoded.userId, user.avatar_url);
+
+    const signatureBlock = avatarUrl
+      ? `<table cellpadding="0" cellspacing="0" style="margin-top:16px;"><tr>
+           <td style="padding-right:12px;vertical-align:top;">
+             <img src="${avatarUrl}" alt="" width="48" height="48" style="border-radius:50%;object-fit:cover;" />
+           </td>
+           <td style="vertical-align:top;font-size:13px;color:#444;">
+             <strong>${fromName.replace(/</g, '&lt;')}</strong><br/>
+             <span style="color:#666;">${fromEmail}</span>
+           </td>
+         </tr></table>`
+      : `<p style="margin-top:16px;font-size:13px;color:#444;">
+           <strong>${fromName.replace(/</g, '&lt;')}</strong><br/>
+           <span style="color:#666;">${fromEmail}</span>
+         </p>`;
 
     const html = `<div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
       <p>${body.replace(/\n/g, '<br>')}</p>
+      ${signatureBlock}
       <hr style="margin: 20px 0; border: none; border-top: 1px solid #eee;">
       <p style="font-size: 12px; color: #666;">
         Sent via Tau Mail — Privacy-native email on TAU CORE™<br>

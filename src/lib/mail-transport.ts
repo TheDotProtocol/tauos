@@ -124,10 +124,8 @@ async function sendViaSmtp(input: SendMailInput): Promise<SendMailResult> {
     ? `"${input.from.name}" <${input.from.email}>`
     : input.from.email;
 
-  const envelopeFrom =
-    process.env.SMTP_ENVELOPE_FROM?.trim() ||
-    process.env.MAIL_FROM?.trim() ||
-    input.from.email;
+  // User-sent mail: envelope matches From so Gmail shows the sender identity, not a relay noreply.
+  const envelopeFrom = input.from.email;
 
   const headers: Record<string, string> = {};
   if (input.inReplyTo) headers['In-Reply-To'] = input.inReplyTo;
@@ -136,7 +134,6 @@ async function sendViaSmtp(input: SendMailInput): Promise<SendMailResult> {
   const transport = getSmtpTransport();
   const info = await transport.sendMail({
     from: fromHeader,
-    sender: envelopeFrom !== input.from.email ? envelopeFrom : undefined,
     replyTo: input.replyTo || input.from.email,
     to: input.to,
     cc: input.cc,
@@ -171,13 +168,8 @@ async function sendViaSendGrid(input: SendMailInput): Promise<SendMailResult> {
 
   sgMail.setApiKey(apiKey);
 
-  const fromEmail =
-    process.env.SENDGRID_FROM_EMAIL?.trim() ||
-    input.from.email;
-
-  const fromName =
-    process.env.SENDGRID_FROM_NAME?.trim() ||
-    input.from.name;
+  const fromEmail = input.from.email;
+  const fromName = input.from.name || input.from.email.split('@')[0];
 
   const [response] = await sgMail.send({
     to: input.to,

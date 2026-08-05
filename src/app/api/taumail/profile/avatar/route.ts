@@ -1,5 +1,5 @@
 import { withTauMailAuth } from '@/lib/taumail/api-route';
-import { deleteTauMailAvatar, getTauMailProfileRow, uploadTauMailAvatar } from '@/lib/taumail/profile-server';
+import { deleteTauMailAvatar, getTauMailProfileRow, mapTauMailProfileAsync, uploadTauMailAvatar } from '@/lib/taumail/profile-server';
 import { NextRequest, NextResponse } from 'next/server';
 
 export const dynamic = 'force-dynamic';
@@ -25,14 +25,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({
         success: true,
         avatarUrl: result.avatarUrl,
-        profile: profile
-          ? {
-              fullName: profile.full_name || '',
-              displayName: profile.display_name || profile.username || '',
-              email: profile.email || '',
-              avatarUrl: profile.avatar_url,
-            }
-          : null,
+        profile: profile ? await mapTauMailProfileAsync(profile) : null,
       });
     } catch (error) {
       console.error('[taumail/profile/avatar]', error);

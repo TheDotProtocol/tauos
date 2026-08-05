@@ -1,8 +1,12 @@
 'use client';
 
+import { useMemo, useState } from 'react';
+import { avatarBackgroundColor, gravatarUrl, initialsFromName } from '@/lib/taumail/avatar';
+
 type TauMailUserAvatarProps = {
   name: string;
   imageUrl?: string | null;
+  email?: string;
   size?: number;
   className?: string;
   rounded?: 'full' | '2xl';
@@ -11,36 +15,43 @@ type TauMailUserAvatarProps = {
 export default function TauMailUserAvatar({
   name,
   imageUrl,
+  email,
   size = 40,
   className = '',
   rounded = 'full',
 }: TauMailUserAvatarProps) {
-  const initials = name
-    .split(/\s+/)
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((w) => w[0]?.toUpperCase())
-    .join('');
+  const [imgFailed, setImgFailed] = useState(false);
 
+  const initials = useMemo(() => initialsFromName(name), [name]);
   const radiusClass = rounded === '2xl' ? 'rounded-2xl' : 'rounded-full';
+  const gravatar = email && !imageUrl ? gravatarUrl(email, size * 2) : null;
+  const resolvedUrl = !imgFailed ? imageUrl || gravatar : null;
 
-  if (imageUrl) {
+  if (resolvedUrl) {
     return (
       <img
-        src={imageUrl}
+        src={resolvedUrl}
         alt={name}
         width={size}
         height={size}
         className={`${radiusClass} shrink-0 object-cover ${className}`}
         style={{ width: size, height: size }}
+        onError={() => setImgFailed(true)}
       />
     );
   }
 
+  const bg = email ? avatarBackgroundColor(email) : '#1e1e24';
+
   return (
     <div
-      className={`${radiusClass} flex shrink-0 items-center justify-center border border-[rgba(255,255,255,0.08)] bg-[#1e1e24] font-semibold text-[#a1a1aa] ${className}`}
-      style={{ width: size, height: size, fontSize: Math.max(11, size * 0.34) }}
+      className={`${radiusClass} flex shrink-0 items-center justify-center font-semibold text-white ${className}`}
+      style={{
+        width: size,
+        height: size,
+        fontSize: Math.max(11, size * 0.34),
+        backgroundColor: bg,
+      }}
       aria-hidden
     >
       {initials || '+'}

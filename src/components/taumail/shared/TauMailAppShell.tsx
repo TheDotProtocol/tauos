@@ -25,7 +25,22 @@ export default function TauMailAppShell({ active, children, userName, userEmail,
     if (!user || isDemo) return;
     fetchTauMailProfile()
       .then((p) => {
-        if (p) setProfile(p);
+        if (!p) return;
+        setProfile(p);
+        const storedUser = localStorage.getItem('tauos_user');
+        if (storedUser) {
+          const parsed = JSON.parse(storedUser);
+          localStorage.setItem(
+            'tauos_user',
+            JSON.stringify({
+              ...parsed,
+              fullName: p.fullName || parsed.fullName,
+              email: p.email || parsed.email,
+              username: p.displayName || parsed.username,
+              avatarUrl: p.avatarUrl ?? parsed.avatarUrl ?? null,
+            }),
+          );
+        }
       })
       .catch(() => undefined);
   }, [user, isDemo]);

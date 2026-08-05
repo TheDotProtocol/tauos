@@ -1,15 +1,13 @@
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
-import Image from 'next/image';
 import { clsx } from 'clsx';
 import { geistMono, geistSans } from '@/lib/website/fonts';
-import { fetchTauMailEmails, markEmailRead } from '@/lib/taumail/api-client';
+import { fetchTauMailEmails, fetchTauMailProfile, markEmailRead, type TauMailProfile } from '@/lib/taumail/api-client';
 import type { TauMailEmail, TauMailFolder } from '@/lib/taumail/types';
-import { tauMailAssets } from '@/lib/taumail/assets';
 import TauMailAppShell from '@/components/taumail/shared/TauMailAppShell';
 import EmailReaderPane from '@/components/taumail/shared/EmailReaderPane';
-import { MailIcon } from '@/components/taumail/shared/MailIcon';
+import TauMailUserAvatar from '@/components/taumail/shared/TauMailUserAvatar';
 import { useTauMailSession } from '@/hooks/useTauMailSession';
 
 import type { TauMailNavId } from '@/lib/taumail/assets';
@@ -24,7 +22,8 @@ type MailFolderViewProps = {
 };
 
 export default function MailFolderView({ folder, title, activeNav, showTabs = false }: MailFolderViewProps) {
-  const { ready, isLoggedIn } = useTauMailSession();
+  const { ready, isLoggedIn, user, isDemo } = useTauMailSession();
+  const [profile, setProfile] = useState<TauMailProfile | null>(null);
   const [emails, setEmails] = useState<TauMailEmail[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -59,6 +58,18 @@ export default function MailFolderView({ folder, title, activeNav, showTabs = fa
     if (!ready || !isLoggedIn) return;
     loadEmails();
   }, [folder, ready, isLoggedIn, loadEmails]);
+
+  useEffect(() => {
+    if (!ready || !isLoggedIn || isDemo) return;
+    fetchTauMailProfile()
+      .then((p) => {
+        if (p) setProfile(p);
+      })
+      .catch(() => undefined);
+  }, [ready, isLoggedIn, isDemo]);
+
+  const userAvatarUrl = profile?.avatarUrl ?? user?.avatarUrl ?? null;
+  const userDisplayName = profile?.displayName || profile?.fullName || user?.fullName || user?.username || 'You';
 
   useEffect(() => {
     if (!ready || !isLoggedIn || folder !== 'inbox') return;
@@ -137,6 +148,10 @@ export default function MailFolderView({ folder, title, activeNav, showTabs = fa
             ) : (
               filtered.map((email) => {
                 const isSelected = email.id === selectedId;
+                const isSentByMe = folder === 'sent';
+                const avatarName = isSentByMe ? userDisplayName : email.sender;
+                const avatarEmail = isSentByMe ? profile?.email || user?.email : email.senderEmail;
+                const avatarUrl = isSentByMe ? userAvatarUrl : undefined;
                 return (
                   <button
                     key={String(email.id)}
@@ -148,12 +163,12 @@ export default function MailFolderView({ folder, title, activeNav, showTabs = fa
                     )}
                   >
                     {email.unread ? <span className="absolute bottom-0 left-0 top-0 w-1 bg-[#d4a843]" /> : null}
-                    <Image
-                      src={email.avatar || tauMailAssets.avatars.sender1}
-                      alt=""
-                      width={36}
-                      height={36}
-                      className="size-9 shrink-0 rounded-[18px] object-cover"
+                    <TauMailUserAvatar
+                      name={avatarName}
+                      email={avatarEmail}
+                      imageUrl={avatarUrl}
+                      size={36}
+                      rounded="full"
                     />
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center justify-between gap-2">
@@ -169,7 +184,15 @@ export default function MailFolderView({ folder, title, activeNav, showTabs = fa
             )}
           </div>
         </div>
-        {selected ? <EmailReaderPane email={selected} recipientLabel={folder === 'sent' ? `To: ${selected.senderEmail}` : undefined} /> : null}
+        {selected ? (
+          <EmailReaderPane
+            email={selected}
+            recipientLabel={folder === 'sent' ? `To: ${selected.senderEmail}` : undefined}
+            avatarName={folder === 'sent' ? userDisplayName : selected.sender}
+            avatarEmail={folder === 'sent' ? profile?.email || user?.email : selected.senderEmail}
+            avatarUrl={folder === 'sent' ? userAvatarUrl : undefined}
+          />
+        ) : null}
       </div>
     </TauMailAppShell>
   );

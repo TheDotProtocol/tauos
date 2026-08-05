@@ -14,14 +14,12 @@ import {
   mapApiSentEmail,
   mapApiTrashEmail,
 } from '@/lib/taumail/types';
-import { tauMailAssets } from '@/lib/taumail/assets';
+import {
+  TAUMAIL_INLINE_ATTACHMENT_BYTES,
+  type MailAttachmentRef,
+} from '@/lib/taumail-attachments';
 
-const avatars = [
-  tauMailAssets.avatars.sender1,
-  tauMailAssets.avatars.sender2,
-  tauMailAssets.avatars.sender3,
-  tauMailAssets.avatars.sender4,
-];
+export type TauMailAttachmentRef = MailAttachmentRef;
 
 function authHeaders(): HeadersInit {
   const token = typeof window !== 'undefined' ? localStorage.getItem('tauos_token') : null;
@@ -32,25 +30,18 @@ function jsonAuthHeaders(): HeadersInit {
   return { ...authHeaders(), 'Content-Type': 'application/json' };
 }
 
-function withAvatar(email: TauMailEmail, index: number): TauMailEmail {
-  return { ...email, avatar: avatars[index % avatars.length] };
-}
-
-function mapDemoInbox(email: DemoInboxEmail, index: number): TauMailEmail {
-  return withAvatar(
-    {
-      id: email.id,
-      sender: email.from,
-      senderEmail: email.fromEmail,
-      subject: email.subject,
-      preview: email.preview,
-      body: email.body,
-      time: email.time,
-      unread: email.unread,
-      starred: email.starred,
-    },
-    index,
-  );
+function mapDemoInbox(email: DemoInboxEmail): TauMailEmail {
+  return {
+    id: email.id,
+    sender: email.from,
+    senderEmail: email.fromEmail,
+    subject: email.subject,
+    preview: email.preview,
+    body: email.body,
+    time: email.time,
+    unread: email.unread,
+    starred: email.starred,
+  };
 }
 
 export type TauMailProfile = {
@@ -113,76 +104,56 @@ export async function fetchTauMailEmails(folder: TauMailFolder): Promise<TauMail
   if (isDemoSession(token)) {
     if (folder === 'inbox') return getDemoInbox().map(mapDemoInbox);
     if (folder === 'sent') {
-      return getDemoSent().map((e, i) =>
-        withAvatar(
-          {
-            id: e.id,
-            sender: 'You',
-            senderEmail: e.recipient_email,
-            subject: e.subject,
-            preview: e.body.slice(0, 100) + '...',
-            body: e.body,
-            time: new Date(e.sent_at).toLocaleString(),
-            unread: false,
-            starred: false,
-          },
-          i,
-        ),
-      );
+      return getDemoSent().map((e) => ({
+        id: e.id,
+        sender: 'You',
+        senderEmail: e.recipient_email,
+        subject: e.subject,
+        preview: e.body.slice(0, 100) + '...',
+        body: e.body,
+        time: new Date(e.sent_at).toLocaleString(),
+        unread: false,
+        starred: false,
+      }));
     }
     if (folder === 'drafts') {
-      return getDemoDrafts().map((e, i) =>
-        withAvatar(
-          {
-            id: e.id,
-            sender: 'Draft',
-            senderEmail: e.to,
-            subject: e.subject,
-            preview: e.body.slice(0, 100) + '...',
-            body: e.body,
-            time: new Date(e.updated_at).toLocaleString(),
-            unread: true,
-            starred: false,
-          },
-          i,
-        ),
-      );
+      return getDemoDrafts().map((e) => ({
+        id: e.id,
+        sender: 'Draft',
+        senderEmail: e.to,
+        subject: e.subject,
+        preview: e.body.slice(0, 100) + '...',
+        body: e.body,
+        time: new Date(e.updated_at).toLocaleString(),
+        unread: true,
+        starred: false,
+      }));
     }
     if (folder === 'spam') {
-      return getDemoSpam().map((e, i) =>
-        withAvatar(
-          {
-            id: e.id,
-            sender: e.from,
-            senderEmail: e.from,
-            subject: e.subject,
-            preview: e.preview,
-            body: e.preview,
-            time: e.time,
-            unread: e.unread,
-            starred: e.starred,
-          },
-          i,
-        ),
-      );
+      return getDemoSpam().map((e) => ({
+        id: e.id,
+        sender: e.from,
+        senderEmail: e.from,
+        subject: e.subject,
+        preview: e.preview,
+        body: e.preview,
+        time: e.time,
+        unread: e.unread,
+        starred: e.starred,
+      }));
     }
     if (folder === 'trash') {
-      return getDemoTrash().map((e, i) =>
-        withAvatar(
-          {
-            id: e.id,
-            sender: e.from,
-            senderEmail: e.from,
-            subject: e.subject,
-            preview: e.preview,
-            body: e.preview,
-            time: e.time,
-            unread: false,
-            starred: false,
-          },
-          i,
-        ),
-      );
+      return getDemoTrash().map((e) => ({
+        id: e.id,
+        sender: e.from,
+        senderEmail: e.from,
+        subject: e.subject,
+        preview: e.preview,
+        body: e.preview,
+        time: e.time,
+        unread: false,
+        starred: false,
+      }));
     }
   }
 
@@ -192,34 +163,34 @@ export async function fetchTauMailEmails(folder: TauMailFolder): Promise<TauMail
     const res = await fetch('/api/taumail/emails/inbox', { headers });
     if (!res.ok) throw new Error('Failed to load inbox');
     const data = await res.json();
-    return (data.emails || []).map((e: Record<string, unknown>, i: number) => withAvatar(mapApiInboxEmail(e), i));
+    return (data.emails || []).map((e: Record<string, unknown>) => mapApiInboxEmail(e));
   }
 
   if (folder === 'sent') {
     const res = await fetch('/api/taumail/emails/sent', { headers });
     if (!res.ok) throw new Error('Failed to load sent');
     const data = await res.json();
-    return (data.emails || []).map((e: Record<string, unknown>, i: number) => withAvatar(mapApiSentEmail(e), i));
+    return (data.emails || []).map((e: Record<string, unknown>) => mapApiSentEmail(e));
   }
 
   if (folder === 'spam') {
     const res = await fetch('/api/taumail/emails/spam', { headers });
     if (!res.ok) throw new Error('Failed to load spam');
     const data = await res.json();
-    return (data.emails || []).map((e: Record<string, unknown>, i: number) => withAvatar(mapApiInboxEmail(e), i));
+    return (data.emails || []).map((e: Record<string, unknown>) => mapApiInboxEmail(e));
   }
 
   if (folder === 'drafts') {
     const res = await fetch('/api/taumail/emails/drafts', { headers });
     if (!res.ok) throw new Error('Failed to load drafts');
     const data = await res.json();
-    return (data.drafts || []).map((e: Record<string, unknown>, i: number) => withAvatar(mapApiDraftEmail(e), i));
+    return (data.drafts || []).map((e: Record<string, unknown>) => mapApiDraftEmail(e));
   }
 
   const res = await fetch('/api/taumail/emails/trash', { headers });
   if (!res.ok) throw new Error('Failed to load trash');
   const data = await res.json();
-  return (data.emails || []).map((e: Record<string, unknown>, i: number) => withAvatar(mapApiTrashEmail(e), i));
+  return (data.emails || []).map((e: Record<string, unknown>) => mapApiTrashEmail(e));
 }
 
 export async function loginTauMail(email: string, password: string) {
@@ -252,7 +223,14 @@ export async function loginTauMail(email: string, password: string) {
   return { ok: true as const, demo: false };
 }
 
-export async function sendTauMail(payload: { to: string; subject: string; body: string }) {
+export async function sendTauMail(payload: {
+  to: string;
+  subject: string;
+  body: string;
+  cc?: string;
+  bcc?: string;
+  attachments?: TauMailAttachmentRef[];
+}) {
   const token = localStorage.getItem('tauos_token');
   if (isDemoSession(token)) {
     return { ok: true, demo: true };
@@ -265,6 +243,70 @@ export async function sendTauMail(payload: { to: string; subject: string; body: 
   const data = await res.json();
   if (!res.ok) return { ok: false, error: data.error || 'Send failed' };
   return { ok: true, demo: false };
+}
+
+export async function uploadTauMailAttachment(
+  file: File,
+): Promise<{ ok: true; ref: TauMailAttachmentRef } | { ok: false; error: string }> {
+  const token = localStorage.getItem('tauos_token');
+  if (!token) return { ok: false, error: 'Not logged in' };
+
+  if (file.size <= TAUMAIL_INLINE_ATTACHMENT_BYTES) {
+    const formData = new FormData();
+    formData.append('file', file);
+    const res = await fetch('/api/taumail/emails/attachments/upload', {
+      method: 'PUT',
+      headers: { Authorization: `Bearer ${token}` },
+      body: formData,
+    });
+    const data = await res.json();
+    if (!res.ok) return { ok: false, error: data.error || 'Upload failed' };
+    return {
+      ok: true,
+      ref: {
+        attachmentId: data.attachmentId,
+        path: data.path,
+        filename: data.filename,
+        contentType: data.contentType,
+        size: data.size,
+      },
+    };
+  }
+
+  const prepRes = await fetch('/api/taumail/emails/attachments', {
+    method: 'POST',
+    headers: jsonAuthHeaders(),
+    body: JSON.stringify({
+      filename: file.name,
+      contentType: file.type || 'application/octet-stream',
+      size: file.size,
+    }),
+  });
+  const prep = await prepRes.json();
+  if (!prepRes.ok) return { ok: false, error: prep.error || 'Failed to prepare upload' };
+
+  const uploadRes = await fetch(prep.uploadUrl, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': file.type || 'application/octet-stream',
+      ...(prep.token ? { 'x-upsert': 'true' } : {}),
+    },
+    body: file,
+  });
+  if (!uploadRes.ok) {
+    return { ok: false, error: 'Failed to upload file to storage' };
+  }
+
+  return {
+    ok: true,
+    ref: {
+      attachmentId: prep.attachmentId,
+      path: prep.path,
+      filename: file.name,
+      contentType: file.type || 'application/octet-stream',
+      size: file.size,
+    },
+  };
 }
 
 export async function saveTauMailDraft(payload: { to: string; subject: string; body: string; draftId?: string }) {
@@ -399,26 +441,24 @@ export async function fetchTauMailContacts(): Promise<TauMailContact[]> {
   const token = localStorage.getItem('tauos_token');
   if (isDemoSession(token)) {
     const { contactsList } = await import('@/lib/taumail/ui-demo-data');
-    return contactsList.map((c, i) => ({
+    return contactsList.map((c) => ({
       id: c.email,
       name: c.name,
       email: c.email,
       role: c.role,
       verified: c.verified,
-      avatar: avatars[i % avatars.length],
     }));
   }
 
   const res = await fetch('/api/taumail/contacts', { headers: authHeaders() });
   if (!res.ok) throw new Error('Failed to load contacts');
   const data = await res.json();
-  return (data.contacts || []).map((c: Record<string, unknown>, i: number) => ({
+  return (data.contacts || []).map((c: Record<string, unknown>) => ({
     id: String(c.id),
     name: String(c.name),
     email: String(c.email),
     role: String(c.role || ''),
     verified: Boolean(c.verified),
-    avatar: avatars[i % avatars.length],
   }));
 }
 

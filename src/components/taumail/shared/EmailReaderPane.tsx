@@ -1,10 +1,10 @@
 'use client';
 
-import Image from 'next/image';
 import { geistMono, geistSans, outfit } from '@/lib/website/fonts';
 import { tauMailAssets } from '@/lib/taumail/assets';
 import type { TauMailEmail } from '@/lib/taumail/types';
 import { MailIcon } from '@/components/taumail/shared/MailIcon';
+import TauMailUserAvatar from '@/components/taumail/shared/TauMailUserAvatar';
 
 const actionButtons = [
   { label: 'Reply', icon: tauMailAssets.icons.arrowUpLeft, gold: false },
@@ -18,10 +18,18 @@ const actionButtons = [
 type EmailReaderPaneProps = {
   email: TauMailEmail;
   recipientLabel?: string;
+  avatarName?: string;
+  avatarEmail?: string;
+  avatarUrl?: string | null;
 };
 
-export default function EmailReaderPane({ email, recipientLabel }: EmailReaderPaneProps) {
-  const avatar = email.avatar || tauMailAssets.avatars.senderLarge;
+export default function EmailReaderPane({
+  email,
+  recipientLabel,
+  avatarName,
+  avatarEmail,
+  avatarUrl,
+}: EmailReaderPaneProps) {
   const paragraphs = email.body.split('\n\n').filter(Boolean);
 
   return (
@@ -29,7 +37,12 @@ export default function EmailReaderPane({ email, recipientLabel }: EmailReaderPa
       <div className="border-b border-[rgba(255,255,255,0.05)] pb-5">
         <div className="flex items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <Image src={avatar} alt="" width={44} height={44} className="size-11 rounded-[22px] object-cover" />
+            <TauMailUserAvatar
+              name={avatarName || email.sender}
+              email={avatarEmail || email.senderEmail}
+              imageUrl={avatarUrl}
+              size={44}
+            />
             <div>
               <p className="text-[15px] font-semibold text-white">{email.sender}</p>
               <p className={`${geistMono.className} text-xs text-[#71717a]`}>

@@ -1,10 +1,10 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import Image from 'next/image';
 import { geistMono, geistSans, outfit } from '@/lib/website/fonts';
 import { tauMailAssets } from '@/lib/taumail/assets';
 import TauMailAppShell from '@/components/taumail/shared/TauMailAppShell';
+import TauMailUserAvatar from '@/components/taumail/shared/TauMailUserAvatar';
 import { MailIcon } from '@/components/taumail/shared/MailIcon';
 import { fetchTauMailContacts, type TauMailContact } from '@/lib/taumail/api-client';
 import { useTauMailSession } from '@/hooks/useTauMailSession';
@@ -53,7 +53,7 @@ export default function TauMailContactsPage() {
           ) : (
             filtered.map((c) => (
               <div key={c.id} className="flex items-center gap-4 rounded-xl border border-[rgba(255,255,255,0.05)] bg-[#121214] p-4">
-                <Image src={c.avatar || tauMailAssets.avatars.sender1} alt="" width={44} height={44} className="size-11 rounded-[22px] object-cover" />
+                <TauMailUserAvatar name={c.name} email={c.email} size={44} />
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-1.5">
                     <p className="text-[15px] font-semibold text-white">{c.name}</p>

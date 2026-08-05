@@ -1,6 +1,6 @@
 import { getPool } from '@/app/api/taumail/middleware/security';
 import { withTauMailAuth } from '@/lib/taumail/api-route';
-import { getTauMailProfileRow, mapTauMailProfile } from '@/lib/taumail/profile-server';
+import { getTauMailProfileRow, mapTauMailProfileAsync } from '@/lib/taumail/profile-server';
 import { NextRequest, NextResponse } from 'next/server';
 
 export const dynamic = 'force-dynamic';
@@ -11,7 +11,7 @@ export async function GET(request: NextRequest) {
     if (!user) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
-    return NextResponse.json({ success: true, profile: mapTauMailProfile(user) });
+    return NextResponse.json({ success: true, profile: await mapTauMailProfileAsync(user) });
   });
 }
 
@@ -45,6 +45,6 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
 
-    return NextResponse.json({ success: true, profile: mapTauMailProfile(user) });
+    return NextResponse.json({ success: true, profile: await mapTauMailProfileAsync(user) });
   });
 }

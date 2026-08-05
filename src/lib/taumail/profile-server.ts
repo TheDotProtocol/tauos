@@ -2,6 +2,7 @@ import { getPool } from '@/lib/db-pool';
 import {
   createSignedDownloadUrl,
   deleteObject,
+  downloadObject,
   getSupabaseStorageConfig,
   uploadObject,
 } from '@/lib/supabase-storage';
@@ -58,9 +59,60 @@ export async function uploadTauMailAvatar(userId: string | number, file: File) {
   const data = await file.arrayBuffer();
   await uploadObject(cfg, objectPath, data, file.type || 'image/jpeg');
 
+  await getPool().query('UPDATE users SET avatar_url = $2 WHERE id = $1', [id, objectPath]);
   const signed = await createSignedDownloadUrl(cfg, objectPath, 60 * 60 * 24 * 7);
-  await getPool().query('UPDATE users SET avatar_url = $2 WHERE id = $1', [id, signed]);
   return { path: objectPath, avatarUrl: signed };
+}
+
+async function inferAvatarObjectPath(userId: string): Promise<string | null> {
+  const cfg = getSupabaseStorageConfig();
+  if (!cfg) return null;
+
+  for (const ext of ['jpg', 'png', 'webp']) {
+    const objectPath = `taumail/avatars/${userId}.${ext}`;
+    try {
+      await downloadObject(cfg, objectPath);
+      return objectPath;
+    } catch {
+      /* try next extension */
+    }
+  }
+  return null;
+}
+
+export async function resolveTauMailAvatarUrl(
+  userId: string | number,
+  avatarUrl: string | null,
+): Promise<string | null> {
+  if (!avatarUrl) return null;
+
+  const cfg = getSupabaseStorageConfig();
+  if (!cfg) return avatarUrl.startsWith('http') ? avatarUrl : null;
+
+  let objectPath = avatarUrl;
+  if (avatarUrl.startsWith('http')) {
+    const fromUrl = avatarUrl.match(/taumail\/avatars\/[^/?]+/);
+    objectPath = fromUrl?.[0] ?? (await inferAvatarObjectPath(uid(userId))) ?? avatarUrl;
+    if (objectPath.startsWith('http')) return objectPath;
+  }
+
+  try {
+    return await createSignedDownloadUrl(cfg, objectPath, 60 * 60 * 24 * 7);
+  } catch {
+    return avatarUrl.startsWith('http') ? avatarUrl : null;
+  }
+}
+
+export async function mapTauMailProfileAsync(row: TauMailProfileRow) {
+  return {
+    fullName: row.full_name || '',
+    displayName: row.display_name || row.username || '',
+    email: row.email || '',
+    organization: row.organization_name || '',
+    title: row.job_title || '',
+    timezone: row.timezone || '(UTC-05:00) Eastern Time (US & Canada)',
+    avatarUrl: await resolveTauMailAvatarUrl(row.id, row.avatar_url),
+  };
 }
 
 export async function deleteTauMailAvatar(userId: string | number) {
