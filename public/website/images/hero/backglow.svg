@@ -1,0 +1,20 @@
+<svg width="1040" height="840" viewBox="0 0 1040 840" fill="none" xmlns="http://www.w3.org/2000/svg">
+<rect width="1040" height="840" fill="#F5F5F5"/>
+<g id="Homepage / 01 &#226;&#128;&#148; Navigation + Hero &#226;&#128;&#148; APPROVED">
+<rect width="1440" height="1200" transform="translate(-200 -260)" fill="#0A0A0B"/>
+<g id="hero-backglow" opacity="0.15" filter="url(#filter0_f_21_2)">
+<ellipse cx="520" cy="420" rx="400" ry="300" fill="url(#paint0_radial_21_2)"/>
+</g>
+</g>
+<defs>
+<filter id="filter0_f_21_2" x="0" y="0" width="1040" height="840" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+<feFlood flood-opacity="0" result="BackgroundImageFix"/>
+<feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape"/>
+<feGaussianBlur stdDeviation="60" result="effect1_foregroundBlur_21_2"/>
+</filter>
+<radialGradient id="paint0_radial_21_2" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(520 420) scale(400 300)">
+<stop stop-color="#D4AF37"/>
+<stop offset="1" stop-color="#D4AF37" stop-opacity="0"/>
+</radialGradient>
+</defs>
+</svg>

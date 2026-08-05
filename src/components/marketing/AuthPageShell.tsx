@@ -2,9 +2,10 @@
 
 import Link from 'next/link';
 import MarketingChrome from '@/components/marketing/MarketingChrome';
-import Navigation from '@/components/marketing/Navigation';
-import Footer from '@/components/marketing/Footer';
+import TxpNavigation from '@/txp/patterns/TxpNavigation';
+import TxpFooter from '@/txp/patterns/TxpFooter';
 import Logo from '@/components/marketing/Logo';
+import { TxpGradientText } from '@/txp/components/primitives';
 
 type AuthPageShellProps = {
   children: React.ReactNode;
@@ -23,26 +24,28 @@ export default function AuthPageShell({
 }: AuthPageShellProps) {
   return (
     <MarketingChrome>
-      <div className="min-h-screen bg-background text-foreground flex flex-col">
-        <Navigation />
+      <div className="min-h-screen bg-black text-white flex flex-col">
+        <TxpNavigation />
         <main className="flex-1 flex items-center justify-center px-4 py-24">
           <div className="w-full max-w-md">
             <div className="text-center mb-8">
               <Logo className="justify-center mb-6" href={null} showWordmark={false} />
-              <h1 className="text-3xl font-bold text-white mb-2">{title}</h1>
-              {subtitle ? <p className="text-muted-foreground">{subtitle}</p> : null}
+              <h1 className="text-3xl font-bold mb-2">
+                <TxpGradientText>{title}</TxpGradientText>
+              </h1>
+              {subtitle ? <p className="text-gray-300">{subtitle}</p> : null}
             </div>
             {children}
             {backHref ? (
               <p className="text-center mt-6 text-sm">
-                <Link href={backHref} className="text-primary hover:text-primary/80 transition-colors">
+                <Link href={backHref} className="text-yellow-400 hover:text-yellow-300 transition-colors">
                   {backLabel}
                 </Link>
               </p>
             ) : null}
           </div>
         </main>
-        <Footer />
+        <TxpFooter />
       </div>
     </MarketingChrome>
   );

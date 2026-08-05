@@ -1,11 +1,10 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import {
-  clearDemoSession,
   DEMO_USER,
   isDemoSession,
-  type DemoUser,
 } from '@/lib/taumail-demo';
 
 type StoredUser = {
@@ -15,7 +14,13 @@ type StoredUser = {
   fullName: string;
 };
 
-export function useTauMailSession() {
+type UseTauMailSessionOptions = {
+  required?: boolean;
+};
+
+export function useTauMailSession(options: UseTauMailSessionOptions = {}) {
+  const { required = true } = options;
+  const router = useRouter();
   const [user, setUser] = useState<StoredUser | null>(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isDemo, setIsDemo] = useState(false);
@@ -29,15 +34,17 @@ export function useTauMailSession() {
       setUser(JSON.parse(storedUser));
       setIsLoggedIn(true);
       setIsDemo(isDemoSession(storedToken));
-    } else {
-      window.location.href = '/taumail';
+    } else if (required) {
+      router.replace('/taumail/login');
     }
     setReady(true);
-  }, []);
+  }, [required, router]);
 
   const logout = () => {
-    clearDemoSession();
-    window.location.href = '/taumail';
+    localStorage.removeItem('tauos_user');
+    localStorage.removeItem('tauos_token');
+    localStorage.removeItem('tauos_demo_mode');
+    router.replace('/taumail/login');
   };
 
   return { user, isLoggedIn, isDemo, ready, logout, demoUser: DEMO_USER };
