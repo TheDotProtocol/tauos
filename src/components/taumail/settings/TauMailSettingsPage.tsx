@@ -143,8 +143,10 @@ export default function TauMailSettingsPage() {
     event.target.value = '';
     if (!file) return;
 
-    if (!file.type.startsWith('image/')) {
-      setAvatarError('Please choose a PNG, JPG, or WEBP image.');
+    const allowed =
+      file.type.startsWith('image/') || /\.(jpe?g|png|webp|gif|heic|heif)$/i.test(file.name);
+    if (!allowed) {
+      setAvatarError('Please choose a PNG, JPG, WEBP, or HEIC image.');
       return;
     }
     if (file.size > 5 * 1024 * 1024) {
@@ -215,33 +217,41 @@ export default function TauMailSettingsPage() {
               </p>
 
               <div className="mt-8 flex items-center gap-6">
-                <div className="relative">
+                <div className="relative shrink-0">
                   <TauMailUserAvatar name={avatarName} imageUrl={profile.avatarUrl} size={96} />
-                  <button
-                    type="button"
-                    onClick={handleAvatarPick}
-                    disabled={uploadingAvatar}
-                    className="absolute inset-0 flex items-center justify-center rounded-full bg-black/50 text-xs font-semibold text-white disabled:opacity-60"
-                  >
-                    {uploadingAvatar ? '...' : profile.avatarUrl ? 'CHANGE' : 'UPLOAD'}
-                  </button>
+                </div>
+                <div>
+                  <p className="text-xs text-[#71717a]">Recommended 256×256px · PNG, JPG, WEBP, HEIC</p>
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    <button
+                      type="button"
+                      onClick={handleAvatarPick}
+                      disabled={uploadingAvatar}
+                      className="rounded-lg bg-[#d4a843] px-4 py-2 text-xs font-semibold text-[#070708] disabled:opacity-60"
+                    >
+                      {uploadingAvatar ? 'Uploading…' : profile.avatarUrl ? 'Change photo' : 'Upload photo'}
+                    </button>
+                    {profile.avatarUrl ? (
+                      <button
+                        type="button"
+                        onClick={handleRemoveAvatar}
+                        disabled={uploadingAvatar}
+                        className="rounded-lg border border-[rgba(255,255,255,0.05)] px-4 py-2 text-xs font-medium text-red-400 hover:text-red-300 disabled:opacity-60"
+                      >
+                        Remove photo
+                      </button>
+                    ) : null}
+                  </div>
                   <input
                     ref={fileInputRef}
                     type="file"
-                    accept="image/png,image/jpeg,image/webp"
+                    accept="image/*,.heic,.heif"
                     className="hidden"
                     onChange={handleAvatarChange}
                   />
-                </div>
-                <div>
-                  <p className="text-xs text-[#71717a]">Recommended 256×256px · PNG, JPG, WEBP</p>
-                  {profile.avatarUrl ? (
-                    <button type="button" onClick={handleRemoveAvatar} className="mt-2 text-xs font-medium text-red-400 hover:text-red-300">
-                      Remove photo
-                    </button>
-                  ) : (
+                  {!profile.avatarUrl ? (
                     <p className="mt-2 text-xs text-[#a1a1aa]">No profile photo yet</p>
-                  )}
+                  ) : null}
                   {avatarError ? <p className="mt-2 text-xs text-red-400">{avatarError}</p> : null}
                 </div>
               </div>

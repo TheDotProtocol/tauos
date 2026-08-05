@@ -1,7 +1,25 @@
 import type { MailAttachmentPayload } from '@/lib/taumail-attachments';
 
+type StoredAttachmentRow = {
+  filename?: string;
+  name?: string;
+  contentType?: string;
+  type?: string;
+  content?: string;
+  size?: number;
+};
+
+function attachmentFilename(row: StoredAttachmentRow): string | null {
+  const name = row.filename || row.name;
+  return typeof name === 'string' && name.trim() ? name.trim() : null;
+}
+
 /** Parse attachments JSON stored on incoming_emails.attachments */
-export function parseStoredIncomingAttachments(raw: unknown): MailAttachmentPayload[] {
+export function parseStoredIncomingAttachments(
+  raw: unknown,
+  options?: { requireContent?: boolean },
+): MailAttachmentPayload[] {
+  const requireContent = options?.requireContent ?? false;
   if (!raw) return [];
   let parsed: unknown = raw;
   if (typeof raw === 'string') {
@@ -14,21 +32,30 @@ export function parseStoredIncomingAttachments(raw: unknown): MailAttachmentPayl
   if (!Array.isArray(parsed)) return [];
 
   return parsed
-    .filter(
-      (a): a is MailAttachmentPayload =>
-        Boolean(
-          a &&
-            typeof a === 'object' &&
-            typeof (a as MailAttachmentPayload).filename === 'string' &&
-            typeof (a as MailAttachmentPayload).content === 'string'
-        )
-    )
-    .map((a) => ({
-      filename: a.filename,
-      contentType: a.contentType || 'application/octet-stream',
-      content: a.content,
-      size: a.size || 0,
-    }));
+    .map((entry) => {
+      if (!entry || typeof entry !== 'object') return null;
+      const row = entry as StoredAttachmentRow;
+      const filename = attachmentFilename(row);
+      if (!filename) return null;
+      const content = typeof row.content === 'string' ? row.content : '';
+      if (requireContent && !content) return null;
+      return {
+        filename,
+        contentType: row.contentType || row.type || 'application/octet-stream',
+        content,
+        size: row.size || 0,
+      };
+    })
+    .filter((a): a is MailAttachmentPayload => a !== null);
+}
+
+/** Strip base64 payloads from list API responses (download on demand). */
+export function stripAttachmentContentForList(raw: unknown): { filename: string; contentType: string; size: number }[] {
+  return parseStoredIncomingAttachments(raw).map(({ filename, contentType, size }) => ({
+    filename,
+    contentType,
+    size,
+  }));
 }
 
 /** SendGrid Inbound Parse: attachment-info + attachment1, attachment2, … */

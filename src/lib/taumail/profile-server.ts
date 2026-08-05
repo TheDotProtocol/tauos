@@ -2,9 +2,32 @@ import { getPool } from '@/lib/db-pool';
 import {
   createSignedDownloadUrl,
   deleteObject,
+  ensureStorageBucket,
   getSupabaseStorageConfig,
   uploadObject,
 } from '@/lib/supabase-storage';
+
+function resolveImageMime(file: File): string {
+  if (file.type.startsWith('image/')) return file.type;
+  const name = file.name.toLowerCase();
+  if (name.endsWith('.png')) return 'image/png';
+  if (name.endsWith('.webp')) return 'image/webp';
+  if (name.endsWith('.gif')) return 'image/gif';
+  if (name.endsWith('.heic') || name.endsWith('.heif')) return 'image/heic';
+  return 'image/jpeg';
+}
+
+function imageExtensionFromFile(file: File): 'png' | 'webp' | 'jpg' {
+  const mime = resolveImageMime(file);
+  if (mime.includes('png')) return 'png';
+  if (mime.includes('webp')) return 'webp';
+  return 'jpg';
+}
+
+export function isAllowedAvatarImage(file: File): boolean {
+  if (file.type.startsWith('image/')) return true;
+  return /\.(jpe?g|png|webp|gif|heic|heif)$/i.test(file.name);
+}
 
 function uid(userId: string | number): string {
   return String(userId);
@@ -51,12 +74,17 @@ export async function uploadTauMailAvatar(userId: string | number, file: File) {
   if (!cfg) {
     throw new Error('Avatar storage is not configured on the server');
   }
+  if (!isAllowedAvatarImage(file)) {
+    throw new Error('Avatar must be a PNG, JPG, WEBP, or HEIC image');
+  }
+
+  await ensureStorageBucket(cfg);
 
   const id = uid(userId);
-  const ext = file.type.includes('png') ? 'png' : file.type.includes('webp') ? 'webp' : 'jpg';
+  const ext = imageExtensionFromFile(file);
   const objectPath = `taumail/avatars/${id}.${ext}`;
   const data = await file.arrayBuffer();
-  await uploadObject(cfg, objectPath, data, file.type || 'image/jpeg');
+  await uploadObject(cfg, objectPath, data, resolveImageMime(file));
 
   await getPool().query('UPDATE users SET avatar_url = $2 WHERE id = $1', [id, objectPath]);
   const signed = await createSignedDownloadUrl(cfg, objectPath, 60 * 60 * 24 * 7);

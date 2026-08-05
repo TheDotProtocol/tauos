@@ -1,5 +1,6 @@
 import { getPool } from '@/app/api/taumail/middleware/security';
 import { withTauMailAuth } from '@/lib/taumail/api-route';
+import { stripAttachmentContentForList } from '@/lib/taumail-inbound';
 import { NextRequest, NextResponse } from 'next/server';
 
 export const dynamic = 'force-dynamic';
@@ -29,7 +30,10 @@ export async function GET(request: NextRequest) {
 
       return NextResponse.json({
         success: true,
-        emails: result.rows,
+        emails: result.rows.map((row) => ({
+          ...row,
+          attachments: stripAttachmentContentForList(row.attachments),
+        })),
         total: result.rows.length,
       });
     });

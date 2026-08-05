@@ -437,6 +437,65 @@ export async function saveTauMailProfile(profile: TauMailProfile) {
   return { ok: true, profile: data.profile };
 }
 
+export async function downloadTauMailAttachment(
+  emailId: string | number,
+  index: number,
+  filename: string,
+  options?: { inline?: boolean },
+) {
+  const token = localStorage.getItem('tauos_token');
+  if (isDemoSession(token)) return { ok: false, error: 'Not available in demo mode' };
+
+  const inline = options?.inline ? '&inline=1' : '';
+  const res = await fetch(
+    `/api/taumail/emails/${emailId}/attachments?index=${index}${inline}`,
+    { headers: authHeaders() },
+  );
+
+  if (!res.ok) {
+    let error = 'Failed to download attachment';
+    try {
+      const data = await res.json();
+      error = data.error || error;
+    } catch {
+      /* binary error body */
+    }
+    return { ok: false, error };
+  }
+
+  const blob = await res.blob();
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = filename;
+  link.click();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+  return { ok: true };
+}
+
+export async function openTauMailAttachment(
+  emailId: string | number,
+  index: number,
+) {
+  const token = localStorage.getItem('tauos_token');
+  if (isDemoSession(token)) return { ok: false, error: 'Not available in demo mode' };
+
+  const res = await fetch(
+    `/api/taumail/emails/${emailId}/attachments?index=${index}&inline=1`,
+    { headers: authHeaders() },
+  );
+
+  if (!res.ok) {
+    return { ok: false, error: 'Failed to open attachment' };
+  }
+
+  const blob = await res.blob();
+  const url = URL.createObjectURL(blob);
+  window.open(url, '_blank', 'noopener,noreferrer');
+  setTimeout(() => URL.revokeObjectURL(url), 60_000);
+  return { ok: true };
+}
+
 export async function uploadTauMailAvatar(file: File) {
   const token = localStorage.getItem('tauos_token');
   if (isDemoSession(token)) return { ok: true, demo: true, avatarUrl: null };

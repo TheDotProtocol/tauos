@@ -1,5 +1,11 @@
 import { withTauMailAuth } from '@/lib/taumail/api-route';
-import { deleteTauMailAvatar, getTauMailProfileRow, mapTauMailProfileAsync, uploadTauMailAvatar } from '@/lib/taumail/profile-server';
+import {
+  deleteTauMailAvatar,
+  getTauMailProfileRow,
+  isAllowedAvatarImage,
+  mapTauMailProfileAsync,
+  uploadTauMailAvatar,
+} from '@/lib/taumail/profile-server';
 import { NextRequest, NextResponse } from 'next/server';
 
 export const dynamic = 'force-dynamic';
@@ -12,8 +18,8 @@ export async function POST(request: NextRequest) {
       if (!file) {
         return NextResponse.json({ error: 'No file provided' }, { status: 400 });
       }
-      if (!file.type.startsWith('image/')) {
-        return NextResponse.json({ error: 'Avatar must be an image' }, { status: 400 });
+      if (!isAllowedAvatarImage(file)) {
+        return NextResponse.json({ error: 'Avatar must be a PNG, JPG, WEBP, or HEIC image' }, { status: 400 });
       }
       if (file.size > 5 * 1024 * 1024) {
         return NextResponse.json({ error: 'Avatar must be under 5 MB' }, { status: 400 });

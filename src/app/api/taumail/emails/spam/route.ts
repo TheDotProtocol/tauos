@@ -1,4 +1,5 @@
 import { getPool, getJwtSecret } from '@/lib/db-pool';
+import { stripAttachmentContentForList } from '@/lib/taumail-inbound';
 import { NextRequest, NextResponse } from 'next/server';
 import jwt from 'jsonwebtoken';
 
@@ -34,7 +35,10 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      emails: result.rows
+      emails: result.rows.map((row) => ({
+        ...row,
+        attachments: stripAttachmentContentForList(row.attachments),
+      })),
     });
 
   } catch (error) {
