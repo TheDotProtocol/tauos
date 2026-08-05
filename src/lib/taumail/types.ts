@@ -29,7 +29,7 @@ export function mapApiInboxEmail(email: Record<string, unknown>): TauMailEmail {
     body,
     time: email.received_at ? new Date(String(email.received_at)).toLocaleString() : 'Unknown',
     unread: !email.is_read,
-    starred: false,
+    starred: Boolean(email.is_starred),
     attachment: Array.isArray(email.attachments) && email.attachments.length > 0,
   };
 }

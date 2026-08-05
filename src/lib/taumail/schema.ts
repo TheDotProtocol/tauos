@@ -8,6 +8,8 @@ export async function ensureTauMailSchema(pool: Pool): Promise<void> {
   await pool.query(`
     ALTER TABLE incoming_emails ADD COLUMN IF NOT EXISTS is_deleted BOOLEAN DEFAULT FALSE;
     ALTER TABLE incoming_emails ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMP;
+    ALTER TABLE incoming_emails ADD COLUMN IF NOT EXISTS is_starred BOOLEAN DEFAULT FALSE;
+    ALTER TABLE incoming_emails ADD COLUMN IF NOT EXISTS is_archived BOOLEAN DEFAULT FALSE;
 
     ALTER TABLE users ADD COLUMN IF NOT EXISTS display_name VARCHAR(255);
     ALTER TABLE users ADD COLUMN IF NOT EXISTS job_title VARCHAR(255);

@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { geistMono, geistSans } from '@/lib/website/fonts';
 import {
   fetchTauMailProfile,
@@ -40,6 +40,7 @@ type PendingAttachment = TauMailAttachmentRef & {
 
 export default function TauMailComposePage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { ready, isLoggedIn, user, isDemo } = useTauMailSession();
   const [to, setTo] = useState('');
@@ -62,6 +63,13 @@ export default function TauMailComposePage() {
   useEffect(() => {
     if (!ready || !isLoggedIn) return;
 
+    const prefillTo = searchParams.get('to');
+    const prefillSubject = searchParams.get('subject');
+    const prefillBody = searchParams.get('body');
+    if (prefillTo) setTo(prefillTo);
+    if (prefillSubject) setSubject(prefillSubject);
+    if (prefillBody) setBody(prefillBody);
+
     if (isDemo) {
       setSignatureName(user?.fullName || user?.username || '');
       setSignatureEmail(user?.email || '');
@@ -79,7 +87,7 @@ export default function TauMailComposePage() {
         setSignatureName(user?.fullName || user?.username || '');
         setSignatureEmail(user?.email || '');
       });
-  }, [ready, isLoggedIn, user, isDemo]);
+  }, [ready, isLoggedIn, user, isDemo, searchParams]);
 
   const totalAttachmentBytes = attachments.reduce((sum, a) => sum + a.size, 0);
 

@@ -6,14 +6,16 @@ import type { TauMailEmail } from '@/lib/taumail/types';
 import { MailIcon } from '@/components/taumail/shared/MailIcon';
 import TauMailUserAvatar from '@/components/taumail/shared/TauMailUserAvatar';
 
-const actionButtons = [
-  { label: 'Reply', icon: tauMailAssets.icons.arrowUpLeft, gold: false },
-  { label: 'Forward', icon: tauMailAssets.icons.arrowUpRight, gold: false },
-  { label: 'Archive', icon: tauMailAssets.icons.package, gold: false },
-  { label: 'Delete', icon: tauMailAssets.icons.trash, gold: false },
-  { label: 'Star', icon: tauMailAssets.icons.starOff, gold: false },
-  { label: 'AI Summarize', icon: tauMailAssets.icons.sparkles, gold: true },
-] as const;
+export type EmailReaderAction = 'reply' | 'forward' | 'archive' | 'delete' | 'star' | 'ai-summarize';
+
+const actionButtons: { action: EmailReaderAction; label: string; icon: string; gold: boolean }[] = [
+  { action: 'reply', label: 'Reply', icon: tauMailAssets.icons.arrowUpLeft, gold: false },
+  { action: 'forward', label: 'Forward', icon: tauMailAssets.icons.arrowUpRight, gold: false },
+  { action: 'archive', label: 'Archive', icon: tauMailAssets.icons.package, gold: false },
+  { action: 'delete', label: 'Delete', icon: tauMailAssets.icons.trash, gold: false },
+  { action: 'star', label: 'Star', icon: tauMailAssets.icons.starOff, gold: false },
+  { action: 'ai-summarize', label: 'AI Summarize', icon: tauMailAssets.icons.sparkles, gold: true },
+];
 
 type EmailReaderPaneProps = {
   email: TauMailEmail;
@@ -21,6 +23,9 @@ type EmailReaderPaneProps = {
   avatarName?: string;
   avatarEmail?: string;
   avatarUrl?: string | null;
+  busyAction?: EmailReaderAction | null;
+  aiSummary?: string | null;
+  onAction?: (action: EmailReaderAction) => void;
 };
 
 export default function EmailReaderPane({
@@ -29,6 +34,9 @@ export default function EmailReaderPane({
   avatarName,
   avatarEmail,
   avatarUrl,
+  busyAction,
+  aiSummary,
+  onAction,
 }: EmailReaderPaneProps) {
   const paragraphs = email.body.split('\n\n').filter(Boolean);
 
@@ -56,21 +64,37 @@ export default function EmailReaderPane({
       </div>
 
       <div className="flex flex-wrap gap-2">
-        {actionButtons.map((btn) => (
-          <button
-            key={btn.label}
-            type="button"
-            className={`flex items-center gap-1.5 rounded-lg border px-3.5 py-2 text-xs font-medium ${
-              btn.gold
-                ? 'border-[rgba(212,168,67,0.15)] bg-[rgba(212,168,67,0.08)] text-[#d4a843]'
-                : 'border-[rgba(255,255,255,0.05)] bg-[#121214] text-white'
-            }`}
-          >
-            <MailIcon src={btn.icon} size={14} />
-            {btn.label}
-          </button>
-        ))}
+        {actionButtons.map((btn) => {
+          const isStar = btn.action === 'star';
+          const label = isStar && email.starred ? 'Unstar' : btn.label;
+          const isBusy = busyAction === btn.action;
+          return (
+            <button
+              key={btn.action}
+              type="button"
+              disabled={Boolean(busyAction) && !isBusy}
+              onClick={() => onAction?.(btn.action)}
+              className={`flex items-center gap-1.5 rounded-lg border px-3.5 py-2 text-xs font-medium disabled:opacity-50 ${
+                btn.gold
+                  ? 'border-[rgba(212,168,67,0.15)] bg-[rgba(212,168,67,0.08)] text-[#d4a843]'
+                  : isStar && email.starred
+                    ? 'border-[rgba(212,168,67,0.25)] bg-[rgba(212,168,67,0.12)] text-[#d4a843]'
+                    : 'border-[rgba(255,255,255,0.05)] bg-[#121214] text-white'
+              }`}
+            >
+              <MailIcon src={btn.icon} size={14} />
+              {isBusy ? 'Working…' : label}
+            </button>
+          );
+        })}
       </div>
+
+      {aiSummary ? (
+        <div className="rounded-lg border border-[rgba(212,168,67,0.15)] bg-[rgba(212,168,67,0.06)] p-4">
+          <p className="text-xs font-semibold uppercase tracking-wide text-[#d4a843]">AI Summary</p>
+          <p className="mt-2 whitespace-pre-wrap text-sm leading-relaxed text-[#d4c4a0]">{aiSummary}</p>
+        </div>
+      ) : null}
 
       <div className="flex-1 space-y-4 text-sm leading-relaxed text-[#a1a1aa]">
         {paragraphs.map((p) => (

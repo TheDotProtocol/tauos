@@ -1,12 +1,22 @@
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { clsx } from 'clsx';
 import { geistMono, geistSans } from '@/lib/website/fonts';
-import { fetchTauMailEmails, fetchTauMailProfile, markEmailRead, type TauMailProfile } from '@/lib/taumail/api-client';
+import {
+  archiveEmail,
+  fetchTauMailEmails,
+  fetchTauMailProfile,
+  markEmailRead,
+  moveEmailToTrash,
+  summarizeTauMailEmail,
+  toggleEmailStar,
+  type TauMailProfile,
+} from '@/lib/taumail/api-client';
 import type { TauMailEmail, TauMailFolder } from '@/lib/taumail/types';
 import TauMailAppShell from '@/components/taumail/shared/TauMailAppShell';
-import EmailReaderPane from '@/components/taumail/shared/EmailReaderPane';
+import EmailReaderPane, { type EmailReaderAction } from '@/components/taumail/shared/EmailReaderPane';
 import TauMailUserAvatar from '@/components/taumail/shared/TauMailUserAvatar';
 import { useTauMailSession } from '@/hooks/useTauMailSession';
 
@@ -22,6 +32,7 @@ type MailFolderViewProps = {
 };
 
 export default function MailFolderView({ folder, title, activeNav, showTabs = false }: MailFolderViewProps) {
+  const router = useRouter();
   const { ready, isLoggedIn, user, isDemo } = useTauMailSession();
   const [profile, setProfile] = useState<TauMailProfile | null>(null);
   const [emails, setEmails] = useState<TauMailEmail[]>([]);
@@ -30,6 +41,9 @@ export default function MailFolderView({ folder, title, activeNav, showTabs = fa
   const [lastRefreshed, setLastRefreshed] = useState<Date | null>(null);
   const [selectedId, setSelectedId] = useState<string | number | null>(null);
   const [activeTab, setActiveTab] = useState<'all' | 'unread' | 'starred'>('all');
+  const [busyAction, setBusyAction] = useState<EmailReaderAction | null>(null);
+  const [aiSummary, setAiSummary] = useState<string | null>(null);
+  const [actionError, setActionError] = useState('');
 
   const loadEmails = useCallback(
     async (options?: { silent?: boolean }) => {
@@ -89,9 +103,85 @@ export default function MailFolderView({ folder, title, activeNav, showTabs = fa
 
   const handleSelect = async (email: TauMailEmail) => {
     setSelectedId(email.id);
+    setAiSummary(null);
+    setActionError('');
     if (email.unread && folder === 'inbox') {
       await markEmailRead(email.id);
       setEmails((prev) => prev.map((e) => (e.id === email.id ? { ...e, unread: false } : e)));
+    }
+  };
+
+  const buildComposeUrl = (email: TauMailEmail, mode: 'reply' | 'forward') => {
+    const params = new URLSearchParams();
+    if (mode === 'reply') {
+      params.set('to', email.senderEmail);
+      params.set('subject', email.subject.startsWith('Re:') ? email.subject : `Re: ${email.subject}`);
+      params.set(
+        'body',
+        `\n\n---\nOn ${email.time}, ${email.sender} wrote:\n${email.body}`,
+      );
+    } else {
+      params.set('subject', email.subject.startsWith('Fwd:') ? email.subject : `Fwd: ${email.subject}`);
+      params.set(
+        'body',
+        `\n\n--- Forwarded message ---\nFrom: ${email.sender} <${email.senderEmail}>\nSubject: ${email.subject}\nDate: ${email.time}\n\n${email.body}`,
+      );
+    }
+    return `/taumail/compose?${params.toString()}`;
+  };
+
+  const handleEmailAction = async (action: EmailReaderAction) => {
+    if (!selected) return;
+    setActionError('');
+
+    if (action === 'reply' || action === 'forward') {
+      router.push(buildComposeUrl(selected, action));
+      return;
+    }
+
+    setBusyAction(action);
+    try {
+      if (action === 'delete') {
+        const result = await moveEmailToTrash(selected.id);
+        if (!result.ok) {
+          setActionError('Could not move message to trash');
+          return;
+        }
+        setEmails((prev) => prev.filter((e) => e.id !== selected.id));
+        setSelectedId(null);
+        setAiSummary(null);
+      } else if (action === 'archive') {
+        const result = await archiveEmail(selected.id);
+        if (!result.ok) {
+          setActionError('Could not archive message');
+          return;
+        }
+        setEmails((prev) => prev.filter((e) => e.id !== selected.id));
+        setSelectedId(null);
+        setAiSummary(null);
+      } else if (action === 'star') {
+        const result = await toggleEmailStar(selected.id, selected.starred);
+        if (!result.ok) {
+          setActionError('error' in result ? result.error : 'Could not update star');
+          return;
+        }
+        setEmails((prev) =>
+          prev.map((e) => (e.id === selected.id ? { ...e, starred: result.starred ?? !e.starred } : e)),
+        );
+      } else if (action === 'ai-summarize') {
+        const result = await summarizeTauMailEmail({
+          sender: selected.sender,
+          subject: selected.subject,
+          body: selected.body,
+        });
+        if (result.ok === false) {
+          setActionError(result.error);
+          return;
+        }
+        setAiSummary(result.summary);
+      }
+    } finally {
+      setBusyAction(null);
     }
   };
 
@@ -185,13 +275,23 @@ export default function MailFolderView({ folder, title, activeNav, showTabs = fa
           </div>
         </div>
         {selected ? (
-          <EmailReaderPane
-            email={selected}
-            recipientLabel={folder === 'sent' ? `To: ${selected.senderEmail}` : undefined}
-            avatarName={folder === 'sent' ? userDisplayName : selected.sender}
-            avatarEmail={folder === 'sent' ? profile?.email || user?.email : selected.senderEmail}
-            avatarUrl={folder === 'sent' ? userAvatarUrl : undefined}
-          />
+          <div className="relative flex min-w-0 flex-1">
+            {actionError ? (
+              <p className="absolute bottom-4 right-4 z-10 rounded-lg border border-red-500/30 bg-red-500/10 px-3 py-2 text-xs text-red-300">
+                {actionError}
+              </p>
+            ) : null}
+            <EmailReaderPane
+              email={selected}
+              recipientLabel={folder === 'sent' ? `To: ${selected.senderEmail}` : undefined}
+              avatarName={folder === 'sent' ? userDisplayName : selected.sender}
+              avatarEmail={folder === 'sent' ? profile?.email || user?.email : selected.senderEmail}
+              avatarUrl={folder === 'sent' ? userAvatarUrl : undefined}
+              busyAction={busyAction}
+              aiSummary={aiSummary}
+              onAction={handleEmailAction}
+            />
+          </div>
         ) : null}
       </div>
     </TauMailAppShell>

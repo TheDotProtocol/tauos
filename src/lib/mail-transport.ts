@@ -1,6 +1,7 @@
 import nodemailer from 'nodemailer';
 import sgMail from '@sendgrid/mail';
 import { isProductionDeploy } from '@/lib/db-pool';
+import { isAllowedMailDomain, parseEmailAddress } from '@/config/mail-domains';
 
 export type SendMailInput = {
   from: { email: string; name?: string };
@@ -22,15 +23,20 @@ export type SendMailInput = {
 
 export type SendMailResult = {
   messageId: string;
-  transport: 'smtp' | 'sendgrid' | 'dev';
+  transport: 'smtp' | 'sendgrid' | 'sendgrid-smtp' | 'dev';
   accepted?: string[];
   rejected?: string[];
   envelopeFrom?: string;
 };
 
 function isExternalAddress(email: string): boolean {
-  const domain = email.split('@')[1]?.toLowerCase() || '';
-  return Boolean(domain && domain !== 'tauos.org');
+  const parsed = parseEmailAddress(email);
+  if (!parsed) return true;
+  return !isAllowedMailDomain(parsed.domain);
+}
+
+function hasExternalRecipients(input: SendMailInput): boolean {
+  return recipientList(input.to).some(isExternalAddress);
 }
 
 function recipientList(to: string | string[]): string[] {
@@ -38,19 +44,7 @@ function recipientList(to: string | string[]): string[] {
   return raw.flatMap((r) => String(r).split(',')).map((e) => e.trim()).filter(Boolean);
 }
 
-/** Prefer SendGrid for Gmail/external when API key exists — Vultr SMTP lacks DKIM alignment. */
-function shouldUseSendGrid(input: SendMailInput): boolean {
-  if (!process.env.SENDGRID_API_KEY) return false;
-  if (process.env.MAIL_TRANSPORT === 'sendgrid') return true;
-  const recipients = recipientList(input.to);
-  // External recipients always use SendGrid (DKIM) even when MAIL_TRANSPORT=smtp
-  if (recipients.some(isExternalAddress)) return true;
-  if (process.env.MAIL_TRANSPORT === 'smtp') return false;
-  return false;
-}
-
 function usePhoneSmtp(input?: SendMailInput): boolean {
-  if (input && shouldUseSendGrid(input)) return false;
   if (process.env.MAIL_TRANSPORT === 'smtp') return true;
   if (process.env.MAIL_TRANSPORT === 'sendgrid') return false;
   if (process.env.PHONE_MAIL_SERVER === 'true') return true;
@@ -194,21 +188,78 @@ async function sendViaSendGrid(input: SendMailInput): Promise<SendMailResult> {
   };
 }
 
-export async function sendMail(input: SendMailInput): Promise<SendMailResult> {
-  const preferSendGrid = shouldUseSendGrid(input);
+async function sendViaSendGridSmtp(input: SendMailInput): Promise<SendMailResult> {
+  const apiKey = process.env.SENDGRID_API_KEY?.trim();
+  if (!apiKey) throw new Error('SendGrid API key not configured');
 
-  if (preferSendGrid && process.env.SENDGRID_API_KEY) {
+  const fromHeader = input.from.name
+    ? `"${input.from.name}" <${input.from.email}>`
+    : input.from.email;
+
+  const headers: Record<string, string> = {};
+  if (input.inReplyTo) headers['In-Reply-To'] = input.inReplyTo;
+  if (input.references) headers['References'] = input.references;
+
+  const transport = nodemailer.createTransport({
+    host: 'smtp.sendgrid.net',
+    port: 587,
+    secure: false,
+    auth: { user: 'apikey', pass: apiKey },
+  });
+
+  const info = await transport.sendMail({
+    from: fromHeader,
+    replyTo: input.replyTo || input.from.email,
+    to: input.to,
+    cc: input.cc,
+    bcc: input.bcc,
+    subject: input.subject,
+    text: input.text,
+    html: input.html,
+    headers,
+    attachments: toMailAttachments(input),
+  });
+
+  if (info.rejected?.length) {
+    throw new Error(`SendGrid SMTP rejected recipients: ${info.rejected.join(', ')}`);
+  }
+
+  return {
+    messageId: info.messageId || `sg-smtp-${Date.now()}`,
+    transport: 'sendgrid-smtp',
+    accepted: info.accepted,
+    rejected: info.rejected,
+    envelopeFrom: input.from.email,
+  };
+}
+
+async function deliverExternalMail(input: SendMailInput): Promise<SendMailResult> {
+  const apiKey = process.env.SENDGRID_API_KEY?.trim();
+  if (!apiKey) {
+    throw new Error(
+      'External delivery requires SENDGRID_API_KEY. The Vultr mail server cannot reach Gmail (outbound port 25 is blocked).',
+    );
+  }
+
+  try {
+    return await sendViaSendGrid(input);
+  } catch (err) {
+    const sgError = sendGridErrorMessage(err);
+    console.error('[mail-transport] SendGrid API failed:', sgError);
     try {
-      return await sendViaSendGrid(input);
-    } catch (err) {
-      const sgError = sendGridErrorMessage(err);
-      console.error('[mail-transport] SendGrid failed:', sgError);
-      if (smtpConfigured()) {
-        console.warn('[mail-transport] Falling back to SMTP after SendGrid failure');
-        return sendViaSmtp(input);
-      }
-      throw new Error(`SendGrid: ${sgError}`);
+      return await sendViaSendGridSmtp(input);
+    } catch (smtpErr) {
+      const relayError = smtpErr instanceof Error ? smtpErr.message : 'SendGrid SMTP failed';
+      throw new Error(`SendGrid delivery failed: ${sgError}. SMTP relay: ${relayError}`);
     }
+  }
+}
+
+export async function sendMail(input: SendMailInput): Promise<SendMailResult> {
+  const external = hasExternalRecipients(input);
+
+  if (external) {
+    return deliverExternalMail(input);
   }
 
   if (usePhoneSmtp(input)) {

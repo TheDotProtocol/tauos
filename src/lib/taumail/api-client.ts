@@ -346,6 +346,47 @@ export async function moveEmailToTrash(emailId: string | number) {
   return { ok: res.ok };
 }
 
+export async function toggleEmailStar(emailId: string | number, starred: boolean) {
+  const token = localStorage.getItem('tauos_token');
+  if (isDemoSession(token)) return { ok: true, starred: !starred };
+
+  const res = await fetch('/api/taumail/emails/actions', {
+    method: 'POST',
+    headers: jsonAuthHeaders(),
+    body: JSON.stringify({ emailId, action: starred ? 'unstar' : 'star' }),
+  });
+  const data = await res.json();
+  if (!res.ok) return { ok: false as const, error: data.error || 'Failed to update star' };
+  return { ok: true as const, starred: !starred };
+}
+
+export async function archiveEmail(emailId: string | number) {
+  const token = localStorage.getItem('tauos_token');
+  if (isDemoSession(token)) return { ok: true };
+
+  const res = await fetch('/api/taumail/emails/actions', {
+    method: 'POST',
+    headers: jsonAuthHeaders(),
+    body: JSON.stringify({ emailId, action: 'archive' }),
+  });
+  return { ok: res.ok };
+}
+
+export async function summarizeTauMailEmail(email: {
+  sender: string;
+  subject: string;
+  body: string;
+}): Promise<{ ok: true; summary: string } | { ok: false; error: string }> {
+  const prompt = `Summarize this email in 2-4 concise bullet points:\nFrom: ${email.sender}\nSubject: ${email.subject}\n\n${email.body}`;
+  try {
+    const message = await sendTauMailAiMessage(prompt);
+    if (!message?.text) return { ok: false, error: 'No summary returned' };
+    return { ok: true, summary: message.text };
+  } catch (error) {
+    return { ok: false, error: error instanceof Error ? error.message : 'AI summarize failed' };
+  }
+}
+
 export async function markEmailRead(emailId: string | number) {
   const token = localStorage.getItem('tauos_token');
   if (isDemoSession(token)) return { ok: true };
