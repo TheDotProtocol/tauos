@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import Image from 'next/image';
 import { clsx } from 'clsx';
 import { geistMono, geistSans } from '@/lib/website/fonts';
@@ -14,6 +14,8 @@ import { useTauMailSession } from '@/hooks/useTauMailSession';
 
 import type { TauMailNavId } from '@/lib/taumail/assets';
 
+const INBOX_POLL_MS = 60_000;
+
 type MailFolderViewProps = {
   folder: TauMailFolder;
   title: string;
@@ -25,20 +27,46 @@ export default function MailFolderView({ folder, title, activeNav, showTabs = fa
   const { ready, isLoggedIn } = useTauMailSession();
   const [emails, setEmails] = useState<TauMailEmail[]>([]);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+  const [lastRefreshed, setLastRefreshed] = useState<Date | null>(null);
   const [selectedId, setSelectedId] = useState<string | number | null>(null);
   const [activeTab, setActiveTab] = useState<'all' | 'unread' | 'starred'>('all');
 
+  const loadEmails = useCallback(
+    async (options?: { silent?: boolean }) => {
+      const silent = options?.silent ?? false;
+      if (!silent) setLoading(true);
+      else setRefreshing(true);
+      try {
+        const data = await fetchTauMailEmails(folder);
+        setEmails(data);
+        setSelectedId((current) => {
+          if (current && data.some((e) => e.id === current)) return current;
+          return data.length ? data[0].id : null;
+        });
+        setLastRefreshed(new Date());
+      } catch (error) {
+        console.error(error);
+      } finally {
+        if (!silent) setLoading(false);
+        setRefreshing(false);
+      }
+    },
+    [folder],
+  );
+
   useEffect(() => {
     if (!ready || !isLoggedIn) return;
-    setLoading(true);
-    fetchTauMailEmails(folder)
-      .then((data) => {
-        setEmails(data);
-        if (data.length) setSelectedId(data[0].id);
-      })
-      .catch(console.error)
-      .finally(() => setLoading(false));
-  }, [folder, ready, isLoggedIn]);
+    loadEmails();
+  }, [folder, ready, isLoggedIn, loadEmails]);
+
+  useEffect(() => {
+    if (!ready || !isLoggedIn || folder !== 'inbox') return;
+    const interval = window.setInterval(() => {
+      loadEmails({ silent: true });
+    }, INBOX_POLL_MS);
+    return () => window.clearInterval(interval);
+  }, [folder, ready, isLoggedIn, loadEmails]);
 
   const filtered = emails.filter((e) => {
     if (activeTab === 'unread') return e.unread;
@@ -65,7 +93,24 @@ export default function MailFolderView({ folder, title, activeNav, showTabs = fa
       <div className={`${geistSans.className} flex min-h-0 flex-1`}>
         <div className="flex w-[400px] shrink-0 flex-col border-r border-[rgba(255,255,255,0.05)]">
           <div className="border-b border-[rgba(255,255,255,0.05)] p-4">
-            <h2 className="text-sm font-semibold text-white">{title}</h2>
+            <div className="flex items-center justify-between gap-2">
+              <h2 className="text-sm font-semibold text-white">{title}</h2>
+              <button
+                type="button"
+                onClick={() => loadEmails({ silent: true })}
+                disabled={refreshing || loading}
+                title="Refresh mailbox"
+                className="rounded-lg border border-[rgba(255,255,255,0.05)] bg-[#121214] px-2.5 py-1 text-[11px] font-semibold text-[#a1a1aa] hover:text-white disabled:opacity-50"
+              >
+                {refreshing ? 'Refreshing…' : 'Refresh'}
+              </button>
+            </div>
+            {lastRefreshed ? (
+              <p className={`${geistMono.className} mt-1 text-[10px] text-[#71717a]`}>
+                Updated {lastRefreshed.toLocaleTimeString()}
+                {folder === 'inbox' ? ' · auto-refresh every 60s' : ''}
+              </p>
+            ) : null}
             {showTabs ? (
               <div className="mt-3 flex gap-1 rounded-lg bg-[#121214] p-1">
                 {(['all', 'unread', 'starred'] as const).map((tab) => (
