@@ -12,6 +12,10 @@ export async function withTauMailAuth(
   }
 
   const pool = getPool();
-  await ensureTauMailSchema(pool);
+  try {
+    await ensureTauMailSchema(pool);
+  } catch (error) {
+    console.error('[taumail] schema ensure failed (non-fatal):', error);
+  }
   return handler(String(auth.userId));
 }

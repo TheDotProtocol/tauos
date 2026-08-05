@@ -1,28 +1,53 @@
-import { Pool } from 'pg';
+import { Pool, type PoolConfig } from 'pg';
 
 let poolInstance: Pool | null = null;
 
+function isServerlessRuntime(): boolean {
+  return Boolean(process.env.VERCEL);
+}
+
 function resolveConnectionString(): string {
-  const connectionString = process.env.DATABASE_URL;
+  let connectionString = process.env.DATABASE_URL;
   if (!connectionString) {
     throw new Error('DATABASE_URL environment variable is required');
   }
-  if (connectionString.includes('sslmode=')) {
-    return connectionString.replace(/sslmode=[^&]*/, 'sslmode=disable');
+
+  const isSupabasePooler = connectionString.includes('pooler.supabase.com');
+
+  // Session pooler (:5432) caps concurrent clients (~15). Serverless needs transaction pooler (:6543).
+  if (isServerlessRuntime() && isSupabasePooler && connectionString.includes(':5432/')) {
+    connectionString = connectionString.replace(':5432/', ':6543/');
   }
-  const sep = connectionString.includes('?') ? '&' : '?';
-  return `${connectionString}${sep}sslmode=disable`;
+
+  const [base, existingQuery = ''] = connectionString.split('?');
+  const params = new URLSearchParams(existingQuery);
+
+  if (isServerlessRuntime() && isSupabasePooler) {
+    params.set('pgbouncer', 'true');
+    params.set('connection_limit', '1');
+  }
+
+  params.set('sslmode', 'disable');
+
+  return `${base}?${params.toString()}`;
+}
+
+function poolConfig(): PoolConfig {
+  const serverless = isServerlessRuntime();
+
+  return {
+    connectionString: resolveConnectionString(),
+    ssl: { rejectUnauthorized: false },
+    max: serverless ? 1 : 10,
+    idleTimeoutMillis: serverless ? 5_000 : 30_000,
+    connectionTimeoutMillis: serverless ? 5_000 : 2_000,
+    allowExitOnIdle: serverless,
+  };
 }
 
 export function getPool(): Pool {
   if (!poolInstance) {
-    poolInstance = new Pool({
-      connectionString: resolveConnectionString(),
-      ssl: { rejectUnauthorized: false },
-      max: 20,
-      idleTimeoutMillis: 30000,
-      connectionTimeoutMillis: 2000,
-    });
+    poolInstance = new Pool(poolConfig());
   }
   return poolInstance;
 }

@@ -2,7 +2,6 @@ import { getPool } from '@/lib/db-pool';
 import {
   createSignedDownloadUrl,
   deleteObject,
-  downloadObject,
   getSupabaseStorageConfig,
   uploadObject,
 } from '@/lib/supabase-storage';
@@ -64,22 +63,6 @@ export async function uploadTauMailAvatar(userId: string | number, file: File) {
   return { path: objectPath, avatarUrl: signed };
 }
 
-async function inferAvatarObjectPath(userId: string): Promise<string | null> {
-  const cfg = getSupabaseStorageConfig();
-  if (!cfg) return null;
-
-  for (const ext of ['jpg', 'png', 'webp']) {
-    const objectPath = `taumail/avatars/${userId}.${ext}`;
-    try {
-      await downloadObject(cfg, objectPath);
-      return objectPath;
-    } catch {
-      /* try next extension */
-    }
-  }
-  return null;
-}
-
 export async function resolveTauMailAvatarUrl(
   userId: string | number,
   avatarUrl: string | null,
@@ -89,17 +72,20 @@ export async function resolveTauMailAvatarUrl(
   const cfg = getSupabaseStorageConfig();
   if (!cfg) return avatarUrl.startsWith('http') ? avatarUrl : null;
 
-  let objectPath = avatarUrl;
   if (avatarUrl.startsWith('http')) {
     const fromUrl = avatarUrl.match(/taumail\/avatars\/[^/?]+/);
-    objectPath = fromUrl?.[0] ?? (await inferAvatarObjectPath(uid(userId))) ?? avatarUrl;
-    if (objectPath.startsWith('http')) return objectPath;
+    if (!fromUrl) return avatarUrl;
+    try {
+      return await createSignedDownloadUrl(cfg, fromUrl[0], 60 * 60 * 24 * 7);
+    } catch {
+      return avatarUrl;
+    }
   }
 
   try {
-    return await createSignedDownloadUrl(cfg, objectPath, 60 * 60 * 24 * 7);
+    return await createSignedDownloadUrl(cfg, avatarUrl, 60 * 60 * 24 * 7);
   } catch {
-    return avatarUrl.startsWith('http') ? avatarUrl : null;
+    return null;
   }
 }
 
