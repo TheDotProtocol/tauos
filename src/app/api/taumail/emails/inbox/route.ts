@@ -18,9 +18,9 @@ export async function GET(request: NextRequest) {
                 END as priority
          FROM incoming_emails ie
          LEFT JOIN users u ON ie.from_email = u.email
-         WHERE ie.user_id = $1
-           AND (ie.is_deleted IS NOT TRUE)
-           AND (ie.is_spam IS NOT TRUE)
+         WHERE ie.user_id::text = $1::text
+           AND COALESCE(ie.is_deleted, false) = false
+           AND COALESCE(ie.is_spam, false) = false
          ORDER BY ie.received_at DESC
          LIMIT 50`,
         [userId],

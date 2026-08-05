@@ -1,52 +1,8 @@
-import { getPool } from '@/lib/db-pool';
+import { parseSendGridInboundAttachments, extractEmailFromHeader } from '@/lib/taumail-inbound';
+import { findUserForInboundRecipient, storeInboundEmail } from '@/lib/taumail/inbound-store';
 import { NextRequest, NextResponse } from 'next/server';
-import {
-  extractEmailFromHeader,
-  parseSendGridInboundAttachments,
-  parseSenderFromHeader,
-} from '@/lib/taumail-inbound';
 
-async function saveIncomingEmail(
-  userId: string | number,
-  from: string,
-  senderName: string,
-  subject: string,
-  text: string,
-  html: string,
-  headers: unknown,
-  attachments: unknown
-) {
-  const result = await getPool().query(
-    `INSERT INTO incoming_emails (
-        user_id,
-        from_email,
-        sender_name,
-        subject,
-        body,
-        body_text,
-        body_html,
-        received_at,
-        is_spam,
-        headers,
-        attachments
-      ) VALUES ($1, $2, $3, $4, $5, $6, $7, CURRENT_TIMESTAMP, $8, $9, $10)
-       RETURNING id, subject, received_at`,
-    [
-      userId,
-      from,
-      senderName,
-      subject || 'No Subject',
-      text || 'No text content',
-      text || 'No text content',
-      html || '<p>No HTML content</p>',
-      false,
-      JSON.stringify(headers || {}),
-      JSON.stringify(attachments || []),
-    ]
-  );
-
-  return result.rows[0];
-}
+export const dynamic = 'force-dynamic';
 
 export async function POST(request: NextRequest) {
   try {
@@ -63,7 +19,7 @@ export async function POST(request: NextRequest) {
     if (contentType.includes('multipart/form-data') || contentType.includes('application/x-www-form-urlencoded')) {
       const formData = await request.formData();
       from = String(formData.get('from') || '');
-      to = String(formData.get('to') || '');
+      to = String(formData.get('to') || formData.get('envelope') || '');
       subject = String(formData.get('subject') || '');
       text = String(formData.get('text') || '');
       html = String(formData.get('html') || '');
@@ -94,37 +50,28 @@ export async function POST(request: NextRequest) {
     }
 
     const cleanRecipientEmail = extractEmailFromHeader(to).toLowerCase();
-    const { fromEmail, senderName, displayName } = parseSenderFromHeader(from);
-
-    const userResult = await getPool().query(
-      'SELECT id, username, email FROM users WHERE email = $1 OR email ILIKE $2',
-      [cleanRecipientEmail, cleanRecipientEmail]
-    );
-
-    if (userResult.rows.length === 0) {
-      const username = cleanRecipientEmail.split('@')[0];
-      const fallback = await getPool().query(
-        'SELECT id, username, email FROM users WHERE username = $1',
-        [username]
-      );
-      if (fallback.rows.length === 0) {
-        console.log(`User not found for inbound email: ${cleanRecipientEmail}`);
-        return NextResponse.json({ error: 'User not found' }, { status: 404 });
-      }
-      userResult.rows.push(fallback.rows[0]);
+    const user = await findUserForInboundRecipient(to);
+    if (!user) {
+      console.warn(`[webhook/incoming] User not found for inbound email: ${cleanRecipientEmail}`);
+      return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
 
-    const user = userResult.rows[0];
-    const row = await saveIncomingEmail(
-      user.id,
-      displayName || fromEmail,
-      senderName,
+    const isSpam =
+      subject?.toLowerCase().includes('spam') ||
+      subject?.toLowerCase().includes('viagra') ||
+      from?.toLowerCase().includes('noreply') ||
+      false;
+
+    const row = await storeInboundEmail({
+      userId: user.id,
+      fromRaw: from,
       subject,
       text,
       html,
       headers,
-      attachments
-    );
+      attachments,
+      isSpam,
+    });
 
     console.log(`Incoming email saved for ${cleanRecipientEmail}:`, row.id, `attachments=${attachments.length}`);
 
@@ -141,7 +88,7 @@ export async function POST(request: NextRequest) {
         error: 'Failed to process incoming email',
         details: error instanceof Error ? error.message : 'Unknown error',
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

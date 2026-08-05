@@ -1,45 +1,42 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { getPool } from '@/lib/db-pool';
+import { getPool } from '@/app/api/taumail/middleware/security';
 import { isAllowedMailDomain, parseEmailAddress } from '@/config/mail-domains';
+import { extractEmailFromHeader } from '@/lib/taumail-inbound';
+import { findUserForInboundRecipient, storeInboundEmail } from '@/lib/taumail/inbound-store';
+import { NextRequest, NextResponse } from 'next/server';
 
 async function storeIncomingEmail(
   to: string,
   from: string,
   subject: string,
-  body: string
+  body: string,
+  html?: string,
 ) {
-  const parsed = parseEmailAddress(to);
+  const cleanTo = extractEmailFromHeader(to).toLowerCase();
+  const parsed = parseEmailAddress(cleanTo);
   if (!parsed || !isAllowedMailDomain(parsed.domain)) {
     return NextResponse.json({ error: 'Unsupported recipient domain' }, { status: 400 });
   }
 
-  const userResult = await getPool().query(
-    'SELECT id, email FROM users WHERE email = $1 OR (username = $2 AND email LIKE $3)',
-    [to.toLowerCase(), parsed.local, `%@${parsed.domain}`]
-  );
-
-  if (userResult.rows.length === 0) {
+  const user = await findUserForInboundRecipient(to);
+  if (!user) {
+    console.warn(`[smtp/incoming] Recipient not found: ${cleanTo}`);
     return NextResponse.json({ error: 'Recipient not found' }, { status: 404 });
   }
 
-  const userId = userResult.rows[0].id;
-  const senderName = from.includes('<')
-    ? from.split('<')[0].trim().replace(/"/g, '')
-    : from.split('@')[0];
+  const row = await storeInboundEmail({
+    userId: user.id,
+    fromRaw: from,
+    subject,
+    text: body,
+    html: html || body,
+  });
 
-  const result = await getPool().query(
-    `INSERT INTO incoming_emails (user_id, from_email, sender_name, subject, body, received_at, is_read, is_spam)
-     VALUES ($1, $2, $3, $4, $5, NOW(), false, false)
-     RETURNING id`,
-    [userId, from, senderName || parsed.local, subject, body]
-  );
-
-  console.log(`✅ Incoming email stored: ${from} -> ${to}`);
+  console.log(`✅ Incoming email stored: ${from} -> ${cleanTo} (user ${user.id})`);
 
   return NextResponse.json({
     success: true,
     message: 'Email received and stored',
-    emailId: result.rows[0].id,
+    emailId: row.id,
     domain: parsed.domain,
   });
 }
@@ -53,10 +50,10 @@ export async function POST(request: NextRequest) {
       if (!to || !from || !subject) {
         return NextResponse.json(
           { error: 'Missing required fields: to, from, subject' },
-          { status: 400 }
+          { status: 400 },
         );
       }
-      return storeIncomingEmail(to, from, subject, text || html || '');
+      return storeIncomingEmail(to, from, subject, text || html || '', html);
     }
 
     const rawEmail = await request.text();
@@ -88,7 +85,7 @@ export async function POST(request: NextRequest) {
     console.error('SMTP incoming error:', error);
     return NextResponse.json(
       { error: 'Failed to process incoming email' },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -100,7 +97,7 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json({ error: 'Missing fields' }, { status: 400 });
     }
     return storeIncomingEmail(to, from, subject, text || 'Simulated incoming message');
-  } catch (error) {
+  } catch {
     return NextResponse.json({ error: 'Simulation failed' }, { status: 500 });
   }
 }
