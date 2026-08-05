@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Postfix pipe: deliver inbound mail to Tau Mail API on Vercel."""
+import base64
 import email
 import json
 import os
@@ -14,36 +15,80 @@ API_URL = os.environ.get(
 )
 
 
-def extract_body(msg: email.message.Message) -> tuple[str, str]:
+def decode_part_bytes(part: email.message.Message) -> bytes:
+    payload = part.get_payload(decode=True)
+    if isinstance(payload, bytes):
+        return payload
+    if isinstance(payload, str):
+        return payload.encode(part.get_content_charset() or "utf-8", errors="replace")
+    return b""
+
+
+def decode_part_text(part: email.message.Message) -> str:
+    data = decode_part_bytes(part)
+    if not data:
+        return ""
+    return data.decode(part.get_content_charset() or "utf-8", errors="replace")
+
+
+def normalize_cid(raw: str) -> str:
+    return (raw or "").strip().strip("<>")
+
+
+def extract_message_parts(msg: email.message.Message) -> tuple[str, str, list, list]:
     text = ""
     html = ""
-    if msg.is_multipart():
-        for part in msg.walk():
-            ctype = part.get_content_type()
-            if part.get_content_disposition() == "attachment":
+    inline_attachments = []
+    file_attachments = []
+
+    for part in msg.walk():
+        if part.get_content_maintype() == "multipart":
+            continue
+
+        ctype = part.get_content_type()
+        disposition = part.get_content_disposition()
+        filename = part.get_filename()
+        cid = normalize_cid(part.get("Content-ID") or "")
+
+        is_inline = bool(cid) or disposition == "inline"
+        is_file_attachment = disposition == "attachment" or (
+            filename and not is_inline and ctype.startswith("application/")
+        )
+
+        if is_file_attachment or (filename and disposition == "attachment"):
+            data = decode_part_bytes(part)
+            if not data:
                 continue
-            try:
-                payload = part.get_content()
-            except Exception:
-                payload = part.get_payload(decode=True)
-                if isinstance(payload, bytes):
-                    payload = payload.decode(part.get_content_charset() or "utf-8", errors="replace")
-            if ctype == "text/plain" and not text:
-                text = payload or ""
-            elif ctype == "text/html" and not html:
-                html = payload or ""
-    else:
-        try:
-            payload = msg.get_content()
-        except Exception:
-            payload = msg.get_payload(decode=True)
-            if isinstance(payload, bytes):
-                payload = payload.decode(msg.get_content_charset() or "utf-8", errors="replace")
-        if msg.get_content_type() == "text/html":
-            html = payload or ""
-        else:
-            text = payload or ""
-    return text, html
+            file_attachments.append(
+                {
+                    "filename": filename or "attachment",
+                    "contentType": ctype,
+                    "content": base64.b64encode(data).decode("ascii"),
+                    "size": len(data),
+                }
+            )
+            continue
+
+        if is_inline and ctype.startswith("image/"):
+            data = decode_part_bytes(part)
+            if not data:
+                continue
+            inline_attachments.append(
+                {
+                    "cid": cid or filename or f"inline-{len(inline_attachments) + 1}",
+                    "contentType": ctype,
+                    "content": base64.b64encode(data).decode("ascii"),
+                    "filename": filename or cid or "inline-image",
+                }
+            )
+            continue
+
+        if ctype == "text/plain" and not text:
+            text = decode_part_text(part)
+        elif ctype == "text/html" and not html:
+            html = decode_part_text(part)
+
+    return text, html, inline_attachments, file_attachments
 
 
 def main() -> int:
@@ -55,7 +100,7 @@ def main() -> int:
     to_addr = recipient or (msg.get("To") or "")
     from_addr = sender or (msg.get("From") or "")
     subject = msg.get("Subject") or "(no subject)"
-    text, html = extract_body(msg)
+    text, html, inline_attachments, file_attachments = extract_message_parts(msg)
 
     payload = {
         "to": to_addr,
@@ -63,6 +108,8 @@ def main() -> int:
         "subject": subject,
         "text": text,
         "html": html or text,
+        "inlineAttachments": inline_attachments,
+        "attachments": file_attachments,
     }
 
     req = urllib.request.Request(
@@ -73,7 +120,7 @@ def main() -> int:
     )
 
     try:
-        with urllib.request.urlopen(req, timeout=30) as resp:
+        with urllib.request.urlopen(req, timeout=60) as resp:
             if resp.status >= 400:
                 print(f"API error {resp.status}", file=sys.stderr)
                 return 75

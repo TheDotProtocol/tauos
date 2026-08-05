@@ -28,6 +28,13 @@ type EmailReaderPaneProps = {
   onAction?: (action: EmailReaderAction) => void;
 };
 
+function downloadAttachment(name: string, contentType: string, base64: string) {
+  const link = document.createElement('a');
+  link.href = `data:${contentType};base64,${base64}`;
+  link.download = name;
+  link.click();
+}
+
 export default function EmailReaderPane({
   email,
   recipientLabel,
@@ -39,6 +46,7 @@ export default function EmailReaderPane({
   onAction,
 }: EmailReaderPaneProps) {
   const paragraphs = email.body.split('\n\n').filter(Boolean);
+  const hasHtmlBody = Boolean(email.bodyHtml?.trim());
 
   return (
     <div className={`${geistSans.className} flex min-w-0 flex-1 flex-col gap-6 overflow-y-auto p-8`}>
@@ -96,18 +104,37 @@ export default function EmailReaderPane({
         </div>
       ) : null}
 
-      <div className="flex-1 space-y-4 text-sm leading-relaxed text-[#a1a1aa]">
-        {paragraphs.map((p) => (
-          <p key={p.slice(0, 40)}>{p}</p>
-        ))}
-      </div>
+      {hasHtmlBody ? (
+        <div
+          className="email-body flex-1 text-sm leading-relaxed text-[#a1a1aa] [&_a]:text-[#d4a843] [&_img]:my-3 [&_img]:max-h-[480px] [&_img]:max-w-full [&_img]:rounded-lg [&_p]:my-2"
+          dangerouslySetInnerHTML={{ __html: email.bodyHtml! }}
+        />
+      ) : (
+        <div className="flex-1 space-y-4 text-sm leading-relaxed text-[#a1a1aa]">
+          {paragraphs.map((p) => (
+            <p key={p.slice(0, 40)}>{p}</p>
+          ))}
+        </div>
+      )}
 
-      {email.attachment ? (
-        <div className="flex w-[280px] items-center gap-3 rounded-[10px] border border-[rgba(255,255,255,0.05)] bg-[#121214] p-3">
-          <MailIcon src={tauMailAssets.icons.file} size={24} />
-          <div className="min-w-0">
-            <p className="truncate text-[13px] font-medium text-white">attachment</p>
-            <p className={`${geistMono.className} text-[11px] text-[#71717a]`}>Attached file</p>
+      {email.attachments && email.attachments.length > 0 ? (
+        <div className="space-y-2">
+          <p className="text-xs font-semibold uppercase tracking-wide text-[#71717a]">Attachments</p>
+          <div className="flex flex-wrap gap-2">
+            {email.attachments.map((file) => (
+              <button
+                key={file.name}
+                type="button"
+                onClick={() => file.content && downloadAttachment(file.name, file.type, file.content)}
+                className="flex max-w-[240px] items-center gap-3 rounded-[10px] border border-[rgba(255,255,255,0.05)] bg-[#121214] p-3 text-left hover:bg-[#1a1a1e]"
+              >
+                <MailIcon src={tauMailAssets.icons.file} size={24} />
+                <div className="min-w-0">
+                  <p className="truncate text-[13px] font-medium text-white">{file.name}</p>
+                  <p className={`${geistMono.className} text-[11px] text-[#71717a]`}>{file.size}</p>
+                </div>
+              </button>
+            ))}
           </div>
         </div>
       ) : null}

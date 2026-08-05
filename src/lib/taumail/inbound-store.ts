@@ -1,6 +1,11 @@
 import { getPool } from '@/lib/db-pool';
 import { extractEmailFromHeader, parseSenderFromHeader } from '@/lib/taumail-inbound';
+import {
+  processInboundHtmlBody,
+  type InlineAttachmentPart,
+} from '@/lib/taumail/inbound-html';
 import { parseEmailAddress } from '@/config/mail-domains';
+import type { MailAttachmentPayload } from '@/lib/taumail-attachments';
 
 export type InboundUser = {
   id: string;
@@ -48,12 +53,18 @@ export async function storeInboundEmail(input: {
   subject: string;
   text: string;
   html?: string;
+  inlineAttachments?: InlineAttachmentPart[];
   headers?: unknown;
-  attachments?: unknown;
+  attachments?: MailAttachmentPayload[] | unknown;
   isSpam?: boolean;
 }) {
   const { fromEmail, senderName } = parseSenderFromHeader(input.fromRaw);
   const pool = getPool();
+  const bodyHtml = processInboundHtmlBody(
+    input.html,
+    input.text,
+    input.inlineAttachments || [],
+  );
 
   const result = await pool.query(
     `INSERT INTO incoming_emails (
@@ -79,7 +90,7 @@ export async function storeInboundEmail(input: {
       input.subject || 'No Subject',
       input.text || 'No text content',
       input.text || 'No text content',
-      input.html || input.text || '<p>No HTML content</p>',
+      bodyHtml,
       Boolean(input.isSpam),
       JSON.stringify(input.headers || {}),
       JSON.stringify(input.attachments || []),

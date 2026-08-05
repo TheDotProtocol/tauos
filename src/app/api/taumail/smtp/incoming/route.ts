@@ -2,6 +2,7 @@ import { getPool } from '@/app/api/taumail/middleware/security';
 import { isAllowedMailDomain, parseEmailAddress } from '@/config/mail-domains';
 import { extractEmailFromHeader } from '@/lib/taumail-inbound';
 import { findUserForInboundRecipient, storeInboundEmail } from '@/lib/taumail/inbound-store';
+import type { InlineAttachmentPart } from '@/lib/taumail/inbound-html';
 import { NextRequest, NextResponse } from 'next/server';
 
 async function storeIncomingEmail(
@@ -10,6 +11,8 @@ async function storeIncomingEmail(
   subject: string,
   body: string,
   html?: string,
+  inlineAttachments?: InlineAttachmentPart[],
+  attachments?: unknown,
 ) {
   const cleanTo = extractEmailFromHeader(to).toLowerCase();
   const parsed = parseEmailAddress(cleanTo);
@@ -29,6 +32,8 @@ async function storeIncomingEmail(
     subject,
     text: body,
     html: html || body,
+    inlineAttachments,
+    attachments,
   });
 
   console.log(`✅ Incoming email stored: ${from} -> ${cleanTo} (user ${user.id})`);
@@ -46,14 +51,22 @@ export async function POST(request: NextRequest) {
     const contentType = request.headers.get('content-type') || '';
 
     if (contentType.includes('application/json')) {
-      const { to, from, subject, text, html } = await request.json();
+      const { to, from, subject, text, html, inlineAttachments, attachments } = await request.json();
       if (!to || !from || !subject) {
         return NextResponse.json(
           { error: 'Missing required fields: to, from, subject' },
           { status: 400 },
         );
       }
-      return storeIncomingEmail(to, from, subject, text || html || '', html);
+      return storeIncomingEmail(
+        to,
+        from,
+        subject,
+        text || html || '',
+        html,
+        inlineAttachments as InlineAttachmentPart[] | undefined,
+        attachments,
+      );
     }
 
     const rawEmail = await request.text();
