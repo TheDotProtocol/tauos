@@ -113,6 +113,56 @@ function toSendGridAttachments(input: SendMailInput) {
   }));
 }
 
+/** Domains verified in SendGrid (default: tauos.org). Other From domains must relay via authenticated address. */
+function getSendGridAuthenticatedDomains(): string[] {
+  const raw =
+    process.env.SENDGRID_AUTHENTICATED_DOMAINS?.trim() ||
+    process.env.SENDGRID_AUTHENTICATED_DOMAIN?.trim() ||
+    'tauos.org';
+  return raw
+    .split(',')
+    .map((d) => d.trim().toLowerCase())
+    .filter(Boolean);
+}
+
+function isSendGridAuthenticatedFrom(email: string): boolean {
+  const parsed = parseEmailAddress(email);
+  if (!parsed) return false;
+  return getSendGridAuthenticatedDomains().includes(parsed.domain);
+}
+
+type ResolvedSendGridFrom = {
+  fromEmail: string;
+  fromName: string;
+  replyTo: string;
+  /** User's real mailbox when From is relayed through an authenticated domain */
+  userEmail?: string;
+  relayed: boolean;
+};
+
+function resolveSendGridFrom(input: SendMailInput): ResolvedSendGridFrom {
+  const userEmail = input.from.email;
+  const userName = input.from.name || userEmail.split('@')[0];
+  const replyTo = input.replyTo || userEmail;
+
+  if (isSendGridAuthenticatedFrom(userEmail)) {
+    return { fromEmail: userEmail, fromName: userName, replyTo, relayed: false };
+  }
+
+  const relayEmail =
+    process.env.SENDGRID_FROM_EMAIL?.trim() ||
+    process.env.MAIL_FROM?.trim() ||
+    'noreply@tauos.org';
+
+  return {
+    fromEmail: relayEmail,
+    fromName: userName,
+    replyTo,
+    userEmail,
+    relayed: true,
+  };
+}
+
 async function sendViaSmtp(input: SendMailInput): Promise<SendMailResult> {
   const fromHeader = input.from.name
     ? `"${input.from.name}" <${input.from.email}>`
@@ -162,29 +212,29 @@ async function sendViaSendGrid(input: SendMailInput): Promise<SendMailResult> {
 
   sgMail.setApiKey(apiKey);
 
-  const fromEmail = input.from.email;
-  const fromName = input.from.name || input.from.email.split('@')[0];
+  const resolved = resolveSendGridFrom(input);
 
   const [response] = await sgMail.send({
     to: input.to,
-    from: { email: fromEmail, name: fromName },
+    from: { email: resolved.fromEmail, name: resolved.fromName },
     subject: input.subject,
     text: input.text,
     html: input.html || input.text,
     cc: input.cc,
     bcc: input.bcc,
-    replyTo: input.replyTo || input.from.email,
+    replyTo: resolved.replyTo,
     attachments: toSendGridAttachments(input),
     headers: {
       ...(input.inReplyTo ? { 'In-Reply-To': input.inReplyTo } : {}),
       ...(input.references ? { References: input.references } : {}),
+      ...(resolved.userEmail ? { 'X-Tau-Mail-Sender': resolved.userEmail } : {}),
     },
   });
 
   return {
     messageId: response.headers['x-message-id'] || `sg-${Date.now()}`,
     transport: 'sendgrid',
-    envelopeFrom: fromEmail,
+    envelopeFrom: resolved.fromEmail,
   };
 }
 
@@ -192,13 +242,15 @@ async function sendViaSendGridSmtp(input: SendMailInput): Promise<SendMailResult
   const apiKey = process.env.SENDGRID_API_KEY?.trim();
   if (!apiKey) throw new Error('SendGrid API key not configured');
 
-  const fromHeader = input.from.name
-    ? `"${input.from.name}" <${input.from.email}>`
-    : input.from.email;
+  const resolved = resolveSendGridFrom(input);
+  const fromHeader = resolved.fromName
+    ? `"${resolved.fromName}" <${resolved.fromEmail}>`
+    : resolved.fromEmail;
 
   const headers: Record<string, string> = {};
   if (input.inReplyTo) headers['In-Reply-To'] = input.inReplyTo;
   if (input.references) headers['References'] = input.references;
+  if (resolved.userEmail) headers['X-Tau-Mail-Sender'] = resolved.userEmail;
 
   const transport = nodemailer.createTransport({
     host: 'smtp.sendgrid.net',
@@ -209,7 +261,7 @@ async function sendViaSendGridSmtp(input: SendMailInput): Promise<SendMailResult
 
   const info = await transport.sendMail({
     from: fromHeader,
-    replyTo: input.replyTo || input.from.email,
+    replyTo: resolved.replyTo,
     to: input.to,
     cc: input.cc,
     bcc: input.bcc,
@@ -229,7 +281,7 @@ async function sendViaSendGridSmtp(input: SendMailInput): Promise<SendMailResult
     transport: 'sendgrid-smtp',
     accepted: info.accepted,
     rejected: info.rejected,
-    envelopeFrom: input.from.email,
+    envelopeFrom: resolved.fromEmail,
   };
 }
 

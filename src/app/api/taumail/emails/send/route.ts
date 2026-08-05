@@ -183,11 +183,17 @@ export async function POST(request: NextRequest) {
     });
 
     const external = isExternalRecipient(String(to).split(',')[0]?.trim() || '');
-    const deliverabilityHint =
-      external && transport === 'smtp'
-        ? 'Sent via backup SMTP relay. Gmail delivery may be delayed — check Spam/Promotions. For reliable external delivery, update SENDGRID_API_KEY in Vercel (current key returns Unauthorized).'
+    const relayedThroughTauos =
+      external &&
+      (transport === 'sendgrid' || transport === 'sendgrid-smtp') &&
+      envelopeFrom &&
+      envelopeFrom.toLowerCase() !== fromEmail.toLowerCase();
+    const deliverabilityHint = relayedThroughTauos
+      ? `Delivered via SendGrid as ${fromName} (Reply-To: ${fromEmail}). Replies go to your Tau Mail address. To show ${fromEmail} directly in Gmail, authenticate taumail.org in SendGrid.`
+      : external && transport === 'smtp'
+        ? 'Sent via SMTP relay. External delivery may be delayed — Gmail requires SendGrid for outbound mail.'
         : external
-          ? 'Message accepted by our mail server. External delivery may take a few minutes — check recipient spam folder if not received.'
+          ? 'Message sent. Check the recipient inbox or spam folder if not received.'
           : undefined;
 
     const result = await getPool().query(
