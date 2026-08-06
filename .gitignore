@@ -155,6 +155,7 @@ public/downloads/*.AppImage
 public/downloads/*.apk
 os-code/installer-scripts/.bin/
 os-code/installer-scripts/dist/
+os-code/installer-scripts/resources/*.iso
 kernel-build/linux-6.14/
 release-files/*.iso
 release-files/tauos-core-*.tar.gz

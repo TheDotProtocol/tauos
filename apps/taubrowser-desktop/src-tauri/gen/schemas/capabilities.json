@@ -1,1 +1,0 @@
-{"org.tauos.browser":{"identifier":"org.tauos.browser","description":"Tau Browser capabilities","local":true,"windows":["main"],"permissions":["core:default","shell:allow-open"]}}

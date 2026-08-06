@@ -1,6 +1,6 @@
 {
   "version": "1.0.0",
-  "updatedAt": "2026-08-06T19:25:00Z",
+  "updatedAt": "2026-08-06T20:25:00Z",
   "releaseBase": "https://github.com/TheDotProtocol/tauos/releases/download/tauos-v1.0.0",
   "artifacts": [
     {
@@ -89,10 +89,10 @@
       "kind": "package",
       "filename": "tauos-installer_1.0.0_amd64.deb",
       "url": "https://github.com/TheDotProtocol/tauos/releases/download/tauos-v1.0.0/tauos-installer_1.0.0_amd64.deb",
-      "size": 72712914,
-      "sha256": "310baaa6d79636b1f6d9ccdcf38516a1b3630e43cd0699f595b4c88d4b8fb0c1",
+      "size": 478226038,
+      "sha256": "e6c0bc72dd96dbc2515e4fc96f5cb35aa6913ccf498b002aa8e1507a045fd83b",
       "available": true,
-      "description": "Debian/Ubuntu installer package"
+      "description": "Debian/Ubuntu installer package (includes boot ISO + Tau Core UI)"
     },
     {
       "id": "installer-linux-x64-appimage",
@@ -127,11 +127,11 @@
       "arch": "arm64",
       "kind": "package",
       "filename": "tauos-installer_1.0.0_arm64.deb",
-      "url": "",
-      "size": 0,
-      "sha256": "",
-      "available": false,
-      "description": "ARM64 .deb — rebuild on Linux with npm run build-linux-arm64"
+      "url": "https://github.com/TheDotProtocol/tauos/releases/download/tauos-v1.0.0/tauos-installer_1.0.0_arm64.deb",
+      "size": 473380352,
+      "sha256": "ebd305ea9b3c63c62f15e3052614b847f4d9bd69b8838378f5ded902e0217cd9",
+      "available": true,
+      "description": "ARM64 .deb for Raspberry Pi / ARM servers (includes boot ISO + Tau Core UI)"
     },
     {
       "id": "tautalk-android-apk",
@@ -153,11 +153,11 @@
       "arch": "arm64",
       "kind": "iso",
       "filename": "TauOS-Desktop-arm64-v1.0.0.iso",
-      "url": "",
-      "size": 0,
-      "sha256": "",
-      "available": false,
-      "description": "ARM64 bootable ISO — run: TAUOS_REBUILD_ROOTFS=1 ./scripts/build-tauos.sh --docker --arch arm64"
+      "url": "https://github.com/TheDotProtocol/tauos/releases/download/tauos-v1.0.0/TauOS-Desktop-arm64-v1.0.0.iso",
+      "size": 434040832,
+      "sha256": "62035d10acf66da3b00a0d3a91ad0ada2df6fac825cb450a2e8987e4c4fa2087",
+      "available": true,
+      "description": "ARM64 bootable ISO for Apple Silicon Linux, Raspberry Pi, ARM PCs"
     }
   ]
 }

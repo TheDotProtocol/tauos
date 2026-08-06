@@ -1,4 +1,0 @@
-print("Hello from TauScript v1.0!");
-
-import { add } from "std.math";
-print(add(21, 21));

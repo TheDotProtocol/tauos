@@ -1,8 +1,0 @@
-/Users/macbook/Desktop/tauos/target/release/deps/clap_lex-2f8d85ae05d62f87.d: /Users/macbook/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/clap_lex-0.7.5/src/lib.rs /Users/macbook/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/clap_lex-0.7.5/src/ext.rs
-
-/Users/macbook/Desktop/tauos/target/release/deps/libclap_lex-2f8d85ae05d62f87.rlib: /Users/macbook/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/clap_lex-0.7.5/src/lib.rs /Users/macbook/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/clap_lex-0.7.5/src/ext.rs
-
-/Users/macbook/Desktop/tauos/target/release/deps/libclap_lex-2f8d85ae05d62f87.rmeta: /Users/macbook/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/clap_lex-0.7.5/src/lib.rs /Users/macbook/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/clap_lex-0.7.5/src/ext.rs
-
-/Users/macbook/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/clap_lex-0.7.5/src/lib.rs:
-/Users/macbook/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/clap_lex-0.7.5/src/ext.rs:

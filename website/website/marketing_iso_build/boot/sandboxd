@@ -1,4 +1,0 @@
-#!/bin/sh
-echo "🐢 TauOS Security Framework"
-echo "Sandboxing enabled"
-echo "Privacy protection active"

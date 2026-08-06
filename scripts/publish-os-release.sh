@@ -14,6 +14,8 @@ EXE_SRC="$DL/TauOS Setup 1.0.0.exe"
 DMG_X64="$DL/TauOS-1.0.0.dmg"
 DMG_ARM64="$DL/TauOS-1.0.0-arm64.dmg"
 DEB_X64="$DL/tauos-installer_1.0.0_amd64.deb"
+DEB_ARM64="$DL/tauos-installer_1.0.0_arm64.deb"
+DEB_ARM64_FALLBACK="$ROOT/os-code/installer-scripts/dist/tauos-installer_1.0.0_arm64.deb"
 APPIMAGE_X64="$DL/TauOS-1.0.0.AppImage"
 APPIMAGE_ARM64="$DL/TauOS-1.0.0-arm64.AppImage"
 
@@ -34,6 +36,7 @@ printf "  %-40s %s\n" "TauOS-1.0.0-arm64.dmg (Apple Silicon)" "$(du -h "$DMG_ARM
 printf "  %-40s %s\n" "TauOS-1.0.0.AppImage (x64)" "$(du -h "$APPIMAGE_X64" | cut -f1)"
 printf "  %-40s %s\n" "TauOS-1.0.0-arm64.AppImage" "$(du -h "$APPIMAGE_ARM64" | cut -f1)"
 [[ -f "$DEB_X64" ]] && printf "  %-40s %s\n" "tauos-installer_1.0.0_amd64.deb" "$(du -h "$DEB_X64" | cut -f1)"
+[[ -f "$DEB_ARM64" || -f "$DEB_ARM64_FALLBACK" ]] && printf "  %-40s %s\n" "tauos-installer_1.0.0_arm64.deb" "$(du -h "${DEB_ARM64:-$DEB_ARM64_FALLBACK}" | cut -f1)"
 [[ -f "$ISO_SRC" ]] && printf "  %-40s %s\n" "TauOS-Desktop-v1.0.0.iso" "$(du -h "$ISO_SRC" | cut -f1)"
 echo ""
 
@@ -74,12 +77,18 @@ cp "$DMG_ARM64" "$STAGE/TauOS-1.0.0-arm64.dmg"
 cp "$APPIMAGE_X64" "$STAGE/TauOS-1.0.0.AppImage"
 cp "$APPIMAGE_ARM64" "$STAGE/TauOS-1.0.0-arm64.AppImage"
 [[ -f "$DEB_X64" ]] && cp "$DEB_X64" "$STAGE/tauos-installer_1.0.0_amd64.deb"
+if [[ -f "$DEB_ARM64" ]]; then cp "$DEB_ARM64" "$STAGE/tauos-installer_1.0.0_arm64.deb"
+elif [[ -f "$DEB_ARM64_FALLBACK" ]]; then cp "$DEB_ARM64_FALLBACK" "$STAGE/tauos-installer_1.0.0_arm64.deb"; fi
 [[ -f "$ISO_SRC" ]] && cp "$ISO_SRC" "$STAGE/TauOS-Desktop-v1.0.0.iso"
+ISO_ARM64="$ROOT/release-files/TauOS-Desktop-arm64-v1.0.0.iso"
+[[ -f "$ISO_ARM64" ]] && cp "$ISO_ARM64" "$STAGE/TauOS-Desktop-arm64-v1.0.0.iso"
 
 UPLOAD=("$STAGE/TauOS-Setup-1.0.0.exe" "$STAGE/TauOS-1.0.0.dmg" "$STAGE/TauOS-1.0.0-arm64.dmg" \
   "$STAGE/TauOS-1.0.0.AppImage" "$STAGE/TauOS-1.0.0-arm64.AppImage")
 [[ -f "$STAGE/tauos-installer_1.0.0_amd64.deb" ]] && UPLOAD+=("$STAGE/tauos-installer_1.0.0_amd64.deb")
+[[ -f "$STAGE/tauos-installer_1.0.0_arm64.deb" ]] && UPLOAD+=("$STAGE/tauos-installer_1.0.0_arm64.deb")
 [[ -f "$STAGE/TauOS-Desktop-v1.0.0.iso" ]] && UPLOAD+=("$STAGE/TauOS-Desktop-v1.0.0.iso")
+[[ -f "$STAGE/TauOS-Desktop-arm64-v1.0.0.iso" ]] && UPLOAD+=("$STAGE/TauOS-Desktop-arm64-v1.0.0.iso")
 
 echo "Uploading ${#UPLOAD[@]} assets (may take several minutes)..."
 gh release upload "$TAG" -R "$REPO" --clobber "${UPLOAD[@]}"
