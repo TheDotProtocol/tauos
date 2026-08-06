@@ -25,22 +25,22 @@ function platformIcon(platform: string) {
 function installInstructions(platform: string): string[] {
   if (platform === 'macos') {
     return [
-      'Open the downloaded .dmg file',
-      'Drag TauOS to Applications',
-      'Launch from Applications — allow if Gatekeeper prompts',
+      'Run the downloaded installer',
+      'Accept the Tau Core EULA in the setup wizard',
+      'Connect to Wi‑Fi, create your Tau ID, then use the desktop',
     ];
   }
   if (platform === 'windows') {
     return [
       'Run the downloaded Setup.exe',
-      'Follow the installer wizard',
-      'Launch TauOS from Start menu',
+      'Accept the EULA and follow the installer wizard',
+      'Boot from USB or launch Tau Core — complete setup (Wi‑Fi, Tau ID)',
     ];
   }
   return [
     'Install: sudo dpkg -i tauos-*.deb (Debian/Ubuntu)',
-    'Or: sudo rpm -i tauos-*.rpm (Fedora/RHEL)',
-    'Launch TauOS from your app menu',
+    'Or run the AppImage with execute permission',
+    'On first boot: EULA → Wi‑Fi → Tau ID → desktop',
   ];
 }
 

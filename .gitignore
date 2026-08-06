@@ -147,6 +147,14 @@ target/
 # Local ISO/build outputs (ISO served via GitHub Releases — see public/downloads/manifest.json)
 *.iso
 !public/downloads/manifest.json
+# Installers — host on GitHub Releases (git push limit 100MB; release assets up to 2GB)
+public/downloads/*.exe
+public/downloads/*.dmg
+public/downloads/*.deb
+public/downloads/*.AppImage
+public/downloads/*.apk
+os-code/installer-scripts/.bin/
+os-code/installer-scripts/dist/
 kernel-build/linux-6.14/
 release-files/*.iso
 release-files/tauos-core-*.tar.gz

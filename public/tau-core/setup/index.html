@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tau Core Setup</title>
+  <link rel="icon" type="image/png" href="../assets/tau-logomark.png">
+  <link rel="stylesheet" href="../shared/tokens.css">
+  <link rel="stylesheet" href="setup.css">
+</head>
+<body>
+  <div id="boot-splash" class="screen boot-screen">
+    <div class="boot-glow"></div>
+    <img src="../assets/tau-logomark.png" alt="Tau Core" class="boot-logo">
+  </div>
+
+  <div id="loading-screen" class="screen loading-screen hidden">
+    <div class="loading-identity">
+      <img src="../assets/tau-logomark.png" alt="" width="64" height="64">
+      <h1>Tau Core</h1>
+    </div>
+    <div class="loading-progress-wrap">
+      <div class="loading-track"><div class="loading-fill" id="loading-fill"></div></div>
+      <p id="loading-status">Preparing your experience...</p>
+    </div>
+  </div>
+
+  <div id="wizard" class="wizard hidden">
+    <header class="wizard-header" id="wizard-header">
+      <div class="brand">
+        <img src="../assets/tau-logomark.png" alt="" width="24" height="24">
+        <span>Tau Core</span>
+      </div>
+      <div class="step-badge" id="step-badge">Setup</div>
+    </header>
+
+    <main class="wizard-main" id="wizard-main"></main>
+
+    <footer class="wizard-footer" id="wizard-footer"></footer>
+  </div>
+
+  <script src="setup.js"></script>
+</body>
+</html>

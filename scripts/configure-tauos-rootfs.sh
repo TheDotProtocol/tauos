@@ -77,13 +77,14 @@ mkdir -p "$ROOTFS/etc/tau" "$ROOTFS/etc/tauos" "$ROOTFS/opt/tauos/bin" \
   "$ROOTFS/var/lib/tauos" "$ROOTFS/var/log/tau" "$ROOTFS/usr/lib/tauos" \
   "$ROOTFS/usr/share/tauos/desktop-ui"
 
-# Stage existing web desktop UI (canonical design)
+# Stage Tau Core desktop UI (Figma-aligned shell + setup wizard)
+if [[ -d "$REPO_ROOT/public/tau-core" ]]; then
+  mkdir -p "$ROOTFS/usr/share/tauos/tau-core"
+  rsync -a --delete "$REPO_ROOT/public/tau-core/" "$ROOTFS/usr/share/tauos/tau-core/"
+fi
+# Legacy desktop-ui redirect
 if [[ -d "$REPO_ROOT/public/desktop-ui" ]]; then
-  rsync -a --delete "$REPO_ROOT/public/desktop-ui/" "$ROOTFS/usr/share/tauos/desktop-ui/"
-  # Offline-friendly: drop external font CDN dependency
-  sed -i.bak 's|@import url(https://fonts.googleapis.com[^)]*)||g' "$ROOTFS/usr/share/tauos/desktop-ui/styles.css" 2>/dev/null || true
-  sed -i.bak '/fonts.googleapis.com/d' "$ROOTFS/usr/share/tauos/desktop-ui/index.html" 2>/dev/null || true
-  rm -f "$ROOTFS/usr/share/tauos/desktop-ui/"*.bak 2>/dev/null || true
+  rsync -a "$REPO_ROOT/public/desktop-ui/" "$ROOTFS/usr/share/tauos/desktop-ui/" 2>/dev/null || true
 fi
 
 # Desktop launcher + API server

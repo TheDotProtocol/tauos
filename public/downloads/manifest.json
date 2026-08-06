@@ -1,7 +1,7 @@
 {
-  "version": "1.0.0-beta.2",
-  "updatedAt": "2026-07-16T07:40:00Z",
-  "releaseBase": "https://github.com/TheDotProtocol/tauos/releases/download/tauos-v1.0.0-beta.2",
+  "version": "1.0.0",
+  "updatedAt": "2026-08-06T19:25:00Z",
+  "releaseBase": "https://github.com/TheDotProtocol/tauos/releases/download/tauos-v1.0.0",
   "artifacts": [
     {
       "id": "iso-desktop-x64",
@@ -10,7 +10,7 @@
       "arch": "x64",
       "kind": "iso",
       "filename": "TauOS-Desktop-v1.0.0.iso",
-      "url": "https://github.com/TheDotProtocol/tauos/releases/download/tauos-v1.0.0-beta.2/TauOS-Desktop-v1.0.0.iso",
+      "url": "https://github.com/TheDotProtocol/tauos/releases/download/tauos-v1.0.0/TauOS-Desktop-v1.0.0.iso",
       "size": 419192832,
       "sha256": "8f7f8c8ebf59b5ceabf34e06f7088200580a5d500fcbd7c852512db613d8bf2f",
       "available": true,
@@ -18,16 +18,55 @@
     },
     {
       "id": "installer-windows-x64",
-      "label": "TauOS Installer for Windows (x64)",
+      "label": "TauOS Installer for Windows (x64 + ARM64)",
       "platform": "windows",
       "arch": "x64",
       "kind": "installer",
-      "filename": "TauOS Setup 1.0.0.exe",
-      "url": "https://github.com/TheDotProtocol/tauos/releases/download/tauos-v1.0.0-beta.2/TauOS-Setup-1.0.0.exe",
-      "size": 81768850,
-      "sha256": "29dc1b95757624589740a26dfcd96a240488c1c1eeed7f88cd8328256f8c02d5",
+      "filename": "TauOS-Setup-1.0.0.exe",
+      "url": "https://github.com/TheDotProtocol/tauos/releases/download/tauos-v1.0.0/TauOS-Setup-1.0.0.exe",
+      "size": 154521408,
+      "sha256": "ab9d85f58636c6e4eae404a84783ee136467f25cf773d6932cdcb504370c8dad",
       "available": true,
-      "description": "USB boot drive creator + TauOS apps"
+      "description": "Universal Windows installer (x64 + ARM64) — USB boot drive creator + TauOS apps"
+    },
+    {
+      "id": "installer-windows-arm64",
+      "label": "TauOS Installer for Windows (ARM64)",
+      "platform": "windows",
+      "arch": "arm64",
+      "kind": "installer",
+      "filename": "TauOS-Setup-1.0.0.exe",
+      "url": "https://github.com/TheDotProtocol/tauos/releases/download/tauos-v1.0.0/TauOS-Setup-1.0.0.exe",
+      "size": 154521408,
+      "sha256": "ab9d85f58636c6e4eae404a84783ee136467f25cf773d6932cdcb504370c8dad",
+      "available": true,
+      "description": "Same universal NSIS installer — includes ARM64 build"
+    },
+    {
+      "id": "installer-macos-x64",
+      "label": "TauOS Installer for macOS (Intel)",
+      "platform": "macos",
+      "arch": "x64",
+      "kind": "installer",
+      "filename": "TauOS-1.0.0.dmg",
+      "url": "https://github.com/TheDotProtocol/tauos/releases/download/tauos-v1.0.0/TauOS-1.0.0.dmg",
+      "size": 98903210,
+      "sha256": "e7cb458710a6be03de9ea5de59e666c74e3f6826900b6ffea3bae2ad76c263c9",
+      "available": true,
+      "description": "Intel Mac installer — unsigned; right-click → Open on first launch"
+    },
+    {
+      "id": "installer-macos-arm64",
+      "label": "TauOS Installer for macOS (Apple Silicon)",
+      "platform": "macos",
+      "arch": "arm64",
+      "kind": "installer",
+      "filename": "TauOS-1.0.0-arm64.dmg",
+      "url": "https://github.com/TheDotProtocol/tauos/releases/download/tauos-v1.0.0/TauOS-1.0.0-arm64.dmg",
+      "size": 93840289,
+      "sha256": "e5d40dce3cdfa5d2379862fa91e16db3bffeadf1cbc32ea63a42fd8efa055472",
+      "available": true,
+      "description": "Apple Silicon installer — unsigned; right-click → Open on first launch"
     },
     {
       "id": "installer-macos-universal",
@@ -36,11 +75,11 @@
       "arch": "universal",
       "kind": "installer",
       "filename": "TauOS-1.0.0.dmg",
-      "url": "https://github.com/TheDotProtocol/tauos/releases/download/tauos-v1.0.0-beta.2/TauOS-1.0.0.dmg",
-      "size": 98901980,
-      "sha256": "d178cc4d2948fb8ad4d50ca8a57d02f2edbb6c260f319e50b5bfbc600179aeae",
+      "url": "https://github.com/TheDotProtocol/tauos/releases/download/tauos-v1.0.0/TauOS-1.0.0.dmg",
+      "size": 98903210,
+      "sha256": "e7cb458710a6be03de9ea5de59e666c74e3f6826900b6ffea3bae2ad76c263c9",
       "available": true,
-      "description": "USB boot drive creator + TauOS apps (Electron)"
+      "description": "macOS installer (Intel DMG — Apple Silicon: use arm64 DMG)"
     },
     {
       "id": "installer-linux-x64-deb",
@@ -49,50 +88,11 @@
       "arch": "x64",
       "kind": "package",
       "filename": "tauos-installer_1.0.0_amd64.deb",
-      "url": "https://github.com/TheDotProtocol/tauos/releases/download/tauos-v1.0.0-beta.2/tauos-installer_1.0.0_amd64.deb",
+      "url": "https://github.com/TheDotProtocol/tauos/releases/download/tauos-v1.0.0/tauos-installer_1.0.0_amd64.deb",
       "size": 72712914,
       "sha256": "310baaa6d79636b1f6d9ccdcf38516a1b3630e43cd0699f595b4c88d4b8fb0c1",
       "available": true,
       "description": "Debian/Ubuntu installer package"
-    },
-    {
-      "id": "installer-macos-x64",
-      "label": "TauOS Installer for macOS (Intel)",
-      "platform": "macos",
-      "arch": "x64",
-      "kind": "installer",
-      "filename": "TauOS-1.0.0-beta.2-x64.dmg",
-      "url": "",
-      "size": 0,
-      "sha256": "",
-      "available": false,
-      "description": "Intel Mac installer — build with electron-builder --x64"
-    },
-    {
-      "id": "installer-macos-arm64",
-      "label": "TauOS Installer for macOS (Apple Silicon)",
-      "platform": "macos",
-      "arch": "arm64",
-      "kind": "installer",
-      "filename": "TauOS-1.0.0-beta.2-arm64.dmg",
-      "url": "",
-      "size": 0,
-      "sha256": "",
-      "available": false,
-      "description": "Apple Silicon installer — build with electron-builder --arm64"
-    },
-    {
-      "id": "installer-windows-arm64",
-      "label": "TauOS Installer for Windows (ARM)",
-      "platform": "windows",
-      "arch": "arm64",
-      "kind": "installer",
-      "filename": "TauOS-Setup-1.0.0-beta.2-arm64.exe",
-      "url": "",
-      "size": 0,
-      "sha256": "",
-      "available": false,
-      "description": "Windows on ARM installer"
     },
     {
       "id": "installer-linux-x64-appimage",
@@ -100,12 +100,12 @@
       "platform": "linux",
       "arch": "x64",
       "kind": "installer",
-      "filename": "TauOS-1.0.0-beta.2-x86_64.AppImage",
-      "url": "",
-      "size": 0,
-      "sha256": "",
-      "available": false,
-      "description": "Portable Linux AppImage"
+      "filename": "TauOS-1.0.0.AppImage",
+      "url": "https://github.com/TheDotProtocol/tauos/releases/download/tauos-v1.0.0/TauOS-1.0.0.AppImage",
+      "size": 104098545,
+      "sha256": "d961c9d49dd41d566c38d6a6f5105d55026f34739a9f3b400bc1a45a55a2c507",
+      "available": true,
+      "description": "Portable Linux AppImage — no install required"
     },
     {
       "id": "installer-linux-arm64-appimage",
@@ -113,12 +113,25 @@
       "platform": "linux",
       "arch": "arm64",
       "kind": "installer",
-      "filename": "TauOS-1.0.0-beta.2-aarch64.AppImage",
+      "filename": "TauOS-1.0.0-arm64.AppImage",
+      "url": "https://github.com/TheDotProtocol/tauos/releases/download/tauos-v1.0.0/TauOS-1.0.0-arm64.AppImage",
+      "size": 104207358,
+      "sha256": "ed7bc2504ea3cb7e3667f4e673fbcba9c2997982cb2337f17a2b8bcf0c403b98",
+      "available": true,
+      "description": "ARM64 Linux AppImage — Raspberry Pi, ARM servers"
+    },
+    {
+      "id": "installer-linux-arm64-deb",
+      "label": "TauOS Installer for Linux (ARM64 .deb)",
+      "platform": "linux",
+      "arch": "arm64",
+      "kind": "package",
+      "filename": "tauos-installer_1.0.0_arm64.deb",
       "url": "",
       "size": 0,
       "sha256": "",
       "available": false,
-      "description": "ARM64 Linux AppImage"
+      "description": "ARM64 .deb — rebuild on Linux with npm run build-linux-arm64"
     },
     {
       "id": "tautalk-android-apk",
@@ -127,7 +140,7 @@
       "arch": "universal",
       "kind": "package",
       "filename": "TauTalk-1.0.0-beta.apk",
-      "url": "/downloads/TauTalk-1.0.0-beta.apk",
+      "url": "https://github.com/TheDotProtocol/tauos/releases/download/taubrowser-v1.0.0-beta.2/TauTalk-1.0.0-beta.apk",
       "size": 43829098,
       "sha256": "dea862bce936b82f66e346a171566f08dfb11dcf30a49e41d09a951384bea7be",
       "available": true,
@@ -139,12 +152,12 @@
       "platform": "linux",
       "arch": "arm64",
       "kind": "iso",
-      "filename": "TauOS-Desktop-arm64-v1.0.0-beta.2.iso",
+      "filename": "TauOS-Desktop-arm64-v1.0.0.iso",
       "url": "",
       "size": 0,
       "sha256": "",
       "available": false,
-      "description": "ARM64 bootable ISO — run build-tauos.sh --arch arm64"
+      "description": "ARM64 bootable ISO — run: TAUOS_REBUILD_ROOTFS=1 ./scripts/build-tauos.sh --docker --arch arm64"
     }
   ]
 }

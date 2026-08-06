@@ -1,0 +1,37 @@
+:root {
+  --tau-ivory: #faf8f5;
+  --tau-ivory-panel: #fffdfb;
+  --tau-ink: #1c1a17;
+  --tau-ink-soft: #12110f;
+  --tau-gold: #c9a84c;
+  --tau-gold-soft: #faf6ee;
+  --tau-muted: #6e6a63;
+  --tau-muted-light: #9c978f;
+  --tau-border: #eae5df;
+  --tau-badge: #f1ece5;
+  --tau-panel-dark: rgba(28, 26, 23, 0.7);
+  --tau-topbar: rgba(10, 10, 10, 0.2);
+  --tau-shadow: 0 16px 32px rgba(0, 0, 0, 0.37);
+  --tau-radius-sm: 6px;
+  --tau-radius-md: 8px;
+  --tau-radius-lg: 12px;
+  --tau-radius-xl: 20px;
+  --font-display: 'Outfit', 'Inter', system-ui, sans-serif;
+  --font-body: 'Geist', 'Inter', system-ui, sans-serif;
+}
+
+@font-face {
+  font-family: 'Outfit';
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+  src: local('Outfit'), local('Inter');
+}
+
+@font-face {
+  font-family: 'Geist';
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+  src: local('Geist'), local('Inter');
+}

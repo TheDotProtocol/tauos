@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tau Core</title>
+  <link rel="icon" type="image/png" href="../assets/tau-logomark.png">
+  <link rel="stylesheet" href="../shared/tokens.css">
+  <link rel="stylesheet" href="desktop.css">
+</head>
+<body>
+  <div class="desktop-bg" id="desktop-bg"></div>
+  <img class="ambient ambient-1" src="../assets/ambient-glow-1.svg" alt="" aria-hidden="true">
+  <img class="ambient ambient-2" src="../assets/ambient-glow-2.svg" alt="" aria-hidden="true">
+  <img class="waveform" src="../assets/waveform.svg" alt="" aria-hidden="true">
+
+  <header class="top-panel">
+    <div class="left-brand">
+      <img src="../assets/tau-logo-nav.png" alt="" width="16" height="16">
+      <button type="button" class="activities-btn" id="activities-btn">Activities</button>
+    </div>
+    <time class="datetime" id="datetime"></time>
+    <div class="status-tray">
+      <span class="status-icon" title="Wi-Fi">📶</span>
+      <span class="status-icon" title="Volume">🔊</span>
+      <span class="status-icon" title="Battery">🔋</span>
+      <button type="button" class="user-avatar" id="user-avatar" title="Tau ID"></button>
+    </div>
+  </header>
+
+  <div class="welcome-toast hidden" id="welcome-toast">
+    <img src="../assets/tau-logomark.png" alt="" width="36" height="36">
+    <div>
+      <strong>Welcome to Tau Core</strong>
+      <p>Your system is ready. Click Activities to open apps.</p>
+    </div>
+    <button type="button" class="toast-close" id="toast-close" aria-label="Close">×</button>
+  </div>
+
+  <div class="app-overlay hidden" id="app-overlay">
+    <div class="app-window" id="app-window">
+      <div class="window-chrome">
+        <span id="window-title">Tau Core</span>
+        <button type="button" id="window-close" aria-label="Close">×</button>
+      </div>
+      <iframe id="app-frame" title="Application" sandbox="allow-scripts allow-same-origin allow-forms allow-popups"></iframe>
+    </div>
+  </div>
+
+  <nav class="bottom-dock" id="bottom-dock" aria-label="Application dock"></nav>
+
+  <script src="desktop.js"></script>
+</body>
+</html>

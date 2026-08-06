@@ -11,10 +11,15 @@
   "scripts": {
     "start": "electron .",
     "build": "electron-builder",
-    "build-win": "electron-builder --win",
-    "build-mac": "electron-builder --mac",
-    "build-linux": "electron-builder --linux",
-    "dist": "npm run build-win && npm run build-mac && npm run build-linux"
+    "build-win": "electron-builder --win --x64",
+    "build-win-arm64": "electron-builder --win --arm64",
+    "build-mac": "electron-builder --mac --x64",
+    "build-mac-arm64": "electron-builder --mac --arm64",
+    "build-mac-universal": "electron-builder --mac --universal",
+    "build-linux": "electron-builder --linux --x64",
+    "build-linux-arm64": "electron-builder --linux --arm64",
+    "dist": "npm run build-win && npm run build-win-arm64 && npm run build-mac && npm run build-mac-arm64 && npm run build-linux && npm run build-linux-arm64",
+    "dist:matrix": "npm run dist"
   },
   "build": {
     "appId": "org.tauos.installer",
@@ -32,21 +37,33 @@
         "from": "resources/",
         "to": "resources/",
         "filter": ["**/*"]
+      },
+      {
+        "from": "../../public/tau-core/legal/",
+        "to": "tau-core/legal/",
+        "filter": ["**/*"]
       }
     ],
     "win": {
-      "target": "nsis",
+      "target": [
+        { "target": "nsis", "arch": ["x64", "arm64"] }
+      ],
       "icon": "assets/icon.ico",
       "publisherName": "TauOS Foundation",
       "verifyUpdateCodeSignature": false
     },
     "mac": {
-      "target": "dmg",
+      "target": [
+        { "target": "dmg", "arch": ["x64", "arm64"] }
+      ],
       "icon": "assets/icon.icns",
       "category": "public.app-category.productivity"
     },
     "linux": {
-      "target": "deb",
+      "target": [
+        { "target": "deb", "arch": ["x64", "arm64"] },
+        { "target": "AppImage", "arch": ["x64", "arm64"] }
+      ],
       "icon": "assets/icon.png",
       "category": "Office"
     },

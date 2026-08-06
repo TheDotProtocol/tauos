@@ -185,7 +185,7 @@ export default function DesktopPage() {
             </div>
             <div className="h-[800px]">
               <iframe
-                src="/desktop-ui/index.html"
+                src="/tau-core/desktop/"
                 className="w-full h-full border-0"
                 title="Tau OS Desktop UI Demo"
               />
