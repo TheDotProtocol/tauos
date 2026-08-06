@@ -11,7 +11,7 @@ async function getStripe(): Promise<StripeClient | null> {
   if (!key) return null;
   try {
     const Stripe = (await import('stripe')).default;
-    return new Stripe(key, { apiVersion: '2024-06-20' }) as unknown as StripeClient;
+    return new Stripe(key) as unknown as StripeClient;
   } catch {
     return null;
   }
