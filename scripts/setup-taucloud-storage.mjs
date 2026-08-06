@@ -42,6 +42,16 @@ async function main() {
     console.log('  ✓ users.storage_used');
   }
 
+  if (!(await columnExists('users', 'mfa_enabled'))) {
+    await pool.query('ALTER TABLE users ADD COLUMN mfa_enabled BOOLEAN DEFAULT false');
+    console.log('  ✓ users.mfa_enabled');
+  }
+
+  if (!(await columnExists('users', 'mfa_secret'))) {
+    await pool.query('ALTER TABLE users ADD COLUMN mfa_secret TEXT');
+    console.log('  ✓ users.mfa_secret');
+  }
+
   await pool.query(`
     CREATE TABLE IF NOT EXISTS taucloud_files (
       id UUID PRIMARY KEY,
@@ -53,10 +63,45 @@ async function main() {
       mime_type TEXT,
       folder TEXT DEFAULT 'root',
       is_shared BOOLEAN DEFAULT false,
+      is_starred BOOLEAN DEFAULT false,
+      deleted_at TIMESTAMPTZ,
       uploaded_at TIMESTAMPTZ DEFAULT NOW()
     )
   `);
   console.log('  ✓ taucloud_files');
+
+  if (!(await columnExists('taucloud_files', 'deleted_at'))) {
+    await pool.query('ALTER TABLE taucloud_files ADD COLUMN deleted_at TIMESTAMPTZ');
+    console.log('  ✓ taucloud_files.deleted_at');
+  }
+  if (!(await columnExists('taucloud_files', 'is_starred'))) {
+    await pool.query('ALTER TABLE taucloud_files ADD COLUMN is_starred BOOLEAN DEFAULT false');
+    console.log('  ✓ taucloud_files.is_starred');
+  }
+
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS taucloud_folders (
+      id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      name TEXT NOT NULL,
+      created_at TIMESTAMPTZ DEFAULT NOW(),
+      UNIQUE (user_id, name)
+    )
+  `);
+  console.log('  ✓ taucloud_folders');
+
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS taucloud_activity (
+      id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      file_id UUID REFERENCES taucloud_files(id) ON DELETE SET NULL,
+      action TEXT NOT NULL,
+      title TEXT NOT NULL,
+      meta TEXT,
+      created_at TIMESTAMPTZ DEFAULT NOW()
+    )
+  `);
+  console.log('  ✓ taucloud_activity');
 
   await pool.query(`
     CREATE TABLE IF NOT EXISTS taucloud_shares (
@@ -73,6 +118,12 @@ async function main() {
 
   await pool.query(
     'CREATE INDEX IF NOT EXISTS idx_taucloud_files_user_folder ON taucloud_files(user_id, folder)'
+  );
+  await pool.query(
+    'CREATE INDEX IF NOT EXISTS idx_taucloud_files_user_deleted ON taucloud_files(user_id, deleted_at)'
+  );
+  await pool.query(
+    'CREATE INDEX IF NOT EXISTS idx_taucloud_activity_user ON taucloud_activity(user_id, created_at DESC)'
   );
   await pool.query(
     'CREATE INDEX IF NOT EXISTS idx_taucloud_shares_token ON taucloud_shares(token)'

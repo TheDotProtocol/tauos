@@ -79,7 +79,7 @@ export default function TauCloudProductPage() {
             Your files. Your servers. Your rules. Secure decentralized storage with uncompromised encryption.
           </p>
           <div className="mt-8 flex flex-wrap justify-center gap-4">
-            <Link href={websiteRoutes.tauCloud} className="rounded-md bg-[#d4af37] px-6 py-3 text-sm font-semibold text-[#0f0f0f] hover:bg-[#e0bc4a]">
+            <Link href="/taucloud/login" className="rounded-md bg-[#d4af37] px-6 py-3 text-sm font-semibold text-[#0f0f0f] hover:bg-[#e0bc4a]">
               Get Tau Cloud
             </Link>
             <Link href={websiteRoutes.security} className="rounded-md bg-[#171717] px-6 py-3 text-sm font-semibold hover:bg-[#222]">
