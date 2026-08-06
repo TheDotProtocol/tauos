@@ -27,8 +27,18 @@ const nextConfig = {
         permanent: false,
       },
       {
-        source: '/developers/ide',
-        destination: '/developers/workspace',
+        source: '/downloads',
+        destination: '/download',
+        permanent: false,
+      },
+      {
+        source: '/products/tau-watch',
+        destination: '/products/tau-tablet#tau-watch',
+        permanent: false,
+      },
+      {
+        source: '/products/tau-glass',
+        destination: '/products/tau-tablet#tau-glass',
         permanent: false,
       },
     ];

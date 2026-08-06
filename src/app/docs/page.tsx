@@ -40,7 +40,7 @@ export default function DocumentationHub() {
               {[
                 { href: '/docs/installation-guides', label: 'Installation', sub: 'Desktop & mobile setup' },
                 { href: '/docs/faq', label: 'FAQ', sub: 'Common questions' },
-                { href: '/downloads', label: 'Downloads', sub: 'APK & installers' },
+                { href: '/download', label: 'Downloads', sub: 'Installers & checksums' },
                 { href: '/beta', label: 'Beta Program', sub: 'Join public beta' },
               ].map((item) => (
                 <Link

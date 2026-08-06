@@ -65,7 +65,7 @@ export default function TxpFooter() {
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Link
-                href="/downloads"
+                href="/download"
                 className="inline-flex items-center rounded-lg bg-yellow-400 px-5 py-2.5 text-sm font-semibold text-black hover:bg-yellow-300 transition-colors duration-300"
               >
                 Download

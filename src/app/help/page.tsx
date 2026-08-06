@@ -41,7 +41,7 @@ export default function HelpPage() {
                 icon: Download,
                 title: "Installation",
                 description: "Download and install TAU CORE™ on your system",
-                link: "/#downloads"
+                link: "/download"
               },
               {
                 icon: Mail,

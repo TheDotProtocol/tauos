@@ -66,6 +66,7 @@ export default function TauTabletWatchGlassPage() {
         {devices.map((device) => (
           <div
             key={device.title}
+            id={device.title.toLowerCase().replace(/\s+/g, '-')}
             className={`mx-auto grid max-w-[1280px] items-center gap-12 lg:grid-cols-2 ${device.imageSide === 'left' ? 'lg:[&>*:first-child]:order-2' : ''}`}
           >
             <div className="relative h-[360px] overflow-hidden rounded-2xl border border-[#262628] bg-[#161616] lg:h-[440px]">

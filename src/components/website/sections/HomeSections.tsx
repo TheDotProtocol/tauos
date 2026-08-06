@@ -519,7 +519,7 @@ export function JoinTauSection() {
                 href="/download"
                 className="flex items-center justify-center gap-3 rounded-full border border-[rgba(255,255,255,0.07)] bg-[#161619] px-6 py-3 text-sm font-semibold text-white transition hover:border-[rgba(212,175,55,0.3)]"
               >
-                Get Tau Core v1.4
+                Get Tau Core v1.0.0
                 <Image src="/website/icons/sections/join/download.svg" alt="" width={14} height={14} className="size-3.5" />
               </Link>
               <div className="flex justify-center gap-4">

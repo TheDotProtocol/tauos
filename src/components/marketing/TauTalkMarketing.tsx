@@ -19,7 +19,8 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
-const ANDROID_APK = '/downloads/TauTalk-1.0.0-beta.apk';
+const ANDROID_APK =
+  'https://github.com/TheDotProtocol/tauos/releases/download/taubrowser-v1.0.0-beta.2/TauTalk-1.0.0-beta.apk';
 const APK_SIZE = '~77 MB';
 
 const comparisons = [

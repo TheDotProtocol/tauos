@@ -13,7 +13,7 @@ export const txpNav = {
     { id: 'business', label: 'Business' },
     { id: 'developers', label: 'Developers' },
     { id: 'enterprise', label: 'Enterprise' },
-    { id: 'downloads', label: 'Downloads', href: '/downloads' },
+    { id: 'downloads', label: 'Downloads', href: '/download' },
     { id: 'about', label: 'About', href: '/about' },
   ],
   megaMenus: {
@@ -87,7 +87,7 @@ export const txpNav = {
           title: 'Design & Standards',
           links: [
             { label: 'Design System', href: '/design-system', description: 'TXP V1 tokens & components' },
-            { label: 'Downloads', href: '/downloads', description: 'SDKs & previews' },
+            { label: 'Downloads', href: '/download', description: 'Installers & checksums' },
             { label: 'Roadmap', href: '/#roadmap', description: 'Where we are going' },
             { label: 'Open Standards', href: '/governance', description: 'Open by principle' },
           ],
@@ -118,6 +118,6 @@ export const txpNav = {
   },
   actions: {
     join: { label: 'Join Tau', href: '/tauid/register' },
-    download: { label: 'Download', href: '/downloads' },
+    download: { label: 'Download', href: '/download' },
   },
 } as const;

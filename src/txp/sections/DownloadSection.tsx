@@ -8,11 +8,14 @@ import { TxpContainer, TxpGlassCard, TxpSection, TxpSectionHeading } from '@/txp
 import { txpStory } from '@/content/txp/story';
 import { txpNav } from '@/content/txp/navigation';
 
+const TAUTALK_APK =
+  'https://github.com/TheDotProtocol/tauos/releases/download/taubrowser-v1.0.0-beta.2/TauTalk-1.0.0-beta.apk';
+
 const platforms = [
-  { icon: Smartphone, name: 'Android', status: 'Public Beta', href: '/downloads/TauTalk-1.0.0-beta.apk', highlight: true },
-  { icon: Monitor, name: 'Windows', status: 'Preview', href: '/downloads' },
-  { icon: Apple, name: 'macOS', status: 'Preview', href: '/downloads' },
-  { icon: Terminal, name: 'Linux', status: 'Preview', href: '/downloads' },
+  { icon: Smartphone, name: 'Android', status: 'Public Beta', href: TAUTALK_APK, highlight: true },
+  { icon: Monitor, name: 'Windows', status: 'Available', href: '/download' },
+  { icon: Apple, name: 'macOS', status: 'Available', href: '/download' },
+  { icon: Terminal, name: 'Linux', status: 'Available', href: '/download' },
 ];
 
 export default function DownloadSection() {
@@ -46,7 +49,7 @@ export default function DownloadSection() {
         </div>
         <div className="flex flex-col sm:flex-row flex-wrap gap-4 justify-center">
           <Button asChild size="lg" className="font-semibold bg-gradient-to-r from-yellow-400 to-orange-500 text-black px-8 h-12 border-0">
-            <Link href="/downloads">
+            <Link href="/download">
               <Download className="w-5 h-5 mr-2" />
               {join.cta}
             </Link>

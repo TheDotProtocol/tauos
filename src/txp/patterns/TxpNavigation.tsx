@@ -198,7 +198,7 @@ export default function TxpNavigation() {
                   </div>
                 </div>
               ))}
-              <Link href="/downloads" className="block py-2" onClick={() => setMobileOpen(false)}>Downloads</Link>
+              <Link href="/download" className="block py-2" onClick={() => setMobileOpen(false)}>Downloads</Link>
               <Link href="/about" className="block py-2" onClick={() => setMobileOpen(false)}>About</Link>
               <div className="flex gap-3 pt-4">
                 <Button asChild className="flex-1">

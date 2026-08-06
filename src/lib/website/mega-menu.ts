@@ -38,8 +38,8 @@ export const productsMegaMenuColumns: MegaMenuColumn[] = [
       { label: 'Tau Phone', description: 'Pure hardware consensus mobile node', href: websiteRoutes.tauPhone, icon: '/website/icons/mega-menu/phone.svg' },
       { label: 'Tau Book Pro', description: 'Asymmetric secure system workstation', href: websiteRoutes.tauBookPro, icon: '/website/icons/mega-menu/book.svg' },
       { label: 'Tau Tablet', description: 'Tablet optimized for decentralized design', href: '/products/tau-tablet', icon: '/website/icons/mega-menu/tablet.svg' },
-      { label: 'Tau Watch', description: 'Biometric hardware signer', href: '/products/tau-watch', icon: '/website/icons/mega-menu/watch.svg' },
-      { label: 'Tau Glass', description: 'Augmented dApp layer HUD glasses', href: '/products/tau-glass', icon: '/website/icons/mega-menu/glass.svg' },
+      { label: 'Tau Watch', description: 'Biometric hardware signer', href: websiteRoutes.tauWatch, icon: '/website/icons/mega-menu/watch.svg' },
+      { label: 'Tau Glass', description: 'Augmented dApp layer HUD glasses', href: websiteRoutes.tauGlass, icon: '/website/icons/mega-menu/glass.svg' },
     ],
   },
   {

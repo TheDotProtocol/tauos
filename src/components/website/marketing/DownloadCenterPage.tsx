@@ -209,6 +209,61 @@ export default function DownloadCenterPage() {
           </div>
 
           <div className="mt-12 rounded-lg border border-[#2a2a2a] bg-[#171717] p-8">
+            <h3 className="text-lg font-bold">Tau Core Desktop UI</h3>
+            <p className="mt-2 text-sm text-[#8e8e93]">
+              Every installer ships the Figma-aligned first-boot wizard and homescreen — EULA, Wi‑Fi setup, Tau ID, and desktop shell.
+            </p>
+            <div className="mt-4 flex flex-wrap gap-4">
+              <a href="/tau-core/setup/" className="text-sm font-semibold text-[#d4af37] underline">
+                Preview setup wizard
+              </a>
+              <a href="/tau-core/desktop/" className="text-sm font-semibold text-[#d4af37] underline">
+                Preview desktop shell
+              </a>
+              <a href="/tau-core/legal/TauCore-EULA.md" className="text-sm font-semibold text-[#d4af37] underline">
+                Tau Core EULA
+              </a>
+            </div>
+          </div>
+
+          <div id="checksums" className="mt-12 rounded-lg border border-[#2a2a2a] bg-[#171717] p-8">
+            <h3 className="text-lg font-bold">Checksums (SHA256)</h3>
+            <p className="mt-2 text-sm text-[#8e8e93]">
+              Verify downloads from{' '}
+              <a
+                href="https://github.com/TheDotProtocol/tauos/releases/tag/tauos-v1.0.0"
+                className="text-[#d4af37] underline"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                GitHub Release tauos-v1.0.0
+              </a>
+            </p>
+            <div className="mt-6 overflow-x-auto">
+              <table className="w-full min-w-[640px] text-left text-xs">
+                <thead>
+                  <tr className="border-b border-[#2a2a2a] text-[11px] font-bold uppercase text-[#d4af37]">
+                    <th className="px-4 py-3">File</th>
+                    <th className="px-4 py-3">Size</th>
+                    <th className="px-4 py-3">SHA256</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {manifest?.artifacts
+                    .filter((a) => a.available && a.sha256)
+                    .map((a) => (
+                      <tr key={a.id} className="border-b border-[#2a2a2a] last:border-0">
+                        <td className="px-4 py-3 font-mono text-[#ccc]">{a.filename}</td>
+                        <td className="px-4 py-3 text-[#8e8e93]">{formatBytes(a.size)}</td>
+                        <td className="px-4 py-3 font-mono text-[#666] break-all">{a.sha256}</td>
+                      </tr>
+                    ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div className="mt-12 rounded-lg border border-[#2a2a2a] bg-[#171717] p-8">
             <h3 className="text-lg font-bold">Installation flow</h3>
             <ol className="mt-4 grid gap-3 text-sm text-[#8e8e93] md:grid-cols-2">
               <li>1. Download the installer or ISO for your platform</li>

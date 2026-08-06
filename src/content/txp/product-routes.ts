@@ -1,5 +1,6 @@
 /** Maps TXP product slugs to existing product landing pages. */
 export const productLandingRoutes: Record<string, string> = {
+  'tau-core': '/products/tau-core',
   'tau-phone': '/products/tau-mobile-os',
   'tau-talk': '/tautalk',
   'tau-mail': '/taumail',

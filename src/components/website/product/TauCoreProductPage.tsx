@@ -23,7 +23,7 @@ const navItems = [
   { label: 'Architecture', href: '#architecture' },
   { label: 'Ecosystem', href: '#ecosystem' },
   { label: 'Docs', href: websiteRoutes.docs },
-  { label: 'Pricing', href: websiteRoutes.download },
+  { label: 'Download', href: websiteRoutes.download },
 ] as const;
 
 export default function TauCoreProductPage() {
@@ -83,10 +83,10 @@ export default function TauCoreProductPage() {
             </p>
             <div className="mt-8 flex flex-wrap justify-center gap-4">
               <Link href={websiteRoutes.download} className="rounded-md bg-tau-accent px-6 py-3 text-sm font-semibold text-tau-bg-deep hover:bg-tau-accent-hover">
-                Download Kernel
+                Download Tau Core
               </Link>
-              <Link href="#architecture" className="rounded-md border border-tau-border-strong px-6 py-3 text-sm font-semibold text-white hover:border-tau-accent">
-                Learn More
+              <Link href="/tau-core/setup/" className="rounded-md border border-tau-border-strong px-6 py-3 text-sm font-semibold text-white hover:border-tau-accent">
+                Preview Desktop UI
               </Link>
             </div>
           </motion.div>
