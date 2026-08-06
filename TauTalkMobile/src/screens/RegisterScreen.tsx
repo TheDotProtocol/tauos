@@ -110,7 +110,7 @@ export default function RegisterScreen({ onSuccess, onBack }: Props) {
         emailOtp: emailOtp.trim(),
         phoneOtp: PHONE_AUTH_ENABLED && phone.trim() ? phoneOtp.trim() : undefined,
       });
-      await saveSession(data.token, data.user);
+      await saveSession(data.token, data.user, data.refreshToken);
       onSuccess(data.token, data.user);
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Registration failed');

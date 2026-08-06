@@ -1,16 +1,25 @@
 import { NextRequest } from 'next/server';
-import { requireAuth, getBearerToken } from '@/lib/auth-server';
+import { requireAuth, getAccessToken } from '@/lib/auth-server';
+import { verifyTauToken } from '@/lib/tau-auth';
 import { listMessages, userInConversation } from '@/lib/tautalk-data';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 
+function resolveAuth(request: NextRequest) {
+  const token = getAccessToken(request) ?? request.nextUrl.searchParams.get('token') ?? null;
+  if (token) {
+    const decoded = verifyTauToken(token);
+    if (!decoded?.userId) return null;
+    return { userId: decoded.userId, token };
+  }
+  const auth = requireAuth(request);
+  if (!auth?.userId) return null;
+  return { userId: auth.userId, token: getAccessToken(request) };
+}
+
 export async function GET(request: NextRequest) {
-  const token =
-    getBearerToken(request) ?? request.nextUrl.searchParams.get('token') ?? null;
-  const auth = token
-    ? (await import('@/lib/tau-auth')).verifyTauToken(token)
-    : requireAuth(request);
+  const auth = resolveAuth(request);
   if (!auth?.userId) {
     return new Response('Unauthorized', { status: 401 });
   }
@@ -36,12 +45,25 @@ export async function GET(request: NextRequest) {
         controller.enqueue(encoder.encode(`event: ${event}\ndata: ${JSON.stringify(data)}\n\n`));
       };
 
-      send('connected', { conversationId, ts: Date.now() });
+      send('connected', { conversationId, ts: Date.now(), cookieAuth: !request.nextUrl.searchParams.get('token') });
+
+      let interval: ReturnType<typeof setInterval>;
 
       const poll = async () => {
         if (closed) return;
+
+        const currentToken = getAccessToken(request) ?? request.nextUrl.searchParams.get('token');
+        const valid = currentToken ? verifyTauToken(currentToken) : requireAuth(request);
+        if (!valid?.userId) {
+          send('auth_expired', { message: 'Session expired' });
+          closed = true;
+          clearInterval(interval);
+          controller.close();
+          return;
+        }
+
         try {
-          const messages = await listMessages(auth.userId!, conversationId, lastSince, 20);
+          const messages = await listMessages(valid.userId, conversationId, lastSince, 20);
           for (const m of messages) {
             send('message', m);
             lastSince = m.created_at;
@@ -52,7 +74,7 @@ export async function GET(request: NextRequest) {
       };
 
       poll();
-      const interval = setInterval(poll, 4000);
+      interval = setInterval(poll, 4000);
 
       request.signal.addEventListener('abort', () => {
         closed = true;

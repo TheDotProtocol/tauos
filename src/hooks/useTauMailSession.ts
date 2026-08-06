@@ -6,14 +6,7 @@ import {
   DEMO_USER,
   isDemoSession,
 } from '@/lib/taumail-demo';
-
-type StoredUser = {
-  id: number;
-  username: string;
-  email: string;
-  fullName: string;
-  avatarUrl?: string | null;
-};
+import { hydrateTauSession, logoutTauSession, type TauSessionUser } from '@/lib/tau-auth-client';
 
 type UseTauMailSessionOptions = {
   required?: boolean;
@@ -22,30 +15,36 @@ type UseTauMailSessionOptions = {
 export function useTauMailSession(options: UseTauMailSessionOptions = {}) {
   const { required = true } = options;
   const router = useRouter();
-  const [user, setUser] = useState<StoredUser | null>(null);
+  const [user, setUser] = useState<TauSessionUser | null>(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isDemo, setIsDemo] = useState(false);
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
-    const storedUser = localStorage.getItem('tauos_user');
-    const storedToken = localStorage.getItem('tauos_token');
-
-    if (storedUser && storedToken) {
-      setUser(JSON.parse(storedUser));
-      setIsLoggedIn(true);
-      setIsDemo(isDemoSession(storedToken));
-    } else if (required) {
-      router.replace('/taumail/login');
-    }
-    setReady(true);
+    let cancelled = false;
+    (async () => {
+      const session = await hydrateTauSession();
+      if (cancelled) return;
+      if (session.user) {
+        setUser(session.user);
+        setIsLoggedIn(true);
+        setIsDemo(isDemoSession(session.token));
+      } else if (required) {
+        router.replace('/taumail/login');
+      }
+      setReady(true);
+    })();
+    return () => {
+      cancelled = true;
+    };
   }, [required, router]);
 
   const logout = () => {
-    localStorage.removeItem('tauos_user');
-    localStorage.removeItem('tauos_token');
+    setUser(null);
+    setIsLoggedIn(false);
+    setIsDemo(false);
     localStorage.removeItem('tauos_demo_mode');
-    router.replace('/taumail/login');
+    logoutTauSession('/taumail/login');
   };
 
   return { user, isLoggedIn, isDemo, ready, logout, demoUser: DEMO_USER };

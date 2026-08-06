@@ -1,7 +1,7 @@
-import { getPool, getJwtSecret } from '@/lib/db-pool';
+import { getPool } from '@/lib/db-pool';
 import { NextRequest, NextResponse } from 'next/server';
 import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
+import { attachAuthSession } from '@/lib/tau-session';
 import { trackMetrics } from '../../../middleware/metrics';
 import {
   DEFAULT_MAIL_DOMAIN,
@@ -154,55 +154,40 @@ export async function POST(request: NextRequest) {
 
     const user = result.rows[0];
 
-    // Generate JWT token with enhanced security
-    const jwtSecret = getJwtSecret('taumail');
-    const token = jwt.sign(
-      { 
-        userId: user.id, 
-        email: user.email, 
-        username: user.username,
-        organizationId: organizationId,
-        iat: Math.floor(Date.now() / 1000)
-      },
-      jwtSecret,
-      { expiresIn: '24h' }
-    );
-
-    // Send welcome email to new user
     try {
       const welcomeResponse = await fetch(`${process.env.NEXT_PUBLIC_TAUMAIL_API_URL || 'https://www.tauos.org/api'}/taumail/welcome`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          userEmail: user.email,
-          userName: user.full_name
-        })
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userEmail: user.email, userName: user.full_name }),
       });
-      
       if (welcomeResponse.ok) {
-        console.log(`✅ Welcome email sent to ${user.email}`);
-      } else {
-        console.log(`⚠️ Welcome email failed for ${user.email}`);
+        console.log(`Welcome email sent to ${user.email}`);
       }
     } catch (welcomeError) {
-      console.log(`⚠️ Welcome email error for ${user.email}:`, welcomeError.message);
+      console.log(`Welcome email error for ${user.email}:`, welcomeError);
     }
 
     const responseTime = Date.now() - startTime;
     trackMetrics('taumail', '/api/taumail/auth/register', responseTime, 200);
 
-    return NextResponse.json({
-      message: 'Registration successful',
-      token,
-      user: {
+    return attachAuthSession(
+      request,
+      {
         id: user.id,
-        username: user.username,
         email: user.email,
-        fullName: user.full_name
+        username: user.username,
+        fullName: user.full_name,
+      },
+      {
+        message: 'Registration successful',
+        user: {
+          id: user.id,
+          username: user.username,
+          email: user.email,
+          fullName: user.full_name,
+        },
       }
-    });
+    );
 
   } catch (error) {
     console.error('TauMail Registration Error:', error);

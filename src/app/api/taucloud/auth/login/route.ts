@@ -2,7 +2,8 @@ import { getPool } from '@/lib/db-pool';
 import { NextRequest, NextResponse } from 'next/server';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
-import { issueSsoToken, getSsoSecret } from '@/lib/tau-auth';
+import { getSsoSecret } from '@/lib/tau-auth';
+import { attachAuthSession } from '@/lib/tau-session';
 
 // Database connection - enterprise grade security
 
@@ -64,29 +65,29 @@ export async function POST(request: NextRequest) {
       [user.id]
     );
 
-    const token = issueSsoToken({
-      id: user.id,
-      email: user.email,
-      username: user.username,
-      fullName: user.full_name,
-    });
-
-    return NextResponse.json({
-      message: 'Login successful',
-      token,
-      sso: true,
-      user: {
+    return attachAuthSession(
+      request,
+      {
         id: user.id,
-        username: user.username,
         email: user.email,
+        username: user.username,
         fullName: user.full_name,
-        organization: {
-          id: user.organization_id,
-          name: user.organization_name,
-          domain: user.organization_domain
-        }
+      },
+      {
+        message: 'Login successful',
+        user: {
+          id: user.id,
+          username: user.username,
+          email: user.email,
+          fullName: user.full_name,
+          organization: {
+            id: user.organization_id,
+            name: user.organization_name,
+            domain: user.organization_domain,
+          },
+        },
       }
-    });
+    );
 
   } catch (error) {
     console.error('TauCloud Login Error:', error);

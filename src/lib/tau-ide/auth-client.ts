@@ -1,3 +1,4 @@
+import { persistTauSession, tauFetchCredentials } from '@/lib/tau-auth-client';
 import { TAU_TOKEN_KEY, TAU_USER_KEY } from '@/lib/tau-auth-constants';
 
 export type TauIdeUser = {
@@ -23,19 +24,19 @@ export function getStoredToken(): string | null {
 }
 
 export function storeSession(token: string, user: TauIdeUser) {
-  localStorage.setItem(TAU_TOKEN_KEY, token);
-  localStorage.setItem(TAU_USER_KEY, JSON.stringify(user));
+  persistTauSession(token, user);
 }
 
 export function clearSession() {
-  localStorage.removeItem(TAU_TOKEN_KEY);
   localStorage.removeItem(TAU_USER_KEY);
+  localStorage.removeItem('tauos_token');
 }
 
 export async function login(email: string, password: string) {
   const res = await fetch('/api/tauid/auth/login', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
+    credentials: tauFetchCredentials,
     body: JSON.stringify({ email, password }),
   });
   const data = await res.json();
@@ -53,6 +54,7 @@ export async function register(fields: {
   const res = await fetch('/api/tauid/auth/register', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
+    credentials: tauFetchCredentials,
     body: JSON.stringify(fields),
   });
   const data = await res.json();

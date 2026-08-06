@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { requireAuth } from '@/lib/auth-server';
 import { getPool } from '@/lib/db-pool';
 import bcrypt from 'bcryptjs';
+import { revokeAllUserSessions, clearSessionCookies } from '@/lib/tau-session';
 
 export const dynamic = 'force-dynamic';
 
@@ -31,7 +32,13 @@ export async function PUT(request: NextRequest) {
       auth.userId,
       hash,
     ]);
-    return NextResponse.json({ success: true, message: 'Password updated' });
+    await revokeAllUserSessions(auth.userId);
+    const response = NextResponse.json({
+      success: true,
+      message: 'Password updated — sign in again on all devices',
+    });
+    clearSessionCookies(response);
+    return response;
   } catch (error) {
     return NextResponse.json({ error: 'Password update failed' }, { status: 500 });
   }

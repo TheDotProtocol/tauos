@@ -1,6 +1,5 @@
-import { getJwtSecret } from '@/lib/db-pool';
+import { verifyTauMailToken } from '@/app/api/taumail/middleware/security';
 import { NextRequest, NextResponse } from 'next/server';
-import jwt from 'jsonwebtoken';
 import { randomUUID } from 'crypto';
 import {
   TAUMAIL_MAX_ATTACHMENT_BYTES,
@@ -22,14 +21,11 @@ function validatePrepareUpload(filename: string, size: number) {
 /** Prepare a direct-to-Supabase upload URL (bypasses Vercel 4.5MB body limit). */
 export async function POST(request: NextRequest) {
   try {
-    const authHeader = request.headers.get('authorization');
-    if (!authHeader?.startsWith('Bearer ')) {
-      return NextResponse.json({ error: 'No token provided' }, { status: 401 });
+    const auth = await verifyTauMailToken(request);
+    if ('error' in auth) {
+      return NextResponse.json({ error: auth.error }, { status: auth.status });
     }
-
-    const token = authHeader.substring(7);
-    const jwtSecret = getJwtSecret('taumail');
-    const decoded = jwt.verify(token, jwtSecret) as { userId: number | string };
+    const userId = auth.userId;
 
     const { filename, contentType, size } = await request.json();
     const validationError = validatePrepareUpload(String(filename || ''), Number(size));
@@ -39,7 +35,7 @@ export async function POST(request: NextRequest) {
 
     const attachmentId = randomUUID();
     const upload = await prepareMailAttachmentUpload(
-      decoded.userId,
+      userId,
       attachmentId,
       sanitizeFilename(String(filename))
     );

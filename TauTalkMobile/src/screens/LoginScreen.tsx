@@ -38,7 +38,7 @@ export default function LoginScreen({ onSuccess, onRegister }: Props) {
     setLoading(true);
     try {
       const data = await login(identifier.trim(), password);
-      await saveSession(data.token, data.user);
+      await saveSession(data.token, data.user, data.refreshToken);
       onSuccess(data.token, data.user);
     } catch (e) {
       const msg = e instanceof Error ? e.message : 'Login failed';

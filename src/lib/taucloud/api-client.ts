@@ -1,9 +1,9 @@
 import type { TauCloudActivityItem, TauCloudFile, TauCloudFolder, TauCloudProfile, TauCloudShareLink, TauCloudStorageBreakdown } from '@/lib/taucloud/types';
 import { mapApiActivity, mapApiCloudFile, mapApiFolder, mapApiShare, mapApiStorage, mapApiStorageBreakdown } from '@/lib/taucloud/types';
+import { persistTauSession, tauAuthHeaders, tauFetch, tauFetchCredentials, logoutTauSession } from '@/lib/tau-auth-client';
 
 function authHeaders(): HeadersInit {
-  const token = typeof window !== 'undefined' ? localStorage.getItem('tauos_token') : null;
-  return token ? { Authorization: `Bearer ${token}` } : {};
+  return tauAuthHeaders();
 }
 
 function jsonAuthHeaders(): HeadersInit {
@@ -14,6 +14,7 @@ export async function loginTauCloud(email: string, password: string) {
   const res = await fetch('/api/taucloud/auth/login', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
+    credentials: tauFetchCredentials,
     body: JSON.stringify({ email, password }),
   });
   const data = await res.json();
@@ -21,8 +22,7 @@ export async function loginTauCloud(email: string, password: string) {
   if (data.requires2fa && data.mfaToken) {
     return { ok: true as const, requires2fa: true as const, mfaToken: data.mfaToken as string };
   }
-  localStorage.setItem('tauos_token', data.token);
-  localStorage.setItem('tauos_user', JSON.stringify(data.user));
+  persistTauSession(data.token, data.user);
   return { ok: true as const, requires2fa: false as const };
 }
 
@@ -30,17 +30,17 @@ export async function verifyTauCloud2fa(mfaToken: string, code: string) {
   const res = await fetch('/api/taucloud/auth/verify-2fa', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
+    credentials: tauFetchCredentials,
     body: JSON.stringify({ mfaToken, code }),
   });
   const data = await res.json();
   if (!res.ok) return { ok: false as const, error: data.error || 'Verification failed' };
-  localStorage.setItem('tauos_token', data.token);
-  localStorage.setItem('tauos_user', JSON.stringify(data.user));
+  persistTauSession(data.token, data.user);
   return { ok: true as const };
 }
 
 export async function fetchTauCloudProfile(): Promise<TauCloudProfile | null> {
-  const res = await fetch('/api/taucloud/profile', { headers: authHeaders() });
+  const res = await tauFetch('/api/taucloud/profile', { headers: authHeaders() });
   if (!res.ok) return null;
   const data = await res.json();
   const user = data.user || {};
@@ -64,7 +64,7 @@ export async function fetchTauCloudFiles(options?: { folder?: string; view?: Tau
     params.set('folder', options.folder);
   }
   const query = params.toString();
-  const res = await fetch(`/api/taucloud/files/list${query ? `?${query}` : ''}`, {
+  const res = await tauFetch(`/api/taucloud/files/list${query ? `?${query}` : ''}`, {
     headers: authHeaders(),
   });
   if (!res.ok) throw new Error('Failed to load files');
@@ -73,7 +73,7 @@ export async function fetchTauCloudFiles(options?: { folder?: string; view?: Tau
 }
 
 export async function fetchTauCloudFileDetail(fileId: string) {
-  const res = await fetch(`/api/taucloud/files/detail?id=${encodeURIComponent(fileId)}`, {
+  const res = await tauFetch(`/api/taucloud/files/detail?id=${encodeURIComponent(fileId)}`, {
     headers: authHeaders(),
   });
   const data = await res.json();
@@ -89,7 +89,7 @@ export async function uploadTauCloudFile(file: File, folder = 'root') {
   const formData = new FormData();
   formData.append('file', file);
   formData.append('folder', folder);
-  const res = await fetch('/api/taucloud/files/upload', {
+  const res = await tauFetch('/api/taucloud/files/upload', {
     method: 'POST',
     headers: authHeaders(),
     body: formData,
@@ -102,7 +102,7 @@ export async function uploadTauCloudFile(file: File, folder = 'root') {
 export async function deleteTauCloudFile(fileId: string, permanent = false) {
   const params = new URLSearchParams({ id: fileId });
   if (permanent) params.set('permanent', 'true');
-  const res = await fetch(`/api/taucloud/files/delete?${params.toString()}`, {
+  const res = await tauFetch(`/api/taucloud/files/delete?${params.toString()}`, {
     method: 'DELETE',
     headers: authHeaders(),
   });
@@ -112,7 +112,7 @@ export async function deleteTauCloudFile(fileId: string, permanent = false) {
 }
 
 export async function restoreTauCloudFile(fileId: string) {
-  const res = await fetch('/api/taucloud/files/restore', {
+  const res = await tauFetch('/api/taucloud/files/restore', {
     method: 'POST',
     headers: jsonAuthHeaders(),
     body: JSON.stringify({ fileId }),
@@ -123,7 +123,7 @@ export async function restoreTauCloudFile(fileId: string) {
 }
 
 export async function toggleTauCloudStar(fileId: string, starred?: boolean) {
-  const res = await fetch('/api/taucloud/files/star', {
+  const res = await tauFetch('/api/taucloud/files/star', {
     method: 'PATCH',
     headers: jsonAuthHeaders(),
     body: JSON.stringify({ fileId, starred }),
@@ -134,7 +134,7 @@ export async function toggleTauCloudStar(fileId: string, starred?: boolean) {
 }
 
 export async function shareTauCloudFile(fileId: string) {
-  const res = await fetch('/api/taucloud/files/share', {
+  const res = await tauFetch('/api/taucloud/files/share', {
     method: 'POST',
     headers: jsonAuthHeaders(),
     body: JSON.stringify({ fileId }),
@@ -146,14 +146,14 @@ export async function shareTauCloudFile(fileId: string) {
 }
 
 export async function fetchTauCloudShares(): Promise<TauCloudShareLink[]> {
-  const res = await fetch('/api/taucloud/shares', { headers: authHeaders() });
+  const res = await tauFetch('/api/taucloud/shares', { headers: authHeaders() });
   if (!res.ok) throw new Error('Failed to load shares');
   const data = await res.json();
   return (data.shares || []).map((row: Record<string, unknown>) => mapApiShare(row));
 }
 
 export async function revokeTauCloudShare(shareId: string) {
-  const res = await fetch(`/api/taucloud/shares?id=${encodeURIComponent(shareId)}`, {
+  const res = await tauFetch(`/api/taucloud/shares?id=${encodeURIComponent(shareId)}`, {
     method: 'DELETE',
     headers: authHeaders(),
   });
@@ -163,14 +163,14 @@ export async function revokeTauCloudShare(shareId: string) {
 }
 
 export async function fetchTauCloudActivity(limit = 50): Promise<TauCloudActivityItem[]> {
-  const res = await fetch(`/api/taucloud/activity?limit=${limit}`, { headers: authHeaders() });
+  const res = await tauFetch(`/api/taucloud/activity?limit=${limit}`, { headers: authHeaders() });
   if (!res.ok) throw new Error('Failed to load activity');
   const data = await res.json();
   return (data.activity || []).map((row: Record<string, unknown>) => mapApiActivity(row));
 }
 
 export async function createTauCloudFolder(name: string) {
-  const res = await fetch('/api/taucloud/folders', {
+  const res = await tauFetch('/api/taucloud/folders', {
     method: 'POST',
     headers: jsonAuthHeaders(),
     body: JSON.stringify({ name }),
@@ -181,14 +181,14 @@ export async function createTauCloudFolder(name: string) {
 }
 
 export async function fetchTauCloudFolders(): Promise<TauCloudFolder[]> {
-  const res = await fetch('/api/taucloud/folders', { headers: authHeaders() });
+  const res = await tauFetch('/api/taucloud/folders', { headers: authHeaders() });
   if (!res.ok) throw new Error('Failed to load folders');
   const data = await res.json();
   return (data.folders || []).map((row: Record<string, unknown>) => mapApiFolder(row));
 }
 
 export async function fetchTauCloudStorageStats() {
-  const res = await fetch('/api/taucloud/storage', { headers: authHeaders() });
+  const res = await tauFetch('/api/taucloud/storage', { headers: authHeaders() });
   if (!res.ok) throw new Error('Failed to load storage stats');
   const data = await res.json();
   const storage = mapApiStorage(data.storage || {});
@@ -201,14 +201,14 @@ export async function fetchTauCloudStorageStats() {
 }
 
 export async function fetchTauCloud2faStatus() {
-  const res = await fetch('/api/taucloud/profile/2fa', { headers: authHeaders() });
+  const res = await tauFetch('/api/taucloud/profile/2fa', { headers: authHeaders() });
   if (!res.ok) throw new Error('Failed to load 2FA status');
   const data = await res.json();
   return { enabled: Boolean(data.enabled), email: String(data.email || '') };
 }
 
 export async function setupTauCloud2fa() {
-  const res = await fetch('/api/taucloud/profile/2fa', {
+  const res = await tauFetch('/api/taucloud/profile/2fa', {
     method: 'POST',
     headers: jsonAuthHeaders(),
     body: JSON.stringify({ action: 'setup' }),
@@ -223,7 +223,7 @@ export async function setupTauCloud2fa() {
 }
 
 export async function enableTauCloud2fa(code: string) {
-  const res = await fetch('/api/taucloud/profile/2fa', {
+  const res = await tauFetch('/api/taucloud/profile/2fa', {
     method: 'POST',
     headers: jsonAuthHeaders(),
     body: JSON.stringify({ action: 'enable', code }),
@@ -234,7 +234,7 @@ export async function enableTauCloud2fa(code: string) {
 }
 
 export async function disableTauCloud2fa(code: string) {
-  const res = await fetch('/api/taucloud/profile/2fa', {
+  const res = await tauFetch('/api/taucloud/profile/2fa', {
     method: 'POST',
     headers: jsonAuthHeaders(),
     body: JSON.stringify({ action: 'disable', code }),
@@ -245,7 +245,7 @@ export async function disableTauCloud2fa(code: string) {
 }
 
 export async function searchTauCloudFiles(query: string): Promise<TauCloudFile[]> {
-  const res = await fetch(`/api/taucloud/search?q=${encodeURIComponent(query)}`, {
+  const res = await tauFetch(`/api/taucloud/search?q=${encodeURIComponent(query)}`, {
     headers: authHeaders(),
   });
   if (!res.ok) throw new Error('Search failed');
@@ -254,7 +254,7 @@ export async function searchTauCloudFiles(query: string): Promise<TauCloudFile[]
 }
 
 export async function downloadTauCloudFile(fileId: string) {
-  const res = await fetch(`/api/taucloud/files/download?id=${encodeURIComponent(fileId)}`, {
+  const res = await tauFetch(`/api/taucloud/files/download?id=${encodeURIComponent(fileId)}`, {
     headers: authHeaders(),
   });
   if (!res.ok) return { ok: false as const, error: 'Download failed' };
@@ -267,7 +267,7 @@ export async function downloadTauCloudFile(fileId: string) {
 }
 
 export async function saveTauCloudProfile(input: { fullName?: string; username?: string }) {
-  const res = await fetch('/api/taucloud/profile', {
+  const res = await tauFetch('/api/taucloud/profile', {
     method: 'PUT',
     headers: jsonAuthHeaders(),
     body: JSON.stringify({
@@ -281,7 +281,7 @@ export async function saveTauCloudProfile(input: { fullName?: string; username?:
 }
 
 export async function changeTauCloudPassword(currentPassword: string, newPassword: string) {
-  const res = await fetch('/api/taucloud/profile/password', {
+  const res = await tauFetch('/api/taucloud/profile/password', {
     method: 'PUT',
     headers: jsonAuthHeaders(),
     body: JSON.stringify({ currentPassword, newPassword }),
@@ -307,7 +307,7 @@ function syncStoredUserAvatar(avatarUrl: string | null) {
 export async function uploadTauCloudAvatar(file: File) {
   const formData = new FormData();
   formData.append('file', file);
-  const res = await fetch('/api/taucloud/profile/avatar', {
+  const res = await tauFetch('/api/taucloud/profile/avatar', {
     method: 'POST',
     headers: authHeaders(),
     body: formData,
@@ -319,7 +319,7 @@ export async function uploadTauCloudAvatar(file: File) {
 }
 
 export async function removeTauCloudAvatar() {
-  const res = await fetch('/api/taucloud/profile/avatar', {
+  const res = await tauFetch('/api/taucloud/profile/avatar', {
     method: 'DELETE',
     headers: authHeaders(),
   });

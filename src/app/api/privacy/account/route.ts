@@ -3,6 +3,7 @@ import { requireAuth } from '@/lib/auth-server';
 import { getPool } from '@/lib/db-pool';
 import { logAudit } from '@/lib/audit-log';
 import bcrypt from 'bcryptjs';
+import { revokeAllUserSessions, clearSessionCookies } from '@/lib/tau-session';
 
 export const dynamic = 'force-dynamic';
 
@@ -43,6 +44,7 @@ export async function DELETE(request: NextRequest) {
     });
 
     await getPool().query('DELETE FROM users WHERE id = $1', [uid]);
+    await revokeAllUserSessions(uid);
 
     await logAudit({
       userId: null,
@@ -51,10 +53,12 @@ export async function DELETE(request: NextRequest) {
       metadata: { email: auth.email },
     });
 
-    return NextResponse.json({
+    const response = NextResponse.json({
       success: true,
-      message: 'Account and associated data scheduled for deletion (cascade).',
+      message: 'Account and associated data deleted.',
     });
+    clearSessionCookies(response);
+    return response;
   } catch (error) {
     console.error('Privacy account delete:', error);
     return NextResponse.json({ error: 'Deletion failed' }, { status: 500 });

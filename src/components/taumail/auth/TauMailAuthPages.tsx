@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { geistMono, geistSans, outfit } from '@/lib/website/fonts';
 import { tauMailAssets } from '@/lib/taumail/assets';
+import { persistTauSession, tauFetchCredentials } from '@/lib/tau-auth-client';
 import { MailIcon } from '@/components/taumail/shared/MailIcon';
 
 type TauMailAuthLayoutProps = {
@@ -71,6 +72,7 @@ export function TauMailRegisterPage() {
             const res = await fetch('/api/taumail/auth/register', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
+              credentials: tauFetchCredentials,
               body: JSON.stringify({
                 email: String(fd.get('email') || ''),
                 password: String(fd.get('password') || ''),
@@ -85,8 +87,7 @@ export function TauMailRegisterPage() {
               return;
             }
             if (data.token) {
-              localStorage.setItem('tauos_token', data.token);
-              localStorage.setItem('tauos_user', JSON.stringify(data.user));
+              persistTauSession(data.token, data.user);
             }
             router.push('/taumail/verify-email');
           } catch {

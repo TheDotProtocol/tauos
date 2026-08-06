@@ -10,6 +10,7 @@ import {
   Smartphone, Monitor, Tablet, Zap, Key, Database, LogOut, ArrowLeft
 } from 'lucide-react';
 import Link from 'next/link';
+import { hydrateTauSession, logoutTauSession } from '@/lib/tau-auth-client';
 
 export default function TauStoreDashboard() {
   const [activeTab, setActiveTab] = useState('discover');
@@ -19,22 +20,24 @@ export default function TauStoreDashboard() {
 
   // Check if user is logged in
   useEffect(() => {
-    const storedUser = localStorage.getItem('tauos_user');
-    const storedToken = localStorage.getItem('tauos_token');
-    
-    if (storedUser && storedToken) {
-      setUser(JSON.parse(storedUser));
-      setIsLoggedIn(true);
-    } else {
-      // Redirect to landing page if not logged in
-      window.location.href = '/taustore';
-    }
+    let cancelled = false;
+    (async () => {
+      const session = await hydrateTauSession();
+      if (cancelled) return;
+      if (session.user) {
+        setUser(session.user);
+        setIsLoggedIn(true);
+      } else {
+        window.location.href = '/taustore';
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   const handleLogout = () => {
-    localStorage.removeItem('tauos_user');
-    localStorage.removeItem('tauos_token');
-    window.location.href = '/taustore';
+    logoutTauSession('/taustore');
   };
 
   const storeMetrics = {

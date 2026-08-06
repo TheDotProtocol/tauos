@@ -8,6 +8,7 @@ import {
   type ConversationCryptoContext,
 } from '@/lib/tautalk-crypto';
 import { useTauSession } from '@/hooks/useTauSession';
+import { connectTauTalkSse, isTauNativeClient } from '@/lib/tautalk-sse';
 import {
   displayNameForConversation,
   usernameLabel,
@@ -85,7 +86,7 @@ const emptyCallMedia: WebCallMediaState = {
 };
 
 export default function TauTalkChatClient() {
-  const { user, token, ready } = useTauSession({
+  const { user, token, ready, logout } = useTauSession({
     requireAuth: true,
     loginPath: '/tautalk/login?redirect=/tautalk/chat',
   });
@@ -125,7 +126,7 @@ export default function TauTalkChatClient() {
 
   const bottomRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
-  const eventSourceRef = useRef<EventSource | null>(null);
+  const eventSourceRef = useRef<(() => void) | null>(null);
   const callManagerRef = useRef<WebCallManager | null>(null);
   const cryptoCtxRef = useRef<ConversationCryptoContext | null>(null);
   const typingDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -416,7 +417,8 @@ export default function TauTalkChatClient() {
   }, []);
 
   useEffect(() => {
-    if (!activeId || !token) return;
+    if (!activeId || !ready) return;
+    if (isTauNativeClient && !token) return;
     let cancelled = false;
     const convType = activeConvTypeRef.current;
 
@@ -426,45 +428,44 @@ export default function TauTalkChatClient() {
       await loadMessages(activeId, ctx);
     })();
 
-    eventSourceRef.current?.close();
-    const es = new EventSource(
-      `/api/tautalk/messages/stream?conversationId=${activeId}&token=${encodeURIComponent(token)}`
-    );
-    es.addEventListener('message', async (ev) => {
-      try {
-        const m = JSON.parse(ev.data);
-        setMessages((prev) => {
-          if (prev.some((x) => x.id === m.id)) return prev;
-          return [...prev, m];
-        });
-        setDecryptFailed((prev) => {
-          const next = { ...prev };
-          delete next[m.id];
-          return next;
-        });
-        const tryDecrypt = () => decryptOne(activeId, m.id, m.content_encrypted);
-        if (cryptoCtxRef.current) {
-          await tryDecrypt();
-        } else {
-          const waitId = window.setInterval(() => {
-            if (cryptoCtxRef.current) {
-              window.clearInterval(waitId);
-              void tryDecrypt();
-            }
-          }, 200);
-          window.setTimeout(() => window.clearInterval(waitId), 10000);
+    eventSourceRef.current?.();
+    eventSourceRef.current = connectTauTalkSse(activeId, token, {
+      onMessage: async (m) => {
+        try {
+          const msg = m as { id: string; content_encrypted: string };
+          setMessages((prev) => {
+            if (prev.some((x) => x.id === msg.id)) return prev;
+            return [...prev, msg];
+          });
+          setDecryptFailed((prev) => {
+            const next = { ...prev };
+            delete next[msg.id];
+            return next;
+          });
+          const tryDecrypt = () => decryptOne(activeId, msg.id, msg.content_encrypted);
+          if (cryptoCtxRef.current) {
+            await tryDecrypt();
+          } else {
+            const waitId = window.setInterval(() => {
+              if (cryptoCtxRef.current) {
+                window.clearInterval(waitId);
+                void tryDecrypt();
+              }
+            }, 200);
+            window.setTimeout(() => window.clearInterval(waitId), 10000);
+          }
+        } catch {
+          /* ignore */
         }
-      } catch {
-        /* ignore */
-      }
+      },
     });
-    eventSourceRef.current = es;
 
     return () => {
       cancelled = true;
-      es.close();
+      eventSourceRef.current?.();
+      eventSourceRef.current = null;
     };
-  }, [activeId, token, prepareConversation, loadMessages, decryptOne]);
+  }, [activeId, ready, token, prepareConversation, loadMessages, decryptOne]);
 
   // Retry decrypt for messages still pending
   useEffect(() => {
@@ -944,11 +945,7 @@ export default function TauTalkChatClient() {
             <User className="w-4 h-4 text-[#D4AF37] shrink-0" />
           </button>
           <button
-            onClick={() => {
-              localStorage.removeItem('tauos_user');
-              localStorage.removeItem('tauos_token');
-              window.location.href = '/tautalk';
-            }}
+            onClick={() => logout('/tautalk')}
             className="p-2 text-[#9ca3af] hover:text-white"
             title="Logout"
           >

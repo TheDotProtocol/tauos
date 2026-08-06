@@ -1,7 +1,7 @@
-import { getPool, getJwtSecret } from '@/lib/db-pool';
+import { getPool } from '@/lib/db-pool';
 import { NextRequest, NextResponse } from 'next/server';
-import jwt from 'jsonwebtoken';
 import { sendMail } from '@/lib/mail-transport';
+import { verifyTauMailToken } from '@/app/api/taumail/middleware/security';
 import { isExternalRecipient, extractEmailAddress } from '@/lib/taumail-compose';
 import { validateAttachmentPayloads, validateAttachmentRefs, type MailAttachmentPayload } from '@/lib/taumail-attachments';
 import {
@@ -95,14 +95,11 @@ async function resolveAttachments(raw: unknown) {
 
 export async function POST(request: NextRequest) {
   try {
-    const authHeader = request.headers.get('authorization');
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return NextResponse.json({ error: 'No token provided' }, { status: 401 });
+    const auth = await verifyTauMailToken(request);
+    if ('error' in auth) {
+      return NextResponse.json({ error: auth.error }, { status: auth.status });
     }
-
-    const token = authHeader.substring(7);
-    const jwtSecret = getJwtSecret('taumail');
-    const decoded = jwt.verify(token, jwtSecret) as { userId: number | string };
+    const userId = auth.userId;
 
     const { to, subject, body, cc, bcc, inReplyTo, references, attachments } = await request.json();
 
@@ -117,7 +114,7 @@ export async function POST(request: NextRequest) {
 
     const userResult = await getPool().query(
       'SELECT username, email, full_name, display_name, avatar_url FROM users WHERE id = $1',
-      [decoded.userId]
+      [userId]
     );
 
     if (userResult.rows.length === 0) {
@@ -127,7 +124,7 @@ export async function POST(request: NextRequest) {
     const user = userResult.rows[0];
     const fromEmail = user.email;
     const fromName = user.full_name || user.display_name || user.username;
-    const avatarUrl = await resolveTauMailAvatarUrl(decoded.userId, user.avatar_url);
+    const avatarUrl = await resolveTauMailAvatarUrl(userId, user.avatar_url);
 
     const signatureBlock = avatarUrl
       ? `<table cellpadding="0" cellspacing="0" style="margin-top:16px;"><tr>
@@ -200,7 +197,7 @@ export async function POST(request: NextRequest) {
       `INSERT INTO sent_emails (user_id, recipient_email, subject, body, sent_at, smtp_status, message_id)
        VALUES ($1, $2, $3, $4, CURRENT_TIMESTAMP, $5, $6)
        RETURNING id, recipient_email, subject, sent_at`,
-      [decoded.userId, to, subject, body, transport, messageId]
+      [userId, to, subject, body, transport, messageId]
     );
 
     await Promise.all(

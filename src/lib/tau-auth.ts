@@ -38,7 +38,7 @@ export function issueSsoToken(user: {
       sso: true,
     },
     getSsoSecret(),
-    { expiresIn: '7d' }
+    { expiresIn: '15m' }
   );
 }
 

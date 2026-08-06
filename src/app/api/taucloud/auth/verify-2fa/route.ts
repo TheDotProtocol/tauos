@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import jwt from 'jsonwebtoken';
 import { getPool } from '@/lib/db-pool';
-import { issueSsoToken } from '@/lib/tau-auth';
 import { getSsoSecret } from '@/lib/tau-auth';
+import { attachAuthSession } from '@/lib/tau-session';
 import { verifyTotpCode } from '@/lib/totp';
 
 export const dynamic = 'force-dynamic';
@@ -49,29 +49,24 @@ export async function POST(request: NextRequest) {
 
     await getPool().query('UPDATE users SET last_login_at = CURRENT_TIMESTAMP WHERE id = $1', [user.id]);
 
-    const token = issueSsoToken({
-      id: user.id,
-      email: user.email,
-      username: user.username,
-      fullName: user.full_name,
-    });
-
-    return NextResponse.json({
-      message: 'Login successful',
-      token,
-      sso: true,
-      user: {
-        id: user.id,
-        username: user.username,
-        email: user.email,
-        fullName: user.full_name,
-        organization: {
-          id: user.organization_id,
-          name: user.organization_name,
-          domain: user.organization_domain,
+    return attachAuthSession(
+      request,
+      { id: user.id, email: user.email, username: user.username, fullName: user.full_name },
+      {
+        message: 'Login successful',
+        user: {
+          id: user.id,
+          username: user.username,
+          email: user.email,
+          fullName: user.full_name,
+          organization: {
+            id: user.organization_id,
+            name: user.organization_name,
+            domain: user.organization_domain,
+          },
         },
-      },
-    });
+      }
+    );
   } catch (error) {
     console.error('TauCloud 2FA verify:', error);
     return NextResponse.json({ error: 'Verification failed' }, { status: 500 });

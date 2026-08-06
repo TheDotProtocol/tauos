@@ -20,6 +20,8 @@ export const websiteRoutes = {
   tauAi: '/tauai',
   tauCloud: '/taucloud',
   tauId: '/tauid',
+  tauIdLogin: '/tauid/login',
+  tauIdRegister: '/tauid/register',
   tauStore: '/taustore',
   projectGrayscale: '/products/project-grayscale',
   tauStartup: '/products/tau-startup',

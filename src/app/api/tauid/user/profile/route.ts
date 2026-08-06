@@ -25,7 +25,8 @@ export async function GET(request: NextRequest) {
     }
     await ensureProfilesTable();
     const userResult = await getPool().query(
-      `SELECT id, username, email, full_name, email_verified, created_at, last_login_at
+      `SELECT id, username, email, full_name, email_verified, avatar_url, mfa_enabled,
+              created_at, last_login_at
        FROM users WHERE id = $1`,
       [auth.userId]
     );

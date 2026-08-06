@@ -1,7 +1,7 @@
 import { getPool } from '@/lib/db-pool';
 import { NextRequest, NextResponse } from 'next/server';
 import bcrypt from 'bcryptjs';
-import { issueSsoToken } from '@/lib/tau-auth';
+import { attachAuthSession } from '@/lib/tau-session';
 
 function normalizePhone(raw: string): string {
   const digits = raw.replace(/\D/g, '');
@@ -55,26 +55,21 @@ export async function POST(request: NextRequest) {
       [user.id]
     );
 
-    const token = issueSsoToken({
-      id: user.id,
-      email: user.email,
-      username: user.username,
-      fullName: user.full_name,
-    });
-
-    return NextResponse.json({
-      message: 'Login successful',
-      token,
-      sso: true,
-      user: {
-        id: user.id,
-        username: user.username,
-        email: user.email,
-        phone: user.phone ?? null,
-        fullName: user.full_name,
-        avatarUrl: user.avatar_url ?? null,
-      },
-    });
+    return attachAuthSession(
+      request,
+      { id: user.id, email: user.email, username: user.username, fullName: user.full_name },
+      {
+        message: 'Login successful',
+        user: {
+          id: user.id,
+          username: user.username,
+          email: user.email,
+          phone: user.phone ?? null,
+          fullName: user.full_name,
+          avatarUrl: user.avatar_url ?? null,
+        },
+      }
+    );
   } catch (error) {
     console.error('TauTalk login:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });

@@ -1,18 +1,58 @@
 import { API_BASE } from '../config';
 import type { TauUser } from '../storage/session';
+import { getRefreshToken, updateAccessToken } from '../storage/session';
 
 type AuthResponse = {
   token: string;
+  refreshToken?: string;
   user: TauUser;
   error?: string;
+};
+
+const NATIVE_HEADERS = {
+  'Content-Type': 'application/json',
+  Accept: 'application/json',
+  'X-Tau-Client': 'native',
 };
 
 function authHeaders(token: string) {
   return {
     Authorization: `Bearer ${token}`,
-    'Content-Type': 'application/json',
-    Accept: 'application/json',
+    ...NATIVE_HEADERS,
   };
+}
+
+export async function refreshSession(): Promise<{ token: string; refreshToken?: string } | null> {
+  const refreshToken = await getRefreshToken();
+  if (!refreshToken) return null;
+
+  const res = await fetch(`${API_BASE}/api/auth/session`, {
+    method: 'POST',
+    headers: NATIVE_HEADERS,
+    body: JSON.stringify({ refreshToken }),
+  });
+  if (!res.ok) return null;
+  const data = (await res.json()) as { token?: string; refreshToken?: string };
+  if (!data.token) return null;
+  await updateAccessToken(data.token, data.refreshToken);
+  return { token: data.token, refreshToken: data.refreshToken };
+}
+
+async function authFetch(token: string, input: string, init: RequestInit = {}): Promise<Response> {
+  let res = await fetch(input, {
+    ...init,
+    headers: { ...authHeaders(token), ...(init.headers as Record<string, string>) },
+  });
+  if (res.status === 401) {
+    const refreshed = await refreshSession();
+    if (refreshed) {
+      res = await fetch(input, {
+        ...init,
+        headers: { ...authHeaders(refreshed.token), ...(init.headers as Record<string, string>) },
+      });
+    }
+  }
+  return res;
 }
 
 async function parseJson<T>(res: Response): Promise<T> {
@@ -48,9 +88,9 @@ export async function login(identifier: string, password: string) {
   }
   payload.identifier = trimmed;
 
-  const res = await fetch(`${API_BASE}/api/tautalk/auth/login`, {
+  const res = await authFetch(token, `${API_BASE}/api/tautalk/auth/login`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: NATIVE_HEADERS,
     body: JSON.stringify(payload),
   });
   return parseJson<AuthResponse>(res);
@@ -58,7 +98,7 @@ export async function login(identifier: string, password: string) {
 
 export async function sendRegistrationOtp(channel: 'email' | 'phone', value: string) {
   const body = channel === 'email' ? { channel, email: value } : { channel, phone: value };
-  const res = await fetch(`${API_BASE}/api/tautalk/auth/otp/send`, {
+  const res = await authFetch(token, `${API_BASE}/api/tautalk/auth/otp/send`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(body),
@@ -75,9 +115,9 @@ export async function register(payload: {
   emailOtp: string;
   phoneOtp?: string;
 }) {
-  const res = await fetch(`${API_BASE}/api/tautalk/auth/register`, {
+  const res = await authFetch(token, `${API_BASE}/api/tautalk/auth/register`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: NATIVE_HEADERS,
     body: JSON.stringify(payload),
   });
   return parseJson<AuthResponse>(res);
@@ -133,7 +173,7 @@ export type KeyParticipant = {
 };
 
 export async function fetchConversations(token: string) {
-  const res = await fetch(`${API_BASE}/api/tautalk/conversations`, {
+  const res = await authFetch(token, `${API_BASE}/api/tautalk/conversations`, {
     headers: authHeaders(token),
   });
   const data = await parseJson<{ conversations: Conversation[] }>(res);
@@ -141,7 +181,7 @@ export async function fetchConversations(token: string) {
 }
 
 export async function createConversation(token: string, query: string) {
-  const res = await fetch(`${API_BASE}/api/tautalk/conversations`, {
+  const res = await authFetch(token, `${API_BASE}/api/tautalk/conversations`, {
     method: 'POST',
     headers: authHeaders(token),
     body: JSON.stringify({ query }),
@@ -154,7 +194,7 @@ export async function createGroupConversation(
   title: string,
   memberIds: string[]
 ) {
-  const res = await fetch(`${API_BASE}/api/tautalk/conversations`, {
+  const res = await authFetch(token, `${API_BASE}/api/tautalk/conversations`, {
     method: 'POST',
     headers: authHeaders(token),
     body: JSON.stringify({ type: 'group', title, memberIds }),
@@ -173,7 +213,7 @@ export async function fetchConversationKeys(token: string, conversationId: strin
 export async function fetchMessages(token: string, conversationId: string, since?: string) {
   const qs = new URLSearchParams({ conversationId });
   if (since) qs.set('since', since);
-  const res = await fetch(`${API_BASE}/api/tautalk/messages?${qs.toString()}`, {
+  const res = await authFetch(token, `${API_BASE}/api/tautalk/messages?${qs.toString()}`, {
     headers: authHeaders(token),
   });
   const data = await parseJson<{ messages: Message[] }>(res);
@@ -187,7 +227,7 @@ export async function sendMessage(
   contentType = 'text',
   replyTo?: string
 ) {
-  const res = await fetch(`${API_BASE}/api/tautalk/messages`, {
+  const res = await authFetch(token, `${API_BASE}/api/tautalk/messages`, {
     method: 'POST',
     headers: authHeaders(token),
     body: JSON.stringify({ conversationId, contentEncrypted, contentType, replyTo }),
@@ -210,7 +250,7 @@ export async function saveContactLabel(
   contactUserId: string,
   displayName: string
 ) {
-  const res = await fetch(`${API_BASE}/api/tautalk/contacts/label`, {
+  const res = await authFetch(token, `${API_BASE}/api/tautalk/contacts/label`, {
     method: 'PUT',
     headers: authHeaders(token),
     body: JSON.stringify({ contactUserId, displayName }),
@@ -227,7 +267,7 @@ export async function removeContactLabel(token: string, contactUserId: string) {
 }
 
 export async function fetchProfile(token: string) {
-  const res = await fetch(`${API_BASE}/api/tautalk/profile`, { headers: authHeaders(token) });
+  const res = await authFetch(token, `${API_BASE}/api/tautalk/profile`, { headers: authHeaders(token) });
   const data = await parseJson<{ profile: TalkProfile }>(res);
   return data.profile;
 }
@@ -236,7 +276,7 @@ export async function updateProfile(
   token: string,
   updates: { username?: string; fullName?: string }
 ) {
-  const res = await fetch(`${API_BASE}/api/tautalk/profile`, {
+  const res = await authFetch(token, `${API_BASE}/api/tautalk/profile`, {
     method: 'PUT',
     headers: authHeaders(token),
     body: JSON.stringify(updates),
@@ -248,7 +288,7 @@ export async function updateProfile(
 export async function uploadAvatar(token: string, uri: string, fileName: string, mime: string) {
   const form = new FormData();
   form.append('file', { uri, name: fileName, type: mime } as unknown as Blob);
-  const res = await fetch(`${API_BASE}/api/tautalk/profile/avatar`, {
+  const res = await authFetch(token, `${API_BASE}/api/tautalk/profile/avatar`, {
     method: 'POST',
     headers: { Authorization: `Bearer ${token}`, Accept: 'application/json' },
     body: form,
@@ -265,7 +305,7 @@ export async function uploadAttachment(
 ) {
   const form = new FormData();
   form.append('file', { uri, name: fileName, type: mime } as unknown as Blob);
-  const res = await fetch(`${API_BASE}/api/tautalk/attachments`, {
+  const res = await authFetch(token, `${API_BASE}/api/tautalk/attachments`, {
     method: 'POST',
     headers: { Authorization: `Bearer ${token}`, Accept: 'application/json' },
     body: form,
@@ -286,7 +326,7 @@ export async function signedAttachmentUrl(token: string, path: string) {
 }
 
 export async function sendTyping(token: string, conversationId: string) {
-  await fetch(`${API_BASE}/api/tautalk/conversations/typing`, {
+  await authFetch(token, `${API_BASE}/api/tautalk/conversations/typing`, {
     method: 'POST',
     headers: authHeaders(token),
     body: JSON.stringify({ conversationId }),
@@ -331,7 +371,7 @@ export async function lookupUser(token: string, query: string) {
 }
 
 export async function registerIdentityKey(token: string, publicKey: string) {
-  const res = await fetch(`${API_BASE}/api/tautalk/identity`, {
+  const res = await authFetch(token, `${API_BASE}/api/tautalk/identity`, {
     method: 'PUT',
     headers: authHeaders(token),
     body: JSON.stringify({ publicKey }),
@@ -369,7 +409,7 @@ export async function startCall(
   mode: 'voice' | 'video'
 ): Promise<CallSession | null> {
   try {
-    const res = await fetch(`${API_BASE}/api/tautalk/calls`, {
+    const res = await authFetch(token, `${API_BASE}/api/tautalk/calls`, {
       method: 'POST',
       headers: authHeaders(token),
       body: JSON.stringify({ conversationId, mode }),
@@ -382,7 +422,7 @@ export async function startCall(
 }
 
 export async function endCall(token: string, sessionId: string) {
-  await fetch(`${API_BASE}/api/tautalk/calls/${sessionId}`, {
+  await authFetch(token, `${API_BASE}/api/tautalk/calls/${sessionId}`, {
     method: 'POST',
     headers: authHeaders(token),
     body: JSON.stringify({ action: 'end' }),
@@ -390,7 +430,7 @@ export async function endCall(token: string, sessionId: string) {
 }
 
 export async function missCall(token: string, sessionId: string) {
-  await fetch(`${API_BASE}/api/tautalk/calls/${sessionId}`, {
+  await authFetch(token, `${API_BASE}/api/tautalk/calls/${sessionId}`, {
     method: 'POST',
     headers: authHeaders(token),
     body: JSON.stringify({ action: 'miss' }),
@@ -403,7 +443,7 @@ export async function sendCallSignal(
   signalType: string,
   payload: unknown
 ) {
-  await fetch(`${API_BASE}/api/tautalk/calls/${sessionId}/signals`, {
+  await authFetch(token, `${API_BASE}/api/tautalk/calls/${sessionId}/signals`, {
     method: 'POST',
     headers: authHeaders(token),
     body: JSON.stringify({ signalType, payload }),
@@ -417,7 +457,7 @@ export async function pollCallSignals(
 ): Promise<CallSignal[]> {
   try {
     const qs = since ? `?since=${encodeURIComponent(since)}` : '';
-    const res = await fetch(`${API_BASE}/api/tautalk/calls/${sessionId}/signals${qs}`, {
+    const res = await authFetch(token, `${API_BASE}/api/tautalk/calls/${sessionId}/signals${qs}`, {
       headers: authHeaders(token),
     });
     if (!res.ok) return [];
@@ -439,7 +479,7 @@ export type IncomingCall = CallSession & {
 
 export async function fetchIncomingCalls(token: string): Promise<IncomingCall[]> {
   try {
-    const res = await fetch(`${API_BASE}/api/tautalk/calls`, {
+    const res = await authFetch(token, `${API_BASE}/api/tautalk/calls`, {
       headers: authHeaders(token),
     });
     if (!res.ok) return [];
@@ -451,7 +491,7 @@ export async function fetchIncomingCalls(token: string): Promise<IncomingCall[]>
 }
 
 export async function acceptCall(token: string, sessionId: string) {
-  const res = await fetch(`${API_BASE}/api/tautalk/calls/${sessionId}`, {
+  const res = await authFetch(token, `${API_BASE}/api/tautalk/calls/${sessionId}`, {
     method: 'POST',
     headers: authHeaders(token),
     body: JSON.stringify({ action: 'accept' }),
@@ -460,7 +500,7 @@ export async function acceptCall(token: string, sessionId: string) {
 }
 
 export async function declineCall(token: string, sessionId: string) {
-  await fetch(`${API_BASE}/api/tautalk/calls/${sessionId}`, {
+  await authFetch(token, `${API_BASE}/api/tautalk/calls/${sessionId}`, {
     method: 'POST',
     headers: authHeaders(token),
     body: JSON.stringify({ action: 'decline' }),

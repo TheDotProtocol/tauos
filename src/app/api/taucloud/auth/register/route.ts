@@ -1,7 +1,7 @@
 import { getPool } from '@/lib/db-pool';
 import { NextRequest, NextResponse } from 'next/server';
 import bcrypt from 'bcryptjs';
-import { issueSsoToken } from '@/lib/tau-auth';
+import { attachAuthSession } from '@/lib/tau-session';
 
 // Database connection - production ready
 
@@ -36,24 +36,19 @@ export async function POST(request: NextRequest) {
 
     const user = result.rows[0];
 
-    const token = issueSsoToken({
-      id: user.id,
-      email: user.email,
-      username: user.username,
-      fullName: user.full_name,
-    });
-
-    return NextResponse.json({
-      message: 'Registration successful',
-      token,
-      sso: true,
-      user: {
-        id: user.id,
-        username: user.username,
-        email: user.email,
-        fullName: user.full_name
+    return attachAuthSession(
+      request,
+      { id: user.id, email: user.email, username: user.username, fullName: user.full_name },
+      {
+        message: 'Registration successful',
+        user: {
+          id: user.id,
+          username: user.username,
+          email: user.email,
+          fullName: user.full_name,
+        },
       }
-    });
+    );
 
   } catch (error) {
     console.error('TauCloud Registration Error:', error);

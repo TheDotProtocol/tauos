@@ -1,7 +1,7 @@
-import { getPool, getJwtSecret } from '@/lib/db-pool';
+import { getPool } from '@/lib/db-pool';
 import { NextRequest, NextResponse } from 'next/server';
 import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
+import { attachAuthSession } from '@/lib/tau-session';
 
 // Database connection - production ready with enhanced error handling
 
@@ -126,39 +126,33 @@ export async function POST(request: NextRequest) {
       [user.id]
     );
 
-    // Generate JWT token with enhanced security
-    const jwtSecret = getJwtSecret('taumail');
-    const token = jwt.sign(
-      { 
-        userId: user.id, 
-        email: user.email, 
-        username: user.username,
-        organizationId: user.organization_id,
-        iat: Math.floor(Date.now() / 1000)
-      },
-      jwtSecret,
-      { expiresIn: '24h' }
-    );
-
     // Log successful login
     console.log(`Successful login for user: ${user.username} (${user.email}) from IP: ${clientIP}`);
 
-    return NextResponse.json({
-      message: 'Login successful',
-      token,
-      user: {
+    return attachAuthSession(
+      request,
+      {
         id: user.id,
-        username: user.username,
         email: user.email,
+        username: user.username,
         fullName: user.full_name,
-        organization: {
-          id: user.organization_id,
-          name: user.organization_name,
-          domain: user.organization_domain
+      },
+      {
+        message: 'Login successful',
+        user: {
+          id: user.id,
+          username: user.username,
+          email: user.email,
+          fullName: user.full_name,
+          organization: {
+            id: user.organization_id,
+            name: user.organization_name,
+            domain: user.organization_domain,
+          },
+          avatarUrl: user.avatar_url ?? null,
         },
-        avatarUrl: user.avatar_url ?? null,
       }
-    });
+    );
 
   } catch (error) {
     console.error('TauMail Login Error:', error);

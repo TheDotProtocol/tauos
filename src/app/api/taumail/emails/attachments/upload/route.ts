@@ -1,6 +1,5 @@
-import { getJwtSecret } from '@/lib/db-pool';
+import { verifyTauMailToken } from '@/app/api/taumail/middleware/security';
 import { NextRequest, NextResponse } from 'next/server';
-import jwt from 'jsonwebtoken';
 import { randomUUID } from 'crypto';
 import { uploadObject, getSupabaseStorageConfig } from '@/lib/supabase-storage';
 import {
@@ -12,14 +11,11 @@ import { buildMailAttachmentPath } from '@/lib/taumail-attachment-storage';
 /** Server-side attachment upload (fallback when signed URL fails; max ~4 MB on Vercel). */
 export async function PUT(request: NextRequest) {
   try {
-    const authHeader = request.headers.get('authorization');
-    if (!authHeader?.startsWith('Bearer ')) {
-      return NextResponse.json({ error: 'No token provided' }, { status: 401 });
+    const auth = await verifyTauMailToken(request);
+    if ('error' in auth) {
+      return NextResponse.json({ error: auth.error }, { status: auth.status });
     }
-
-    const token = authHeader.substring(7);
-    const jwtSecret = getJwtSecret('taumail');
-    const decoded = jwt.verify(token, jwtSecret) as { userId: number | string };
+    const userId = auth.userId;
 
     const formData = await request.formData();
     const file = formData.get('file');
@@ -43,7 +39,7 @@ export async function PUT(request: NextRequest) {
 
     const attachmentId = randomUUID();
     const safeName = sanitizeFilename(file.name);
-    const path = buildMailAttachmentPath(decoded.userId, attachmentId, safeName);
+    const path = buildMailAttachmentPath(userId, attachmentId, safeName);
     const bytes = await file.arrayBuffer();
 
     await uploadObject(cfg, path, bytes, file.type || 'application/octet-stream');

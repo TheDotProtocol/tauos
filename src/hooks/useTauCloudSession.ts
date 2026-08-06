@@ -1,15 +1,8 @@
-'use client';
+"use client";
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-
-type StoredUser = {
-  id: string | number;
-  username: string;
-  email: string;
-  fullName?: string;
-  avatarUrl?: string | null;
-};
+import { hydrateTauSession, logoutTauSession, type TauSessionUser } from '@/lib/tau-auth-client';
 
 type UseTauCloudSessionOptions = {
   required?: boolean;
@@ -18,27 +11,32 @@ type UseTauCloudSessionOptions = {
 export function useTauCloudSession(options: UseTauCloudSessionOptions = {}) {
   const { required = true } = options;
   const router = useRouter();
-  const [user, setUser] = useState<StoredUser | null>(null);
+  const [user, setUser] = useState<TauSessionUser | null>(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
-    const storedUser = localStorage.getItem('tauos_user');
-    const storedToken = localStorage.getItem('tauos_token');
-
-    if (storedUser && storedToken) {
-      setUser(JSON.parse(storedUser));
-      setIsLoggedIn(true);
-    } else if (required) {
-      router.replace('/taucloud/login');
-    }
-    setReady(true);
+    let cancelled = false;
+    (async () => {
+      const session = await hydrateTauSession();
+      if (cancelled) return;
+      if (session.user) {
+        setUser(session.user);
+        setIsLoggedIn(true);
+      } else if (required) {
+        router.replace('/taucloud/login');
+      }
+      setReady(true);
+    })();
+    return () => {
+      cancelled = true;
+    };
   }, [required, router]);
 
   const logout = () => {
-    localStorage.removeItem('tauos_user');
-    localStorage.removeItem('tauos_token');
-    router.replace('/taucloud/login');
+    setUser(null);
+    setIsLoggedIn(false);
+    logoutTauSession('/taucloud/login');
   };
 
   return { user, isLoggedIn, ready, logout };

@@ -49,10 +49,13 @@ export default function TauIdProductPage() {
             One identity. Complete control. Decouple your digital footprint from corporations.
           </p>
           <div className="mt-8 flex flex-wrap justify-center gap-4">
-            <Link href={websiteRoutes.register} className="rounded-md bg-[#d4af37] px-6 py-3 text-sm font-semibold text-[#0f0f0f] hover:bg-[#e0bc4a]">
+            <Link href={websiteRoutes.tauIdRegister} className="rounded-md bg-[#d4af37] px-6 py-3 text-sm font-semibold text-[#0f0f0f] hover:bg-[#e0bc4a]">
               Create Your Tau ID
             </Link>
-            <Link href={websiteRoutes.docs} className="rounded-md bg-[#171717] px-6 py-3 text-sm font-semibold hover:bg-[#222]">
+            <Link href={websiteRoutes.tauIdLogin} className="rounded-md bg-[#171717] px-6 py-3 text-sm font-semibold hover:bg-[#222]">
+              Sign In
+            </Link>
+            <Link href={websiteRoutes.docs} className="rounded-md border border-[#262626] bg-transparent px-6 py-3 text-sm font-semibold hover:bg-[#171717]">
               Explore SSO Protocols
             </Link>
           </div>

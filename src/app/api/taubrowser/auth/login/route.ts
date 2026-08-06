@@ -1,7 +1,7 @@
 import { getPool } from '@/lib/db-pool';
 import { NextRequest, NextResponse } from 'next/server';
 import bcrypt from 'bcryptjs';
-import { issueSsoToken } from '@/lib/tau-auth';
+import { attachAuthSession } from '@/lib/tau-session';
 
 export async function POST(request: NextRequest) {
   try {
@@ -39,24 +39,19 @@ export async function POST(request: NextRequest) {
       [user.id]
     );
 
-    const token = issueSsoToken({
-      id: user.id,
-      email: user.email,
-      username: user.username,
-      fullName: user.full_name,
-    });
-
-    return NextResponse.json({
-      message: 'Login successful',
-      token,
-      sso: true,
-      user: {
-        id: user.id,
-        username: user.username,
-        email: user.email,
-        fullName: user.full_name,
-      },
-    });
+    return attachAuthSession(
+      request,
+      { id: user.id, email: user.email, username: user.username, fullName: user.full_name },
+      {
+        message: 'Login successful',
+        user: {
+          id: user.id,
+          username: user.username,
+          email: user.email,
+          fullName: user.full_name,
+        },
+      }
+    );
   } catch (error) {
     console.error('TauBrowser Login Error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });

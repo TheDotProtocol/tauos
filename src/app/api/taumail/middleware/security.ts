@@ -1,24 +1,20 @@
-import { getPool, getJwtSecret } from '@/lib/db-pool';
-import jwt from 'jsonwebtoken';
+import { verifyTauToken } from '@/lib/tau-auth';
+import { getAccessToken } from '@/lib/auth-server';
 import { NextRequest } from 'next/server';
 
+/** Unified Tau SSO token verification — works for all apps (Mail, Cloud, Talk, etc.). */
 export async function verifyTauMailToken(request: NextRequest) {
-  const authHeader = request.headers.get('authorization');
-  if (!authHeader?.startsWith('Bearer ')) {
+  const token = getAccessToken(request);
+  if (!token) {
     return { error: 'No token provided', status: 401 as const };
   }
 
-  const token = authHeader.substring(7);
-  try {
-    const decoded = jwt.verify(token, getJwtSecret('taumail')) as { userId: string };
-    return { userId: decoded.userId };
-  } catch {
-    return { error: 'Invalid token', status: 401 as const };
+  const decoded = verifyTauToken(token);
+  if (!decoded?.userId) {
+    return { error: 'Invalid or expired token', status: 401 as const };
   }
+
+  return { userId: decoded.userId };
 }
 
-export async function checkRateLimit(_userId: string): Promise<boolean> {
-  return true;
-}
-
-export { getPool };
+export { getPool } from '@/lib/db-pool';

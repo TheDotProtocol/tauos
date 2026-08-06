@@ -1,7 +1,7 @@
 import { getPool } from '@/lib/db-pool';
 import { NextRequest, NextResponse } from 'next/server';
 import bcrypt from 'bcryptjs';
-import { issueSsoToken } from '@/lib/tau-auth';
+import { attachAuthSession } from '@/lib/tau-session';
 import { ensureBrowserProfile } from '@/lib/taubrowser-data';
 
 export async function POST(request: NextRequest) {
@@ -33,24 +33,19 @@ export async function POST(request: NextRequest) {
     const user = result.rows[0];
     await ensureBrowserProfile(user.id);
 
-    const token = issueSsoToken({
-      id: user.id,
-      email: user.email,
-      username: user.username,
-      fullName: user.full_name,
-    });
-
-    return NextResponse.json({
-      message: 'TauBrowser registration successful',
-      token,
-      sso: true,
-      user: {
-        id: user.id,
-        username: user.username,
-        email: user.email,
-        fullName: user.full_name,
-      },
-    });
+    return attachAuthSession(
+      request,
+      { id: user.id, email: user.email, username: user.username, fullName: user.full_name },
+      {
+        message: 'TauBrowser registration successful',
+        user: {
+          id: user.id,
+          username: user.username,
+          email: user.email,
+          fullName: user.full_name,
+        },
+      }
+    );
   } catch (error) {
     console.error('TauBrowser Registration Error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });

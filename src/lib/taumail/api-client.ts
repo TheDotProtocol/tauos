@@ -14,6 +14,8 @@ import {
   mapApiSentEmail,
   mapApiTrashEmail,
 } from '@/lib/taumail/types';
+import { persistTauSession, tauAuthHeaders, tauFetch, tauFetchCredentials } from '@/lib/tau-auth-client';
+import { TAU_TOKEN_KEY, TAU_USER_KEY } from '@/lib/tau-auth-constants';
 import {
   TAUMAIL_INLINE_ATTACHMENT_BYTES,
   type MailAttachmentRef,
@@ -22,12 +24,15 @@ import {
 export type TauMailAttachmentRef = MailAttachmentRef;
 
 function authHeaders(): HeadersInit {
-  const token = typeof window !== 'undefined' ? localStorage.getItem('tauos_token') : null;
-  return token ? { Authorization: `Bearer ${token}` } : {};
+  return tauAuthHeaders();
 }
 
 function jsonAuthHeaders(): HeadersInit {
   return { ...authHeaders(), 'Content-Type': 'application/json' };
+}
+
+function getStoredToken(): string | null {
+  return typeof window !== 'undefined' ? localStorage.getItem(TAU_TOKEN_KEY) : null;
 }
 
 function mapDemoInbox(email: DemoInboxEmail): TauMailEmail {
@@ -99,7 +104,7 @@ export type TauMailStorageData = {
 };
 
 export async function fetchTauMailEmails(folder: TauMailFolder): Promise<TauMailEmail[]> {
-  const token = typeof window !== 'undefined' ? localStorage.getItem('tauos_token') : null;
+  const token = typeof window !== 'undefined' ? localStorage.getItem(TAU_TOKEN_KEY) : null;
 
   if (isDemoSession(token)) {
     if (folder === 'inbox') return getDemoInbox().map(mapDemoInbox);
@@ -160,34 +165,34 @@ export async function fetchTauMailEmails(folder: TauMailFolder): Promise<TauMail
   const headers = authHeaders();
 
   if (folder === 'inbox') {
-    const res = await fetch('/api/taumail/emails/inbox', { headers });
+    const res = await tauFetch('/api/taumail/emails/inbox', { headers });
     if (!res.ok) throw new Error('Failed to load inbox');
     const data = await res.json();
     return (data.emails || []).map((e: Record<string, unknown>) => mapApiInboxEmail(e));
   }
 
   if (folder === 'sent') {
-    const res = await fetch('/api/taumail/emails/sent', { headers });
+    const res = await tauFetch('/api/taumail/emails/sent', { headers });
     if (!res.ok) throw new Error('Failed to load sent');
     const data = await res.json();
     return (data.emails || []).map((e: Record<string, unknown>) => mapApiSentEmail(e));
   }
 
   if (folder === 'spam') {
-    const res = await fetch('/api/taumail/emails/spam', { headers });
+    const res = await tauFetch('/api/taumail/emails/spam', { headers });
     if (!res.ok) throw new Error('Failed to load spam');
     const data = await res.json();
     return (data.emails || []).map((e: Record<string, unknown>) => mapApiInboxEmail(e));
   }
 
   if (folder === 'drafts') {
-    const res = await fetch('/api/taumail/emails/drafts', { headers });
+    const res = await tauFetch('/api/taumail/emails/drafts', { headers });
     if (!res.ok) throw new Error('Failed to load drafts');
     const data = await res.json();
     return (data.drafts || []).map((e: Record<string, unknown>) => mapApiDraftEmail(e));
   }
 
-  const res = await fetch('/api/taumail/emails/trash', { headers });
+  const res = await tauFetch('/api/taumail/emails/trash', { headers });
   if (!res.ok) throw new Error('Failed to load trash');
   const data = await res.json();
   return (data.emails || []).map((e: Record<string, unknown>) => mapApiTrashEmail(e));
@@ -203,22 +208,19 @@ export async function loginTauMail(email: string, password: string) {
   const res = await fetch('/api/taumail/auth/login', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
+    credentials: tauFetchCredentials,
     body: JSON.stringify({ email, password }),
   });
   const data = await res.json();
   if (!res.ok) return { ok: false as const, error: data.error || 'Login failed' };
 
-  localStorage.setItem('tauos_token', data.token);
-  localStorage.setItem(
-    'tauos_user',
-    JSON.stringify({
-      id: data.user.id,
-      username: data.user.username,
-      email: data.user.email,
-      fullName: data.user.fullName,
-      avatarUrl: data.user.avatarUrl ?? null,
-    }),
-  );
+  persistTauSession(data.token, {
+    id: data.user.id,
+    username: data.user.username,
+    email: data.user.email,
+    fullName: data.user.fullName,
+    avatarUrl: data.user.avatarUrl ?? null,
+  });
   localStorage.removeItem('tauos_demo_mode');
   return { ok: true as const, demo: false };
 }
@@ -231,11 +233,11 @@ export async function sendTauMail(payload: {
   bcc?: string;
   attachments?: TauMailAttachmentRef[];
 }) {
-  const token = localStorage.getItem('tauos_token');
+  const token = localStorage.getItem(TAU_TOKEN_KEY);
   if (isDemoSession(token)) {
     return { ok: true, demo: true };
   }
-  const res = await fetch('/api/taumail/emails/send', {
+  const res = await tauFetch('/api/taumail/emails/send', {
     method: 'POST',
     headers: jsonAuthHeaders(),
     body: JSON.stringify(payload),
@@ -248,15 +250,15 @@ export async function sendTauMail(payload: {
 export async function uploadTauMailAttachment(
   file: File,
 ): Promise<{ ok: true; ref: TauMailAttachmentRef } | { ok: false; error: string }> {
-  const token = localStorage.getItem('tauos_token');
+  const token = localStorage.getItem(TAU_TOKEN_KEY);
   if (!token) return { ok: false, error: 'Not logged in' };
 
   if (file.size <= TAUMAIL_INLINE_ATTACHMENT_BYTES) {
     const formData = new FormData();
     formData.append('file', file);
-    const res = await fetch('/api/taumail/emails/attachments/upload', {
+    const res = await tauFetch('/api/taumail/emails/attachments/upload', {
       method: 'PUT',
-      headers: { Authorization: `Bearer ${token}` },
+      headers: authHeaders(),
       body: formData,
     });
     const data = await res.json();
@@ -273,7 +275,7 @@ export async function uploadTauMailAttachment(
     };
   }
 
-  const prepRes = await fetch('/api/taumail/emails/attachments', {
+  const prepRes = await tauFetch('/api/taumail/emails/attachments', {
     method: 'POST',
     headers: jsonAuthHeaders(),
     body: JSON.stringify({
@@ -310,7 +312,7 @@ export async function uploadTauMailAttachment(
 }
 
 export async function saveTauMailDraft(payload: { to: string; subject: string; body: string; draftId?: string }) {
-  const token = localStorage.getItem('tauos_token');
+  const token = localStorage.getItem(TAU_TOKEN_KEY);
   if (isDemoSession(token)) return { ok: true, demo: true };
 
   if (payload.draftId) {
@@ -324,7 +326,7 @@ export async function saveTauMailDraft(payload: { to: string; subject: string; b
     return { ok: true, draftId: data.draft?.id };
   }
 
-  const res = await fetch('/api/taumail/emails/drafts', {
+  const res = await tauFetch('/api/taumail/emails/drafts', {
     method: 'POST',
     headers: jsonAuthHeaders(),
     body: JSON.stringify(payload),
@@ -335,10 +337,10 @@ export async function saveTauMailDraft(payload: { to: string; subject: string; b
 }
 
 export async function moveEmailToTrash(emailId: string | number) {
-  const token = localStorage.getItem('tauos_token');
+  const token = localStorage.getItem(TAU_TOKEN_KEY);
   if (isDemoSession(token)) return { ok: true };
 
-  const res = await fetch('/api/taumail/emails/trash', {
+  const res = await tauFetch('/api/taumail/emails/trash', {
     method: 'POST',
     headers: jsonAuthHeaders(),
     body: JSON.stringify({ emailId, action: 'trash' }),
@@ -347,10 +349,10 @@ export async function moveEmailToTrash(emailId: string | number) {
 }
 
 export async function toggleEmailStar(emailId: string | number, starred: boolean) {
-  const token = localStorage.getItem('tauos_token');
+  const token = localStorage.getItem(TAU_TOKEN_KEY);
   if (isDemoSession(token)) return { ok: true, starred: !starred };
 
-  const res = await fetch('/api/taumail/emails/actions', {
+  const res = await tauFetch('/api/taumail/emails/actions', {
     method: 'POST',
     headers: jsonAuthHeaders(),
     body: JSON.stringify({ emailId, action: starred ? 'unstar' : 'star' }),
@@ -361,10 +363,10 @@ export async function toggleEmailStar(emailId: string | number, starred: boolean
 }
 
 export async function archiveEmail(emailId: string | number) {
-  const token = localStorage.getItem('tauos_token');
+  const token = localStorage.getItem(TAU_TOKEN_KEY);
   if (isDemoSession(token)) return { ok: true };
 
-  const res = await fetch('/api/taumail/emails/actions', {
+  const res = await tauFetch('/api/taumail/emails/actions', {
     method: 'POST',
     headers: jsonAuthHeaders(),
     body: JSON.stringify({ emailId, action: 'archive' }),
@@ -388,9 +390,9 @@ export async function summarizeTauMailEmail(email: {
 }
 
 export async function markEmailRead(emailId: string | number) {
-  const token = localStorage.getItem('tauos_token');
+  const token = localStorage.getItem(TAU_TOKEN_KEY);
   if (isDemoSession(token)) return { ok: true };
-  const res = await fetch('/api/taumail/emails/mark-read', {
+  const res = await tauFetch('/api/taumail/emails/mark-read', {
     method: 'POST',
     headers: jsonAuthHeaders(),
     body: JSON.stringify({ emailId }),
@@ -399,20 +401,20 @@ export async function markEmailRead(emailId: string | number) {
 }
 
 export async function fetchTauMailProfile(): Promise<TauMailProfile | null> {
-  const token = localStorage.getItem('tauos_token');
+  const token = localStorage.getItem(TAU_TOKEN_KEY);
   if (isDemoSession(token)) return null;
 
-  const res = await fetch('/api/taumail/profile', { headers: authHeaders() });
+  const res = await tauFetch('/api/taumail/profile', { headers: authHeaders() });
   if (!res.ok) throw new Error('Failed to load profile');
   const data = await res.json();
   return data.profile;
 }
 
 export async function saveTauMailProfile(profile: TauMailProfile) {
-  const token = localStorage.getItem('tauos_token');
+  const token = localStorage.getItem(TAU_TOKEN_KEY);
   if (isDemoSession(token)) return { ok: true, demo: true };
 
-  const res = await fetch('/api/taumail/profile', {
+  const res = await tauFetch('/api/taumail/profile', {
     method: 'PUT',
     headers: jsonAuthHeaders(),
     body: JSON.stringify(profile),
@@ -443,7 +445,7 @@ export async function downloadTauMailAttachment(
   filename: string,
   options?: { inline?: boolean },
 ) {
-  const token = localStorage.getItem('tauos_token');
+  const token = localStorage.getItem(TAU_TOKEN_KEY);
   if (isDemoSession(token)) return { ok: false, error: 'Not available in demo mode' };
 
   const inline = options?.inline ? '&inline=1' : '';
@@ -477,7 +479,7 @@ export async function openTauMailAttachment(
   emailId: string | number,
   index: number,
 ) {
-  const token = localStorage.getItem('tauos_token');
+  const token = localStorage.getItem(TAU_TOKEN_KEY);
   if (isDemoSession(token)) return { ok: false, error: 'Not available in demo mode' };
 
   const res = await fetch(
@@ -497,12 +499,12 @@ export async function openTauMailAttachment(
 }
 
 export async function uploadTauMailAvatar(file: File) {
-  const token = localStorage.getItem('tauos_token');
+  const token = localStorage.getItem(TAU_TOKEN_KEY);
   if (isDemoSession(token)) return { ok: true, demo: true, avatarUrl: null };
 
   const formData = new FormData();
   formData.append('file', file);
-  const res = await fetch('/api/taumail/profile/avatar', {
+  const res = await tauFetch('/api/taumail/profile/avatar', {
     method: 'POST',
     headers: authHeaders(),
     body: formData,
@@ -520,10 +522,10 @@ export async function uploadTauMailAvatar(file: File) {
 }
 
 export async function removeTauMailAvatar() {
-  const token = localStorage.getItem('tauos_token');
+  const token = localStorage.getItem(TAU_TOKEN_KEY);
   if (isDemoSession(token)) return { ok: true, demo: true };
 
-  const res = await fetch('/api/taumail/profile/avatar', {
+  const res = await tauFetch('/api/taumail/profile/avatar', {
     method: 'DELETE',
     headers: authHeaders(),
   });
@@ -538,7 +540,7 @@ export async function removeTauMailAvatar() {
 }
 
 export async function fetchTauMailContacts(): Promise<TauMailContact[]> {
-  const token = localStorage.getItem('tauos_token');
+  const token = localStorage.getItem(TAU_TOKEN_KEY);
   if (isDemoSession(token)) {
     const { contactsList } = await import('@/lib/taumail/ui-demo-data');
     return contactsList.map((c) => ({
@@ -550,7 +552,7 @@ export async function fetchTauMailContacts(): Promise<TauMailContact[]> {
     }));
   }
 
-  const res = await fetch('/api/taumail/contacts', { headers: authHeaders() });
+  const res = await tauFetch('/api/taumail/contacts', { headers: authHeaders() });
   if (!res.ok) throw new Error('Failed to load contacts');
   const data = await res.json();
   return (data.contacts || []).map((c: Record<string, unknown>) => ({
@@ -563,23 +565,23 @@ export async function fetchTauMailContacts(): Promise<TauMailContact[]> {
 }
 
 export async function fetchTauMailTasks(): Promise<TauMailTask[]> {
-  const token = localStorage.getItem('tauos_token');
+  const token = localStorage.getItem(TAU_TOKEN_KEY);
   if (isDemoSession(token)) {
     const { tasksList } = await import('@/lib/taumail/ui-demo-data');
     return tasksList.map((t, i) => ({ id: String(i), ...t }));
   }
 
-  const res = await fetch('/api/taumail/tasks', { headers: authHeaders() });
+  const res = await tauFetch('/api/taumail/tasks', { headers: authHeaders() });
   if (!res.ok) throw new Error('Failed to load tasks');
   const data = await res.json();
   return data.tasks || [];
 }
 
 export async function toggleTauMailTask(id: string, isDone: boolean) {
-  const token = localStorage.getItem('tauos_token');
+  const token = localStorage.getItem(TAU_TOKEN_KEY);
   if (isDemoSession(token)) return { ok: true };
 
-  const res = await fetch('/api/taumail/tasks', {
+  const res = await tauFetch('/api/taumail/tasks', {
     method: 'PATCH',
     headers: jsonAuthHeaders(),
     body: JSON.stringify({ id, isDone }),
@@ -588,7 +590,7 @@ export async function toggleTauMailTask(id: string, isDone: boolean) {
 }
 
 export async function fetchTauMailCalendar(): Promise<TauMailCalendarData> {
-  const token = localStorage.getItem('tauos_token');
+  const token = localStorage.getItem(TAU_TOKEN_KEY);
   if (isDemoSession(token)) {
     const demo = await import('@/lib/taumail/ui-demo-data');
     return {
@@ -600,57 +602,57 @@ export async function fetchTauMailCalendar(): Promise<TauMailCalendarData> {
     };
   }
 
-  const res = await fetch('/api/taumail/calendar', { headers: authHeaders() });
+  const res = await tauFetch('/api/taumail/calendar', { headers: authHeaders() });
   if (!res.ok) throw new Error('Failed to load calendar');
   return res.json();
 }
 
 export async function fetchTauMailNotifications(): Promise<TauMailNotification[]> {
-  const token = localStorage.getItem('tauos_token');
+  const token = localStorage.getItem(TAU_TOKEN_KEY);
   if (isDemoSession(token)) {
     const { notificationsList } = await import('@/lib/taumail/ui-demo-data');
     return notificationsList.map((n, i) => ({ id: String(i), ...n }));
   }
 
-  const res = await fetch('/api/taumail/notifications', { headers: authHeaders() });
+  const res = await tauFetch('/api/taumail/notifications', { headers: authHeaders() });
   if (!res.ok) throw new Error('Failed to load notifications');
   const data = await res.json();
   return data.notifications || [];
 }
 
 export async function fetchTauMailStorage(): Promise<TauMailStorageData> {
-  const token = localStorage.getItem('tauos_token');
+  const token = localStorage.getItem(TAU_TOKEN_KEY);
   if (isDemoSession(token)) {
     const { storageBreakdown } = await import('@/lib/taumail/ui-demo-data');
     const usedGb = storageBreakdown.reduce((s, b) => s + b.used, 0);
     return { usedGb, totalGb: 250, breakdown: storageBreakdown };
   }
 
-  const res = await fetch('/api/taumail/storage', { headers: authHeaders() });
+  const res = await tauFetch('/api/taumail/storage', { headers: authHeaders() });
   if (!res.ok) throw new Error('Failed to load storage');
   return res.json();
 }
 
 export async function fetchTauMailAi(): Promise<{ messages: TauMailAiMessage[]; prompts: string[] }> {
-  const token = localStorage.getItem('tauos_token');
+  const token = localStorage.getItem(TAU_TOKEN_KEY);
   if (isDemoSession(token)) {
     const demo = await import('@/lib/taumail/ui-demo-data');
     return { messages: demo.aiMessages, prompts: demo.aiPrompts };
   }
 
-  const res = await fetch('/api/taumail/ai', { headers: authHeaders() });
+  const res = await tauFetch('/api/taumail/ai', { headers: authHeaders() });
   if (!res.ok) throw new Error('Failed to load AI chat');
   const data = await res.json();
   return { messages: data.messages || [], prompts: data.prompts || [] };
 }
 
 export async function sendTauMailAiMessage(message: string): Promise<TauMailAiMessage | null> {
-  const token = localStorage.getItem('tauos_token');
+  const token = localStorage.getItem(TAU_TOKEN_KEY);
   if (isDemoSession(token)) {
     return { role: 'assistant', text: 'Demo mode — connect with a real account to use Tau AI.' };
   }
 
-  const res = await fetch('/api/taumail/ai', {
+  const res = await tauFetch('/api/taumail/ai', {
     method: 'POST',
     headers: jsonAuthHeaders(),
     body: JSON.stringify({ message }),

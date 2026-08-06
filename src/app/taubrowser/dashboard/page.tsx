@@ -8,10 +8,10 @@ import {
   Trash2, RefreshCw, Globe, Lock, Eye, Zap, ExternalLink, Plus, Layers
 } from 'lucide-react';
 import Link from 'next/link';
+import { tauAuthHeaders, tauFetch, hydrateTauSession, logoutTauSession } from '@/lib/tau-auth-client';
 
 function authHeaders() {
-  const token = localStorage.getItem('tauos_token');
-  return { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' };
+  return { ...tauAuthHeaders(), 'Content-Type': 'application/json' };
 }
 
 export default function TauBrowserDashboard() {
@@ -32,7 +32,7 @@ export default function TauBrowserDashboard() {
     setLoading(true);
     try {
       const [syncRes, dlRes] = await Promise.all([
-        fetch('/api/taubrowser/sync', { headers: authHeaders() }),
+        tauFetch('/api/taubrowser/sync', { headers: authHeaders() }),
         fetch('/api/taubrowser/downloads'),
       ]);
       if (syncRes.ok) {
@@ -55,27 +55,31 @@ export default function TauBrowserDashboard() {
   }, []);
 
   useEffect(() => {
-    const storedUser = localStorage.getItem('tauos_user');
-    const storedToken = localStorage.getItem('tauos_token');
-    if (storedUser && storedToken) {
-      setUser(JSON.parse(storedUser));
-      setIsLoggedIn(true);
-      loadData();
-    } else {
-      window.location.href = '/taubrowser';
-    }
+    let cancelled = false;
+    (async () => {
+      const session = await hydrateTauSession();
+      if (cancelled) return;
+      if (session.user) {
+        setUser(session.user);
+        setIsLoggedIn(true);
+        loadData();
+      } else {
+        window.location.href = '/taubrowser';
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
   }, [loadData]);
 
   const handleLogout = () => {
-    localStorage.removeItem('tauos_user');
-    localStorage.removeItem('tauos_token');
-    window.location.href = '/taubrowser';
+    logoutTauSession('/taubrowser');
   };
 
   const toggleSetting = async (key) => {
     const next = { ...settings, [key]: !settings[key] };
     setSettings(next);
-    await fetch('/api/taubrowser/settings', {
+    await tauFetch('/api/taubrowser/settings', {
       method: 'PUT',
       headers: authHeaders(),
       body: JSON.stringify({ [key]: next[key] }),
@@ -85,7 +89,7 @@ export default function TauBrowserDashboard() {
   const addBookmark = async (e) => {
     e.preventDefault();
     if (!newBookmark.title || !newBookmark.url) return;
-    const res = await fetch('/api/taubrowser/bookmarks', {
+    const res = await tauFetch('/api/taubrowser/bookmarks', {
       method: 'POST',
       headers: authHeaders(),
       body: JSON.stringify(newBookmark),
@@ -106,7 +110,7 @@ export default function TauBrowserDashboard() {
 
   const clearHistory = async () => {
     if (!confirm('Clear all synced browsing history?')) return;
-    await fetch('/api/taubrowser/history', { method: 'DELETE', headers: authHeaders() });
+    await tauFetch('/api/taubrowser/history', { method: 'DELETE', headers: authHeaders() });
     loadData();
   };
 

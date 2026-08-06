@@ -1,7 +1,7 @@
 import { getPool } from '@/lib/db-pool';
 import { NextRequest, NextResponse } from 'next/server';
 import bcrypt from 'bcryptjs';
-import { issueSsoToken } from '@/lib/tau-auth';
+import { attachAuthSession } from '@/lib/tau-session';
 import { normalizeEmail, normalizePhone, verifyOtp } from '@/lib/tautalk-otp';
 
 export async function POST(request: NextRequest) {
@@ -93,26 +93,21 @@ export async function POST(request: NextRequest) {
     );
 
     const user = result.rows[0];
-    const token = issueSsoToken({
-      id: user.id,
-      email: user.email,
-      username: user.username,
-      fullName: user.full_name,
-    });
-
-    return NextResponse.json({
-      message: 'Registration successful',
-      token,
-      sso: true,
-      user: {
-        id: user.id,
-        username: user.username,
-        email: user.email,
-        phone: user.phone ?? null,
-        fullName: user.full_name,
-        avatarUrl: user.avatar_url ?? null,
-      },
-    });
+    return attachAuthSession(
+      request,
+      { id: user.id, email: user.email, username: user.username, fullName: user.full_name },
+      {
+        message: 'Registration successful',
+        user: {
+          id: user.id,
+          username: user.username,
+          email: user.email,
+          phone: user.phone ?? null,
+          fullName: user.full_name,
+          avatarUrl: user.avatar_url ?? null,
+        },
+      }
+    );
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Internal server error';
     console.error('TauTalk register:', error);
