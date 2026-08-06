@@ -52,7 +52,7 @@ export async function GET(request: NextRequest) {
       };
 
       poll();
-      const interval = setInterval(poll, 2500);
+      const interval = setInterval(poll, 4000);
 
       request.signal.addEventListener('abort', () => {
         closed = true;

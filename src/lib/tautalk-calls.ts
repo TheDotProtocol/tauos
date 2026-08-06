@@ -28,7 +28,10 @@ export async function getPeerForCall(conversationId: string, userId: string | nu
   return peer;
 }
 
-export async function expireStaleCallSessions(conversationId?: string) {
+let lastStaleExpireAt = 0;
+const STALE_EXPIRE_INTERVAL_MS = 25_000;
+
+export async function expireStaleCallSessions(_conversationId?: string) {
   await getPool().query(
     `UPDATE tautalk_call_sessions
      SET status = 'missed', ended_at = NOW()
@@ -40,6 +43,13 @@ export async function expireStaleCallSessions(conversationId?: string) {
      WHERE status = 'active'
        AND COALESCE(answered_at, started_at) < NOW() - INTERVAL '90 seconds'`
   );
+}
+
+export async function expireStaleCallSessionsIfDue() {
+  const now = Date.now();
+  if (now - lastStaleExpireAt < STALE_EXPIRE_INTERVAL_MS) return;
+  lastStaleExpireAt = now;
+  await expireStaleCallSessions();
 }
 
 /** End any in-flight sessions for a conversation so a new call can start cleanly. */
@@ -60,7 +70,7 @@ export async function createCallSession(
   const allowed = await userInConversation(userId, conversationId);
   if (!allowed) throw new Error('Not found');
 
-  await expireStaleCallSessions();
+  await expireStaleCallSessionsIfDue();
   await resetCallSessionsForConversation(conversationId);
 
   const peer = await getPeerForCall(conversationId, userId);
@@ -84,7 +94,7 @@ export async function getCallSession(sessionId: string, userId: string | number)
 }
 
 export async function listIncomingCalls(userId: string | number) {
-  await expireStaleCallSessions();
+  await expireStaleCallSessionsIfDue();
   const result = await getPool().query(
     `SELECT s.*,
             c.type AS conversation_type,
@@ -193,20 +203,18 @@ export async function listCallSignals(
   userId: string | number,
   since?: string
 ) {
-  const session = await getCallSession(sessionId, userId);
-  if (!session) throw new Error('Not found');
-
-  const params: string[] = [sessionId, uid(userId)];
-  let sql = `
-    SELECT id, session_id, sender_id, signal_type, payload, created_at
-    FROM tautalk_call_signals
-    WHERE session_id = $1 AND sender_id <> $2`;
-  if (since) {
-    params.push(since);
-    sql += ` AND created_at > $3::timestamptz`;
-  }
-  sql += ` ORDER BY created_at ASC LIMIT 100`;
-
-  const result = await getPool().query(sql, params);
+  const params: (string | undefined)[] = [sessionId, uid(userId), since ?? null];
+  const result = await getPool().query(
+    `SELECT sig.id, sig.session_id, sig.sender_id, sig.signal_type, sig.payload, sig.created_at
+     FROM tautalk_call_signals sig
+     JOIN tautalk_call_sessions cs ON cs.id = sig.session_id
+     WHERE sig.session_id = $1
+       AND (cs.caller_id = $2 OR cs.callee_id = $2)
+       AND sig.sender_id <> $2
+       AND ($3::timestamptz IS NULL OR sig.created_at > $3::timestamptz)
+     ORDER BY sig.created_at ASC
+     LIMIT 100`,
+    params
+  );
   return result.rows;
 }

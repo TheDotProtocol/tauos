@@ -89,6 +89,7 @@ export type ConversationPeer = {
   email: string;
   full_name: string;
   avatar_url?: string | null;
+  contact_label?: string | null;
 };
 
 export type TalkProfile = {
@@ -118,6 +119,7 @@ export type Message = {
   sender_username: string;
   content_encrypted: string;
   content_type: string;
+  reply_to?: string | null;
   created_at: string;
 };
 
@@ -126,6 +128,7 @@ export type KeyParticipant = {
   username: string;
   fullName?: string | null;
   publicKey: string | null;
+  publicKeys?: string[];
   lastReadAt?: string | null;
 };
 
@@ -144,6 +147,19 @@ export async function createConversation(token: string, query: string) {
     body: JSON.stringify({ query }),
   });
   return parseJson<{ conversation: { id: string; peer?: ConversationPeer } }>(res);
+}
+
+export async function createGroupConversation(
+  token: string,
+  title: string,
+  memberIds: string[]
+) {
+  const res = await fetch(`${API_BASE}/api/tautalk/conversations`, {
+    method: 'POST',
+    headers: authHeaders(token),
+    body: JSON.stringify({ type: 'group', title, memberIds }),
+  });
+  return parseJson<{ conversation: { id: string } }>(res);
 }
 
 export async function fetchConversationKeys(token: string, conversationId: string) {
@@ -168,15 +184,46 @@ export async function sendMessage(
   token: string,
   conversationId: string,
   contentEncrypted: string,
-  contentType = 'text'
+  contentType = 'text',
+  replyTo?: string
 ) {
   const res = await fetch(`${API_BASE}/api/tautalk/messages`, {
     method: 'POST',
     headers: authHeaders(token),
-    body: JSON.stringify({ conversationId, contentEncrypted, contentType }),
+    body: JSON.stringify({ conversationId, contentEncrypted, contentType, replyTo }),
   });
   const data = await parseJson<{ message: Message }>(res);
   return data.message;
+}
+
+export async function fetchContactLabel(token: string, contactUserId: string) {
+  const res = await fetch(
+    `${API_BASE}/api/tautalk/contacts/label?contactUserId=${encodeURIComponent(contactUserId)}`,
+    { headers: authHeaders(token) }
+  );
+  const data = await parseJson<{ label: string | null }>(res);
+  return data.label ?? null;
+}
+
+export async function saveContactLabel(
+  token: string,
+  contactUserId: string,
+  displayName: string
+) {
+  const res = await fetch(`${API_BASE}/api/tautalk/contacts/label`, {
+    method: 'PUT',
+    headers: authHeaders(token),
+    body: JSON.stringify({ contactUserId, displayName }),
+  });
+  const data = await parseJson<{ label: string }>(res);
+  return data.label;
+}
+
+export async function removeContactLabel(token: string, contactUserId: string) {
+  await fetch(
+    `${API_BASE}/api/tautalk/contacts/label?contactUserId=${encodeURIComponent(contactUserId)}`,
+    { method: 'DELETE', headers: authHeaders(token) }
+  );
 }
 
 export async function fetchProfile(token: string) {

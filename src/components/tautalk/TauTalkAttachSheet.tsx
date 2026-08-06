@@ -47,7 +47,7 @@ export default function TauTalkAttachSheet({
 
   return (
     <div className="fixed inset-0 z-50 bg-black/50 flex items-end sm:items-center justify-center p-0 sm:p-4">
-      <div className="bg-gray-900 border border-gray-800 rounded-t-2xl sm:rounded-2xl p-5 w-full max-w-md">
+      <div className="bg-[#0c0c12] border border-white/[0.08] rounded-t-2xl sm:rounded-2xl p-5 w-full max-w-md">
         <div className="flex items-center justify-between mb-4">
           <div>
             <h3 className="font-bold text-lg">Share</h3>
@@ -64,7 +64,7 @@ export default function TauTalkAttachSheet({
             onClick={onPhoto}
             className="flex flex-col items-start text-left p-3.5 rounded-xl bg-white/5 border border-white/10 hover:bg-white/[0.07]"
           >
-            <ImageIcon className="w-6 h-6 text-green-400 mb-2" />
+            <ImageIcon className="w-6 h-6 text-[#D4AF37] mb-2" />
             <span className="font-medium">Photo</span>
             <span className="text-xs text-gray-500">Gallery or camera</span>
           </button>
@@ -73,7 +73,7 @@ export default function TauTalkAttachSheet({
             onClick={onFile}
             className="flex flex-col items-start text-left p-3.5 rounded-xl bg-white/5 border border-white/10 hover:bg-white/[0.07]"
           >
-            <FileUp className="w-6 h-6 text-green-400 mb-2" />
+            <FileUp className="w-6 h-6 text-[#D4AF37] mb-2" />
             <span className="font-medium">File</span>
             <span className="text-xs text-gray-500">Documents & more</span>
           </button>
@@ -87,7 +87,7 @@ export default function TauTalkAttachSheet({
             }`}
           >
             <Mic
-              className={`w-6 h-6 mb-2 ${recording ? 'text-red-400 animate-pulse' : 'text-green-400'}`}
+              className={`w-6 h-6 mb-2 ${recording ? 'text-red-400 animate-pulse' : 'text-[#D4AF37]'}`}
             />
             <span className="font-medium">{recording ? `Recording ${seconds}s` : 'Voice note'}</span>
             <span className="text-xs text-gray-500">{recording ? 'Tap to send' : 'Tap to record'}</span>
@@ -97,7 +97,7 @@ export default function TauTalkAttachSheet({
             onClick={onLocation}
             className="flex flex-col items-start text-left p-3.5 rounded-xl bg-white/5 border border-white/10 hover:bg-white/[0.07]"
           >
-            <MapPin className="w-6 h-6 text-green-400 mb-2" />
+            <MapPin className="w-6 h-6 text-[#D4AF37] mb-2" />
             <span className="font-medium">Location</span>
             <span className="text-xs text-gray-500">Share where you are</span>
           </button>
@@ -110,7 +110,7 @@ export default function TauTalkAttachSheet({
               onClose();
               onVoiceCall();
             }}
-            className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl bg-green-500/15 text-green-400 font-medium"
+            className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl bg-[rgba(212,175,55,0.15)] text-[#D4AF37] font-medium"
           >
             <Phone className="w-5 h-5" /> Voice call
           </button>
@@ -120,7 +120,7 @@ export default function TauTalkAttachSheet({
               onClose();
               onVideoCall();
             }}
-            className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl bg-green-500/15 text-green-400 font-medium"
+            className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl bg-[rgba(212,175,55,0.15)] text-[#D4AF37] font-medium"
           >
             <Video className="w-5 h-5" /> Video call
           </button>

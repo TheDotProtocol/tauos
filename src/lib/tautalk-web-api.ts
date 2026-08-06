@@ -24,6 +24,8 @@ export type KeyParticipant = {
   username: string;
   fullName?: string | null;
   publicKey: string | null;
+  /** Current + historical keys for decrypt after browser/device changes */
+  publicKeys?: string[];
   lastReadAt?: string | null;
 };
 
@@ -100,13 +102,51 @@ export async function fetchConversationKeys(
 export async function buildCryptoContext(
   conversationId: string,
   convType: string,
-  participants: KeyParticipant[]
+  participants: KeyParticipant[],
+  token?: string
 ): Promise<ConversationCryptoContext> {
   const { getOrCreateKeyPair } = await import('@/lib/tautalk-crypto');
   const { publicKey } = await getOrCreateKeyPair();
-  const participantPublicKeys = participants
-    .map((p) => p.publicKey)
-    .filter((k): k is string => Boolean(k));
+
+  const enriched = await Promise.all(
+    participants.map(async (p) => {
+      const fromApi = p.publicKeys?.length
+        ? p.publicKeys
+        : p.publicKey
+          ? [p.publicKey]
+          : [];
+      if (fromApi.length > 0) {
+        return { ...p, publicKey: p.publicKey ?? fromApi[0], publicKeys: fromApi };
+      }
+      if (!token) return p;
+      try {
+        const res = await fetch(
+          `/api/tautalk/identity?q=${encodeURIComponent(p.username)}`,
+          { headers: headers(token) }
+        );
+        if (!res.ok) return p;
+        const data = (await res.json()) as {
+          key?: { public_key?: string } | null;
+        };
+        const pk = data.key?.public_key ?? null;
+        return pk ? { ...p, publicKey: pk, publicKeys: [pk] } : p;
+      } catch {
+        return p;
+      }
+    })
+  );
+
+  const participantPublicKeys: string[] = [];
+  for (const p of enriched) {
+    const keys = p.publicKeys?.length
+      ? p.publicKeys
+      : p.publicKey
+        ? [p.publicKey]
+        : [];
+    for (const k of keys) {
+      if (k && !participantPublicKeys.includes(k)) participantPublicKeys.push(k);
+    }
+  }
   if (!participantPublicKeys.includes(publicKey)) {
     participantPublicKeys.push(publicKey);
   }
@@ -215,11 +255,74 @@ export async function sendCallSignal(
 
 export async function pollCallSignals(token: string, sessionId: string, since?: string) {
   const qs = since ? `?since=${encodeURIComponent(since)}` : '';
-  const res = await fetch(`/api/tautalk/calls/${sessionId}/signals${qs}`, {
+  try {
+    const res = await fetch(`/api/tautalk/calls/${sessionId}/signals${qs}`, {
+      headers: headers(token),
+    });
+    if (!res.ok) return [];
+    const data = (await res.json()) as {
+      signals?: Array<{ id: string; signal_type: string; payload: unknown; created_at: string }>;
+      error?: string;
+    };
+    return data.signals ?? [];
+  } catch {
+    return [];
+  }
+}
+
+export type TypingUser = {
+  user_id: string;
+  username: string;
+  full_name?: string | null;
+  updated_at: string;
+};
+
+export async function fetchTyping(token: string, conversationId: string): Promise<TypingUser[]> {
+  const res = await fetch(
+    `/api/tautalk/conversations/typing?conversationId=${encodeURIComponent(conversationId)}`,
+    { headers: headers(token) }
+  );
+  const data = await parseJson<{ typing: TypingUser[] }>(res);
+  return data.typing ?? [];
+}
+
+export async function sendTyping(token: string, conversationId: string) {
+  await fetch('/api/tautalk/conversations/typing', {
+    method: 'POST',
     headers: headers(token),
+    body: JSON.stringify({ conversationId }),
   });
-  const data = await parseJson<{
-    signals: Array<{ id: string; signal_type: string; payload: unknown; created_at: string }>;
-  }>(res);
-  return data.signals ?? [];
+}
+
+export async function fetchContactLabel(
+  token: string,
+  contactUserId: string
+): Promise<string | null> {
+  const res = await fetch(
+    `/api/tautalk/contacts/label?contactUserId=${encodeURIComponent(contactUserId)}`,
+    { headers: headers(token) }
+  );
+  const data = await parseJson<{ label: string | null }>(res);
+  return data.label ?? null;
+}
+
+export async function saveContactLabel(
+  token: string,
+  contactUserId: string,
+  displayName: string
+): Promise<string> {
+  const res = await fetch('/api/tautalk/contacts/label', {
+    method: 'PUT',
+    headers: headers(token),
+    body: JSON.stringify({ contactUserId, displayName }),
+  });
+  const data = await parseJson<{ label: string }>(res);
+  return data.label;
+}
+
+export async function removeContactLabel(token: string, contactUserId: string) {
+  await fetch(
+    `/api/tautalk/contacts/label?contactUserId=${encodeURIComponent(contactUserId)}`,
+    { method: 'DELETE', headers: headers(token) }
+  );
 }

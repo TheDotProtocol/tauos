@@ -24,7 +24,16 @@ export function textPayload(text: string): MessagePayload {
   return { v: 1, kind: 'text', text };
 }
 
+/** Never display legacy decrypt-failure placeholder as message text. */
+export function isDecryptFailureText(text: string | null | undefined): boolean {
+  if (!text) return true;
+  return text === '[Encrypted message]';
+}
+
 export function parsePayload(plaintext: string): MessagePayload {
+  if (isDecryptFailureText(plaintext)) {
+    throw new Error('Cannot parse failed decrypt payload');
+  }
   const trimmed = plaintext.trim();
   if (trimmed.startsWith('{')) {
     try {

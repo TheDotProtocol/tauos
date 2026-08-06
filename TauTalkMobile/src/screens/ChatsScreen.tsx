@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   ActivityIndicator,
   FlatList,
@@ -13,6 +13,7 @@ import {
 import {
   Conversation,
   createConversation,
+  createGroupConversation,
   fetchConversationKeys,
   fetchConversations,
   lookupUser,
@@ -20,6 +21,7 @@ import {
 } from '../api/client';
 import Avatar from '../components/Avatar';
 import GlassPanel from '../components/GlassPanel';
+import MIcon from '../components/MIcon';
 import PrivacyPledge from '../components/PrivacyPledge';
 import { getOrCreateKeyPair } from '../crypto/tautalk-crypto';
 import { colors, radii } from '../theme';
@@ -28,6 +30,7 @@ import {
   displayNameForConversation,
   enrichConversationPeer,
   formatChatTime,
+  matchesConversationSearch,
   usernameForConversation,
 } from '../utils/conversation';
 
@@ -38,6 +41,8 @@ type Props = {
   onOpenProfile: () => void;
   onLogout: () => void;
 };
+
+type NewMode = 'direct' | 'group';
 
 function normalizePeer(raw: Conversation['peer']): Conversation['peer'] {
   if (!raw) return null;
@@ -54,8 +59,12 @@ function normalizePeer(raw: Conversation['peer']): Conversation['peer'] {
 export default function ChatsScreen({ token, user, onOpenChat, onOpenProfile, onLogout }: Props) {
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState('');
   const [showNew, setShowNew] = useState(false);
+  const [newMode, setNewMode] = useState<NewMode>('direct');
   const [newQuery, setNewQuery] = useState('');
+  const [groupTitle, setGroupTitle] = useState('');
+  const [groupMembers, setGroupMembers] = useState('');
   const [creating, setCreating] = useState(false);
   const [error, setError] = useState('');
 
@@ -90,7 +99,22 @@ export default function ChatsScreen({ token, user, onOpenChat, onOpenProfile, on
     })();
   }, [token, refresh]);
 
-  const startChat = async () => {
+  const filtered = useMemo(
+    () => conversations.filter((c) => matchesConversationSearch(c, searchQuery)),
+    [conversations, searchQuery]
+  );
+
+  const resolveMemberIds = async (raw: string): Promise<string[]> => {
+    const queries = raw.split(',').map((s) => s.trim()).filter(Boolean);
+    const ids: string[] = [];
+    for (const q of queries) {
+      const profile = await lookupUser(token, q);
+      if (profile) ids.push(String(profile.id));
+    }
+    return ids;
+  };
+
+  const startDirectChat = async () => {
     if (!newQuery.trim()) return;
     setCreating(true);
     setError('');
@@ -117,6 +141,45 @@ export default function ChatsScreen({ token, user, onOpenChat, onOpenProfile, on
     }
   };
 
+  const startGroupChat = async () => {
+    if (!groupTitle.trim() || !groupMembers.trim()) return;
+    setCreating(true);
+    setError('');
+    try {
+      const memberIds = await resolveMemberIds(groupMembers);
+      if (memberIds.length === 0) {
+        setError('Add at least one valid member email or @username');
+        return;
+      }
+      const data = await createGroupConversation(token, groupTitle.trim(), memberIds);
+      const title = groupTitle.trim();
+      setShowNew(false);
+      setGroupTitle('');
+      setGroupMembers('');
+      await refresh();
+      onOpenChat({
+        id: data.conversation.id,
+        type: 'group',
+        title,
+        updated_at: new Date().toISOString(),
+        last_message_at: null,
+        last_message_encrypted: null,
+        unread_count: 0,
+        peer: null,
+      });
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Could not create group');
+    } finally {
+      setCreating(false);
+    }
+  };
+
+  const openNewModal = (mode: NewMode) => {
+    setNewMode(mode);
+    setShowNew(true);
+    setError('');
+  };
+
   return (
     <View style={styles.container}>
       <StatusBar barStyle="light-content" backgroundColor={colors.whatsappHeader} />
@@ -126,9 +189,7 @@ export default function ChatsScreen({ token, user, onOpenChat, onOpenProfile, on
           <Avatar name={user.fullName || user.username} size={42} gold imageUrl={user.avatarUrl} />
           <View style={styles.headerText}>
             <Text style={styles.headerTitle}>TauTalk</Text>
-            <Text style={styles.headerSub}>
-              @{user.username} · tap for profile
-            </Text>
+            <Text style={styles.headerSub}>@{user.username} · tap for profile</Text>
           </View>
         </Pressable>
         <Pressable onPress={onLogout} style={styles.logoutBtn} hitSlop={8}>
@@ -136,29 +197,57 @@ export default function ChatsScreen({ token, user, onOpenChat, onOpenProfile, on
         </Pressable>
       </View>
 
-      <Pressable style={styles.searchBar} onPress={() => setShowNew(true)}>
-        <Text style={styles.searchPlaceholder}>Search or start new chat</Text>
-        <View style={styles.fabMini}>
-          <Text style={styles.fabMiniText}>+</Text>
-        </View>
-      </Pressable>
+      <View style={styles.searchBar}>
+        <MIcon name="search" size={20} color={colors.textSoft} />
+        <TextInput
+          style={styles.searchInput}
+          placeholder="Search chats"
+          placeholderTextColor={colors.textSoft}
+          value={searchQuery}
+          onChangeText={setSearchQuery}
+          autoCapitalize="none"
+          autoCorrect={false}
+        />
+        {searchQuery ? (
+          <Pressable onPress={() => setSearchQuery('')} hitSlop={8}>
+            <MIcon name="close" size={18} color={colors.textSoft} />
+          </Pressable>
+        ) : null}
+      </View>
 
-      {error ? <Text style={styles.error}>{error}</Text> : null}
+      <View style={styles.actionRow}>
+        <Pressable style={styles.actionChip} onPress={() => openNewModal('direct')}>
+          <MIcon name="person-add" size={18} color={colors.goldLight} />
+          <Text style={styles.actionChipText}>New chat</Text>
+        </Pressable>
+        <Pressable style={styles.actionChip} onPress={() => openNewModal('group')}>
+          <MIcon name="group-add" size={18} color={colors.goldLight} />
+          <Text style={styles.actionChipText}>New group</Text>
+        </Pressable>
+      </View>
+
+      {error && !showNew ? <Text style={styles.error}>{error}</Text> : null}
 
       {loading ? (
         <ActivityIndicator color={colors.goldLight} style={{ marginTop: 48 }} />
       ) : (
         <FlatList
-          data={conversations}
+          data={filtered}
           keyExtractor={(item) => item.id}
           contentContainerStyle={
-            conversations.length === 0 ? styles.emptyList : styles.listContent
+            filtered.length === 0 ? styles.emptyList : styles.listContent
           }
           ListFooterComponent={<PrivacyPledge compact />}
           ListEmptyComponent={
             <View style={styles.emptyWrap}>
-              <Text style={styles.emptyTitle}>No chats yet</Text>
-              <Text style={styles.empty}>Tap above to message someone by email or @username</Text>
+              <Text style={styles.emptyTitle}>
+                {searchQuery ? 'No matches' : 'No chats yet'}
+              </Text>
+              <Text style={styles.empty}>
+                {searchQuery
+                  ? 'Try a different name or @username'
+                  : 'Start a new chat or create a group above'}
+              </Text>
             </View>
           }
           renderItem={({ item }) => {
@@ -177,7 +266,7 @@ export default function ChatsScreen({ token, user, onOpenChat, onOpenProfile, on
                   </View>
                   <View style={styles.rowBottom}>
                     <Text style={styles.rowPreview} numberOfLines={1}>
-                      {handle ? `${handle} · ` : ''}
+                      {item.type === 'group' ? 'Group · ' : handle ? `${handle} · ` : ''}
                       {item.last_message_at ? 'Encrypted message' : 'Say hello 👋'}
                     </Text>
                     {item.unread_count > 0 ? (
@@ -193,32 +282,81 @@ export default function ChatsScreen({ token, user, onOpenChat, onOpenProfile, on
         />
       )}
 
-      <Pressable style={styles.fab} onPress={() => setShowNew(true)}>
-        <Text style={styles.fabText}>+</Text>
-      </Pressable>
-
       <Modal visible={showNew} transparent animationType="slide">
         <View style={styles.modalBackdrop}>
           <GlassPanel style={styles.modalCard} strong>
-            <Text style={styles.modalTitle}>New chat</Text>
-            <Text style={styles.modalHint}>Email, phone, or @username</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="arun@taumail.org or @arun-mail"
-              placeholderTextColor={colors.textSoft}
-              autoCapitalize="none"
-              value={newQuery}
-              onChangeText={setNewQuery}
-            />
+            <View style={styles.modeTabs}>
+              <Pressable
+                style={[styles.modeTab, newMode === 'direct' && styles.modeTabActive]}
+                onPress={() => setNewMode('direct')}>
+                <Text style={[styles.modeTabText, newMode === 'direct' && styles.modeTabTextActive]}>
+                  Direct
+                </Text>
+              </Pressable>
+              <Pressable
+                style={[styles.modeTab, newMode === 'group' && styles.modeTabActive]}
+                onPress={() => setNewMode('group')}>
+                <Text style={[styles.modeTabText, newMode === 'group' && styles.modeTabTextActive]}>
+                  Group
+                </Text>
+              </Pressable>
+            </View>
+
+            {newMode === 'direct' ? (
+              <>
+                <Text style={styles.modalTitle}>New chat</Text>
+                <Text style={styles.modalHint}>Email, phone, or @username</Text>
+                <TextInput
+                  style={styles.input}
+                  placeholder="arun@taumail.org or @arun-mail"
+                  placeholderTextColor={colors.textSoft}
+                  autoCapitalize="none"
+                  value={newQuery}
+                  onChangeText={setNewQuery}
+                />
+              </>
+            ) : (
+              <>
+                <Text style={styles.modalTitle}>New group</Text>
+                <TextInput
+                  style={styles.input}
+                  placeholder="Group name"
+                  placeholderTextColor={colors.textSoft}
+                  value={groupTitle}
+                  onChangeText={setGroupTitle}
+                />
+                <TextInput
+                  style={[styles.input, { marginTop: 10 }]}
+                  placeholder="Members: emails or @usernames, comma separated"
+                  placeholderTextColor={colors.textSoft}
+                  autoCapitalize="none"
+                  value={groupMembers}
+                  onChangeText={setGroupMembers}
+                />
+              </>
+            )}
+
+            {error && showNew ? <Text style={styles.modalError}>{error}</Text> : null}
+
             <View style={styles.modalActions}>
-              <Pressable onPress={() => setShowNew(false)} style={styles.modalSecondary}>
+              <Pressable
+                onPress={() => {
+                  setShowNew(false);
+                  setError('');
+                }}
+                style={styles.modalSecondary}>
                 <Text style={styles.modalSecondaryText}>Cancel</Text>
               </Pressable>
-              <Pressable onPress={startChat} style={styles.modalPrimary} disabled={creating}>
+              <Pressable
+                onPress={newMode === 'direct' ? startDirectChat : startGroupChat}
+                style={styles.modalPrimary}
+                disabled={creating}>
                 {creating ? (
                   <ActivityIndicator color="#1a1200" />
                 ) : (
-                  <Text style={styles.modalPrimaryText}>Start</Text>
+                  <Text style={styles.modalPrimaryText}>
+                    {newMode === 'direct' ? 'Start' : 'Create'}
+                  </Text>
                 )}
               </Pressable>
             </View>
@@ -255,27 +393,36 @@ const styles = StyleSheet.create({
   logout: { color: colors.goldLight, fontWeight: '700', fontSize: 13 },
   searchBar: {
     marginHorizontal: 14,
-    marginVertical: 10,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
+    marginTop: 10,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
     borderRadius: radii.lg,
     backgroundColor: colors.surface,
     borderWidth: 1,
     borderColor: colors.border,
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
+    gap: 10,
   },
-  searchPlaceholder: { color: colors.textSoft, fontSize: 15 },
-  fabMini: {
-    width: 28,
-    height: 28,
-    borderRadius: 14,
-    backgroundColor: colors.goldLight,
+  searchInput: { flex: 1, color: colors.text, fontSize: 15, padding: 0 },
+  actionRow: {
+    flexDirection: 'row',
+    gap: 10,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+  },
+  actionChip: {
+    flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
+    gap: 6,
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderRadius: radii.full,
+    backgroundColor: colors.goldDim,
+    borderWidth: 1,
+    borderColor: colors.glassBorder,
   },
-  fabMiniText: { color: '#1a1200', fontWeight: '800', fontSize: 18, marginTop: -1 },
+  actionChipText: { color: colors.goldLight, fontWeight: '700', fontSize: 13 },
   row: {
     paddingHorizontal: 14,
     paddingVertical: 12,
@@ -310,24 +457,8 @@ const styles = StyleSheet.create({
   emptyTitle: { color: colors.goldLight, fontSize: 18, fontWeight: '700', marginBottom: 8 },
   empty: { color: colors.textMuted, textAlign: 'center', lineHeight: 22 },
   emptyList: { flexGrow: 1, justifyContent: 'center' },
-  listContent: { paddingBottom: 88, paddingHorizontal: 12, paddingTop: 4 },
+  listContent: { paddingBottom: 24, paddingHorizontal: 12, paddingTop: 4 },
   error: { color: colors.danger, textAlign: 'center', paddingHorizontal: 16 },
-  fab: {
-    position: 'absolute',
-    right: 20,
-    bottom: 24,
-    width: 58,
-    height: 58,
-    borderRadius: 29,
-    backgroundColor: colors.goldLight,
-    alignItems: 'center',
-    justifyContent: 'center',
-    shadowColor: colors.goldLight,
-    shadowOpacity: 0.45,
-    shadowRadius: 10,
-    elevation: 6,
-  },
-  fabText: { color: '#1a1200', fontSize: 32, fontWeight: '300', marginTop: -2 },
   modalBackdrop: {
     flex: 1,
     backgroundColor: 'rgba(0,0,0,0.65)',
@@ -338,8 +469,28 @@ const styles = StyleSheet.create({
     borderBottomRightRadius: 0,
     padding: 22,
   },
+  modeTabs: {
+    flexDirection: 'row',
+    gap: 8,
+    marginBottom: 16,
+  },
+  modeTab: {
+    flex: 1,
+    paddingVertical: 10,
+    borderRadius: radii.md,
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: colors.border,
+  },
+  modeTabActive: {
+    backgroundColor: colors.goldDim,
+    borderColor: colors.glassBorder,
+  },
+  modeTabText: { color: colors.textMuted, fontWeight: '700' },
+  modeTabTextActive: { color: colors.goldLight },
   modalTitle: { color: colors.text, fontSize: 22, fontWeight: '800' },
   modalHint: { color: colors.textMuted, marginTop: 4, marginBottom: 14 },
+  modalError: { color: colors.danger, marginTop: 10, fontSize: 13 },
   input: {
     backgroundColor: 'rgba(0,0,0,0.28)',
     borderRadius: radii.md,

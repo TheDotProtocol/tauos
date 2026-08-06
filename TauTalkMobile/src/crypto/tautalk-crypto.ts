@@ -155,11 +155,13 @@ export async function encryptMessage(
   return encryptWithKey(key, plaintext);
 }
 
+export const DECRYPT_FAILURE = '[Encrypted message]' as const;
+
 export async function decryptMessage(
   conversationId: string,
   payload: string,
   ctx?: ConversationCryptoContext
-): Promise<string> {
+): Promise<string | null> {
   const keyBytesList: Uint8Array[] = [];
 
   if (ctx) {
@@ -187,7 +189,7 @@ export async function decryptMessage(
     const text = decryptWithKey(key, payload);
     if (text !== null) return text;
   }
-  return '[Encrypted message]';
+  return null;
 }
 
 export async function generateKeyPair(): Promise<{ publicKey: string; privateKey: string }> {
@@ -202,12 +204,20 @@ export async function generateKeyPair(): Promise<{ publicKey: string; privateKey
 export async function buildCryptoContext(
   conversationId: string,
   convType: string,
-  participants: Array<{ publicKey?: string | null }>
+  participants: Array<{ publicKey?: string | null; publicKeys?: string[] }>
 ): Promise<ConversationCryptoContext> {
   const { publicKey } = await getOrCreateKeyPair();
-  const participantPublicKeys = participants
-    .map((p) => p.publicKey)
-    .filter((k): k is string => Boolean(k));
+  const participantPublicKeys: string[] = [];
+  for (const p of participants) {
+    const keys = p.publicKeys?.length
+      ? p.publicKeys
+      : p.publicKey
+        ? [p.publicKey]
+        : [];
+    for (const k of keys) {
+      if (k && !participantPublicKeys.includes(k)) participantPublicKeys.push(k);
+    }
+  }
   if (!participantPublicKeys.includes(publicKey)) {
     participantPublicKeys.push(publicKey);
   }

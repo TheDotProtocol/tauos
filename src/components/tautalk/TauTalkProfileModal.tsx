@@ -89,9 +89,9 @@ export default function TauTalkProfileModal({ token, open, onClose, onUpdated }:
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4">
-      <div className="w-full max-w-md rounded-2xl border border-gray-700 bg-gray-900 shadow-2xl">
-        <div className="flex items-center justify-between px-5 py-4 border-b border-gray-800">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/70 p-4">
+      <div className="w-full max-w-md rounded-2xl border border-white/[0.08] bg-[#0c0c12] shadow-2xl">
+        <div className="flex items-center justify-between px-5 py-4 border-b border-white/[0.08]">
           <h2 className="text-lg font-bold text-white">Your profile</h2>
           <button type="button" onClick={onClose} className="text-gray-400 hover:text-white p-1">
             <X className="w-5 h-5" />
@@ -133,7 +133,7 @@ export default function TauTalkProfileModal({ token, open, onClose, onUpdated }:
                 <input
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
-                  className="mt-1.5 w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-xl text-white"
+                  className="mt-1.5 w-full px-4 py-3 bg-white/[0.06] border border-white/[0.08] rounded-xl text-white"
                   placeholder="yourname"
                 />
               </div>
@@ -143,7 +143,7 @@ export default function TauTalkProfileModal({ token, open, onClose, onUpdated }:
                 <input
                   value={fullName}
                   onChange={(e) => setFullName(e.target.value)}
-                  className="mt-1.5 w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-xl text-white"
+                  className="mt-1.5 w-full px-4 py-3 bg-white/[0.06] border border-white/[0.08] rounded-xl text-white"
                   placeholder="Your name"
                 />
               </div>
@@ -161,7 +161,7 @@ export default function TauTalkProfileModal({ token, open, onClose, onUpdated }:
                 type="button"
                 onClick={save}
                 disabled={saving}
-                className="w-full py-3 rounded-xl bg-green-500 text-black font-semibold disabled:opacity-50"
+                className="w-full py-3 rounded-xl bg-[#D4AF37] text-[#0f0f0f] font-semibold disabled:opacity-50"
               >
                 {saving ? 'Saving…' : 'Save changes'}
               </button>

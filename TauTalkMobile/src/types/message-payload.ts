@@ -44,7 +44,7 @@ export function payloadPreview(payload: MessagePayload): string {
     case 'image':
       return payload.caption?.trim() || '📷 Photo';
     case 'file':
-      return `📎 ${payload.name}`;
+      return payload.mime.startsWith('audio/') ? '🎤 Voice message' : `📎 ${payload.name}`;
     case 'location':
       return payload.label?.trim() || '📍 Location';
     default:

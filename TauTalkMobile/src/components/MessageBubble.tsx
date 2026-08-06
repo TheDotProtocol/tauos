@@ -7,8 +7,10 @@ import {
   Text,
   View,
 } from 'react-native';
+import SoundPlayer from 'react-native-sound-player';
 import { signedAttachmentUrl } from '../api/client';
 import MIcon from './MIcon';
+import type { ReplyQuote } from './ContactLabelModal';
 import { colors } from '../theme';
 import type { MessagePayload } from '../types/message-payload';
 import { openStreetMapUrl } from '../utils/maps';
@@ -18,10 +20,38 @@ type Props = {
   isMe: boolean;
   token: string;
   time: string;
+  replyQuote?: ReplyQuote | null;
+  senderName?: string;
   onImagePress?: (uri: string) => void;
+  onLongPress?: () => void;
 };
 
-export default function MessageBubble({ payload, isMe, token, time, onImagePress }: Props) {
+function ReplySnippet({ quote }: { quote: ReplyQuote }) {
+  return (
+    <View style={replyStyles.wrap}>
+      <View style={replyStyles.accent} />
+      <View style={replyStyles.body}>
+        <Text style={replyStyles.name} numberOfLines={1}>
+          {quote.senderUsername}
+        </Text>
+        <Text style={replyStyles.preview} numberOfLines={2}>
+          {quote.preview}
+        </Text>
+      </View>
+    </View>
+  );
+}
+
+export default function MessageBubble({
+  payload,
+  isMe,
+  token,
+  time,
+  replyQuote,
+  senderName,
+  onImagePress,
+  onLongPress,
+}: Props) {
   const [mediaUrl, setMediaUrl] = useState<string | null>(
     payload.kind === 'image' || payload.kind === 'file' ? payload.url ?? null : null
   );
@@ -49,13 +79,24 @@ export default function MessageBubble({ payload, isMe, token, time, onImagePress
 
   const bubbleStyle = [styles.bubble, isMe ? styles.bubbleMe : styles.bubbleOther];
 
+  const playAudio = () => {
+    if (!mediaUrl) return;
+    try {
+      SoundPlayer.playUrl(mediaUrl);
+    } catch {
+      Linking.openURL(mediaUrl).catch(() => {});
+    }
+  };
+
   if (payload.kind === 'text') {
     return (
       <View style={[styles.row, isMe ? styles.rowMe : styles.rowOther]}>
-        <View style={bubbleStyle}>
+        {!isMe && senderName ? <Text style={styles.senderName}>{senderName}</Text> : null}
+        <Pressable style={bubbleStyle} onLongPress={onLongPress} delayLongPress={400}>
+          {replyQuote ? <ReplySnippet quote={replyQuote} /> : null}
           <Text style={[styles.text, isMe && styles.textMe]}>{payload.text}</Text>
           <Text style={[styles.time, isMe && styles.timeMe]}>{time}</Text>
-        </View>
+        </Pressable>
       </View>
     );
   }
@@ -63,7 +104,9 @@ export default function MessageBubble({ payload, isMe, token, time, onImagePress
   if (payload.kind === 'image') {
     return (
       <View style={[styles.row, isMe ? styles.rowMe : styles.rowOther]}>
-        <View style={[bubbleStyle, styles.mediaBubble]}>
+        {!isMe && senderName ? <Text style={styles.senderName}>{senderName}</Text> : null}
+        <Pressable style={[bubbleStyle, styles.mediaBubble]} onLongPress={onLongPress} delayLongPress={400}>
+          {replyQuote ? <ReplySnippet quote={replyQuote} /> : null}
           {mediaUrl ? (
             <Pressable onPress={() => onImagePress?.(mediaUrl)}>
               <Image source={{ uri: mediaUrl }} style={styles.image} resizeMode="cover" />
@@ -75,7 +118,7 @@ export default function MessageBubble({ payload, isMe, token, time, onImagePress
             <Text style={[styles.text, isMe && styles.textMe, styles.caption]}>{payload.caption}</Text>
           ) : null}
           <Text style={[styles.time, isMe && styles.timeMe]}>{time}</Text>
-        </View>
+        </Pressable>
       </View>
     );
   }
@@ -84,15 +127,19 @@ export default function MessageBubble({ payload, isMe, token, time, onImagePress
     const isAudio = payload.mime.startsWith('audio/');
     return (
       <View style={[styles.row, isMe ? styles.rowMe : styles.rowOther]}>
+        {!isMe && senderName ? <Text style={styles.senderName}>{senderName}</Text> : null}
         <Pressable
           style={bubbleStyle}
-          onPress={() => !isAudio && mediaUrl && Linking.openURL(mediaUrl)}
-          disabled={isAudio || !mediaUrl}>
+          onPress={() => (isAudio ? playAudio() : mediaUrl && Linking.openURL(mediaUrl))}
+          onLongPress={onLongPress}
+          delayLongPress={400}
+          disabled={!isAudio && !mediaUrl}>
+          {replyQuote ? <ReplySnippet quote={replyQuote} /> : null}
           {isAudio ? (
             <>
               <MIcon name="mic" size={22} color={colors.goldLight} style={styles.fileIcon} />
               <Text style={[styles.text, isMe && styles.textMe]}>
-                {mediaUrl ? 'Voice message' : 'Loading voice…'}
+                {mediaUrl ? 'Tap to play voice message' : 'Loading voice…'}
               </Text>
             </>
           ) : (
@@ -114,7 +161,13 @@ export default function MessageBubble({ payload, isMe, token, time, onImagePress
     const mapsUrl = openStreetMapUrl(payload.lat, payload.lng);
     return (
       <View style={[styles.row, isMe ? styles.rowMe : styles.rowOther]}>
-        <Pressable style={bubbleStyle} onPress={() => Linking.openURL(mapsUrl)}>
+        {!isMe && senderName ? <Text style={styles.senderName}>{senderName}</Text> : null}
+        <Pressable
+          style={bubbleStyle}
+          onPress={() => Linking.openURL(mapsUrl)}
+          onLongPress={onLongPress}
+          delayLongPress={400}>
+          {replyQuote ? <ReplySnippet quote={replyQuote} /> : null}
           <MIcon name="location-on" size={22} color={colors.goldLight} style={styles.fileIcon} />
           <Text style={[styles.text, isMe && styles.textMe]}>
             {payload.label || 'Shared location'}
@@ -132,10 +185,25 @@ export default function MessageBubble({ payload, isMe, token, time, onImagePress
   return null;
 }
 
+const replyStyles = StyleSheet.create({
+  wrap: {
+    flexDirection: 'row',
+    marginBottom: 8,
+    borderRadius: 8,
+    overflow: 'hidden',
+    backgroundColor: 'rgba(0,0,0,0.2)',
+  },
+  accent: { width: 3, backgroundColor: colors.gold },
+  body: { flex: 1, paddingHorizontal: 8, paddingVertical: 6 },
+  name: { color: colors.gold, fontSize: 11, fontWeight: '700' },
+  preview: { color: colors.textMuted, fontSize: 11, marginTop: 2 },
+});
+
 const styles = StyleSheet.create({
-  row: { marginBottom: 8, flexDirection: 'row' },
-  rowMe: { justifyContent: 'flex-end' },
-  rowOther: { justifyContent: 'flex-start' },
+  row: { marginBottom: 8 },
+  rowMe: { alignItems: 'flex-end' },
+  rowOther: { alignItems: 'flex-start' },
+  senderName: { color: colors.gold, fontSize: 11, marginBottom: 4, marginLeft: 4 },
   bubble: {
     maxWidth: '80%',
     borderRadius: 18,

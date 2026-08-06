@@ -88,7 +88,7 @@ export async function deriveConversationKey(
   const { privateKey } = await getOrCreateKeyPair();
   const others = ctx.participantPublicKeys.filter((k) => k && k !== ctx.myPublicKey);
 
-  if (ctx.type === 'direct' && others.length === 1) {
+  if (ctx.type === 'direct' && others.length >= 1) {
     return deriveDirectKey(conversationId, privateKey, others[0]);
   }
   const allKeys = ctx.participantPublicKeys.filter(Boolean);
@@ -115,12 +115,28 @@ export async function encryptMessage(
   return btoa(Array.from(combined, (b) => String.fromCharCode(b)).join(''));
 }
 
+/** Legacy failure string — never treat as message text. */
+export const DECRYPT_FAILURE = '[Encrypted message]' as const;
+
 export async function decryptMessage(
   conversationId: string,
   payload: string,
   ctx?: ConversationCryptoContext
-): Promise<string> {
+): Promise<string | null> {
+  if (!payload?.trim()) return null;
+
+  let combined: Uint8Array;
+  try {
+    combined = Uint8Array.from(atob(payload), (c) => c.charCodeAt(0));
+  } catch {
+    return null;
+  }
+  if (combined.length < 13) return null;
+
   const keys: CryptoKey[] = [];
+
+  // Legacy messages first — fastest path for older chats
+  keys.push(await deriveLegacyKey(conversationId));
 
   if (ctx) {
     try {
@@ -142,9 +158,6 @@ export async function decryptMessage(
     }
   }
 
-  keys.push(await deriveLegacyKey(conversationId));
-
-  const combined = Uint8Array.from(atob(payload), (c) => c.charCodeAt(0));
   const iv = combined.slice(0, 12);
   const data = combined.slice(12);
 
@@ -161,7 +174,7 @@ export async function decryptMessage(
       /* try next key */
     }
   }
-  return '[Encrypted message]';
+  return null;
 }
 
 export async function generateKeyPair(): Promise<{ publicKey: string; privateKey: string }> {

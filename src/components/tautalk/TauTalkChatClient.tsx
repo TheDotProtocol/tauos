@@ -12,6 +12,9 @@ import {
   displayNameForConversation,
   usernameLabel,
   peerAvatar,
+  peerRealName,
+  peerUserId,
+  withContactLabel,
   normalizeConversations,
   type TalkConversation,
 } from '@/lib/tautalk-conversation-utils';
@@ -20,6 +23,8 @@ import {
   fetchConversationKeys,
   fetchIncomingCalls,
   fetchCallSession,
+  fetchTyping,
+  sendTyping,
   startCall,
   declineCall,
   uploadAttachment,
@@ -30,20 +35,29 @@ import { ensureCallNotificationPermission, notifyIncomingCall } from '@/lib/taut
 import {
   contentTypeForPayload,
   parsePayload,
+  payloadPreview,
   textPayload,
   type MessagePayload,
 } from '@/lib/tautalk-message-payload';
 import TauTalkMessageBubble from '@/components/tautalk/TauTalkMessageBubble';
 import TauTalkAttachSheet from '@/components/tautalk/TauTalkAttachSheet';
+import TauTalkEmojiPicker from '@/components/tautalk/TauTalkEmojiPicker';
+import TauTalkMessageContextMenu, {
+  TauTalkReplyBar,
+  type MessageContextMenuState,
+  type ReplyQuote,
+} from '@/components/tautalk/TauTalkMessageContextMenu';
 import { TAUTALK_UNAVAILABLE_MESSAGE } from '@/lib/tautalk-call-constants';
 import { startIncomingRing, startOutgoingRingback, stopCallSounds } from '@/lib/tautalk-call-sounds';
 import { WebCallManager, type WebCallMediaState } from '@/lib/tautalk-web-call';
 import TauTalkAvatar from '@/components/tautalk/TauTalkAvatar';
 import TauTalkProfileModal from '@/components/tautalk/TauTalkProfileModal';
+import TauTalkContactModal from '@/components/tautalk/TauTalkContactModal';
 import TauTalkCallOverlay from '@/components/tautalk/TauTalkCallOverlay';
 import TauTalkIncomingCall from '@/components/tautalk/TauTalkIncomingCall';
+import { tauTalkAssets } from '@/lib/tautalk-ui/assets';
+import Image from 'next/image';
 import {
-  MessageCircle,
   Send,
   Plus,
   Paperclip,
@@ -73,11 +87,12 @@ const emptyCallMedia: WebCallMediaState = {
 export default function TauTalkChatClient() {
   const { user, token, ready } = useTauSession({
     requireAuth: true,
-    loginPath: '/tauid/login?redirect=/tautalk/chat',
+    loginPath: '/tautalk/login?redirect=/tautalk/chat',
   });
 
   const [profile, setProfile] = useState<TalkProfile | null>(null);
   const [showProfile, setShowProfile] = useState(false);
+  const [showContact, setShowContact] = useState(false);
   const [conversations, setConversations] = useState<TalkConversation[]>([]);
   const [activeId, setActiveId] = useState<string | null>(null);
   const [messages, setMessages] = useState<any[]>([]);
@@ -103,11 +118,17 @@ export default function TauTalkChatClient() {
   const [callMode, setCallMode] = useState<'voice' | 'video'>('voice');
   const [callError, setCallError] = useState('');
   const [callMedia, setCallMedia] = useState<WebCallMediaState>(emptyCallMedia);
+  const [typingNames, setTypingNames] = useState<string[]>([]);
+  const [replyTarget, setReplyTarget] = useState<ReplyQuote | null>(null);
+  const [contextMenu, setContextMenu] = useState<MessageContextMenuState | null>(null);
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
 
   const bottomRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
   const eventSourceRef = useRef<EventSource | null>(null);
   const callManagerRef = useRef<WebCallManager | null>(null);
   const cryptoCtxRef = useRef<ConversationCryptoContext | null>(null);
+  const typingDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [callPeerName, setCallPeerName] = useState('');
   const lastNotifiedCallRef = useRef<string | null>(null);
   const isOutgoingCallRef = useRef(false);
@@ -116,6 +137,11 @@ export default function TauTalkChatClient() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const voiceChunksRef = useRef<Blob[]>([]);
+  const identityRegisteredRef = useRef(false);
+  const loadConvTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const activeConvTypeRef = useRef<'direct' | 'group'>('direct');
+  const preparedConvIdRef = useRef<string | null>(null);
+  const [decryptFailed, setDecryptFailed] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
     cryptoCtxRef.current = cryptoCtx;
@@ -146,14 +172,93 @@ export default function TauTalkChatClient() {
     }
   }, [token]);
 
+  const scheduleLoadConversations = useCallback(() => {
+    if (loadConvTimerRef.current) clearTimeout(loadConvTimerRef.current);
+    loadConvTimerRef.current = setTimeout(() => {
+      void loadConversations();
+    }, 350);
+  }, [loadConversations]);
+
+  const onContactLabelUpdated = useCallback((contactUserId: string, label: string | null) => {
+    setConversations((prev) =>
+      prev.map((c) => withContactLabel(c, contactUserId, label))
+    );
+  }, []);
+
+  const replyQuoteFor = useCallback(
+    (message: { reply_to?: string | null }): ReplyQuote | null => {
+      if (!message.reply_to) return null;
+      const parent = messages.find((x) => x.id === message.reply_to);
+      if (!parent) {
+        return {
+          id: message.reply_to,
+          senderUsername: 'Unknown',
+          preview: 'Original message',
+        };
+      }
+      const parentPayload = decrypted[parent.id];
+      const isParentMe =
+        String(parent.sender_id) === String(user?.id) ||
+        parent.sender_username === user?.username;
+      return {
+        id: parent.id,
+        senderUsername: isParentMe ? 'You' : parent.sender_username || 'Contact',
+        preview: parentPayload ? payloadPreview(parentPayload) : '…',
+      };
+    },
+    [messages, decrypted, user?.id, user?.username]
+  );
+
+  const startReplyToMessage = useCallback(
+    (messageId: string) => {
+      const m = messages.find((x) => x.id === messageId);
+      if (!m) return;
+      const payload = decrypted[m.id];
+      if (!payload) return;
+      const isMe =
+        String(m.sender_id) === String(user?.id) || m.sender_username === user?.username;
+      setReplyTarget({
+        id: m.id,
+        senderUsername: isMe ? 'You' : m.sender_username || 'Contact',
+        preview: payloadPreview(payload),
+      });
+      setShowEmojiPicker(false);
+      inputRef.current?.focus();
+    },
+    [messages, decrypted, user?.id, user?.username]
+  );
+
+  const insertEmoji = useCallback((emoji: string) => {
+    setInput((prev) => prev + emoji);
+    inputRef.current?.focus();
+  }, []);
+
   const decryptAll = useCallback(
     async (msgs: any[], conversationId: string, ctx: ConversationCryptoContext | null) => {
+      if (!ctx) return;
       const dec: Record<string, MessagePayload> = {};
+      const failed: Record<string, boolean> = {};
       for (const m of msgs) {
-        const plain = await decryptMessage(conversationId, m.content_encrypted, ctx ?? undefined);
-        dec[m.id] = parsePayload(plain);
+        let success = false;
+        for (let attempt = 0; attempt < 6; attempt++) {
+          const plain = await decryptMessage(conversationId, m.content_encrypted, ctx);
+          if (plain !== null) {
+            dec[m.id] = parsePayload(plain);
+            success = true;
+            break;
+          }
+          if (attempt < 5) {
+            await new Promise((r) => setTimeout(r, 150 * (attempt + 1)));
+          }
+        }
+        if (!success) failed[m.id] = true;
       }
-      setDecrypted(dec);
+      setDecrypted((prev) => ({ ...prev, ...dec }));
+      setDecryptFailed((prev) => {
+        const next = { ...prev };
+        for (const id of Object.keys(dec)) delete next[id];
+        return { ...next, ...failed };
+      });
     },
     []
   );
@@ -162,9 +267,23 @@ export default function TauTalkChatClient() {
     async (conversationId: string, messageId: string, contentEncrypted: string) => {
       const ctx = cryptoCtxRef.current;
       if (!ctx) return;
-      const plain = await decryptMessage(conversationId, contentEncrypted, ctx);
-      const payload = parsePayload(plain);
-      setDecrypted((prev) => ({ ...prev, [messageId]: payload }));
+      for (let attempt = 0; attempt < 6; attempt++) {
+        const plain = await decryptMessage(conversationId, contentEncrypted, ctx);
+        if (plain !== null) {
+          const payload = parsePayload(plain);
+          setDecrypted((prev) => ({ ...prev, [messageId]: payload }));
+          setDecryptFailed((prev) => {
+            const next = { ...prev };
+            delete next[messageId];
+            return next;
+          });
+          return;
+        }
+        if (attempt < 5) {
+          await new Promise((r) => setTimeout(r, 150 * (attempt + 1)));
+        }
+      }
+      setDecryptFailed((prev) => ({ ...prev, [messageId]: true }));
     },
     []
   );
@@ -172,16 +291,28 @@ export default function TauTalkChatClient() {
   const prepareConversation = useCallback(
     async (conversationId: string, convType: string) => {
       if (!token) return null;
-      setCryptoReady(false);
-      setCryptoError('');
+      const switching = preparedConvIdRef.current !== conversationId;
+      if (switching) {
+        setCryptoReady(false);
+        setCryptoError('');
+      }
       try {
-        await registerIdentityKey(token);
+        if (!identityRegisteredRef.current) {
+          await registerIdentityKey(token);
+          identityRegisteredRef.current = true;
+        }
         const parts = await fetchConversationKeys(token, conversationId);
         setParticipants(parts);
-        const ctx = await buildCryptoContext(conversationId, convType, parts);
+        const ctx = await buildCryptoContext(conversationId, convType, parts, token);
+        if (convType !== 'group' && parts.some((p) => !p.publicKey && !(p.publicKeys?.length))) {
+          setCryptoError('Contact encryption keys are still syncing. Messages may take a moment.');
+        } else {
+          setCryptoError('');
+        }
         setCryptoCtx(ctx);
         cryptoCtxRef.current = ctx;
         setCryptoReady(true);
+        preparedConvIdRef.current = conversationId;
         return ctx;
       } catch (e) {
         setCryptoError(e instanceof Error ? e.message : 'Encryption setup failed');
@@ -209,9 +340,16 @@ export default function TauTalkChatClient() {
   );
 
   useEffect(() => {
-    if (!ready || !token) return;
+    if (!ready) return;
+    if (!token) {
+      setLoading(false);
+      return;
+    }
     registerIdentityKey(token)
-      .then(() => loadConversations())
+      .then(() => {
+        identityRegisteredRef.current = true;
+        return loadConversations();
+      })
       .finally(() => setLoading(false));
   }, [ready, token, loadConversations]);
 
@@ -241,7 +379,7 @@ export default function TauTalkChatClient() {
       }
     };
     poll();
-    const id = setInterval(poll, 1000);
+    const id = setInterval(poll, 2500);
     return () => clearInterval(id);
   }, [token, callOpen]);
 
@@ -278,17 +416,12 @@ export default function TauTalkChatClient() {
   }, []);
 
   useEffect(() => {
-    if (!cryptoCtx || !activeId || messages.length === 0) return;
-    void decryptAll(messages, activeId, cryptoCtx);
-  }, [cryptoCtx, activeId, messages, decryptAll]);
-
-  useEffect(() => {
     if (!activeId || !token) return;
     let cancelled = false;
-    const conv = conversations.find((c) => c.id === activeId);
+    const convType = activeConvTypeRef.current;
 
     (async () => {
-      const ctx = await prepareConversation(activeId, conv?.type ?? 'direct');
+      const ctx = await prepareConversation(activeId, convType);
       if (cancelled || !ctx) return;
       await loadMessages(activeId, ctx);
     })();
@@ -303,6 +436,11 @@ export default function TauTalkChatClient() {
         setMessages((prev) => {
           if (prev.some((x) => x.id === m.id)) return prev;
           return [...prev, m];
+        });
+        setDecryptFailed((prev) => {
+          const next = { ...prev };
+          delete next[m.id];
+          return next;
         });
         const tryDecrypt = () => decryptOne(activeId, m.id, m.content_encrypted);
         if (cryptoCtxRef.current) {
@@ -326,19 +464,65 @@ export default function TauTalkChatClient() {
       cancelled = true;
       es.close();
     };
-  }, [activeId, token, conversations, prepareConversation, loadMessages, decryptOne]);
+  }, [activeId, token, prepareConversation, loadMessages, decryptOne]);
+
+  // Retry decrypt for messages still pending
+  useEffect(() => {
+    if (!activeId || !cryptoCtx) return;
+
+    const id = window.setInterval(() => {
+      const pending = messages.filter((m) => !decrypted[m.id] && !decryptFailed[m.id]);
+      for (const m of pending) {
+        void decryptOne(activeId, m.id, m.content_encrypted);
+      }
+    }, 3000);
+    return () => window.clearInterval(id);
+  }, [activeId, cryptoCtx, messages, decrypted, decryptFailed, decryptOne]);
+
+  useEffect(() => {
+    if (!activeId || !token) {
+      setTypingNames([]);
+      return;
+    }
+    const poll = () => {
+      fetchTyping(token, activeId)
+        .then((rows) => {
+          const names = rows
+            .filter((r) => r.username !== user?.username)
+            .map((r) => r.full_name || r.username);
+          setTypingNames(names);
+        })
+        .catch(() => setTypingNames([]));
+    };
+    poll();
+    const id = setInterval(poll, 2000);
+    return () => clearInterval(id);
+  }, [activeId, token, user?.username]);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
   const selectConversation = async (id: string) => {
+    const conv = conversations.find((c) => c.id === id);
+    activeConvTypeRef.current = conv?.type ?? 'direct';
+    preparedConvIdRef.current = null;
     setActiveId(id);
     setMobileShowChat(true);
     setSendError('');
     setDecrypted({});
+    setDecryptFailed({});
     setMessages([]);
+    setCryptoCtx(null);
+    cryptoCtxRef.current = null;
+    setCryptoReady(false);
+    setCryptoError('');
+    setReplyTarget(null);
+    setContextMenu(null);
+    setShowEmojiPicker(false);
   };
+
+  const openProfile = () => setShowProfile(true);
 
   const sendPayload = async (payload: MessagePayload) => {
     if (!activeId || !token || !cryptoCtxRef.current) {
@@ -348,6 +532,7 @@ export default function TauTalkChatClient() {
 
     setSending(true);
     setSendError('');
+    const replyToId = replyTarget?.id;
     try {
       const json = JSON.stringify(payload);
       const encrypted = await encryptMessage(activeId, json, cryptoCtxRef.current);
@@ -358,6 +543,7 @@ export default function TauTalkChatClient() {
           conversationId: activeId,
           contentEncrypted: encrypted,
           contentType: contentTypeForPayload(payload),
+          replyTo: replyToId,
         }),
       });
       const data = await res.json();
@@ -369,7 +555,8 @@ export default function TauTalkChatClient() {
         return [...prev, { ...saved, sender_username: user?.username }];
       });
       setDecrypted((prev) => ({ ...prev, [saved.id]: payload }));
-      await loadConversations();
+      setReplyTarget(null);
+      scheduleLoadConversations();
     } catch (err) {
       setSendError(err instanceof Error ? err.message : 'Could not send message');
     } finally {
@@ -685,10 +872,18 @@ export default function TauTalkChatClient() {
     }
   };
 
-  if (loading || !ready) {
+  if (!ready || loading) {
     return (
-      <div className="min-h-screen bg-[#0a0a0f] flex items-center justify-center text-gray-400">
+      <div className="min-h-screen bg-[#050508] flex items-center justify-center text-[#9ca3af]">
         Loading Tau Talk...
+      </div>
+    );
+  }
+
+  if (!token) {
+    return (
+      <div className="min-h-screen bg-[#050508] flex items-center justify-center text-[#9ca3af]">
+        Redirecting to sign in…
       </div>
     );
   }
@@ -696,41 +891,57 @@ export default function TauTalkChatClient() {
   const activeConv = conversations.find((c) => c.id === activeId);
   const activePeerName = activeConv ? displayNameForConversation(activeConv, user?.id) : '';
   const activePeerHandle = activeConv ? usernameLabel(activeConv) : null;
+  const activePeerId = activeConv ? peerUserId(activeConv) : null;
+  const activePeerRealName = activeConv ? peerRealName(activeConv) : '';
+
   const myName = profile?.fullName || user?.fullName || user?.username || user?.email || 'You';
   const myAvatar = profile?.avatarUrl ?? null;
+  const typingLabel =
+    typingNames.length === 0
+      ? null
+      : typingNames.length === 1
+        ? `${typingNames[0]} is typing…`
+        : `${typingNames.slice(0, 2).join(', ')} are typing…`;
 
   return (
-    <div className="h-screen flex flex-col bg-[#0a0a0f] text-white">
-      <header className="flex items-center justify-between px-4 py-3 border-b border-gray-800 bg-gray-900/80">
+    <div className="h-screen flex flex-col bg-[#050508] text-[#f5f5f7]">
+      <header className="flex items-center justify-between px-4 py-3 border-b border-white/[0.08] bg-[#0b141a]">
         <div className="flex items-center gap-3">
           {mobileShowChat && (
             <button
               onClick={() => setMobileShowChat(false)}
-              className="sm:hidden p-1 text-gray-400"
+              className="sm:hidden p-1 text-[#9ca3af]"
               aria-label="Back"
             >
               <ArrowLeft className="w-5 h-5" />
             </button>
           )}
-          <MessageCircle className="w-6 h-6 text-green-400 shrink-0" />
+          <Image
+            src={tauTalkAssets.brand.icon}
+            alt="Tau Talk"
+            width={32}
+            height={32}
+            className="rounded-lg shrink-0"
+          />
           <div>
             <h1 className="font-bold">Tau Talk</h1>
-            <p className="text-xs text-green-400 flex items-center gap-1">
-              <Lock className="w-3 h-3" /> Encrypted · Web
+            <p className="text-xs text-[#D4AF37] flex items-center gap-1">
+              <Lock className="w-3 h-3" /> E2EE Secured · Web
             </p>
           </div>
         </div>
         <div className="flex items-center gap-2 sm:gap-3">
           <button
             type="button"
-            onClick={() => setShowProfile(true)}
-            className="flex items-center gap-2 px-2 py-1 rounded-lg hover:bg-gray-800 transition-colors"
+            onClick={openProfile}
+            className="flex items-center gap-2 px-3 py-1.5 rounded-lg hover:bg-white/[0.06] transition-colors border border-transparent hover:border-[rgba(212,175,55,0.25)]"
+            aria-label="Open your profile"
           >
             <TauTalkAvatar name={myName} imageUrl={myAvatar} size={36} />
-            <span className="text-sm text-gray-300 hidden md:block max-w-[140px] truncate">
+            <span className="text-sm font-medium text-[#f5f5f7] max-w-[120px] sm:max-w-[140px] truncate">
               {myName}
             </span>
-            <User className="w-4 h-4 text-gray-500 hidden sm:block" />
+            <User className="w-4 h-4 text-[#D4AF37] shrink-0" />
           </button>
           <button
             onClick={() => {
@@ -738,7 +949,7 @@ export default function TauTalkChatClient() {
               localStorage.removeItem('tauos_token');
               window.location.href = '/tautalk';
             }}
-            className="p-2 text-gray-400 hover:text-white"
+            className="p-2 text-[#9ca3af] hover:text-white"
             title="Logout"
           >
             <LogOut className="w-4 h-4" />
@@ -750,25 +961,25 @@ export default function TauTalkChatClient() {
         <aside
           className={`${
             mobileShowChat ? 'hidden sm:flex' : 'flex'
-          } w-full sm:w-80 border-r border-gray-800 flex-col shrink-0`}
+          } w-full sm:w-80 border-r border-white/[0.08] flex-col shrink-0 bg-[#0c0c12]`}
         >
           <div className="p-3 flex gap-2">
             <button
               onClick={() => setShowNewChat(true)}
-              className="flex-1 flex items-center justify-center gap-2 py-2 bg-green-500/20 text-green-400 rounded-lg text-sm font-medium"
+              className="flex-1 flex items-center justify-center gap-2 py-2 bg-[rgba(212,175,55,0.15)] text-[#D4AF37] rounded-lg text-sm font-medium"
             >
               <Plus className="w-4 h-4" /> New chat
             </button>
             <button
               onClick={() => setShowNewGroup(true)}
-              className="flex items-center justify-center gap-1 px-3 py-2 bg-gray-800 text-gray-300 rounded-lg text-sm"
+              className="flex items-center justify-center gap-1 px-3 py-2 bg-white/[0.06] text-[#9ca3af] rounded-lg text-sm"
             >
               <Users className="w-4 h-4" />
             </button>
           </div>
           <div className="flex-1 overflow-y-auto">
             {conversations.length === 0 ? (
-              <p className="text-center text-gray-500 text-sm p-6">No conversations yet.</p>
+              <p className="text-center text-[#6b7280] text-sm p-6">No conversations yet.</p>
             ) : (
               conversations.map((c) => {
                 const name = displayNameForConversation(c, user?.id);
@@ -777,8 +988,8 @@ export default function TauTalkChatClient() {
                   <button
                     key={c.id}
                     onClick={() => selectConversation(c.id)}
-                    className={`w-full text-left px-4 py-3 border-b border-gray-800/50 hover:bg-gray-800/50 flex gap-3 items-center ${
-                      activeId === c.id ? 'bg-gray-800' : ''
+                    className={`w-full text-left px-4 py-3 border-b border-white/[0.06] hover:bg-white/[0.04] flex gap-3 items-center ${
+                      activeId === c.id ? 'bg-white/[0.06]' : ''
                     }`}
                   >
                     <TauTalkAvatar
@@ -790,15 +1001,15 @@ export default function TauTalkChatClient() {
                       <div className="flex justify-between items-start gap-2">
                         <span className="font-medium truncate">{name}</span>
                         {c.unread_count > 0 && (
-                          <span className="text-xs bg-green-500 text-black px-1.5 rounded-full shrink-0">
+                          <span className="text-xs bg-[#D4AF37] text-[#0f0f0f] px-1.5 rounded-full shrink-0">
                             {c.unread_count}
                           </span>
                         )}
                       </div>
                       {handle ? (
-                        <p className="text-xs text-green-400/80 truncate">{handle}</p>
+                        <p className="text-xs text-[#D4AF37]/80 truncate">{handle}</p>
                       ) : null}
-                      <p className="text-xs text-gray-500 mt-0.5 truncate">
+                      <p className="text-xs text-[#6b7280] mt-0.5 truncate">
                         {c.last_message_at
                           ? new Date(c.last_message_at).toLocaleString()
                           : 'No messages'}
@@ -809,42 +1020,82 @@ export default function TauTalkChatClient() {
               })
             )}
           </div>
+
+          <button
+            type="button"
+            onClick={openProfile}
+            className="m-3 mt-auto flex items-center gap-3 rounded-xl border border-white/[0.08] bg-white/[0.04] p-3 text-left hover:bg-white/[0.06] hover:border-[rgba(212,175,55,0.25)] transition-colors"
+          >
+            <TauTalkAvatar name={myName} imageUrl={myAvatar} size={40} />
+            <div className="min-w-0 flex-1">
+              <p className="text-sm font-semibold truncate text-[#f5f5f7]">{myName}</p>
+              <p className="text-xs text-[#D4AF37]">Edit profile · photo · username</p>
+            </div>
+            <User className="w-4 h-4 text-[#D4AF37] shrink-0" />
+          </button>
         </aside>
 
         <main
           className={`${
             !mobileShowChat && !activeId ? 'hidden sm:flex' : 'flex'
-          } flex-1 flex-col min-w-0 min-h-0`}
+          } flex-1 flex-col min-w-0 min-h-0 bg-[#0a1014]`}
         >
           {!activeId ? (
-            <div className="flex-1 flex flex-col items-center justify-center text-gray-500 gap-4 p-6">
-              <Shield className="w-16 h-16 text-green-500/30" />
+            <div className="flex-1 flex flex-col items-center justify-center text-[#6b7280] gap-4 p-6">
+              <Shield className="w-16 h-16 text-[#D4AF37]/30" />
               <p>Select a conversation or start a new chat</p>
             </div>
           ) : (
             <>
-              <div className="px-4 py-3 border-b border-gray-800 flex items-center justify-between gap-3 shrink-0">
-                <div className="flex items-center gap-3 min-w-0">
-                  <TauTalkAvatar
-                    name={activePeerName}
-                    imageUrl={activeConv?.type === 'direct' ? peerAvatar(activeConv) : null}
-                    size={40}
-                  />
-                  <div className="min-w-0">
-                    <p className="font-semibold truncate">{activePeerName}</p>
-                    {activePeerHandle ? (
-                      <p className="text-xs text-green-400/80 truncate">{activePeerHandle}</p>
-                    ) : activeConv?.type === 'group' ? (
-                      <p className="text-xs text-gray-500">{participants.length} members</p>
-                    ) : null}
+              <div className="px-4 py-3 border-b border-white/[0.08] flex items-center justify-between gap-3 shrink-0 bg-[#0b141a]">
+                {activeConv?.type === 'direct' ? (
+                  <button
+                    type="button"
+                    onClick={() => setShowContact(true)}
+                    className="flex items-center gap-3 min-w-0 text-left hover:opacity-90 transition-opacity"
+                    title="Edit contact name"
+                  >
+                    <TauTalkAvatar
+                      name={activePeerName}
+                      imageUrl={peerAvatar(activeConv)}
+                      size={40}
+                    />
+                    <div className="min-w-0">
+                      <p className="font-semibold truncate">{activePeerName}</p>
+                      {typingLabel ? (
+                        <p className="text-xs text-[#D4AF37] truncate">{typingLabel}</p>
+                      ) : activePeerHandle ? (
+                        <p className="text-xs text-[#D4AF37]/80 truncate">
+                          {activePeerRealName !== activePeerName
+                            ? `${activePeerRealName} · E2EE`
+                            : 'E2EE Secured Session'}
+                        </p>
+                      ) : null}
+                    </div>
+                  </button>
+                ) : (
+                  <div className="flex items-center gap-3 min-w-0">
+                    <TauTalkAvatar
+                      name={activePeerName}
+                      imageUrl={null}
+                      size={40}
+                    />
+                    <div className="min-w-0">
+                      <p className="font-semibold truncate">{activePeerName}</p>
+                      {typingLabel ? (
+                        <p className="text-xs text-[#D4AF37] truncate">{typingLabel}</p>
+                      ) : (
+                        <p className="text-xs text-[#6b7280]">{participants.length} members</p>
+                      )}
+                    </div>
                   </div>
-                </div>
+                )}
                 {activeConv?.type === 'direct' ? (
                   <div className="flex items-center gap-1 shrink-0">
                     <button
                       type="button"
                       onClick={() => beginCall('voice')}
-                      className="p-2.5 rounded-full hover:bg-gray-800 text-green-400"
+                      className="p-2.5 rounded-full hover:bg-white/[0.06] text-[#D4AF37]"
                       title="Voice call"
                     >
                       <Phone className="w-5 h-5" />
@@ -852,7 +1103,7 @@ export default function TauTalkChatClient() {
                     <button
                       type="button"
                       onClick={() => beginCall('video')}
-                      className="p-2.5 rounded-full hover:bg-gray-800 text-green-400"
+                      className="p-2.5 rounded-full hover:bg-white/[0.06] text-[#D4AF37]"
                       title="Video call"
                     >
                       <Video className="w-5 h-5" />
@@ -874,8 +1125,8 @@ export default function TauTalkChatClient() {
                   const time = new Date(m.created_at).toLocaleTimeString();
                   return (
                     <div key={m.id}>
-                      {!isMe && (
-                        <p className="text-xs text-green-400 mb-1 px-1">{m.sender_username}</p>
+                      {!isMe && activeConv?.type === 'group' && (
+                        <p className="text-xs text-[#D4AF37] mb-1 px-1">{m.sender_username}</p>
                       )}
                       {payload ? (
                         <TauTalkMessageBubble
@@ -883,10 +1134,25 @@ export default function TauTalkChatClient() {
                           isMe={isMe}
                           token={token!}
                           time={time}
+                          replyQuote={replyQuoteFor(m)}
+                          onContextMenu={(e) => {
+                            e.preventDefault();
+                            setContextMenu({
+                              x: e.clientX,
+                              y: e.clientY,
+                              messageId: m.id,
+                            });
+                          }}
                         />
+                      ) : decryptFailed[m.id] ? (
+                        <div className={`flex ${isMe ? 'justify-end' : 'justify-start'}`}>
+                          <div className="px-4 py-2 rounded-2xl text-sm bg-white/[0.06] text-[#6b7280] border border-white/[0.08]">
+                            🔒 Unable to decrypt — encryption keys may have changed
+                          </div>
+                        </div>
                       ) : (
                         <div className={`flex ${isMe ? 'justify-end' : 'justify-start'}`}>
-                          <div className="px-4 py-2 rounded-2xl text-sm bg-gray-800 text-gray-400 animate-pulse">
+                          <div className="px-4 py-2 rounded-2xl text-sm bg-white/[0.06] text-[#9ca3af]">
                             Decrypting…
                           </div>
                         </div>
@@ -914,22 +1180,42 @@ export default function TauTalkChatClient() {
 
               <form
                 onSubmit={sendMessage}
-                className="p-4 border-t border-gray-800 flex flex-col gap-2 shrink-0"
+                className="p-4 border-t border-white/[0.08] flex flex-col gap-2 shrink-0 bg-[#0b141a]"
               >
                 {sendError ? <p className="text-xs text-red-400">{sendError}</p> : null}
+                {replyTarget ? (
+                  <TauTalkReplyBar quote={replyTarget} onClear={() => setReplyTarget(null)} />
+                ) : null}
                 <div className="flex gap-2">
                   <button
                     type="button"
-                    onClick={() => setShowAttach(true)}
+                    onClick={() => {
+                      setShowEmojiPicker(false);
+                      setShowAttach(true);
+                    }}
                     disabled={!cryptoReady || sending}
-                    className="px-3 py-3 rounded-xl bg-gray-800 text-green-400 disabled:opacity-40"
+                    className="px-3 py-3 rounded-xl bg-white/[0.06] text-[#D4AF37] disabled:opacity-40"
                     title="Attach photo, file, voice note, or location"
                   >
                     <Paperclip className="w-5 h-5" />
                   </button>
+                  <TauTalkEmojiPicker
+                    open={showEmojiPicker}
+                    onToggle={() => setShowEmojiPicker((v) => !v)}
+                    onPick={insertEmoji}
+                    disabled={!cryptoReady || sending}
+                  />
                   <input
+                    ref={inputRef}
                     value={input}
-                    onChange={(e) => setInput(e.target.value)}
+                    onChange={(e) => {
+                      setInput(e.target.value);
+                      if (typingDebounceRef.current) clearTimeout(typingDebounceRef.current);
+                      if (!e.target.value.trim() || !activeId || !token) return;
+                      typingDebounceRef.current = setTimeout(() => {
+                        sendTyping(token, activeId).catch(() => {});
+                      }, 400);
+                    }}
                     onKeyDown={(e) => {
                       if (e.key === 'Enter' && !e.shiftKey) {
                         e.preventDefault();
@@ -942,12 +1228,12 @@ export default function TauTalkChatClient() {
                       cryptoReady ? 'Type a message · Enter to send' : 'Preparing encryption…'
                     }
                     disabled={!cryptoReady || sending}
-                    className="flex-1 px-4 py-3 bg-gray-800 border border-gray-700 rounded-xl text-white focus:border-green-500 outline-none disabled:opacity-50"
+                    className="flex-1 px-4 py-3 bg-white/[0.06] border border-white/[0.08] rounded-xl text-white focus:border-[#D4AF37] outline-none disabled:opacity-50"
                   />
                   <button
                     type="submit"
                     disabled={!input.trim() || !cryptoReady || sending}
-                    className="px-4 py-3 bg-green-500 text-black rounded-xl disabled:opacity-40 font-medium min-w-[52px]"
+                    className="px-4 py-3 bg-[#D4AF37] text-[#0f0f0f] rounded-xl disabled:opacity-40 font-medium min-w-[52px]"
                   >
                     <Send className="w-5 h-5" />
                   </button>
@@ -960,7 +1246,7 @@ export default function TauTalkChatClient() {
 
       {showNewChat && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-          <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6 w-full max-w-sm">
+          <div className="bg-[#0c0c12] border border-white/[0.08] rounded-2xl p-6 w-full max-w-sm">
             <h3 className="font-bold text-lg mb-4 flex items-center gap-2">
               <Search className="w-5 h-5" /> New conversation
             </h3>
@@ -970,13 +1256,13 @@ export default function TauTalkChatClient() {
                 placeholder="Email or @username"
                 value={newChatQuery}
                 onChange={(e) => setNewChatQuery(e.target.value)}
-                className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white mb-4"
+                className="w-full px-4 py-3 bg-white/[0.06] border border-white/[0.08] rounded-lg text-white mb-4"
               />
               <div className="flex gap-2">
-                <button type="button" onClick={() => setShowNewChat(false)} className="flex-1 py-2 bg-gray-700 rounded-lg">
+                <button type="button" onClick={() => setShowNewChat(false)} className="flex-1 py-2 bg-white/[0.08] rounded-lg">
                   Cancel
                 </button>
-                <button type="submit" className="flex-1 py-2 bg-green-500 text-black rounded-lg font-semibold">
+                <button type="submit" className="flex-1 py-2 bg-[#D4AF37] text-[#0f0f0f] rounded-lg font-semibold">
                   Start
                 </button>
               </div>
@@ -987,7 +1273,7 @@ export default function TauTalkChatClient() {
 
       {showNewGroup && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-          <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6 w-full max-w-md">
+          <div className="bg-[#0c0c12] border border-white/[0.08] rounded-2xl p-6 w-full max-w-md">
             <h3 className="font-bold text-lg mb-4 flex items-center gap-2">
               <Users className="w-5 h-5" /> New group
             </h3>
@@ -996,19 +1282,19 @@ export default function TauTalkChatClient() {
                 placeholder="Group name"
                 value={groupTitle}
                 onChange={(e) => setGroupTitle(e.target.value)}
-                className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white"
+                className="w-full px-4 py-3 bg-white/[0.06] border border-white/[0.08] rounded-lg text-white"
               />
               <input
                 placeholder="Members: email1, email2, ..."
                 value={groupMembers}
                 onChange={(e) => setGroupMembers(e.target.value)}
-                className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white"
+                className="w-full px-4 py-3 bg-white/[0.06] border border-white/[0.08] rounded-lg text-white"
               />
               <div className="flex gap-2 pt-2">
-                <button type="button" onClick={() => setShowNewGroup(false)} className="flex-1 py-2 bg-gray-700 rounded-lg">
+                <button type="button" onClick={() => setShowNewGroup(false)} className="flex-1 py-2 bg-white/[0.08] rounded-lg">
                   Cancel
                 </button>
-                <button type="submit" className="flex-1 py-2 bg-green-500 text-black rounded-lg font-semibold">
+                <button type="submit" className="flex-1 py-2 bg-[#D4AF37] text-[#0f0f0f] rounded-lg font-semibold">
                   Create
                 </button>
               </div>
@@ -1040,7 +1326,32 @@ export default function TauTalkChatClient() {
         token={token!}
         open={showProfile}
         onClose={() => setShowProfile(false)}
-        onUpdated={(p) => setProfile(p)}
+        onUpdated={(p) => {
+          setProfile(p);
+          if (user) {
+            localStorage.setItem(
+              'tauos_user',
+              JSON.stringify({
+                id: user.id,
+                username: p.username,
+                email: p.email,
+                fullName: p.fullName,
+                avatarUrl: p.avatarUrl,
+              })
+            );
+          }
+        }}
+      />
+
+      <TauTalkContactModal
+        token={token!}
+        open={showContact}
+        contactUserId={activePeerId}
+        realName={activePeerRealName}
+        username={activePeerHandle?.replace(/^@/, '') ?? null}
+        avatarUrl={activeConv?.type === 'direct' ? peerAvatar(activeConv) : null}
+        onClose={() => setShowContact(false)}
+        onUpdated={onContactLabelUpdated}
       />
 
       <TauTalkAttachSheet
@@ -1057,6 +1368,14 @@ export default function TauTalkChatClient() {
         onStopVoice={stopVoiceNote}
         onVoiceCall={() => void beginCall('voice')}
         onVideoCall={() => void beginCall('video')}
+      />
+
+      <TauTalkMessageContextMenu
+        menu={contextMenu}
+        onReply={() => {
+          if (contextMenu) startReplyToMessage(contextMenu.messageId);
+        }}
+        onClose={() => setContextMenu(null)}
       />
     </div>
   );

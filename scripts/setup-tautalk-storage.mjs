@@ -157,6 +157,30 @@ async function main() {
   );
   console.log('  ✓ tautalk_call_signals');
 
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS tautalk_key_history (
+      id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      public_key TEXT NOT NULL,
+      created_at TIMESTAMPTZ DEFAULT NOW()
+    )
+  `);
+  await pool.query(
+    'CREATE INDEX IF NOT EXISTS idx_tautalk_key_history_user ON tautalk_key_history(user_id, created_at DESC)'
+  );
+  console.log('  ✓ tautalk_key_history');
+
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS tautalk_contact_labels (
+      owner_user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      contact_user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      display_name TEXT NOT NULL,
+      updated_at TIMESTAMPTZ DEFAULT NOW(),
+      PRIMARY KEY (owner_user_id, contact_user_id)
+    )
+  `);
+  console.log('  ✓ tautalk_contact_labels');
+
   console.log('\n✅ Tau Talk schema ready');
   await pool.end();
 }

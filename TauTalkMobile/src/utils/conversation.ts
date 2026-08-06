@@ -2,13 +2,24 @@ import type { Conversation, ConversationPeer } from '../api/client';
 
 export function displayNameForConversation(
   conv: Conversation,
-  currentUserId?: string
+  _currentUserId?: string
 ): string {
   if (conv.type === 'group' && conv.title) return conv.title;
+  if (conv.peer?.contact_label?.trim()) return conv.peer.contact_label.trim();
   if (conv.peer?.full_name) return conv.peer.full_name;
   if (conv.title) return conv.title;
-  if (conv.peer?.username) return conv.peer.username;
+  if (conv.peer?.username) {
+    return conv.peer.username.replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
+  }
   return conv.type === 'group' ? 'Group chat' : 'Unknown';
+}
+
+export function peerRealName(conv: Conversation): string {
+  if (conv.peer?.full_name) return conv.peer.full_name;
+  if (conv.peer?.username) {
+    return conv.peer.username.replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
+  }
+  return 'Contact';
 }
 
 export function usernameForConversation(conv: Conversation): string | null {
@@ -16,12 +27,16 @@ export function usernameForConversation(conv: Conversation): string | null {
   return null;
 }
 
-export function peerFromCreateResponse(
-  id: string,
-  peer?: ConversationPeer
-): Conversation['peer'] {
-  if (!peer) return null;
-  return peer;
+export function withContactLabel(
+  conv: Conversation,
+  contactUserId: string,
+  label: string | null
+): Conversation {
+  if (!conv.peer || String(conv.peer.id) !== String(contactUserId)) return conv;
+  return {
+    ...conv,
+    peer: { ...conv.peer, contact_label: label },
+  };
 }
 
 export function formatChatTime(iso: string | null): string {
@@ -76,4 +91,14 @@ export async function enrichConversationPeer(
   } catch {
     return conv;
   }
+}
+
+export function matchesConversationSearch(conv: Conversation, query: string): boolean {
+  const q = query.trim().toLowerCase();
+  if (!q) return true;
+  const name = displayNameForConversation(conv).toLowerCase();
+  const handle = conv.peer?.username?.toLowerCase() ?? '';
+  const email = conv.peer?.email?.toLowerCase() ?? '';
+  const title = conv.title?.toLowerCase() ?? '';
+  return name.includes(q) || handle.includes(q) || email.includes(q) || title.includes(q);
 }

@@ -6,24 +6,31 @@ function isServerlessRuntime(): boolean {
   return Boolean(process.env.VERCEL);
 }
 
+function isSupabasePoolerUrl(connectionString: string): boolean {
+  return connectionString.includes('pooler.supabase.com');
+}
+
 function resolveConnectionString(): string {
   let connectionString = process.env.DATABASE_URL;
   if (!connectionString) {
     throw new Error('DATABASE_URL environment variable is required');
   }
 
-  const isSupabasePooler = connectionString.includes('pooler.supabase.com');
+  const isSupabasePooler = isSupabasePoolerUrl(connectionString);
 
-  // Session pooler (:5432) caps concurrent clients (~15). Serverless needs transaction pooler (:6543).
-  if (isServerlessRuntime() && isSupabasePooler && connectionString.includes(':5432/')) {
+  // Session pooler (:5432) caps concurrent clients (~15). Use transaction pooler (:6543).
+  if (isSupabasePooler && connectionString.includes(':5432/')) {
     connectionString = connectionString.replace(':5432/', ':6543/');
   }
 
   const [base, existingQuery = ''] = connectionString.split('?');
   const params = new URLSearchParams(existingQuery);
 
-  if (isServerlessRuntime() && isSupabasePooler) {
+  if (isSupabasePooler) {
     params.set('pgbouncer', 'true');
+  }
+
+  if (isServerlessRuntime() && isSupabasePooler) {
     params.set('connection_limit', '1');
   }
 
@@ -34,13 +41,15 @@ function resolveConnectionString(): string {
 
 function poolConfig(): PoolConfig {
   const serverless = isServerlessRuntime();
+  const connectionString = resolveConnectionString();
+  const isSupabasePooler = isSupabasePoolerUrl(process.env.DATABASE_URL ?? '');
 
   return {
-    connectionString: resolveConnectionString(),
+    connectionString,
     ssl: { rejectUnauthorized: false },
-    max: serverless ? 1 : 10,
-    idleTimeoutMillis: serverless ? 5_000 : 30_000,
-    connectionTimeoutMillis: serverless ? 5_000 : 2_000,
+    max: serverless ? 1 : isSupabasePooler ? 4 : 10,
+    idleTimeoutMillis: serverless ? 5_000 : 20_000,
+    connectionTimeoutMillis: serverless ? 5_000 : 5_000,
     allowExitOnIdle: serverless,
   };
 }

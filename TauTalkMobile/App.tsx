@@ -181,6 +181,7 @@ function App(): JSX.Element {
             setAcceptedIncoming(null);
             setScreen('chats');
           }}
+          onConversationUpdate={(updated) => setActiveConversation(updated)}
           incomingCall={acceptedIncoming}
           onIncomingHandled={() => setAcceptedIncoming(null)}
         />

@@ -4,7 +4,7 @@ import GlassPanel from './GlassPanel';
 import MIcon from './MIcon';
 import { colors, radii } from '../theme';
 
-export type AttachmentAction = 'camera' | 'gallery' | 'document' | 'location';
+export type AttachmentAction = 'camera' | 'gallery' | 'document' | 'location' | 'voice';
 export type CallPreviewAction = 'voice' | 'video';
 
 type Props = {
@@ -12,6 +12,9 @@ type Props = {
   onClose: () => void;
   onPick: (action: AttachmentAction) => void;
   onCallPreview: (mode: CallPreviewAction) => void;
+  recording?: boolean;
+  onStartVoice?: () => void;
+  onStopVoice?: () => void;
 };
 
 const ATTACHMENTS: {
@@ -24,6 +27,7 @@ const ATTACHMENTS: {
   { id: 'gallery', icon: 'photo-library', label: 'Gallery', sub: 'Photos & images' },
   { id: 'document', icon: 'attach-file', label: 'Document', sub: 'PDF, docs, files' },
   { id: 'location', icon: 'location-on', label: 'Location', sub: 'Share where you are' },
+  { id: 'voice', icon: 'mic', label: 'Voice note', sub: 'Hold to record in chat' },
 ];
 
 const CALLS: { id: CallPreviewAction; icon: string; label: string }[] = [
@@ -31,14 +35,28 @@ const CALLS: { id: CallPreviewAction; icon: string; label: string }[] = [
   { id: 'video', icon: 'videocam', label: 'Video preview' },
 ];
 
-export default function AttachmentSheet({ visible, onClose, onPick, onCallPreview }: Props) {
+export default function AttachmentSheet({
+  visible,
+  onClose,
+  onPick,
+  onCallPreview,
+  recording,
+  onStartVoice,
+  onStopVoice,
+}: Props) {
   return (
     <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
       <Pressable style={styles.backdrop} onPress={onClose}>
         <Pressable style={styles.sheetWrap} onPress={(e) => e.stopPropagation()}>
           <GlassPanel style={styles.sheet} strong>
             <Text style={styles.title}>Share</Text>
-            <Text style={styles.subtitle}>Material Design · encrypted attachments</Text>
+            <Text style={styles.subtitle}>Tau Talk · end-to-end encrypted</Text>
+            {recording ? (
+              <Pressable style={styles.recordingBanner} onPress={onStopVoice}>
+                <MIcon name="stop" size={22} color={colors.danger} />
+                <Text style={styles.recordingText}>Recording… tap to send voice note</Text>
+              </Pressable>
+            ) : null}
 
             <View style={styles.callRow}>
               {CALLS.map((c) => (
@@ -63,6 +81,10 @@ export default function AttachmentSheet({ visible, onClose, onPick, onCallPrevie
                   key={a.id}
                   style={styles.tile}
                   onPress={() => {
+                    if (a.id === 'voice') {
+                      onStartVoice?.();
+                      return;
+                    }
                     onClose();
                     onPick(a.id);
                   }}>
@@ -100,6 +122,18 @@ const styles = StyleSheet.create({
   },
   title: { color: colors.goldLight, fontSize: 20, fontWeight: '800' },
   subtitle: { color: colors.textSoft, fontSize: 12, marginTop: 4, marginBottom: 14 },
+  recordingBanner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    backgroundColor: 'rgba(248,113,113,0.12)',
+    borderRadius: radii.md,
+    padding: 12,
+    marginBottom: 12,
+    borderWidth: 1,
+    borderColor: 'rgba(248,113,113,0.35)',
+  },
+  recordingText: { color: colors.danger, fontWeight: '600', flex: 1 },
   callRow: { flexDirection: 'row', gap: 10, marginBottom: 14 },
   callTile: {
     flex: 1,

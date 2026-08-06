@@ -1,0 +1,25 @@
+/** Tau Talk design tokens — Figma tau-talk + mobile theme alignment */
+
+export const tauTalkTokens = {
+  pageBg: '#050508',
+  panelBg: '#0c0c12',
+  surface: 'rgba(255, 255, 255, 0.06)',
+  surfaceStrong: 'rgba(255, 255, 255, 0.1)',
+  chatBg: '#0a1014',
+  headerBg: '#0b141a',
+  border: 'rgba(255, 255, 255, 0.08)',
+  gold: '#D4AF37',
+  goldLight: '#F5C842',
+  goldMuted: 'rgba(212, 175, 55, 0.15)',
+  goldBorder: 'rgba(212, 175, 55, 0.22)',
+  textPrimary: '#f5f5f7',
+  textSecondary: '#9ca3af',
+  textMuted: '#6b7280',
+  online: '#28c840',
+  bubbleMe: '#1a3d2e',
+  bubbleMeBorder: 'rgba(212, 175, 55, 0.45)',
+  bubbleOther: 'rgba(255, 255, 255, 0.08)',
+  bubbleOtherBorder: 'rgba(255, 255, 255, 0.12)',
+  danger: '#f87171',
+  sidebarWidth: 320,
+} as const;

@@ -22,6 +22,7 @@ import {
   fetchTyping,
   IncomingCall,
   Message,
+  registerIdentityKey,
   sendMessage as sendMessageApi,
   sendTyping,
   startCall,
@@ -30,7 +31,10 @@ import {
 import AttachmentSheet, { AttachmentAction } from '../components/AttachmentSheet';
 import Avatar from '../components/Avatar';
 import CallPreviewScreen, { CallConnectionState, CallMode } from '../components/CallPreviewScreen';
+import ContactLabelModal, { ReplyBar, type ReplyQuote } from '../components/ContactLabelModal';
+import EmojiPicker from '../components/EmojiPicker';
 import ImageViewerModal from '../components/ImageViewerModal';
+import MessageActionSheet from '../components/MessageActionSheet';
 import MIcon from '../components/MIcon';
 import MessageBubble from '../components/MessageBubble';
 import { CallMediaState, TauCallManager } from '../calls/TauCallManager';
@@ -42,41 +46,57 @@ import {
   ConversationCryptoContext,
   decryptMessage,
   encryptMessage,
+  getOrCreateKeyPair,
 } from '../crypto/tautalk-crypto';
 import { colors, radii } from '../theme';
 import type { TauUser } from '../storage/session';
-import { displayNameForConversation, usernameForConversation } from '../utils/conversation';
+import {
+  displayNameForConversation,
+  peerRealName,
+  usernameForConversation,
+  withContactLabel,
+} from '../utils/conversation';
 import {
   contentTypeForPayload,
   MessagePayload,
   parsePayload,
+  payloadPreview,
   textPayload,
 } from '../types/message-payload';
+import { startVoiceRecording, stopVoiceRecording } from '../utils/voiceRecorder';
 
 type Props = {
   token: string;
   user: TauUser;
   conversation: Conversation;
   onBack: () => void;
+  onConversationUpdate?: (conversation: Conversation) => void;
   incomingCall?: IncomingCall | null;
   onIncomingHandled?: () => void;
 };
 
-type ChatItem = Message & { payload: MessagePayload };
+type ChatItem = Message & { payload?: MessagePayload };
 
 export default function ChatScreen({
   token,
   user,
-  conversation,
+  conversation: initialConversation,
   onBack,
+  onConversationUpdate,
   incomingCall,
   onIncomingHandled,
 }: Props) {
+  const [conversation, setConversation] = useState(initialConversation);
   const [messages, setMessages] = useState<ChatItem[]>([]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
   const [sheetOpen, setSheetOpen] = useState(false);
+  const [voiceRecording, setVoiceRecording] = useState(false);
+  const [showEmoji, setShowEmoji] = useState(false);
+  const [showContact, setShowContact] = useState(false);
+  const [replyTarget, setReplyTarget] = useState<ReplyQuote | null>(null);
+  const [actionMessageId, setActionMessageId] = useState<string | null>(null);
   const [callMode, setCallMode] = useState<CallMode | null>(null);
   const [callConnectionState, setCallConnectionState] = useState<CallConnectionState>('preview');
   const [callMedia, setCallMedia] = useState<CallMediaState>({
@@ -96,15 +116,64 @@ export default function ChatScreen({
   const [cryptoError, setCryptoError] = useState('');
 
   const peerName = displayNameForConversation(conversation, user.id);
+  const peerReal = peerRealName(conversation);
   const peerHandle = usernameForConversation(conversation);
   const peerAvatar = conversation.peer?.avatar_url ?? null;
+  const peerId = conversation.peer?.id ?? null;
+  const isDirect = conversation.type === 'direct';
+
+  useEffect(() => {
+    setConversation(initialConversation);
+  }, [initialConversation]);
+
+  const replyQuoteFor = useCallback(
+    (message: Message): ReplyQuote | null => {
+      if (!message.reply_to) return null;
+      const parent = messages.find((x) => x.id === message.reply_to);
+      if (!parent) {
+        return { id: message.reply_to, senderUsername: 'Unknown', preview: 'Original message' };
+      }
+      const isParentMe =
+        String(parent.sender_id) === String(user.id) ||
+        parent.sender_username === user.username;
+      return {
+        id: parent.id,
+        senderUsername: isParentMe ? 'You' : parent.sender_username || 'Contact',
+        preview: parent.payload ? payloadPreview(parent.payload) : '…',
+      };
+    },
+    [messages, user.id, user.username]
+  );
+
+  const startReplyToMessage = (messageId: string) => {
+    const m = messages.find((x) => x.id === messageId);
+    if (!m?.payload) return;
+    const isMe =
+      String(m.sender_id) === String(user.id) || m.sender_username === user.username;
+    setReplyTarget({
+      id: m.id,
+      senderUsername: isMe ? 'You' : m.sender_username || 'Contact',
+      preview: payloadPreview(m.payload),
+    });
+    setShowEmoji(false);
+  };
 
   const decryptBatch = useCallback(
     async (msgs: Message[], ctx: ConversationCryptoContext | null) => {
       const out: ChatItem[] = [];
       for (const m of msgs) {
-        const plain = await decryptMessage(conversation.id, m.content_encrypted, ctx ?? undefined);
-        out.push({ ...m, payload: parsePayload(plain) });
+        let payload: MessagePayload | undefined;
+        for (let attempt = 0; attempt < 5; attempt++) {
+          const plain = await decryptMessage(conversation.id, m.content_encrypted, ctx ?? undefined);
+          if (plain !== null) {
+            payload = parsePayload(plain);
+            break;
+          }
+          if (attempt < 4) {
+            await new Promise((r) => setTimeout(r, 120 * (attempt + 1)));
+          }
+        }
+        out.push(payload ? { ...m, payload } : { ...m });
       }
       return out;
     },
@@ -114,6 +183,7 @@ export default function ChatScreen({
   const sendPayload = async (payload: MessagePayload) => {
     if (!cryptoCtx) return;
     setSending(true);
+    const replyToId = replyTarget?.id;
     try {
       const json = JSON.stringify(payload);
       const encrypted = await encryptMessage(conversation.id, json, cryptoCtx);
@@ -121,14 +191,15 @@ export default function ChatScreen({
         token,
         conversation.id,
         encrypted,
-        contentTypeForPayload(payload)
+        contentTypeForPayload(payload),
+        replyToId
       );
-      const plain = await decryptMessage(conversation.id, saved.content_encrypted, cryptoCtx);
       setMessages((prev) => [
         ...prev,
-        { ...saved, sender_username: user.username, payload: parsePayload(plain) },
+        { ...saved, sender_username: user.username, payload },
       ]);
       lastTimestampRef.current = saved.created_at;
+      setReplyTarget(null);
     } catch (e) {
       Alert.alert('Send failed', e instanceof Error ? e.message : 'Could not send message');
     } finally {
@@ -139,11 +210,16 @@ export default function ChatScreen({
   const loadAll = useCallback(async () => {
     try {
       setCryptoError('');
+      const { publicKey } = await getOrCreateKeyPair();
+      await registerIdentityKey(token, publicKey).catch(() => {});
       const keyData = await fetchConversationKeys(token, conversation.id);
       const ctx = await buildCryptoContext(
         conversation.id,
         conversation.type,
-        keyData.participants.map((p) => ({ publicKey: p.publicKey }))
+        keyData.participants.map((p) => ({
+          publicKey: p.publicKey,
+          publicKeys: p.publicKeys,
+        }))
       );
       setCryptoCtx(ctx);
       const msgs = await fetchMessages(token, conversation.id);
@@ -380,6 +456,38 @@ export default function ChatScreen({
     };
   }, [incomingCall]);
 
+  const startVoiceNote = async () => {
+    try {
+      await startVoiceRecording();
+      setVoiceRecording(true);
+    } catch (e) {
+      Alert.alert(
+        'Voice note',
+        e instanceof Error ? e.message : 'Microphone recording is unavailable. Rebuild the app after npm install.'
+      );
+    }
+  };
+
+  const stopVoiceNote = async () => {
+    if (!voiceRecording) return;
+    setVoiceRecording(false);
+    setSheetOpen(false);
+    try {
+      const path = await stopVoiceRecording();
+      const uri = path.startsWith('file://') ? path : `file://${path}`;
+      const mime = Platform.OS === 'ios' ? 'audio/m4a' : 'audio/mp4';
+      await uploadAndSend(uri, `voice-${Date.now()}.${Platform.OS === 'ios' ? 'm4a' : 'mp4'}`, mime, 'file');
+    } catch (e) {
+      Alert.alert('Voice note', e instanceof Error ? e.message : 'Could not save voice note');
+    }
+  };
+
+  const onContactLabelUpdated = (contactUserId: string, label: string | null) => {
+    const next = withContactLabel(conversation, contactUserId, label);
+    setConversation(next);
+    onConversationUpdate?.(next);
+  };
+
   const onAttachment = async (action: AttachmentAction) => {
     if (action === 'camera') {
       launchCamera({ mediaType: 'photo', quality: 0.85 }, async (res) => {
@@ -439,23 +547,29 @@ export default function ChatScreen({
         <Pressable onPress={onBack} hitSlop={12} style={styles.backBtn}>
           <MIcon name="arrow-back" size={24} color={colors.goldLight} />
         </Pressable>
-        <Avatar name={peerName} size={40} gold imageUrl={peerAvatar} />
-        <View style={styles.headerInfo}>
-          <Text style={styles.headerTitle} numberOfLines={1}>
-            {peerName}
-          </Text>
-          {typingLabel ? (
-            <Text style={styles.typingSub} numberOfLines={1}>
-              {typingLabel}
+        <Pressable
+          style={styles.headerProfile}
+          onPress={() => isDirect && peerId && setShowContact(true)}
+          disabled={!isDirect || !peerId}>
+          <Avatar name={peerName} size={40} gold imageUrl={peerAvatar} />
+          <View style={styles.headerInfo}>
+            <Text style={styles.headerTitle} numberOfLines={1}>
+              {peerName}
             </Text>
-          ) : peerHandle ? (
-            <Text style={styles.headerSub} numberOfLines={1}>
-              {peerHandle} · encrypted
-            </Text>
-          ) : (
-            <Text style={styles.headerSub}>End-to-end encrypted</Text>
-          )}
-        </View>
+            {typingLabel ? (
+              <Text style={styles.typingSub} numberOfLines={1}>
+                {typingLabel}
+              </Text>
+            ) : peerHandle ? (
+              <Text style={styles.headerSub} numberOfLines={1}>
+                {peerReal !== peerName ? `${peerReal} · ` : ''}
+                {peerHandle} · encrypted
+              </Text>
+            ) : (
+              <Text style={styles.headerSub}>End-to-end encrypted</Text>
+            )}
+          </View>
+        </Pressable>
         <Pressable
           style={styles.headerAction}
           onPress={() => openCall('voice')}
@@ -487,14 +601,24 @@ export default function ChatScreen({
                 hour: '2-digit',
                 minute: '2-digit',
               });
-              return (
+              const showSender = conversation.type === 'group' && !isMe;
+              return item.payload ? (
                 <MessageBubble
                   payload={item.payload}
                   isMe={isMe}
                   token={token}
                   time={time}
+                  replyQuote={replyQuoteFor(item)}
+                  senderName={showSender ? item.sender_username : undefined}
                   onImagePress={(uri) => setViewerUri(uri)}
+                  onLongPress={() => setActionMessageId(item.id)}
                 />
+              ) : (
+                <View style={[styles.row, isMe ? styles.rowMe : styles.rowOther]}>
+                  <View style={styles.decrypting}>
+                    <Text style={styles.decryptingText}>Decrypting…</Text>
+                  </View>
+                </View>
               );
             }}
           />
@@ -502,34 +626,71 @@ export default function ChatScreen({
       </View>
 
       <View style={styles.composer}>
-        <Pressable style={styles.attachBtn} onPress={() => setSheetOpen(true)}>
-          <MIcon name="add" size={26} color={colors.goldLight} />
-        </Pressable>
-        <TextInput
-          style={styles.input}
-          placeholder="Message"
-          placeholderTextColor={colors.textSoft}
-          value={input}
-          onChangeText={onInputChange}
-          multiline
-        />
-        <Pressable
-          style={[styles.send, (!input.trim() || sending) && styles.sendDisabled]}
-          onPress={submitText}
-          disabled={sending || !input.trim()}>
-          {sending ? (
-            <ActivityIndicator color="#1a1200" size="small" />
-          ) : (
-            <MIcon name="send" size={22} color="#1a1200" />
-          )}
-        </Pressable>
+        {replyTarget ? <ReplyBar quote={replyTarget} onClear={() => setReplyTarget(null)} /> : null}
+        <View style={styles.composerRow}>
+          <Pressable style={styles.attachBtn} onPress={() => setSheetOpen(true)}>
+            <MIcon name="add" size={26} color={colors.goldLight} />
+          </Pressable>
+          <Pressable style={styles.attachBtn} onPress={() => setShowEmoji(true)}>
+            <MIcon name="insert-emoticon" size={24} color={colors.goldLight} />
+          </Pressable>
+          <TextInput
+            style={styles.input}
+            placeholder="Message"
+            placeholderTextColor={colors.textSoft}
+            value={input}
+            onChangeText={onInputChange}
+            multiline
+          />
+          <Pressable
+            style={[styles.send, (!input.trim() || sending) && styles.sendDisabled]}
+            onPress={submitText}
+            disabled={sending || !input.trim()}>
+            {sending ? (
+              <ActivityIndicator color="#1a1200" size="small" />
+            ) : (
+              <MIcon name="send" size={22} color="#1a1200" />
+            )}
+          </Pressable>
+        </View>
       </View>
+
+      <EmojiPicker
+        visible={showEmoji}
+        onClose={() => setShowEmoji(false)}
+        onPick={(emoji) => setInput((prev) => prev + emoji)}
+      />
+
+      <MessageActionSheet
+        visible={actionMessageId !== null}
+        onReply={() => {
+          if (actionMessageId) startReplyToMessage(actionMessageId);
+        }}
+        onClose={() => setActionMessageId(null)}
+      />
+
+      <ContactLabelModal
+        visible={showContact}
+        token={token}
+        contactUserId={peerId}
+        realName={peerReal}
+        username={conversation.peer?.username ?? null}
+        avatarUrl={peerAvatar}
+        onClose={() => setShowContact(false)}
+        onUpdated={onContactLabelUpdated}
+      />
 
       <AttachmentSheet
         visible={sheetOpen}
-        onClose={() => setSheetOpen(false)}
+        onClose={() => {
+          if (voiceRecording) void stopVoiceNote();
+          setSheetOpen(false);
+        }}
         onPick={onAttachment}
         onCallPreview={(mode) => openCall(mode)}
+        recording={voiceRecording}
+        onStartVoice={startVoiceNote}
+        onStopVoice={stopVoiceNote}
       />
 
       <ImageViewerModal
@@ -572,6 +733,7 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   backBtn: { paddingHorizontal: 4, paddingVertical: 4 },
+  headerProfile: { flex: 1, flexDirection: 'row', alignItems: 'center', gap: 10, minWidth: 0 },
   headerInfo: { flex: 1, minWidth: 0 },
   headerAction: {
     width: 36,
@@ -589,15 +751,13 @@ const styles = StyleSheet.create({
   wallpaper: { flex: 1, backgroundColor: colors.chatBg },
   messageList: { padding: 12, paddingBottom: 8 },
   composer: {
-    flexDirection: 'row',
-    alignItems: 'flex-end',
     paddingHorizontal: 8,
     paddingVertical: 8,
     backgroundColor: colors.whatsappHeader,
     borderTopWidth: 1,
     borderTopColor: colors.border,
-    gap: 6,
   },
+  composerRow: { flexDirection: 'row', alignItems: 'flex-end', gap: 6 },
   attachBtn: {
     width: 40,
     height: 40,
@@ -636,4 +796,14 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     fontSize: 13,
   },
+  row: { marginVertical: 4 },
+  rowMe: { alignItems: 'flex-end' },
+  rowOther: { alignItems: 'flex-start' },
+  decrypting: {
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    borderRadius: radii.lg,
+    backgroundColor: colors.surface,
+  },
+  decryptingText: { color: colors.textMuted, fontSize: 14 },
 });

@@ -3,7 +3,7 @@ import { requireAuth } from '@/lib/auth-server';
 import {
   getConversationParticipants,
   userInConversation,
-  getPublicKey,
+  getPublicKeysForUser,
 } from '@/lib/tautalk-data';
 
 export const dynamic = 'force-dynamic';
@@ -24,16 +24,34 @@ export async function GET(request: NextRequest) {
     }
     const participants = await getConversationParticipants(conversationId);
     const keys = await Promise.all(
-      participants.map(async (p) => ({
-        userId: p.id,
-        username: p.username,
-        fullName: p.full_name,
-        publicKey: (await getPublicKey(p.id))?.public_key ?? null,
-        lastReadAt: p.last_read_at,
-      }))
+      participants.map(async (p) => {
+        try {
+          const publicKeys = await getPublicKeysForUser(p.id);
+          return {
+            userId: String(p.id),
+            username: p.username,
+            fullName: p.full_name,
+            publicKey: publicKeys[0] ?? null,
+            publicKeys,
+            lastReadAt: p.last_read_at,
+          };
+        } catch (err) {
+          console.error('TauTalk keys participant error:', p.id, err);
+          return {
+            userId: String(p.id),
+            username: p.username,
+            fullName: p.full_name,
+            publicKey: null,
+            publicKeys: [] as string[],
+            lastReadAt: p.last_read_at,
+          };
+        }
+      })
     );
     return NextResponse.json({ success: true, participants: keys });
   } catch (error) {
-    return NextResponse.json({ error: 'Failed to load keys' }, { status: 500 });
+    console.error('TauTalk keys route error:', error);
+    const message = error instanceof Error ? error.message : 'Failed to load keys';
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }

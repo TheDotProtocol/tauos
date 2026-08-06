@@ -82,13 +82,13 @@ export default function TauTalkCallOverlay({
           <div className="text-center">
             <div
               className={`mx-auto mb-5 w-24 h-24 rounded-full flex items-center justify-center ${
-                ringing ? 'bg-green-500/20 animate-pulse' : unavailable ? 'bg-red-500/15' : 'bg-gray-800'
+                ringing ? 'bg-[rgba(212,175,55,0.2)] animate-pulse' : unavailable ? 'bg-red-500/15' : 'bg-white/[0.06]'
               }`}
             >
               {mode === 'video' ? (
-                <Video className="w-10 h-10 text-green-400" />
+                <Video className="w-10 h-10 text-[#D4AF37]" />
               ) : (
-                <Phone className="w-10 h-10 text-green-400" />
+                <Phone className="w-10 h-10 text-[#D4AF37]" />
               )}
             </div>
             <p className="text-2xl font-bold text-white mb-2">{peerName || 'Contact'}</p>
@@ -101,7 +101,7 @@ export default function TauTalkCallOverlay({
             autoPlay
             playsInline
             muted
-            className="absolute bottom-24 right-4 w-32 h-44 object-cover rounded-xl border-2 border-green-500/40 bg-gray-900"
+            className="absolute bottom-24 right-4 w-32 h-44 object-cover rounded-xl border-2 border-[#D4AF37]/40 bg-[#0c0c12]"
           />
         ) : null}
       </div>

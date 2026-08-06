@@ -1,12 +1,14 @@
-import { acceptCall, endCall, missCall, pollCallSignals, sendCallSignal, type CallSession } from '@/lib/tautalk-web-api';
+import {
+  acceptCall,
+  endCall,
+  missCall,
+  pollCallSignals,
+  sendCallSignal,
+  type CallSession,
+} from '@/lib/tautalk-web-api';
 import { TAUTALK_RING_TIMEOUT_MS, TAUTALK_UNAVAILABLE_MESSAGE } from '@/lib/tautalk-call-constants';
+import { getTautalkIceServers, TAUTALK_SIGNAL_POLL_MS } from '@/lib/tautalk-ice-config';
 
-const ICE_SERVERS: RTCIceServer[] = [
-  { urls: 'stun:stun.l.google.com:19302' },
-  { urls: 'stun:stun1.l.google.com:19302' },
-];
-
-const SIGNAL_POLL_MS = 1500;
 const CALLEE_OFFER_WAIT_MS = 12_000;
 
 export type WebCallMediaState = {
@@ -14,7 +16,7 @@ export type WebCallMediaState = {
   remoteStream: MediaStream | null;
   muted: boolean;
   cameraOff: boolean;
-  connectionState: RTCPeerConnectionState | 'idle' | 'ringing' | 'unavailable';
+  connectionState: RTCPeerConnectionState | 'idle' | 'ringing' | 'connecting' | 'unavailable';
 };
 
 type Listener = (state: WebCallMediaState) => void;
@@ -68,6 +70,7 @@ export class WebCallManager {
   }
 
   async startOutgoing(token: string, session: CallSession, mode: 'voice' | 'video') {
+    await this.cleanup(false);
     this.token = token;
     this.session = session;
     this.role = 'caller';
@@ -81,6 +84,7 @@ export class WebCallManager {
   }
 
   async startIncoming(token: string, session: CallSession, mode: 'voice' | 'video') {
+    await this.cleanup(false);
     this.token = token;
     this.session = session;
     this.role = 'callee';
@@ -102,7 +106,10 @@ export class WebCallManager {
       });
       this.patch({ localStream: this.localStream });
 
-      this.pc = new RTCPeerConnection({ iceServers: ICE_SERVERS });
+      this.pc = new RTCPeerConnection({
+        iceServers: getTautalkIceServers(),
+        iceCandidatePoolSize: 4,
+      });
       this.localStream.getTracks().forEach((t) => this.pc!.addTrack(t, this.localStream!));
 
       this.pc.ontrack = (ev) => {
@@ -149,8 +156,10 @@ export class WebCallManager {
 
   private startPolling() {
     this.stopPolling();
-    this.pollTimer = setInterval(() => this.pollSignals().catch(() => {}), SIGNAL_POLL_MS);
-    this.pollSignals().catch(() => {});
+    void this.pollSignals();
+    this.pollTimer = setInterval(() => {
+      void this.pollSignals();
+    }, TAUTALK_SIGNAL_POLL_MS);
   }
 
   private stopPolling() {
@@ -173,10 +182,14 @@ export class WebCallManager {
 
   private async pollSignals() {
     if (!this.session) return;
-    const signals = await pollCallSignals(this.token, this.session.id, this.lastSignalAt);
-    for (const s of signals) {
-      this.lastSignalAt = s.created_at;
-      await this.handleSignal(s.signal_type, this.parsePayload(s.payload));
+    try {
+      const signals = await pollCallSignals(this.token, this.session.id, this.lastSignalAt);
+      for (const s of signals) {
+        this.lastSignalAt = s.created_at;
+        await this.handleSignal(s.signal_type, this.parsePayload(s.payload));
+      }
+    } catch {
+      /* pool or network blip — next poll will retry */
     }
   }
 

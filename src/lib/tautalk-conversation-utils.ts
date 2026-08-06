@@ -4,6 +4,8 @@ export type TalkPeer = {
   email: string;
   full_name: string;
   avatar_url?: string | null;
+  /** Private nickname set by the current user (WhatsApp-style). */
+  contact_label?: string | null;
 };
 
 export type TalkConversation = {
@@ -34,6 +36,7 @@ export function displayNameForConversation(
 ): string {
   if (conv.type === 'group' && conv.title) return conv.title;
   const peer = parsePeer(conv.peer);
+  if (peer?.contact_label?.trim()) return peer.contact_label.trim();
   if (peer?.full_name) return peer.full_name;
   if (peer?.username) return peer.username.replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
   if (conv.title) return conv.title;
@@ -46,8 +49,34 @@ export function usernameLabel(conv: TalkConversation): string | null {
   return null;
 }
 
+export function peerRealName(conv: TalkConversation): string {
+  const peer = parsePeer(conv.peer);
+  if (peer?.full_name) return peer.full_name;
+  if (peer?.username) {
+    return peer.username.replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
+  }
+  return 'Contact';
+}
+
+export function peerUserId(conv: TalkConversation): string | null {
+  return parsePeer(conv.peer)?.id ?? null;
+}
+
 export function peerAvatar(conv: TalkConversation): string | null {
   return parsePeer(conv.peer)?.avatar_url ?? null;
+}
+
+export function withContactLabel(
+  conv: TalkConversation,
+  contactUserId: string,
+  label: string | null
+): TalkConversation {
+  const peer = parsePeer(conv.peer);
+  if (!peer || String(peer.id) !== String(contactUserId)) return conv;
+  return {
+    ...conv,
+    peer: { ...peer, contact_label: label },
+  };
 }
 
 export function normalizeConversations(rows: TalkConversation[]): TalkConversation[] {
