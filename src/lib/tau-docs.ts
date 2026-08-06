@@ -12,9 +12,8 @@ export type DocCatalogEntry = {
   section: string;
 };
 
-/** TauCore numbered suite (shipped in src/app/docs for production). */
+/** Public TauCore documentation suite (community edition). */
 const TAU_CORE_SUITE: Omit<DocCatalogEntry, 'section'>[] = [
-  { slug: 'production-readiness', title: 'Production Readiness Audit', file: '01_Production_Readiness_Audit_Report.md', source: 'taucore', description: 'Technical and security audit for enterprise deployment' },
   { slug: 'technical-whitepaper', title: 'Technical Whitepaper', file: '02_TauCore_Technical_Whitepaper.md', source: 'taucore', description: 'Architecture, privacy AI, and performance' },
   { slug: 'product-guide', title: 'Product Guide', file: '03_TauCore_Product_Guide.md', source: 'taucore', description: 'Desktop, mobile, cloud, and app usage' },
   { slug: 'privacy-security', title: 'Privacy & Security', file: '04_TauCore_Privacy_Security_Documentation.md', source: 'taucore', description: 'GDPR, SOC2, ISO 27001 compliance' },
@@ -22,10 +21,7 @@ const TAU_CORE_SUITE: Omit<DocCatalogEntry, 'section'>[] = [
   { slug: 'installation-guides', title: 'Installation Guides', file: '06_TauCore_Installation_Guides.md', source: 'taucore', description: 'Windows, macOS, Linux, Android, iOS setup' },
   { slug: 'sla-disaster-recovery', title: 'SLA & Disaster Recovery', file: '07_TauCore_SLA_Disaster_Recovery_Policy.md', source: 'taucore', description: 'Uptime, DR, and support escalation' },
   { slug: 'faq', title: 'FAQ & Knowledge Base', file: '08_TauCore_FAQ_Knowledge_Base.md', source: 'taucore', description: 'Common questions and troubleshooting' },
-  { slug: 'investor-pitch', title: 'Investor Pitch Deck', file: '09_TauCore_Investor_Pitch_Deck.md', source: 'taucore', description: 'Market, model, and investment case' },
-  { slug: 'go-to-market', title: 'Go-To-Market Strategy', file: '10_TauCore_Go_To_Market_Strategy.md', source: 'taucore', description: 'Segments, pricing, and growth' },
   { slug: 'release-notes-v1', title: 'Release Notes v1.0', file: '11_TauCore_Release_Notes_v1.0.md', source: 'taucore', description: 'Features, fixes, and roadmap' },
-  { slug: 'project-overview', title: 'Comprehensive Project Overview', file: '12_TauCore_Comprehensive_Project_Overview.md', source: 'taucore', description: 'Vision, technology, and team' },
 ];
 
 /** Curated dev docs from /docs (local only — not pushed to GitHub). */
@@ -53,7 +49,7 @@ export const docSections: { title: string; description: string; slugs: string[] 
   {
     title: 'Platform & Architecture',
     description: 'Technical depth for builders and evaluators',
-    slugs: ['technical-whitepaper', 'project-overview', 'integration-status', 'design-system'],
+    slugs: ['technical-whitepaper', 'integration-status', 'design-system'],
   },
   {
     title: 'Products',
@@ -71,9 +67,9 @@ export const docSections: { title: string; description: string; slugs: string[] 
     slugs: ['privacy-security', 'production-readiness', 'sla-disaster-recovery', 'governance'],
   },
   {
-    title: 'Business & Launch',
-    description: 'Investors, GTM, and rollout status',
-    slugs: ['investor-pitch', 'go-to-market', 'public-rollout', 'release-notes-v1', 'why-tauos'],
+    title: 'Release & Community',
+    description: 'Release notes and community resources',
+    slugs: ['release-notes-v1', 'public-rollout', 'why-tauos'],
   },
 ];
 
