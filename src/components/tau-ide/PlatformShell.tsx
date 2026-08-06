@@ -1,34 +1,43 @@
 'use client';
 
 import { useState } from 'react';
-import TauIdeSidebar from './Sidebar';
-import TauIdeHeader from './Header';
-import ConnectionStatusBar from './ConnectionStatusBar';
+import { usePathname } from 'next/navigation';
+import DeveloperSidebar from '@/components/tau-developer/DeveloperSidebar';
+import DeveloperTopBar from '@/components/tau-developer/DeveloperTopBar';
+import { geistSans } from '@/lib/website/fonts';
+import { titleForPath } from '@/lib/tau-developer/nav';
+import { tauDev } from '@/lib/tau-developer/theme';
+import '@/styles/tau-developer.css';
 
-interface PlatformShellProps {
+type Props = {
   children: React.ReactNode;
   title?: string;
+  /** @deprecated Figma shell uses pathname-based titles; kept for existing pages */
   mode?: 'professional' | 'beginner' | 'architect';
-}
+};
 
-export default function PlatformShell({ children, title, mode }: PlatformShellProps) {
+export default function PlatformShell({ children, title }: Props) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const pathname = usePathname();
+  const pageTitle = title ?? titleForPath(pathname);
 
   return (
-    <div className="tau-ide flex h-screen overflow-hidden bg-[#0a0a0a]">
+    <div
+      className={`tau-dev ${geistSans.className} flex h-screen min-h-screen overflow-hidden`}
+      style={{ backgroundColor: tauDev.bg, color: tauDev.text }}
+    >
       <a
         href="#main-content"
-        className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-[100] focus:px-4 focus:py-2 focus:bg-cyan-500 focus:text-black focus:rounded-lg"
+        className="sr-only focus:not-sr-only focus:absolute focus:left-2 focus:top-2 focus:z-[100] focus:rounded-lg focus:bg-[#f5a623] focus:px-4 focus:py-2 focus:text-[#060608]"
       >
         Skip to main content
       </a>
-      <TauIdeSidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
-      <div className="flex flex-col flex-1 min-w-0 overflow-hidden">
-        <TauIdeHeader onMenuClick={() => setSidebarOpen(true)} title={title} mode={mode} />
-        <main id="main-content" className="flex-1 overflow-auto" tabIndex={-1}>
+      <DeveloperSidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+      <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
+        <DeveloperTopBar title={pageTitle} onMenuClick={() => setSidebarOpen(true)} />
+        <main id="main-content" className="tau-dev-scroll flex-1 overflow-auto" tabIndex={-1}>
           {children}
         </main>
-        <ConnectionStatusBar />
       </div>
     </div>
   );

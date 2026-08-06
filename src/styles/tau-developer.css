@@ -1,0 +1,33 @@
+.tau-dev {
+  --tau-dev-bg: #060608;
+  --tau-dev-sidebar: #0b0b0d;
+  --tau-dev-surface: #0c0c0e;
+  --tau-dev-surface-elevated: #0f0f12;
+  --tau-dev-border: #16161c;
+  --tau-dev-gold: #f5a623;
+  --tau-dev-gold-muted: rgba(212, 148, 26, 0.13);
+  --tau-dev-gold-border: rgba(245, 166, 35, 0.3);
+  --tau-dev-text: #fafafa;
+  --tau-dev-text-muted: #a1a1aa;
+  --tau-dev-text-dim: #52525b;
+  --tau-dev-success: #10b981;
+  --tau-dev-success-bg: rgba(16, 185, 129, 0.11);
+}
+
+.tau-dev ::selection {
+  background: rgba(245, 166, 35, 0.25);
+}
+
+.tau-dev-scroll::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.tau-dev-scroll::-webkit-scrollbar-thumb {
+  background: #16161c;
+  border-radius: 3px;
+}
+
+.tau-dev-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}

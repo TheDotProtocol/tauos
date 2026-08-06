@@ -49,8 +49,12 @@ export function guardRequest(request: NextRequest, options: GuardOptions = {}): 
   return { ok: true, userId: user?.userId ? userIdString(user) : undefined, start };
 }
 
-export function finishGuard(metricKey: string, start: number, error?: string) {
-  recordMetric(metricKey, Date.now() - start, error);
+export function finishGuard(metricKey: string, start: number, error?: string, userId?: string) {
+  const durationMs = Date.now() - start;
+  recordMetric(metricKey, durationMs, error);
+  import('@/lib/tau-developer/server/platform-db')
+    .then(({ recordDailyMetric }) => recordDailyMetric(userId, metricKey, durationMs, Boolean(error)))
+    .catch(() => {});
 }
 
 export function safeErrorMessage(error: unknown, production = process.env.NODE_ENV === 'production'): string {

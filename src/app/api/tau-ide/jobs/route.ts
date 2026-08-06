@@ -34,6 +34,12 @@ export async function POST(request: NextRequest) {
       }).catch(console.error);
     } else if (jobType === 'index_knowledge') {
       runJobAsync(job.id, async () => buildKnowledgeFromMemory(projectId)).catch(console.error);
+    } else if (jobType === 'deploy') {
+      runJobAsync(job.id, async () => ({
+        environment: input?.environment ?? 'production',
+        branch: input?.branch ?? 'main',
+        status: 'deployed',
+      })).catch(console.error);
     }
 
     return NextResponse.json({ job }, { status: 202 });

@@ -24,11 +24,20 @@ export class Parser {
           statements.push(stmt);
         }
       } catch (error) {
-        console.error('Parse error:', error);
         this.synchronize();
       }
     }
     
+    return statements;
+  }
+
+  /** Parse entire program; throws on first syntax error (for API routes). */
+  parseStrict(): ASTNode[] {
+    const statements: ASTNode[] = [];
+    while (!this.isAtEnd()) {
+      const stmt = this.parseStatement();
+      if (stmt) statements.push(stmt);
+    }
     return statements;
   }
 

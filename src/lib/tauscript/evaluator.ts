@@ -409,7 +409,7 @@ export class Evaluator {
     const args = node.args.map(arg => this.evaluateNode(arg));
 
     // Check for built-in functions with JS implementation
-    const func = this.environment.functions.get(funcName);
+    const func = this.getFunction(funcName);
     if (func && func.jsImpl) {
       return func.jsImpl(args);
     }
@@ -690,6 +690,16 @@ export class Evaluator {
       env = env.parent;
     }
     throw new Error(`Variable '${name}' not found`);
+  }
+
+  private getFunction(name: string): (TauFunction & { jsImpl?: (args: TauValue[]) => TauValue }) | undefined {
+    let env: Environment | undefined = this.environment;
+    while (env) {
+      const func = env.functions.get(name);
+      if (func) return func as TauFunction & { jsImpl?: (args: TauValue[]) => TauValue };
+      env = env.parent;
+    }
+    return undefined;
   }
 
   private setVariable(name: string, value: TauValue, isLet: boolean): void {

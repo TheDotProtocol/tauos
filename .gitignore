@@ -18,6 +18,11 @@
 !src/app/api/**/password/**
 !src/app/api/**/keys/
 !src/app/api/**/keys/**
+!src/app/api/developers/api-keys/
+!src/app/api/developers/api-keys/**
+!src/app/developers/(platform)/api-keys/
+!src/app/developers/(platform)/api-keys/**
+!src/components/tau-developer/DeveloperApiKeysContent.tsx
 
 # Database files
 *.sql
