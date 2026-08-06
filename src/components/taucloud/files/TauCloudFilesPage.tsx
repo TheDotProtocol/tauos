@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { Suspense, useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import TauCloudAppShell from '@/components/taucloud/shared/TauCloudAppShell';
@@ -19,28 +19,68 @@ import {
 import type { TauCloudFile } from '@/lib/taucloud/types';
 import { useTauCloudSession } from '@/hooks/useTauCloudSession';
 
+type TauCloudFilesMode = 'files' | 'recent' | 'shared' | 'trash';
+
 type TauCloudFilesPageProps = {
-  mode?: 'files' | 'recent' | 'shared' | 'trash';
+  mode?: TauCloudFilesMode;
 };
 
-const viewMap: Record<NonNullable<TauCloudFilesPageProps['mode']>, TauCloudFileView> = {
+const viewMap: Record<TauCloudFilesMode, TauCloudFileView> = {
   files: 'files',
   recent: 'recent',
   shared: 'shared',
   trash: 'trash',
 };
 
+function FilesLoading() {
+  return (
+    <div className="flex min-h-screen items-center justify-center bg-[#0d0d0f] text-[#71717a]">Loading...</div>
+  );
+}
+
 export default function TauCloudFilesPage({ mode = 'files' }: TauCloudFilesPageProps) {
+  if (mode === 'files') {
+    return (
+      <Suspense fallback={<FilesLoading />}>
+        <TauCloudFilesWithFolder />
+      </Suspense>
+    );
+  }
+
+  return <TauCloudFilesPageContent mode={mode} folder="root" />;
+}
+
+function TauCloudFilesWithFolder() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const folder = searchParams.get('folder') || 'root';
+
+  const handleFolderChange = (nextFolder: string) => {
+    const params = new URLSearchParams(searchParams.toString());
+    if (nextFolder === 'root') params.delete('folder');
+    else params.set('folder', nextFolder);
+    const query = params.toString();
+    router.push(query ? `/taucloud/files?${query}` : '/taucloud/files');
+  };
+
+  return (
+    <TauCloudFilesPageContent mode="files" folder={folder} onFolderChange={handleFolderChange} />
+  );
+}
+
+type TauCloudFilesPageContentProps = {
+  mode: TauCloudFilesMode;
+  folder: string;
+  onFolderChange?: (folder: string) => void;
+};
+
+function TauCloudFilesPageContent({ mode, folder, onFolderChange }: TauCloudFilesPageContentProps) {
   const { user } = useTauCloudSession();
   const [files, setFiles] = useState<TauCloudFile[]>([]);
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
 
-  const active: 'files' | 'recent' | 'shared' | 'trash' =
-    mode === 'recent' ? 'recent' : mode === 'shared' ? 'shared' : mode === 'trash' ? 'trash' : 'files';
+  const active: TauCloudFilesMode = mode;
 
   const reload = useCallback(() => {
     const request =
@@ -54,14 +94,6 @@ export default function TauCloudFilesPage({ mode = 'files' }: TauCloudFilesPageP
     setError('');
     reload();
   }, [reload]);
-
-  const handleFolderChange = (nextFolder: string) => {
-    const params = new URLSearchParams(searchParams.toString());
-    if (nextFolder === 'root') params.delete('folder');
-    else params.set('folder', nextFolder);
-    const query = params.toString();
-    router.push(query ? `/taucloud/files?${query}` : '/taucloud/files');
-  };
 
   const handleShare = async (fileId: string) => {
     const result = await shareTauCloudFile(fileId);
@@ -124,8 +156,8 @@ export default function TauCloudFilesPage({ mode = 'files' }: TauCloudFilesPageP
         {message ? <p className="text-sm text-[#ffb800]">{message}</p> : null}
 
         <div className={mode === 'files' ? 'grid gap-6 xl:grid-cols-[280px_minmax(0,1fr)]' : undefined}>
-          {mode === 'files' ? (
-            <FolderBrowser activeFolder={folder} onFolderChange={handleFolderChange} />
+          {mode === 'files' && onFolderChange ? (
+            <FolderBrowser activeFolder={folder} onFolderChange={onFolderChange} />
           ) : null}
 
           <div className="space-y-8">

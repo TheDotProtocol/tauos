@@ -1,12 +1,27 @@
 'use client';
 
+import { Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import TauCloudAppShell from '@/components/taucloud/shared/TauCloudAppShell';
 import FolderBrowser from '@/components/taucloud/shared/FolderBrowser';
 import UploadDropZone from '@/components/taucloud/shared/UploadDropZone';
 import { useTauCloudSession } from '@/hooks/useTauCloudSession';
 
+function UploadLoading() {
+  return (
+    <div className="flex min-h-screen items-center justify-center bg-[#0d0d0f] text-[#71717a]">Loading...</div>
+  );
+}
+
 export default function TauCloudUploadPage() {
+  return (
+    <Suspense fallback={<UploadLoading />}>
+      <TauCloudUploadPageContent />
+    </Suspense>
+  );
+}
+
+function TauCloudUploadPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const folder = searchParams.get('folder') || 'root';
