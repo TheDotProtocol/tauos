@@ -2,6 +2,31 @@
   "defaultPassword": "ChangeMe-After-First-Login!",
   "mailboxes": [
     {
+      "email": "saleena@taumail.org",
+      "fullName": "Saleena Thamani",
+      "username": "saleena-mail"
+    },
+    {
+      "email": "arun@taumail.org",
+      "fullName": "Arun Kumar",
+      "username": "arun-mail"
+    },
+    {
+      "email": "senthil@taumail.org",
+      "fullName": "Senthil Kumar",
+      "username": "senthil-mail"
+    },
+    {
+      "email": "robb@taumail.org",
+      "fullName": "Robb Duran",
+      "username": "robb-mail"
+    },
+    {
+      "email": "oleg@taumail.org",
+      "fullName": "Oleg Novenski",
+      "username": "oleg-mail"
+    },
+    {
       "email": "ceo@thearholdings.group",
       "fullName": "AR Holdings CEO",
       "username": "arh-ceo"
