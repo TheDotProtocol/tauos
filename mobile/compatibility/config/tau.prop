@@ -1,0 +1,8 @@
+# Tau Compatibility Platform properties (M5.1)
+# Installed to /system/etc/tau.prop on device image
+
+ro.tau.platform=aosp-beta
+ro.tau.channel=beta
+ro.tau.version=1.0.0
+ro.tau.compatibility=1
+ro.tau.milestone=5.1

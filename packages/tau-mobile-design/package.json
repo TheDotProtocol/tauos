@@ -1,0 +1,15 @@
+{
+  "name": "@tau/mobile-design",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Tau Mobile design tokens — Figma source of truth (SyttNz970dAe4MSnkrCxdw)",
+  "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "typescript": "^5.4.0"
+  }
+}

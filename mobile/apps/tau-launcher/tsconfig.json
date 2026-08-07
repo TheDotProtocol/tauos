@@ -1,0 +1,11 @@
+{
+  "extends": "@react-native/typescript-config/tsconfig.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@tau/mobile-design": ["../../../packages/tau-mobile-design/src/index.ts"],
+      "@tau/core": ["../../../packages/tau-core/src/index.ts"]
+    }
+  },
+  "include": ["src/**/*", "index.js", "App.tsx"]
+}
