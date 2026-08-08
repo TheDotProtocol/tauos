@@ -1,6 +1,7 @@
 import type { ChatRequest, ChatResponse, StreamChunk, ProviderHealth, ModelCapability, AiProviderId } from './types';
 import { getProvider, pickAutoProvider, getConfiguredProviders, listAllModels, PROVIDER_CONFIGS } from './registry';
 import { trackUsage } from './usage';
+import { TAU_IDE_DEFAULT_SYSTEM_PROMPT } from './prompts';
 
 const MAX_RETRIES = 2;
 
@@ -14,7 +15,7 @@ export async function runAiChat(input: ChatRequest): Promise<ChatResponse> {
 
   const messages = input.messages[0]?.role === 'system'
     ? input.messages
-    : [{ role: 'system' as const, content: 'You are Tau AI on Tau IDE — privacy-first, helpful, precise.' }, ...input.messages];
+    : [{ role: 'system' as const, content: TAU_IDE_DEFAULT_SYSTEM_PROMPT }, ...input.messages];
 
   let lastError: Error | null = null;
 
@@ -90,6 +91,19 @@ export function getProviderMatrix() {
 }
 
 export { getUsageStats, getRecentUsage } from './usage';
+
+export { toModelSubstrate } from './substrate-bridge';
+export {
+  getSubstrate,
+  listSubstrates,
+  listConfiguredSubstrates,
+  createSubstrateRegistry,
+  vllmSubstrateStub,
+  getProviderSubstrateMetadata,
+  PROVIDER_SUBSTRATE_METADATA,
+} from './substrate-registry';
+export { createTauFoundationSubstrateStub, TAU_FOUNDATION_SUBSTRATE_ID } from '@tau/ai';
+export { TAU_IDE_DEFAULT_SYSTEM_PROMPT } from './prompts';
 
 // Re-export types for backward compatibility
 export type { AiProviderId as AiProvider, ChatMessage, ChatRequest, ChatResponse, ModelCapability as AiModelInfo } from './types';

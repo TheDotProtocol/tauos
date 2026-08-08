@@ -91,7 +91,7 @@ export default function TauAiProductPage() {
           </p>
           <div className="mt-8 flex flex-wrap justify-center gap-4">
             <Link
-              href={websiteRoutes.tauAi}
+              href={websiteRoutes.tauAiApp}
               className="rounded-lg bg-[#d4af37] px-6 py-3.5 text-[15px] font-bold text-[#0f0f0f] hover:bg-[#e0bc4a]"
             >
               Try Tau AI

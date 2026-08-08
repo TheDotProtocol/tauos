@@ -18,6 +18,9 @@ export const websiteRoutes = {
   tauDrive: '/products/tau-drive',
   tauIde: '/developers',
   tauAi: '/tauai',
+  /** Tau AI product app (Figma UI) — welcome → auth → home */
+  tauAiApp: '/tau-ai-app/welcome',
+  tauAiLogin: '/tau-ai-app/auth',
   tauCloud: '/taucloud',
   tauId: '/tauid',
   tauIdLogin: '/tauid/login',

@@ -77,6 +77,7 @@ export type AiProviderConfig = {
 };
 
 export interface AiProviderAdapter {
+  /** Gateway provider id — maps 1:1 to ModelSubstrate.id via substrate-bridge (AI-2). */
   id: AiProviderId;
   isConfigured(): boolean;
   listModels(): ModelCapability[];

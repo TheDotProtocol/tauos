@@ -1,0 +1,152 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://tau.local/schemas/tau-dataset-record-1.0.0.json",
+  "title": "TauDatasetRecord",
+  "description": "TF-1 canonical record schema for tau-dataset-v0.1",
+  "type": "object",
+  "required": [
+    "id",
+    "datasetVersion",
+    "schemaVersion",
+    "category",
+    "taskType",
+    "input",
+    "output",
+    "metadata",
+    "provenance",
+    "license",
+    "createdAt",
+    "updatedAt"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "id": { "type": "string", "format": "uuid" },
+    "datasetVersion": { "const": "tau-dataset-v0.1" },
+    "schemaVersion": { "const": "1.0.0" },
+    "category": {
+      "type": "string",
+      "enum": [
+        "GENERAL_INSTRUCTION",
+        "REASONING",
+        "CODING",
+        "TOOL_USE",
+        "PLANNING",
+        "MEMORY_CONTEXT",
+        "TRUTHFULNESS",
+        "UNCERTAINTY",
+        "PROVENANCE",
+        "PRIVACY",
+        "SECURITY",
+        "CORRECTION",
+        "CONSTITUTIONAL_BEHAVIOR",
+        "TAU_ECOSYSTEM",
+        "CONVERSATIONAL",
+        "EXECUTIVE_DECISION",
+        "MULTILINGUAL",
+        "FUTURE_MULTIMODAL"
+      ]
+    },
+    "taskType": { "type": "string", "minLength": 1 },
+    "input": { "type": "string", "minLength": 1 },
+    "output": { "type": "string", "minLength": 1 },
+    "systemContext": { "type": "string" },
+    "messages": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["role", "content"],
+        "properties": {
+          "role": { "enum": ["system", "user", "assistant"] },
+          "content": { "type": "string" }
+        }
+      }
+    },
+    "metadata": {
+      "type": "object",
+      "required": ["language", "modality", "difficulty"],
+      "properties": {
+        "language": { "type": "string" },
+        "modality": { "const": "text" },
+        "difficulty": { "enum": ["low", "medium", "high"] },
+        "qualityScore": { "type": "number", "minimum": 0, "maximum": 1 },
+        "safetyTags": { "type": "array", "items": { "type": "string" } },
+        "constitutionalTags": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "TRUTHFULNESS",
+              "UNCERTAINTY",
+              "TRANSPARENCY",
+              "USER_AUTONOMY",
+              "PRIVACY",
+              "SECURITY",
+              "PROVENANCE",
+              "CORRECTION",
+              "CAPABILITY_HONESTY",
+              "INSTRUCTION_HIERARCHY"
+            ]
+          }
+        },
+        "behaviorType": { "enum": ["good", "bad", "corrected", "uncertain"] },
+        "productContext": {
+          "enum": ["taumail", "tau-developer", "tau-ai", "general", null]
+        },
+        "taskSubtype": { "type": "string" }
+      }
+    },
+    "provenance": {
+      "type": "object",
+      "required": [
+        "type",
+        "source",
+        "transformation",
+        "synthetic",
+        "creationMethod",
+        "humanReviewed",
+        "reviewStatus",
+        "licenseStatus",
+        "legalStatus"
+      ],
+      "properties": {
+        "type": {
+          "enum": [
+            "TAU_CREATED",
+            "THIRD_PARTY_LICENSED",
+            "THIRD_PARTY_TRANSFORMED",
+            "TAU_SYNTHETIC",
+            "EXTERNAL_DATA",
+            "UNKNOWN"
+          ]
+        },
+        "source": { "type": "string" },
+        "transformation": { "type": "string" },
+        "synthetic": { "type": "boolean" },
+        "creationMethod": { "type": "string" },
+        "generatorModel": { "type": ["string", "null"] },
+        "humanReviewed": { "type": "boolean" },
+        "reviewStatus": { "enum": ["UNREVIEWED", "REVIEWED", "REJECTED"] },
+        "reviewer": { "type": ["string", "null"] },
+        "licenseStatus": {
+          "enum": ["CLEAR", "UNKNOWN", "REQUIRES_LEGAL_REVIEW", "RESTRICTED", "NOT_PERMITTED"]
+        },
+        "legalStatus": {
+          "enum": ["VERIFIED", "UNKNOWN", "REQUIRES_LEGAL_REVIEW"]
+        }
+      }
+    },
+    "license": {
+      "type": "object",
+      "required": ["status"],
+      "properties": {
+        "spdx": { "type": ["string", "null"] },
+        "status": {
+          "enum": ["CLEAR", "UNKNOWN", "REQUIRES_LEGAL_REVIEW", "RESTRICTED", "NOT_PERMITTED"]
+        },
+        "notes": { "type": "string" }
+      }
+    },
+    "split": { "enum": ["train", "validation", "test"] },
+    "createdAt": { "type": "string", "format": "date-time" },
+    "updatedAt": { "type": "string", "format": "date-time" }
+  }
+}

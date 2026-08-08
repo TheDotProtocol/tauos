@@ -164,8 +164,14 @@ tauos-desktop.iso
 new-website/sources/emergent/
 new-website/sources/replit/
 
-# Bulk mailbox provisioning (contains real addresses/passwords)
-scripts/mailboxes.json
+# Tau Foundation Model training checkpoints (TF-2+)
+checkpoints/
+
+datasets/tau-foundation/**/raw/**
+datasets/tau-foundation/**/*.parquet
+datasets/tau-foundation/**/*.zip
+datasets/tau-foundation/**/*.tar.gz
+
 scripts/mailboxes-provisioned.json
 
 # ── Repository restructure: never commit internal/build paths ──

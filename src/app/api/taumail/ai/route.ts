@@ -2,6 +2,7 @@ import { getPool } from '@/app/api/taumail/middleware/security';
 import { withTauMailAuth } from '@/lib/taumail/api-route';
 import { ensureDefaultWorkspaceData } from '@/lib/taumail/schema';
 import { runAiChat } from '@/lib/ai-gateway';
+import { runTauMailFoundationChat } from '@/lib/taumail/foundation-bridge';
 import { NextRequest, NextResponse } from 'next/server';
 
 export const dynamic = 'force-dynamic';
@@ -58,16 +59,35 @@ export async function POST(request: NextRequest) {
       .map((row) => ({ role: row.role as 'user' | 'assistant', content: row.content }));
 
     let assistantText = 'I processed your request. Check your inbox and calendar for related items.';
+    let integrationPath: 'foundation' | 'legacy' = 'foundation';
+    let integrationLevel = 'INTEGRATION_VERIFIED';
+
     try {
-      const result = await runAiChat({
+      const foundation = await runTauMailFoundationChat({
+        userId,
         messages: chatMessages,
         privacyMode: true,
       });
-      assistantText = result.message || assistantText;
-    } catch (error) {
-      console.error('[taumail/ai]', error);
-      assistantText =
-        'Tau AI is temporarily unavailable. Your message was saved — try again in a moment.';
+      assistantText = foundation.message || assistantText;
+      integrationPath = foundation.integrationPath;
+      integrationLevel = foundation.integrationLevel;
+    } catch (foundationError) {
+      console.warn('[taumail/ai] foundation path failed, falling back to legacy gateway', foundationError);
+      try {
+        const result = await runAiChat({
+          messages: chatMessages,
+          privacyMode: true,
+        });
+        assistantText = result.message || assistantText;
+        integrationPath = 'legacy';
+        integrationLevel = 'ADAPTER_VERIFIED';
+      } catch (error) {
+        console.error('[taumail/ai]', error);
+        assistantText =
+          'Tau AI is temporarily unavailable. Your message was saved — try again in a moment.';
+        integrationPath = 'legacy';
+        integrationLevel = 'ADAPTER_VERIFIED';
+      }
     }
 
     const saved = await pool.query(
@@ -83,6 +103,11 @@ export async function POST(request: NextRequest) {
         id: saved.rows[0].id,
         role: 'assistant',
         text: assistantText,
+      },
+      integration: {
+        path: integrationPath,
+        level: integrationLevel,
+        appId: 'taumail',
       },
     });
   });

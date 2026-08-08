@@ -170,7 +170,10 @@ export async function fetchTauIdProfile(): Promise<{
   user: TauIdProfile;
   profiles: IdentityProfile[];
 } | null> {
-  const res = await fetch('/api/tauid/user/profile', { headers: authHeaders() });
+  const res = await fetch('/api/tauid/user/profile', {
+    headers: authHeaders(),
+    credentials: tauFetchCredentials,
+  });
   if (!res.ok) return null;
   return res.json();
 }

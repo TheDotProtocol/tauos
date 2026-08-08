@@ -18,7 +18,8 @@
     "jsx": "preserve",
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "@tau/ai": ["./packages/tau-ai/src/index.ts"]
     },
     "plugins": [
       {

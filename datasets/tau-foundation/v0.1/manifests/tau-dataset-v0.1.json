@@ -1,0 +1,48 @@
+{
+  "datasetVersion": "tau-dataset-v0.1",
+  "schemaVersion": "1.0.0",
+  "validationVersion": "1.0.0",
+  "generatedAt": "2026-08-08T10:45:39.336Z",
+  "recordCounts": {
+    "total": 106,
+    "train": 97,
+    "validation": 4,
+    "test": 5
+  },
+  "categoryCounts": {
+    "CONSTITUTIONAL_BEHAVIOR": 17,
+    "TRUTHFULNESS": 2,
+    "UNCERTAINTY": 2,
+    "PROVENANCE": 4,
+    "TAU_ECOSYSTEM": 9,
+    "PRIVACY": 4,
+    "MEMORY_CONTEXT": 7,
+    "SECURITY": 5,
+    "CORRECTION": 2,
+    "CODING": 14,
+    "TOOL_USE": 10,
+    "REASONING": 9,
+    "CONVERSATIONAL": 4,
+    "PLANNING": 4,
+    "GENERAL_INSTRUCTION": 7,
+    "EXECUTIVE_DECISION": 3,
+    "MULTILINGUAL": 3
+  },
+  "provenanceCounts": {
+    "TAU_CREATED": 106
+  },
+  "licenseCounts": {
+    "CLEAR": 106
+  },
+  "contentHash": "b1ce998d01f0d116c814eece53d65214176efc7557793e5a6fb47387adc4c3d6",
+  "provenanceSummary": {
+    "tauCreated": 106,
+    "synthetic": 0,
+    "thirdParty": 0,
+    "requiresLegalReview": 0
+  },
+  "validationStatus": "PASS",
+  "sources": [
+    "curated/gold/seed-authors.jsonl"
+  ]
+}

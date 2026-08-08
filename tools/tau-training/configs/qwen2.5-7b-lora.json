@@ -1,0 +1,21 @@
+{
+  "adapter_id": "qwen2.5",
+  "base_model_id": "Qwen/Qwen2.5-7B-Instruct",
+  "base_model_revision": null,
+  "training_method": "qlora_sft",
+  "smoke_mode": false,
+  "max_seq_length": 4096,
+  "per_device_train_batch_size": 1,
+  "gradient_accumulation_steps": 8,
+  "learning_rate": 0.0002,
+  "num_train_epochs": 1,
+  "max_steps": -1,
+  "seed": 42,
+  "lora": {
+    "r": 32,
+    "lora_alpha": 64,
+    "lora_dropout": 0.05,
+    "bias": "none",
+    "task_type": "CAUSAL_LM"
+  }
+}
