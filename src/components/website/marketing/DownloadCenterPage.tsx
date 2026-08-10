@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 import ProductPageLayout from '@/components/website/product/shared/ProductPageLayout';
 import JourneyNav from '@/components/website/marketing/shared/JourneyNav';
 import JourneyFooter from '@/components/website/marketing/shared/JourneyFooter';
@@ -16,6 +17,9 @@ import {
   type DownloadManifest,
 } from '@/lib/downloads';
 import InstallWizard from '@/components/InstallWizard';
+import TauMailMobileDownloadSection from '@/components/website/product/shared/TauMailMobileDownloadSection';
+import { tauMailMobileDownloads } from '@/lib/taumail-mobile-downloads';
+import { websiteRoutes } from '@/lib/website/routes';
 
 const PLATFORM_MATRIX = [
   { platform: 'Windows', arch: 'x64', key: 'installer-windows-x64' },
@@ -135,6 +139,94 @@ export default function DownloadCenterPage() {
         </section>
       )}
 
+      <TauMailMobileDownloadSection id="taumail-mobile" />
+
+      <section className={`${inter.className} px-6 pb-12 md:px-20`}>
+        <div className="mx-auto max-w-[900px] rounded-lg border border-[#2a2820] bg-[#171717] p-8">
+          <h3 className="text-lg font-bold">Tau ecosystem mobile apps</h3>
+          <p className="mt-2 text-sm text-[#8e8e93]">
+            Tau Mail runs natively on Android and iOS. Use webmail in the browser anytime at taumail.org.
+          </p>
+          <div className="mt-6 overflow-x-auto rounded-lg border border-[#2a2a2a]">
+            <table className="w-full min-w-[640px] text-left text-sm">
+              <thead>
+                <tr className="border-b border-[#2a2a2a] bg-[#0f0f0f] text-[11px] font-bold uppercase text-[#d4af37]">
+                  <th className="px-4 py-3">App</th>
+                  <th className="px-4 py-3">Platform</th>
+                  <th className="px-4 py-3">Status</th>
+                  <th className="px-4 py-3">Download</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr className="border-b border-[#2a2a2a]">
+                  <td className="px-4 py-3 font-semibold">Tau Mail</td>
+                  <td className="px-4 py-3 text-[#8e8e93]">Android (APK)</td>
+                  <td className="px-4 py-3">
+                    <StatusBadge available={tauMailMobileDownloads.android.available} />
+                  </td>
+                  <td className="px-4 py-3">
+                    {tauMailMobileDownloads.android.available ? (
+                      <a
+                        href={tauMailMobileDownloads.android.url}
+                        className="font-semibold text-[#d4af37] underline"
+                        download={tauMailMobileDownloads.android.filename}
+                      >
+                        {tauMailMobileDownloads.android.buttonLabel}
+                      </a>
+                    ) : (
+                      <span className="text-[#666]">{tauMailMobileDownloads.android.buttonLabel} — release pending</span>
+                    )}
+                  </td>
+                </tr>
+                <tr className="border-b border-[#2a2a2a]">
+                  <td className="px-4 py-3 font-semibold">Tau Mail</td>
+                  <td className="px-4 py-3 text-[#8e8e93]">iOS</td>
+                  <td className="px-4 py-3">
+                    <StatusBadge available={tauMailMobileDownloads.ios.available} />
+                  </td>
+                  <td className="px-4 py-3">
+                    {tauMailMobileDownloads.ios.available ? (
+                      <a
+                        href={tauMailMobileDownloads.ios.url}
+                        className="font-semibold text-[#d4af37] underline"
+                        download={tauMailMobileDownloads.ios.filename}
+                      >
+                        {tauMailMobileDownloads.ios.buttonLabel}
+                      </a>
+                    ) : (
+                      <span className="text-[#666]">{tauMailMobileDownloads.ios.buttonLabel} — release pending</span>
+                    )}
+                  </td>
+                </tr>
+                <tr>
+                  <td className="px-4 py-3 font-semibold">TauTalk</td>
+                  <td className="px-4 py-3 text-[#8e8e93]">Android (APK)</td>
+                  <td className="px-4 py-3">
+                    <StatusBadge available={Boolean(artifactMap.get('tautalk-android-apk')?.available)} />
+                  </td>
+                  <td className="px-4 py-3">
+                    {artifactMap.get('tautalk-android-apk')?.available ? (
+                      <a
+                        href={artifactMap.get('tautalk-android-apk')!.url}
+                        className="font-semibold text-[#d4af37] underline"
+                        download
+                      >
+                        Download for Android
+                      </a>
+                    ) : (
+                      <span className="text-[#666]">—</span>
+                    )}
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <a href="/taumail#mobile-apps" className="mt-4 inline-block text-sm font-semibold text-[#d4af37] underline">
+            Tau Mail product page →
+          </a>
+        </div>
+      </section>
+
       <section className={`${inter.className} px-6 pb-12 md:px-20`}>
         <div className="mx-auto max-w-[900px]">
           <InstallWizard manifest={manifest} detected={detected} />
@@ -220,9 +312,9 @@ export default function DownloadCenterPage() {
               <a href="/tau-core/desktop/" className="text-sm font-semibold text-[#d4af37] underline">
                 Preview desktop shell
               </a>
-              <a href="/tau-core/legal/TauCore-EULA.md" className="text-sm font-semibold text-[#d4af37] underline">
+              <Link href={websiteRoutes.tauCoreEula} className="text-sm font-semibold text-[#d4af37] underline">
                 Tau Core EULA
-              </a>
+              </Link>
             </div>
           </div>
 
@@ -274,9 +366,9 @@ export default function DownloadCenterPage() {
               <li>6. Create or sign in with Tau ID</li>
               <li>7. Arrive at the Tau Core homescreen</li>
             </ol>
-            <a href="/tau-core/legal/TauCore-EULA.md" className="mt-4 inline-block text-sm text-[#d4af37] underline">
+            <Link href={websiteRoutes.tauCoreEula} className="mt-4 inline-block text-sm text-[#d4af37] underline">
               Read the Tau Core EULA
-            </a>
+            </Link>
           </div>
         </div>
       </section>

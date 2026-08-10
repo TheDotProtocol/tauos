@@ -181,39 +181,6 @@ export function TauMailForgotPasswordPage() {
   );
 }
 
-export function TauMailTwoFactorPage() {
-  const router = useRouter();
-
-  return (
-    <TauMailAuthLayout>
-      <TauMailAuthHeader title="Two-Factor Authentication" subtitle="Enter the 6-digit code from your authenticator app." />
-      <div className="mt-8 flex justify-center gap-2">
-        {['4', '8', '2', '•', '•', '•'].map((digit, i) => (
-          <div
-            key={i}
-            className={`flex size-12 items-center justify-center rounded-lg border text-lg font-semibold ${
-              digit === '•' ? 'border-[rgba(255,255,255,0.05)] bg-[#0b0810] text-[#71717a]' : 'border-[#d4a843] bg-[rgba(212,168,67,0.08)] text-white'
-            }`}
-          >
-            {digit}
-          </div>
-        ))}
-      </div>
-      <button
-        type="button"
-        onClick={() => router.push('/taumail/inbox')}
-        className="mt-8 w-full rounded-lg bg-[#d4a843] py-3 text-sm font-semibold text-[#070708]"
-      >
-        Verify Code
-      </button>
-      <p className={`${geistMono.className} mt-4 text-center text-[11px] text-[#71717a]`}>Code expires in 04:32</p>
-      <Link href="/taumail/login" className="mt-4 block text-center text-[13px] font-semibold text-[#d4a843] underline">
-        Use backup code instead
-      </Link>
-    </TauMailAuthLayout>
-  );
-}
-
 export function TauMailWelcomePage() {
   const router = useRouter();
 

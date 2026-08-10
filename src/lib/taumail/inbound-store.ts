@@ -6,6 +6,7 @@ import {
 } from '@/lib/taumail/inbound-html';
 import { parseEmailAddress } from '@/config/mail-domains';
 import type { MailAttachmentPayload } from '@/lib/taumail-attachments';
+import { notifyUserOfNewEmail } from '@/lib/taumail/push';
 
 export type InboundUser = {
   id: string;
@@ -97,5 +98,15 @@ export async function storeInboundEmail(input: {
     ],
   );
 
-  return result.rows[0];
+  const row = result.rows[0];
+
+  if (!input.isSpam) {
+    notifyUserOfNewEmail(String(input.userId), {
+      emailId: row.id,
+      subject: input.subject || 'No Subject',
+      fromLabel: senderName || fromEmail,
+    }).catch((err) => console.warn('[inbound] push notify failed:', err));
+  }
+
+  return row;
 }

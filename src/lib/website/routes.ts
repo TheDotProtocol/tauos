@@ -43,6 +43,7 @@ export const websiteRoutes = {
   governance: '/governance',
   privacy: '/legal/privacy',
   terms: '/legal/terms',
+  tauCoreEula: '/legal/tau-core-eula',
   cookies: '/legal/cookies',
   security: '/enterprise/security',
   login: '/developers/login',

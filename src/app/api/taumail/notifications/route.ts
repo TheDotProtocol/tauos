@@ -29,7 +29,7 @@ export async function GET(request: NextRequest) {
     const notifications = result.rows.map((row) => ({
       id: row.id,
       title: row.title,
-      meta: row.meta || formatMeta(row.created_at),
+      meta: formatMeta(row.created_at),
       tone: row.tone || 'info',
       isRead: row.is_read,
     }));

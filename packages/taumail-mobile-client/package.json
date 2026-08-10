@@ -1,0 +1,22 @@
+{
+  "name": "@tau/taumail-mobile-client",
+  "version": "0.1.0",
+  "private": true,
+  "description": "TauMail mobile API client — consumes existing TauMail/Tau ID backend",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
+  "peerDependencies": {
+    "@react-native-community/netinfo": ">=11.0.0",
+    "react-native-encrypted-storage": ">=4.0.0"
+  },
+  "peerDependenciesMeta": {
+    "@react-native-community/netinfo": { "optional": true },
+    "react-native-encrypted-storage": { "optional": true }
+  },
+  "devDependencies": {
+    "typescript": "^5.4.0"
+  }
+}

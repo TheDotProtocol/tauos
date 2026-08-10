@@ -134,6 +134,32 @@
       "description": "ARM64 .deb for Raspberry Pi / ARM servers (includes boot ISO + Tau Core UI)"
     },
     {
+      "id": "taumail-android-apk",
+      "label": "Tau Mail for Android (Public Beta)",
+      "platform": "android",
+      "arch": "universal",
+      "kind": "package",
+      "filename": "TauMail-1.0.0-beta.apk",
+      "url": "https://github.com/TheDotProtocol/tauos/releases/download/taumail-v1.0.0-beta.1/TauMail-1.0.0-beta.apk",
+      "size": 0,
+      "sha256": "",
+      "available": true,
+      "description": "Privacy-first mail · push notifications · com.taumail.mobile"
+    },
+    {
+      "id": "taumail-ios-ipa",
+      "label": "Tau Mail for iOS (Public Beta)",
+      "platform": "ios",
+      "arch": "universal",
+      "kind": "package",
+      "filename": "TauMail-1.0.0-beta.ipa",
+      "url": "https://github.com/TheDotProtocol/tauos/releases/download/taumail-v1.0.0-beta.1/TauMail-1.0.0-beta.ipa",
+      "size": 0,
+      "sha256": "",
+      "available": true,
+      "description": "Native iPhone app · com.taumail.mobile"
+    },
+    {
       "id": "tautalk-android-apk",
       "label": "TauTalk for Android (Public Beta)",
       "platform": "android",

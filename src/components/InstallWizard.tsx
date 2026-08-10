@@ -3,14 +3,20 @@
 import { useMemo, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  Download, CheckCircle, Copy, ArrowRight, ArrowLeft, Monitor, Laptop, Server, Rocket,
+  Download,
+  CheckCircle,
+  Copy,
+  ArrowRight,
+  ArrowLeft,
+  Monitor,
+  Laptop,
+  Server,
+  Rocket,
 } from 'lucide-react';
 import {
-  detectPlatform,
   pickBestArtifact,
   formatBytes,
   type DownloadManifest,
-  type DownloadArtifact,
   type DetectedPlatform,
 } from '@/lib/downloads';
 
@@ -73,21 +79,21 @@ export default function InstallWizard({ manifest, detected }: Props) {
     <motion.div
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
-      className="mb-12 bg-gradient-to-br from-purple-900/20 to-gray-900/40 border border-purple-500/30 rounded-2xl p-6 sm:p-8"
+      className="mb-12 rounded-xl border border-[#d4af37]/30 bg-[#171717] p-6 sm:p-8 shadow-[0_12px_24px_rgba(212,175,55,0.06)]"
     >
-      <div className="flex items-center gap-2 mb-6">
-        <Rocket className="w-5 h-5 text-purple-400" />
+      <div className="mb-6 flex items-center gap-2">
+        <Rocket className="size-5 text-[#d4af37]" />
         <h2 className="text-xl font-bold text-white">One-click install wizard</h2>
-        <span className="text-xs px-2 py-0.5 rounded-full bg-purple-500/20 text-purple-300 ml-auto">
+        <span className="ml-auto rounded-full bg-[#3a3114] px-2 py-0.5 text-xs font-semibold text-[#d4af37]">
           Public Beta
         </span>
       </div>
 
-      <div className="flex gap-2 mb-8">
+      <div className="mb-8 flex gap-2">
         {[1, 2, 3, 4].map((s) => (
           <div
             key={s}
-            className={`h-1 flex-1 rounded-full ${step >= s ? 'bg-purple-500' : 'bg-gray-700'}`}
+            className={`h-1 flex-1 rounded-full ${step >= s ? 'bg-[#d4af37]' : 'bg-[#2a2a2a]'}`}
           />
         ))}
       </div>
@@ -95,59 +101,80 @@ export default function InstallWizard({ manifest, detected }: Props) {
       <AnimatePresence mode="wait">
         {step === 1 && (
           <motion.div key="s1" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-            <h3 className="text-lg font-semibold text-white mb-2">Step 1 — Detect platform</h3>
-            <p className="text-gray-400 text-sm mb-4">
+            <h3 className="mb-2 text-lg font-semibold text-white">Step 1 — Detect platform</h3>
+            <p className="mb-4 text-sm text-[#8e8e93]">
               We detected your system automatically. Confirm or pick another build below.
             </p>
-            <div className="flex items-center gap-3 p-4 bg-gray-800/50 rounded-xl border border-gray-700">
-              <Icon className="w-8 h-8 text-purple-400" />
+            <div className="flex items-center gap-3 rounded-xl border border-[#2a2820] bg-[#0f0f0f] p-4">
+              <Icon className="size-8 text-[#d4af37]" />
               <div>
-                <p className="text-white font-medium">{detected?.label ?? 'Unknown platform'}</p>
-                <p className="text-xs text-gray-500">Version {manifest.version}</p>
+                <p className="font-medium text-white">{detected?.label ?? 'Unknown platform'}</p>
+                <p className="text-xs text-[#666]">Version {manifest.version}</p>
               </div>
             </div>
             <button
+              type="button"
               onClick={() => setStep(2)}
-              className="mt-6 flex items-center gap-2 px-6 py-3 bg-purple-500 text-white rounded-lg font-semibold"
+              className="mt-6 flex items-center gap-2 rounded-lg bg-[#d4af37] px-6 py-3 font-semibold text-[#0f0f0f] hover:bg-[#e0bc4a]"
             >
-              Continue <ArrowRight className="w-4 h-4" />
+              Continue <ArrowRight className="size-4" />
             </button>
           </motion.div>
         )}
 
         {step === 2 && (
           <motion.div key="s2" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-            <h3 className="text-lg font-semibold text-white mb-2">Step 2 — Download</h3>
+            <h3 className="mb-2 text-lg font-semibold text-white">Step 2 — Download</h3>
             {artifact?.available ? (
               <>
-                <p className="text-gray-400 text-sm mb-4">
-                  Recommended: <strong className="text-white">{artifact.label}</strong> ({formatBytes(artifact.size)})
+                <p className="mb-4 text-sm text-[#8e8e93]">
+                  Recommended: <strong className="text-white">{artifact.label}</strong> (
+                  {formatBytes(artifact.size)})
                 </p>
                 <a
                   href={artifact.url}
                   download={artifact.filename}
-                  className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg font-semibold mb-4"
+                  className="mb-4 inline-flex items-center gap-2 rounded-lg bg-[#d4af37] px-6 py-3 font-semibold text-[#0f0f0f] hover:bg-[#e0bc4a]"
                 >
-                  <Download className="w-5 h-5" /> Download {artifact.label}
+                  <Download className="size-5" /> Download {artifact.label}
                 </a>
-                <div className="flex items-center gap-2 text-xs text-gray-500 font-mono break-all">
-                  SHA256: {artifact.sha256.slice(0, 24)}…
-                  <button onClick={copySha} className="p-1 hover:text-white" title="Copy SHA256">
-                    {copied ? <CheckCircle className="w-4 h-4 text-green-400" /> : <Copy className="w-4 h-4" />}
-                  </button>
-                </div>
+                {artifact.sha256 ? (
+                  <div className="flex items-center gap-2 break-all font-mono text-xs text-[#666]">
+                    SHA256: {artifact.sha256.slice(0, 24)}…
+                    <button
+                      type="button"
+                      onClick={copySha}
+                      className="p-1 hover:text-[#d4af37]"
+                      title="Copy SHA256"
+                    >
+                      {copied ? (
+                        <CheckCircle className="size-4 text-emerald-400" />
+                      ) : (
+                        <Copy className="size-4" />
+                      )}
+                    </button>
+                  </div>
+                ) : null}
               </>
             ) : (
-              <p className="text-amber-400 text-sm mb-4">
+              <p className="mb-4 text-sm text-[#d4af37]">
                 No installer available for {detected?.label}. Choose another platform from the list below.
               </p>
             )}
-            <div className="flex gap-2 mt-6">
-              <button onClick={() => setStep(1)} className="flex items-center gap-1 px-4 py-2 bg-gray-700 rounded-lg">
-                <ArrowLeft className="w-4 h-4" /> Back
+            <div className="mt-6 flex gap-2">
+              <button
+                type="button"
+                onClick={() => setStep(1)}
+                className="flex items-center gap-1 rounded-lg border border-[#2a2820] bg-[#0f0f0f] px-4 py-2 hover:border-[#d4af37]"
+              >
+                <ArrowLeft className="size-4" /> Back
               </button>
-              <button onClick={() => setStep(3)} className="flex items-center gap-1 px-6 py-2 bg-purple-500 rounded-lg font-semibold">
-                Continue <ArrowRight className="w-4 h-4" />
+              <button
+                type="button"
+                onClick={() => setStep(3)}
+                className="flex items-center gap-1 rounded-lg bg-[#d4af37] px-6 py-2 font-semibold text-[#0f0f0f] hover:bg-[#e0bc4a]"
+              >
+                Continue <ArrowRight className="size-4" />
               </button>
             </div>
           </motion.div>
@@ -155,18 +182,26 @@ export default function InstallWizard({ manifest, detected }: Props) {
 
         {step === 3 && (
           <motion.div key="s3" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-            <h3 className="text-lg font-semibold text-white mb-2">Step 3 — Install</h3>
-            <ol className="list-decimal list-inside space-y-2 text-gray-300 text-sm mb-6">
+            <h3 className="mb-2 text-lg font-semibold text-white">Step 3 — Install</h3>
+            <ol className="mb-6 list-inside list-decimal space-y-2 text-sm text-[#a0a0a0]">
               {installInstructions(artifact?.platform ?? detected?.platform ?? 'linux').map((line) => (
                 <li key={line}>{line}</li>
               ))}
             </ol>
             <div className="flex gap-2">
-              <button onClick={() => setStep(2)} className="flex items-center gap-1 px-4 py-2 bg-gray-700 rounded-lg">
-                <ArrowLeft className="w-4 h-4" /> Back
+              <button
+                type="button"
+                onClick={() => setStep(2)}
+                className="flex items-center gap-1 rounded-lg border border-[#2a2820] bg-[#0f0f0f] px-4 py-2 hover:border-[#d4af37]"
+              >
+                <ArrowLeft className="size-4" /> Back
               </button>
-              <button onClick={() => setStep(4)} className="flex items-center gap-1 px-6 py-2 bg-purple-500 rounded-lg font-semibold">
-                Continue <ArrowRight className="w-4 h-4" />
+              <button
+                type="button"
+                onClick={() => setStep(4)}
+                className="flex items-center gap-1 rounded-lg bg-[#d4af37] px-6 py-2 font-semibold text-[#0f0f0f] hover:bg-[#e0bc4a]"
+              >
+                Continue <ArrowRight className="size-4" />
               </button>
             </div>
           </motion.div>
@@ -174,9 +209,9 @@ export default function InstallWizard({ manifest, detected }: Props) {
 
         {step === 4 && (
           <motion.div key="s4" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-            <h3 className="text-lg font-semibold text-white mb-2">Step 4 — Launch TAU CORE</h3>
-            <p className="text-gray-400 text-sm mb-4">Sign up for Tau ID, then open your apps:</p>
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            <h3 className="mb-2 text-lg font-semibold text-white">Step 4 — Launch Tau Core</h3>
+            <p className="mb-4 text-sm text-[#8e8e93]">Sign up for Tau ID, then open your apps:</p>
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
               {[
                 { href: '/tauid/register', label: 'Tau ID' },
                 { href: '/taumail', label: 'Tau Mail' },
@@ -188,14 +223,18 @@ export default function InstallWizard({ manifest, detected }: Props) {
                 <a
                   key={href}
                   href={href}
-                  className="p-3 text-center bg-gray-800/60 border border-gray-700 rounded-lg text-sm text-white hover:border-purple-400 transition-colors"
+                  className="rounded-lg border border-[#2a2820] bg-[#0f0f0f] p-3 text-center text-sm text-white transition-colors hover:border-[#d4af37] hover:text-[#d4af37]"
                 >
                   {label}
                 </a>
               ))}
             </div>
-            <button onClick={() => setStep(3)} className="mt-6 flex items-center gap-1 px-4 py-2 bg-gray-700 rounded-lg">
-              <ArrowLeft className="w-4 h-4" /> Back
+            <button
+              type="button"
+              onClick={() => setStep(3)}
+              className="mt-6 flex items-center gap-1 rounded-lg border border-[#2a2820] bg-[#0f0f0f] px-4 py-2 hover:border-[#d4af37]"
+            >
+              <ArrowLeft className="size-4" /> Back
             </button>
           </motion.div>
         )}

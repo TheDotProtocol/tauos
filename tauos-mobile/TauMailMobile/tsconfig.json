@@ -1,0 +1,21 @@
+{
+  "extends": "@tsconfig/react-native/tsconfig.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@tau/taumail-mobile-client": ["../../packages/taumail-mobile-client/src/index.ts"],
+      "@tau/taumail-mobile-client/*": ["../../packages/taumail-mobile-client/src/*"],
+      "*": ["src/*"]
+    }
+  },
+  "include": [
+    "src/**/*",
+    "index.js"
+  ],
+  "exclude": [
+    "node_modules",
+    "babel.config.js",
+    "metro.config.js",
+    "jest.config.js"
+  ]
+} 

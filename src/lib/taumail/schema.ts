@@ -16,6 +16,18 @@ export async function ensureTauMailSchema(pool: Pool): Promise<void> {
     ALTER TABLE users ADD COLUMN IF NOT EXISTS timezone VARCHAR(100);
     ALTER TABLE users ADD COLUMN IF NOT EXISTS storage_used_bytes BIGINT DEFAULT 0;
     ALTER TABLE users ADD COLUMN IF NOT EXISTS storage_quota_bytes BIGINT DEFAULT 268435456000;
+    ALTER TABLE users ADD COLUMN IF NOT EXISTS push_notifications_enabled BOOLEAN DEFAULT TRUE;
+
+    CREATE TABLE IF NOT EXISTS taumail_push_devices (
+      id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+      user_id VARCHAR(255) NOT NULL,
+      device_id VARCHAR(255) NOT NULL,
+      platform VARCHAR(20) NOT NULL DEFAULT 'unknown',
+      push_token TEXT,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      UNIQUE(user_id, device_id)
+    );
 
     CREATE TABLE IF NOT EXISTS email_drafts (
       id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
@@ -36,6 +48,11 @@ export async function ensureTauMailSchema(pool: Pool): Promise<void> {
       email VARCHAR(255) NOT NULL,
       role VARCHAR(255),
       verified BOOLEAN DEFAULT FALSE,
+      phone VARCHAR(50),
+      phone_country_code VARCHAR(10) DEFAULT '+1',
+      tau_id VARCHAR(255),
+      organization VARCHAR(255),
+      designation VARCHAR(255),
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     );
 
@@ -83,8 +100,15 @@ export async function ensureTauMailSchema(pool: Pool): Promise<void> {
     CREATE INDEX IF NOT EXISTS idx_taumail_tasks_user ON taumail_tasks(user_id);
     CREATE INDEX IF NOT EXISTS idx_taumail_calendar_user ON taumail_calendar_events(user_id);
     CREATE INDEX IF NOT EXISTS idx_taumail_notifications_user ON taumail_notifications(user_id);
+    CREATE INDEX IF NOT EXISTS idx_taumail_push_devices_user ON taumail_push_devices(user_id);
     CREATE INDEX IF NOT EXISTS idx_taumail_ai_messages_user ON taumail_ai_messages(user_id);
     CREATE INDEX IF NOT EXISTS idx_incoming_emails_deleted ON incoming_emails(user_id, is_deleted);
+
+    ALTER TABLE taumail_contacts ADD COLUMN IF NOT EXISTS phone VARCHAR(50);
+    ALTER TABLE taumail_contacts ADD COLUMN IF NOT EXISTS phone_country_code VARCHAR(10) DEFAULT '+1';
+    ALTER TABLE taumail_contacts ADD COLUMN IF NOT EXISTS tau_id VARCHAR(255);
+    ALTER TABLE taumail_contacts ADD COLUMN IF NOT EXISTS organization VARCHAR(255);
+    ALTER TABLE taumail_contacts ADD COLUMN IF NOT EXISTS designation VARCHAR(255);
   `);
 
   schemaReady = true;
@@ -92,18 +116,6 @@ export async function ensureTauMailSchema(pool: Pool): Promise<void> {
 
 export async function ensureDefaultWorkspaceData(pool: Pool, userId: string): Promise<void> {
   await ensureTauMailSchema(pool);
-
-  const contacts = await pool.query('SELECT COUNT(*)::int AS count FROM taumail_contacts WHERE user_id = $1', [userId]);
-  if (contacts.rows[0].count === 0) {
-    await pool.query(
-      `INSERT INTO taumail_contacts (user_id, name, email, role, verified) VALUES
-        ($1, 'Sariel Tau', 'sariel@tau.org', 'Protocol Lead', true),
-        ($1, 'Director Vance', 'vance@tau.engineering', 'Grid Operations', true),
-        ($1, 'Aetheria Labs', 'team@aetheria.net', 'Performance Node', false),
-        ($1, 'Epsilon Cargo', 'cargo@epsilon.net', 'Logistics', true)`,
-      [userId],
-    );
-  }
 
   const tasks = await pool.query('SELECT COUNT(*)::int AS count FROM taumail_tasks WHERE user_id = $1', [userId]);
   if (tasks.rows[0].count === 0) {
@@ -129,18 +141,6 @@ export async function ensureDefaultWorkspaceData(pool: Pool, userId: string): Pr
         ($1, 'Epsilon Cargo Dispatch', 'Terminal Block D', '2026-10-28 14:00:00', '2026-10-28 15:00:00', 'gold'),
         ($1, 'Node Handshake Debug', 'Security Subsystem', '2026-10-28 16:30:00', '2026-10-28 17:30:00', 'purple'),
         ($1, 'Cargo Dispatch', NULL, '2026-10-30 11:00:00', '2026-10-30 12:00:00', 'purple')`,
-      [userId],
-    );
-  }
-
-  const notifications = await pool.query('SELECT COUNT(*)::int AS count FROM taumail_notifications WHERE user_id = $1', [userId]);
-  if (notifications.rows[0].count === 0) {
-    await pool.query(
-      `INSERT INTO taumail_notifications (user_id, title, meta, tone) VALUES
-        ($1, 'Node security handshake successful', '4m ago · Security', 'success'),
-        ($1, 'Springfield hub failsafe triggered', '12m ago · Grid', 'danger'),
-        ($1, 'New message from Sariel Tau', '28m ago · Inbox', 'info'),
-        ($1, 'Storage at 57% capacity', '1h ago · Storage', 'warning')`,
       [userId],
     );
   }

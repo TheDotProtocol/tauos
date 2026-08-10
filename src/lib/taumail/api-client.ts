@@ -214,6 +214,14 @@ export async function loginTauMail(email: string, password: string) {
   const data = await res.json();
   if (!res.ok) return { ok: false as const, error: data.error || 'Login failed' };
 
+  if (data.requires2fa && data.mfaToken) {
+    return {
+      ok: true as const,
+      requires2fa: true as const,
+      mfaToken: data.mfaToken as string,
+    };
+  }
+
   persistTauSession(data.token, {
     id: data.user.id,
     username: data.user.username,
@@ -223,6 +231,54 @@ export async function loginTauMail(email: string, password: string) {
   });
   localStorage.removeItem('tauos_demo_mode');
   return { ok: true as const, demo: false };
+}
+
+export async function verifyTauMail2fa(mfaToken: string, code: string) {
+  const res = await fetch('/api/tauid/auth/verify-2fa', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    credentials: tauFetchCredentials,
+    body: JSON.stringify({ mfaToken, code }),
+  });
+  const data = await res.json();
+  if (!res.ok) return { ok: false as const, error: data.error || 'Verification failed' };
+  if (data.token && data.user) {
+    persistTauSession(data.token, {
+      id: data.user.id,
+      username: data.user.username,
+      email: data.user.email,
+      fullName: data.user.fullName,
+    });
+  }
+  return { ok: true as const };
+}
+
+export async function searchTauMailEmails(
+  query: string,
+  folder: 'inbox' | 'sent' | 'all' = 'all',
+): Promise<TauMailEmail[]> {
+  const token = getStoredToken();
+  if (isDemoSession(token)) {
+    const q = query.trim().toLowerCase();
+    if (!q) return [];
+    return getDemoInbox()
+      .map(mapDemoInbox)
+      .filter(
+        (e) =>
+          e.subject.toLowerCase().includes(q) ||
+          e.body.toLowerCase().includes(q) ||
+          e.sender.toLowerCase().includes(q),
+      );
+  }
+
+  const params = new URLSearchParams({ q: query, folder });
+  const res = await tauFetch(`/api/taumail/emails/search?${params.toString()}`, { headers: authHeaders() });
+  if (!res.ok) throw new Error('Search failed');
+  const data = await res.json();
+  return (data.emails || []).map((row: Record<string, unknown>) => {
+    if (row.folder === 'sent') return mapApiSentEmail(row);
+    return mapApiInboxEmail(row);
+  });
 }
 
 export async function sendTauMail(payload: {

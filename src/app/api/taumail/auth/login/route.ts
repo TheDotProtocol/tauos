@@ -1,6 +1,8 @@
 import { getPool } from '@/lib/db-pool';
 import { NextRequest, NextResponse } from 'next/server';
 import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
+import { getSsoSecret } from '@/lib/tau-auth';
 import { attachAuthSession } from '@/lib/tau-session';
 
 // Database connection - production ready with enhanced error handling
@@ -88,6 +90,7 @@ export async function POST(request: NextRequest) {
     // Query user from database with organization info
     const result = await getPool().query(
       `SELECT u.id, u.username, u.email, u.password_hash, u.full_name, u.avatar_url, u.is_active, u.organization_id,
+              u.mfa_enabled, u.mfa_secret,
               o.name as organization_name, o.domain as organization_domain
        FROM users u 
        LEFT JOIN organizations o ON u.organization_id = o.id 
@@ -116,9 +119,22 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Invalid credentials' }, { status: 401 });
     }
 
-    // Clear failed attempts on successful login
+    // Clear failed attempts on successful password verification
     const key = `login:${clientIP}:${sanitizedEmail}`;
     loginAttempts.delete(key);
+
+    if (user.mfa_enabled && user.mfa_secret) {
+      const mfaToken = jwt.sign(
+        { userId: user.id, purpose: 'tauid_mfa' },
+        getSsoSecret(),
+        { expiresIn: '5m' },
+      );
+      return NextResponse.json({
+        requires2fa: true,
+        mfaToken,
+        message: 'Two-factor authentication required',
+      });
+    }
 
     // Update last login
     await getPool().query(

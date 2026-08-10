@@ -10,6 +10,7 @@ import {
 } from '@/lib/taumail-attachment-storage';
 import { isAllowedMailDomain, parseEmailAddress } from '@/config/mail-domains';
 import { resolveTauMailAvatarUrl } from '@/lib/taumail/profile-server';
+import { notifyUserOfNewEmail } from '@/lib/taumail/push';
 
 async function deliverToInternalInboxes(
   fromEmail: string,
@@ -36,11 +37,12 @@ async function deliverToInternalInboxes(
     if (userResult.rows.length === 0) continue;
 
     const displayFrom = fromName ? `${fromName} <${fromEmail}>` : fromEmail;
-    await getPool().query(
+    const insertResult = await getPool().query(
       `INSERT INTO incoming_emails (
           user_id, from_email, sender_name, subject, body, body_text, body_html,
           received_at, is_spam, headers, attachments
-        ) VALUES ($1, $2, $3, $4, $5, $6, $7, CURRENT_TIMESTAMP, false, $8, $9)`,
+        ) VALUES ($1, $2, $3, $4, $5, $6, $7, CURRENT_TIMESTAMP, false, $8, $9)
+        RETURNING id`,
       [
         userResult.rows[0].id,
         displayFrom,
@@ -53,6 +55,16 @@ async function deliverToInternalInboxes(
         JSON.stringify(attachments),
       ]
     );
+
+    const recipientId = String(userResult.rows[0].id);
+    const emailId = insertResult.rows[0]?.id;
+    if (emailId) {
+      notifyUserOfNewEmail(recipientId, {
+        emailId,
+        subject,
+        fromLabel: fromName || fromEmail,
+      }).catch((err) => console.warn('[internal-delivery] push notify failed:', err));
+    }
   }
 }
 

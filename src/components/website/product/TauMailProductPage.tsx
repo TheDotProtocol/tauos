@@ -9,6 +9,7 @@ import AppsSuiteFooter from '@/components/website/product/shared/AppsSuiteFooter
 import AppsSuiteNav from '@/components/website/product/shared/AppsSuiteNav';
 import ProductPageLayout from '@/components/website/product/shared/ProductPageLayout';
 import ProductSectionHeader from '@/components/website/product/shared/ProductSectionHeader';
+import TauMailMobileDownloadSection from '@/components/website/product/shared/TauMailMobileDownloadSection';
 
 const features = [
   {
@@ -97,6 +98,7 @@ export default function TauMailProductPage() {
               Already a Tau? Login
             </Link>
           </div>
+          <TauMailMobileDownloadSection variant="hero" />
 
           {/* Mail mockup — Figma 31:1472 */}
           <div className="mt-16 flex w-full max-w-[1000px] overflow-hidden rounded-xl border border-[#2a2820] bg-[#161616] shadow-[0_16px_32px_-4px_rgba(0,0,0,0.7)]">
@@ -142,6 +144,8 @@ export default function TauMailProductPage() {
           </div>
         </div>
       </section>
+
+      <TauMailMobileDownloadSection />
 
       <section className="border-y border-[#2a2820] bg-[#161616] px-6 py-24 md:px-20">
         <div className="mx-auto max-w-[1280px]">

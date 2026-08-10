@@ -1,0 +1,29 @@
+# Secrets — never commit
+android/app/google-services.json
+ios/TauMailMobile/GoogleService-Info.plist
+
+# Dependencies & builds
+node_modules/
+ios/Pods/
+ios/build/
+android/app/build/
+android/.gradle/
+android/build/
+*.apk
+*.ipa
+*.aab
+
+# Metro / RN
+.expo/
+*.jsbundle
+android/app/src/main/assets/index.android.bundle
+
+# OS / IDE
+.DS_Store
+.idea/
+*.xcuserstate
+xcuserdata/
+
+# Env
+.env
+.env.local

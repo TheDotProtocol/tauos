@@ -41,6 +41,11 @@ const nextConfig = {
         destination: '/products/tau-tablet#tau-glass',
         permanent: false,
       },
+      {
+        source: '/tau-core/legal/TauCore-EULA.md',
+        destination: '/legal/tau-core-eula',
+        permanent: true,
+      },
     ];
   },
   // Disable static optimization for dynamic API routes

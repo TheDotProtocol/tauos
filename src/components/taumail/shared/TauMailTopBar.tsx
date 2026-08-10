@@ -1,6 +1,8 @@
 'use client';
 
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 import { geistMono, geistSans, outfit } from '@/lib/website/fonts';
 import { tauMailAssets } from '@/lib/taumail/assets';
 import { MailIcon } from '@/components/taumail/shared/MailIcon';
@@ -12,15 +14,30 @@ type TauMailTopBarProps = {
 };
 
 export default function TauMailTopBar({ userName = 'Account', avatarUrl }: TauMailTopBarProps) {
+  const router = useRouter();
+  const [query, setQuery] = useState('');
+
+  const submitSearch = (event: React.FormEvent) => {
+    event.preventDefault();
+    const q = query.trim();
+    if (!q) return;
+    router.push(`/taumail/search?q=${encodeURIComponent(q)}`);
+  };
+
   return (
     <header
       className={`${geistSans.className} flex h-[72px] shrink-0 items-center justify-between border-b border-[rgba(255,255,255,0.05)] px-8 py-4`}
     >
-      <div className="flex w-[400px] items-center gap-2.5 rounded-lg border border-[rgba(255,255,255,0.05)] bg-[#121214] px-4 py-2">
+      <form onSubmit={submitSearch} className="flex w-[400px] items-center gap-2.5 rounded-lg border border-[rgba(255,255,255,0.05)] bg-[#121214] px-4 py-2">
         <MailIcon src={tauMailAssets.icons.search} size={14} />
-        <span className="flex-1 text-[13px] text-[#a1a1aa]">Search emails, commands, and cohorts...</span>
-        <span className={`${geistMono.className} rounded bg-[#070708] px-1.5 py-0.5 text-[10px] text-[#71717a]`}>⌘ K</span>
-      </div>
+        <input
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          placeholder="Search emails, subjects, senders..."
+          className="flex-1 bg-transparent text-[13px] text-white outline-none placeholder:text-[#71717a]"
+        />
+        <span className={`${geistMono.className} rounded bg-[#070708] px-1.5 py-0.5 text-[10px] text-[#71717a]`}>↵</span>
+      </form>
 
       <div className="flex items-center gap-4">
         <div className="flex items-center gap-1.5 rounded-md border border-[rgba(212,168,67,0.15)] bg-[rgba(212,168,67,0.08)] px-2 py-1">
