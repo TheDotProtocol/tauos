@@ -23,6 +23,7 @@ android/app/src/main/assets/index.android.bundle
 .idea/
 *.xcuserstate
 xcuserdata/
+android/local.properties
 
 # Env
 .env
