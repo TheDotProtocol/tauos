@@ -2,6 +2,7 @@
 const path = require('path');
 
 const nextConfig = {
+  transpilePackages: ['@tau/ai'],
   experimental: {
     serverComponentsExternalPackages: ['pg']
   },
@@ -77,6 +78,7 @@ const nextConfig = {
     config.resolve.alias = {
       ...config.resolve.alias,
       '@': path.resolve(__dirname, 'src'),
+      '@tau/ai': path.resolve(__dirname, 'packages/tau-ai/src/index.ts'),
     };
     if (dev && !isServer) {
       config.watchOptions = {

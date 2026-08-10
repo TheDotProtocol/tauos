@@ -17,6 +17,9 @@
 !/scripts/**/*
 !/public
 !/public/**/*
+!/packages
+!/packages/tau-ai
+!/packages/tau-ai/**/*
 # Large tracked binaries — host via GitHub Releases, not Vercel
 /public/downloads/*.iso
 /public/downloads/*.dmg

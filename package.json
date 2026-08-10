@@ -37,6 +37,7 @@
   },
   "dependencies": {
     "@heroicons/react": "^2.2.0",
+    "@tau/ai": "file:packages/tau-ai",
     "@monaco-editor/react": "^4.7.0",
     "@radix-ui/react-slot": "^1.3.0",
     "@radix-ui/react-toast": "^1.2.18",
